@@ -168,7 +168,7 @@ hzn.getSuspensionReasons();
 */
 
 // retrieve the array of hassets used
-hzn.getSynths({ network: 'testnet' }).map(({ name }) => name);
+hzn.getHassets({ network: 'testnet' }).map(({ name }) => name);
 // ['hUSD', 'hEUR', ...]
 
 // retrieve an object detailing the contract deployed to the given network.
