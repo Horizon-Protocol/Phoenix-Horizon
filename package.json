@@ -1,9 +1,9 @@
 {
-	"name": "synthetix",
+	"name": "@phoenix-global/horizon",
 	"version": "2.33.1",
 	"license": "MIT",
-	"author": "Synthetix",
-	"description": "The smart contracts which make up the Synthetix system. (synthetix.io)",
+	"author": "Horizon",
+	"description": "The smart contracts which make up the Horizon system. (phoenix.global)",
 	"scripts": {
 		"clean-install": "rm -rf build && rm ./package-lock.json && rm -rf node_modules/* && npm install",
 		"compile:legacy": "buidler compile --config legacy/buidler.legacy.js",
@@ -36,11 +36,11 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/Synthetixio/synthetix.git"
+		"url": "git+https://github.com/PhoenixGlobal/Phoenix-Horizon.git"
 	},
 	"keywords": [
-		"Synthetix",
-		"SNX",
+		"Horizon",
+		"HZN",
 		"sUSD",
 		"Solidity",
 		"Ethereum",
