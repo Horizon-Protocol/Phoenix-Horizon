@@ -20,7 +20,7 @@ contract Depot is Owned, Pausable, ReentrancyGuard, MixinResolver, IDepot {
     using SafeMath for uint;
     using SafeDecimalMath for uint;
 
-    bytes32 internal constant SNX = "SNX";
+    bytes32 internal constant SNX = "HZN";
     bytes32 internal constant ETH = "ETH";
 
     /* ========== STATE VARIABLES ========== */
@@ -284,7 +284,7 @@ contract Depot is Owned, Pausable, ReentrancyGuard, MixinResolver, IDepot {
         // And send them the SNX.
         synthetix().transfer(msg.sender, synthetixToSend);
 
-        emit Exchange("ETH", msg.value, "SNX", synthetixToSend);
+        emit Exchange("ETH", msg.value, "HZN", synthetixToSend);
 
         return synthetixToSend;
     }
@@ -342,7 +342,7 @@ contract Depot is Owned, Pausable, ReentrancyGuard, MixinResolver, IDepot {
         // And send them the SNX.
         synthetix().transfer(msg.sender, synthetixToSend);
 
-        emit Exchange("sUSD", synthAmount, "SNX", synthetixToSend);
+        emit Exchange("sUSD", synthAmount, "HZN", synthetixToSend);
 
         return synthetixToSend;
     }

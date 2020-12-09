@@ -51,7 +51,7 @@ const createRandomKeysAndRates = quantity => {
 contract('Exchange Rates', async accounts => {
 	const [deployerAccount, owner, oracle, accountOne, accountTwo] = accounts;
 	const [SNX, sJPY, sXTZ, sBNB, sUSD, sEUR, sAUD, fastGasPrice] = [
-		'SNX',
+		'HZN',
 		'sJPY',
 		'sXTZ',
 		'sBNB',
@@ -993,7 +993,7 @@ contract('Exchange Rates', async accounts => {
 			beforeEach(async () => {
 				// Send a price update to guarantee we're not depending on values from outside this test.
 				await instance.updateRates(
-					['sAUD', 'sEUR', 'SNX'].map(toBytes32),
+					['sAUD', 'sEUR', 'HZN'].map(toBytes32),
 					['0.5', '1.25', '0.1'].map(toUnit),
 					timestamp,
 					{ from: oracle }

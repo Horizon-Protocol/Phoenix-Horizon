@@ -30,7 +30,7 @@ contract('Depot @ovm-skip', async accounts => {
 
 	const [, owner, oracle, fundsWallet, address1, address2, address3] = accounts;
 
-	const [SNX, ETH] = ['SNX', 'ETH'].map(toBytes32);
+	const [SNX, ETH] = ['HZN', 'ETH'].map(toBytes32);
 
 	const approveAndDepositSynths = async (synthsToDeposit, depositor) => {
 		// Approve Transaction
@@ -807,7 +807,7 @@ contract('Depot @ovm-skip', async accounts => {
 					assert.eventEqual(exchangeEvent, 'Exchange', {
 						fromCurrency: 'ETH',
 						fromAmount: ethToSend,
-						toCurrency: 'SNX',
+						toCurrency: 'HZN',
 						toAmount: snxToPurchase,
 					});
 				});
@@ -871,7 +871,7 @@ contract('Depot @ovm-skip', async accounts => {
 					assert.eventEqual(exchangeEvent, 'Exchange', {
 						fromCurrency: 'sUSD',
 						fromAmount: synthsToSend,
-						toCurrency: 'SNX',
+						toCurrency: 'HZN',
 						toAmount: snxToPurchase,
 					});
 				});
@@ -1232,7 +1232,7 @@ contract('Depot @ovm-skip', async accounts => {
 			assert.eventEqual(exchangeEvent, 'Exchange', {
 				fromCurrency: 'sUSD',
 				fromAmount: synthsToSend,
-				toCurrency: 'SNX',
+				toCurrency: 'HZN',
 				toAmount: purchaseValueInSynthetix,
 			});
 		});

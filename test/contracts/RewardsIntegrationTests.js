@@ -52,7 +52,7 @@ contract('Rewards Integration Tests', async accounts => {
 		'sAUD',
 		'sEUR',
 		'sBTC',
-		'SNX',
+		'HZN',
 		'iBTC',
 		'sETH',
 		'ETH',

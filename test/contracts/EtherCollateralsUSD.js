@@ -128,8 +128,8 @@ contract('EtherCollateralsUSD', async accounts => {
 	before(async () => {
 		// Mock SNX, sUSD
 		[{ token: synthetix }, { token: sUSDSynth }] = await Promise.all([
-			mockToken({ accounts, name: 'Synthetix', symbol: 'SNX' }),
-			mockToken({ accounts, synth: 'sUSD', name: 'Synthetic USD', symbol: 'sUSD' }),
+			mockToken({ accounts, name: 'Horizon', symbol: 'HZN' }),
+			mockToken({ accounts, synth: 'sUSD', name: 'Horizon USD', symbol: 'sUSD' }),
 		]);
 
 		({

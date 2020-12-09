@@ -11,7 +11,7 @@ const { onlyGivenAddressCanInvoke, ensureOnlyExpectedMutativeFunctions } = requi
 const { toBytes32 } = require('../..');
 
 contract('SystemStatus', async accounts => {
-	const [SYSTEM, ISSUANCE, EXCHANGE, SYNTH] = ['System', 'Issuance', 'Exchange', 'Synth'].map(
+	const [SYSTEM, ISSUANCE, EXCHANGE, HASSET] = ['System', 'Issuance', 'Exchange', 'Hasset'].map(
 		toBytes32
 	);
 
@@ -92,7 +92,7 @@ contract('SystemStatus', async accounts => {
 				assert.eventEqual(txn, 'SystemSuspended', [givenReason]);
 			});
 			it('and the require checks all revert as expected', async () => {
-				const reason = 'Synthetix is suspended. Operation prohibited';
+				const reason = 'Horizon is suspended. Operation prohibited';
 				await assert.revert(systemStatus.requireSystemActive(), reason);
 				await assert.revert(systemStatus.requireIssuanceActive(), reason);
 				await assert.revert(systemStatus.requireSynthActive(toBytes32('sETH')), reason);
@@ -132,7 +132,7 @@ contract('SystemStatus', async accounts => {
 					assert.equal(isSystemUpgrading, true);
 				});
 				it('and the require checks all revert with system upgrading, as expected', async () => {
-					const reason = 'Synthetix is suspended, upgrade in progress... please stand by';
+					const reason = 'Horizon is suspended, upgrade in progress... please stand by';
 					await assert.revert(systemStatus.requireSystemActive(), reason);
 					await assert.revert(systemStatus.requireIssuanceActive(), reason);
 					await assert.revert(systemStatus.requireSynthActive(toBytes32('sETH')), reason);
@@ -628,7 +628,7 @@ contract('SystemStatus', async accounts => {
 
 		describe('when the owner adds an address to suspend only', () => {
 			beforeEach(async () => {
-				await systemStatus.updateAccessControl(SYNTH, account3, true, false, { from: owner });
+				await systemStatus.updateAccessControl(HASSET, account3, true, false, { from: owner });
 			});
 
 			it('other addresses still cannot suspend', async () => {
@@ -657,7 +657,7 @@ contract('SystemStatus', async accounts => {
 				it('and the synth require check reverts as expected', async () => {
 					await assert.revert(
 						systemStatus.requireSynthActive(sBTC),
-						'Synth is suspended. Operation prohibited'
+						'Hasset is suspended. Operation prohibited'
 					);
 				});
 				it('but not the others', async () => {
@@ -665,7 +665,7 @@ contract('SystemStatus', async accounts => {
 					await systemStatus.requireIssuanceActive();
 				});
 				it('and requireSynthsActive() reverts if one is the given synth', async () => {
-					const reason = 'One or more synths are suspended. Operation prohibited';
+					const reason = 'One or more hassets are suspended. Operation prohibited';
 					await assert.revert(systemStatus.requireSynthsActive(toBytes32('sETH'), sBTC), reason);
 					await assert.revert(systemStatus.requireSynthsActive(sBTC, toBytes32('sTRX')), reason);
 					await systemStatus.requireSynthsActive(toBytes32('sETH'), toBytes32('sUSD')); // no issues
@@ -679,7 +679,7 @@ contract('SystemStatus', async accounts => {
 				});
 				it('nor can it do any other restricted action', async () => {
 					await assert.revert(
-						systemStatus.updateAccessControl(SYNTH, account1, true, true, { from: account3 })
+						systemStatus.updateAccessControl(HASSET, account1, true, true, { from: account3 })
 					);
 					await assert.revert(systemStatus.suspendSystem('1', { from: account3 }));
 					await assert.revert(systemStatus.resumeSystem({ from: account3 }));
@@ -715,7 +715,7 @@ contract('SystemStatus', async accounts => {
 
 			describe('when the owner adds an address to resume only', () => {
 				beforeEach(async () => {
-					await systemStatus.updateAccessControl(SYNTH, account3, false, true, { from: owner });
+					await systemStatus.updateAccessControl(HASSET, account3, false, true, { from: owner });
 				});
 
 				it('other addresses still cannot resume', async () => {
@@ -789,11 +789,13 @@ contract('SystemStatus', async accounts => {
 		describe('when invoked by the owner', () => {
 			let txn;
 			beforeEach(async () => {
-				txn = await systemStatus.updateAccessControl(SYNTH, account3, true, false, { from: owner });
+				txn = await systemStatus.updateAccessControl(HASSET, account3, true, false, {
+					from: owner,
+				});
 			});
 
 			it('then it emits the expected event', () => {
-				assert.eventEqual(txn, 'AccessControlUpdated', [SYNTH, account3, true, false]);
+				assert.eventEqual(txn, 'AccessControlUpdated', [HASSET, account3, true, false]);
 			});
 
 			it('and the user can perform the action', async () => {
@@ -802,13 +804,13 @@ contract('SystemStatus', async accounts => {
 
 			describe('when overridden for the same user', () => {
 				beforeEach(async () => {
-					txn = await systemStatus.updateAccessControl(SYNTH, account3, false, false, {
+					txn = await systemStatus.updateAccessControl(HASSET, account3, false, false, {
 						from: owner,
 					});
 				});
 
 				it('then it emits the expected event', () => {
-					assert.eventEqual(txn, 'AccessControlUpdated', [SYNTH, account3, false, false]);
+					assert.eventEqual(txn, 'AccessControlUpdated', [HASSET, account3, false, false]);
 				});
 
 				it('and the user cannot perform the action', async () => {

@@ -25,7 +25,7 @@ const {
 } = require('../..');
 
 contract('DebtCache', async accounts => {
-	const [sUSD, sAUD, sEUR, SNX, sETH] = ['sUSD', 'sAUD', 'sEUR', 'SNX', 'sETH'].map(toBytes32);
+	const [sUSD, sAUD, sEUR, SNX, sETH] = ['sUSD', 'sAUD', 'sEUR', 'HZN', 'sETH'].map(toBytes32);
 	const synthKeys = [sUSD, sAUD, sEUR, sETH, SNX];
 
 	const [, owner, oracle, account1, account2] = accounts;
@@ -411,10 +411,7 @@ contract('DebtCache', async accounts => {
 
 			it('will not operate if the system is paused except by the owner', async () => {
 				await setStatus({ owner, systemStatus, section: 'System', suspend: true });
-				await assert.revert(
-					debtCache.takeDebtSnapshot({ from: account1 }),
-					'Synthetix is suspended'
-				);
+				await assert.revert(debtCache.takeDebtSnapshot({ from: account1 }), 'Horizon is suspended');
 				await debtCache.takeDebtSnapshot({ from: owner });
 			});
 		});
@@ -502,7 +499,7 @@ contract('DebtCache', async accounts => {
 				await setStatus({ owner, systemStatus, section: 'System', suspend: true });
 				await assert.revert(
 					debtCache.updateCachedSynthDebts([sAUD, sEUR], { from: account1 }),
-					'Synthetix is suspended'
+					'Horizon is suspended'
 				);
 				await debtCache.updateCachedSynthDebts([sAUD, sEUR], { from: owner });
 			});

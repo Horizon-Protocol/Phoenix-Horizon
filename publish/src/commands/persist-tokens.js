@@ -92,13 +92,13 @@ const persistTokens = async ({
 			chainId,
 			address,
 			symbol,
-			name: symbol === 'SNX' ? 'Synthetix Network Token' : `Synth ${name}`,
+			name: symbol === 'HZN' ? 'Phoenix Horizon' : `Synth ${name}`,
 			decimals,
-			logoURI: baseURI + (symbol === 'SNX' ? '/snx/SNX.svg' : `/synths/${symbol}.svg`),
+			logoURI: baseURI + (symbol === 'HZN' ? '/snx/SNX.svg' : `/synths/${symbol}.svg`),
 			tags: []
 				.concat(index ? 'index' : [])
 				.concat(inverted ? 'inverse' : [])
-				.concat(symbol !== 'SNX' ? 'synth' : []),
+				.concat(symbol !== 'HZN' ? 'synth' : []),
 		})),
 	};
 

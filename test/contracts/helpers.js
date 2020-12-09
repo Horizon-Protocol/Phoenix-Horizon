@@ -71,7 +71,7 @@ module.exports = {
 		const timestamp = await currentTime();
 
 		const [SNX, sAUD, sEUR, sBTC, iBTC, sETH, ETH] = [
-			'SNX',
+			'HZN',
 			'sAUD',
 			'sEUR',
 			'sBTC',

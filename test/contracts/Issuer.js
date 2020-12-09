@@ -27,7 +27,7 @@ const {
 } = require('../..');
 
 contract('Issuer (via Synthetix)', async accounts => {
-	const [sUSD, sAUD, sEUR, SNX, sETH, ETH] = ['sUSD', 'sAUD', 'sEUR', 'SNX', 'sETH', 'ETH'].map(
+	const [sUSD, sAUD, sEUR, SNX, sETH, ETH] = ['sUSD', 'sAUD', 'sEUR', 'HZN', 'sETH', 'ETH'].map(
 		toBytes32
 	);
 	const synthKeys = [sUSD, sAUD, sEUR, sETH, SNX];
@@ -506,7 +506,7 @@ contract('Issuer (via Synthetix)', async accounts => {
 
 			describe('maxIssuableSynths()', () => {
 				it("should correctly calculate a user's maximum issuable synths without prior issuance", async () => {
-					const rate = await exchangeRates.rateForCurrency(toBytes32('SNX'));
+					const rate = await exchangeRates.rateForCurrency(toBytes32('HZN'));
 					const issuedSynthetixs = web3.utils.toBN('200000');
 					await synthetix.transfer(account1, toUnit(issuedSynthetixs), {
 						from: owner,
@@ -971,7 +971,7 @@ contract('Issuer (via Synthetix)', async accounts => {
 							});
 						});
 					});
-					['SNX', 'sAUD', ['SNX', 'sAUD'], 'none'].forEach(type => {
+					['HZN', 'sAUD', ['HZN', 'sAUD'], 'none'].forEach(type => {
 						describe(`when ${type} is stale`, () => {
 							beforeEach(async () => {
 								await fastForward(
@@ -979,7 +979,7 @@ contract('Issuer (via Synthetix)', async accounts => {
 								);
 
 								// set all rates minus those to ignore
-								const ratesToUpdate = ['SNX']
+								const ratesToUpdate = ['HZN']
 									.concat(synths)
 									.filter(key => key !== 'sUSD' && ![].concat(type).includes(key));
 
@@ -1203,7 +1203,7 @@ contract('Issuer (via Synthetix)', async accounts => {
 						});
 					});
 
-					['SNX', 'sAUD', ['SNX', 'sAUD'], 'none'].forEach(type => {
+					['HZN', 'sAUD', ['HZN', 'sAUD'], 'none'].forEach(type => {
 						describe(`when ${type} is stale`, () => {
 							beforeEach(async () => {
 								await fastForward(
@@ -1211,7 +1211,7 @@ contract('Issuer (via Synthetix)', async accounts => {
 								);
 
 								// set all rates minus those to ignore
-								const ratesToUpdate = ['SNX']
+								const ratesToUpdate = ['HZN']
 									.concat(synths)
 									.filter(key => key !== 'sUSD' && ![].concat(type).includes(key));
 
@@ -1219,7 +1219,7 @@ contract('Issuer (via Synthetix)', async accounts => {
 
 								await exchangeRates.updateRates(
 									ratesToUpdate.map(toBytes32),
-									ratesToUpdate.map(rate => toUnit(rate === 'SNX' ? '0.1' : '1')),
+									ratesToUpdate.map(rate => toUnit(rate === 'HZN' ? '0.1' : '1')),
 									timestamp,
 									{
 										from: oracle,

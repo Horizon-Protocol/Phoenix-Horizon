@@ -33,7 +33,7 @@ contract('SynthetixEscrow', async accounts => {
 	// Run once at beginning - snapshots will take care of resetting this before each test
 	before(async () => {
 		// Mock SNX
-		({ token: synthetix } = await mockToken({ accounts, name: 'Synthetix', symbol: 'SNX' }));
+		({ token: synthetix } = await mockToken({ accounts, name: 'Horizon', symbol: 'HZN' }));
 
 		escrow = await setupContract({
 			accounts,

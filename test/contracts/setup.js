@@ -144,7 +144,7 @@ const setupContract = async ({
 			owner,
 			oracle,
 			tryGetAddressOf('AddressResolver'),
-			[toBytes32('SNX')],
+			[toBytes32('HZN')],
 			[toWei('0.2', 'ether')],
 		],
 		SynthetixState: [owner, ZERO_ADDRESS],
@@ -465,7 +465,7 @@ const setupContract = async ({
 				cache['ExchangeState'].setAssociatedContract(instance.address, { from: owner }),
 
 				cache['SystemStatus'].updateAccessControl(
-					toBytes32('Synth'),
+					toBytes32('Hasset'),
 					instance.address,
 					true,
 					false,

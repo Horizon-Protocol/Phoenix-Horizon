@@ -280,7 +280,7 @@ const deploy = async ({
 
 	try {
 		oldExrates = deployer.getExistingContract({ contract: 'ExchangeRates' });
-		currentSynthetixPrice = await oldExrates.methods.rateForCurrency(toBytes32('SNX')).call();
+		currentSynthetixPrice = await oldExrates.methods.rateForCurrency(toBytes32('HZN')).call();
 		if (!oracleExrates) {
 			oracleExrates = await oldExrates.methods.oracle().call();
 		}
@@ -501,7 +501,7 @@ const deploy = async ({
 			account,
 			oracleExrates,
 			addressOf(readProxyForResolver),
-			[toBytes32('SNX')],
+			[toBytes32('HZN')],
 			[currentSynthetixPrice],
 		],
 	});
@@ -736,9 +736,11 @@ const deploy = async ({
 			target: systemStatus,
 			read: 'accessControl',
 			readArg: [toBytes32('Synth'), addressOf(exchanger)],
+			// readArg: [toBytes32('Hasset'), addressOf(exchanger)],
 			expected: ({ canSuspend } = {}) => canSuspend,
 			write: 'updateAccessControl',
 			writeArg: [toBytes32('Synth'), addressOf(exchanger), true, false],
+			// writeArg: [toBytes32('Hasset'), addressOf(exchanger), true, false],
 		});
 	}
 

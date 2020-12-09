@@ -64,7 +64,7 @@ contract('FeePool', async accounts => {
 	};
 
 	// CURRENCIES
-	const [sUSD, sAUD, SNX] = ['sUSD', 'sAUD', 'SNX'].map(toBytes32);
+	const [sUSD, sAUD, SNX] = ['sUSD', 'sAUD', 'HZN'].map(toBytes32);
 
 	let feePool,
 		debtCache,
@@ -802,7 +802,7 @@ contract('FeePool', async accounts => {
 						});
 					});
 				});
-				['SNX', 'sAUD', ['SNX', 'sAUD'], 'none'].forEach(type => {
+				['HZN', 'sAUD', ['HZN', 'sAUD'], 'none'].forEach(type => {
 					describe(`when ${type} is stale`, () => {
 						beforeEach(async () => {
 							await fastForward(
@@ -810,7 +810,7 @@ contract('FeePool', async accounts => {
 							);
 
 							// set all rates minus those to ignore
-							const ratesToUpdate = ['SNX']
+							const ratesToUpdate = ['HZN']
 								.concat(synths)
 								.filter(key => key !== 'sUSD' && ![].concat(type).includes(key));
 
@@ -1301,7 +1301,7 @@ contract('FeePool', async accounts => {
 						});
 					});
 				});
-				['SNX', 'sAUD', ['SNX', 'sAUD'], 'none'].forEach(type => {
+				['HZN', 'sAUD', ['HZN', 'sAUD'], 'none'].forEach(type => {
 					describe(`when ${type} is stale`, () => {
 						beforeEach(async () => {
 							await fastForward(
@@ -1309,7 +1309,7 @@ contract('FeePool', async accounts => {
 							);
 
 							// set all rates minus those to ignore
-							const ratesToUpdate = ['SNX']
+							const ratesToUpdate = ['HZN']
 								.concat(synths)
 								.filter(key => key !== 'sUSD' && ![].concat(type).includes(key));
 
