@@ -5,12 +5,8 @@ const abiDecoder = require('abi-decoder');
 
 // load the data in explicitly (not programmatically) so webpack knows what to bundle
 const data = {
-	kovan: require('./publish/deployed/kovan'),
-	rinkeby: require('./publish/deployed/rinkeby'),
-	ropsten: require('./publish/deployed/ropsten'),
+	testnet: require('./publish/deployed/testnet'),
 	mainnet: require('./publish/deployed/mainnet'),
-	goerli: require('./publish/deployed/goerli'),
-	'goerli-ovm': require('./publish/deployed/goerli-ovm'),
 };
 
 const assets = require('./publish/assets.json');

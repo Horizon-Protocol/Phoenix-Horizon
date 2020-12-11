@@ -52,7 +52,7 @@ const ensureDeploymentPath = deploymentPath => {
 
 // Load up all contracts in the flagged source, get their deployed addresses (if any) and compiled sources
 const loadAndCheckRequiredSources = ({ deploymentPath, network }) => {
-	console.log(gray(`Loading the list of synths for ${network.toUpperCase()}...`));
+	console.log(gray(`Loading the list of hassets for ${network.toUpperCase()}...`));
 	const synthsFile = path.join(deploymentPath, SYNTHS_FILENAME);
 	const synths = getSynths({ network, deploymentPath });
 
@@ -109,7 +109,7 @@ const loadAndCheckRequiredSources = ({ deploymentPath, network }) => {
 };
 
 const getEtherscanLinkPrefix = network => {
-	return `https://${network !== 'mainnet' ? network + '.' : ''}etherscan.io`;
+	return `https://${network !== 'mainnet' ? network + '.' : ''}bscscan.com`;
 };
 
 const loadConnections = ({ network, useFork }) => {
@@ -130,9 +130,7 @@ const loadConnections = ({ network, useFork }) => {
 		network === 'mainnet' ? process.env.DEPLOY_PRIVATE_KEY : process.env.TESTNET_DEPLOY_PRIVATE_KEY;
 
 	const etherscanUrl =
-		network === 'mainnet'
-			? 'https://api.etherscan.io/api'
-			: `https://api-${network}.etherscan.io/api`;
+		network === 'mainnet' ? 'https://api.bscscan.com/api' : `https://${network}.bscscan.com/api`;
 
 	const etherscanLinkPrefix = getEtherscanLinkPrefix(network);
 

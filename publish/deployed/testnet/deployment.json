@@ -4,7 +4,7 @@
 			"name": "SafeDecimalMath",
 			"address": "0x21aB9DDb42cbcc06Ba220193B6219f4fa5a3a138",
 			"source": "SafeDecimalMath",
-			"link": "https://testnet.etherscan.io/address/0x21aB9DDb42cbcc06Ba220193B6219f4fa5a3a138",
+			"link": "https://testnet.bscscan.com/address/0x21aB9DDb42cbcc06Ba220193B6219f4fa5a3a138",
 			"timestamp": "2020-12-11T10:41:19.939Z",
 			"txn": "",
 			"network": "testnet"
@@ -13,7 +13,7 @@
 			"name": "Math",
 			"address": "0x346a41549f192d4437CEc75c2F137c6e71564b40",
 			"source": "Math",
-			"link": "https://testnet.etherscan.io/address/0x346a41549f192d4437CEc75c2F137c6e71564b40",
+			"link": "https://testnet.bscscan.com/address/0x346a41549f192d4437CEc75c2F137c6e71564b40",
 			"timestamp": "2020-12-11T10:41:26.246Z",
 			"txn": "",
 			"network": "testnet"
@@ -22,7 +22,7 @@
 			"name": "AddressResolver",
 			"address": "0xAc68Fdd5C2D6999BBE6bb9b875639B1aE3F25B52",
 			"source": "AddressResolver",
-			"link": "https://testnet.etherscan.io/address/0xAc68Fdd5C2D6999BBE6bb9b875639B1aE3F25B52",
+			"link": "https://testnet.bscscan.com/address/0xAc68Fdd5C2D6999BBE6bb9b875639B1aE3F25B52",
 			"timestamp": "2020-12-11T10:41:32.026Z",
 			"txn": "",
 			"network": "testnet"
@@ -31,7 +31,7 @@
 			"name": "ReadProxyAddressResolver",
 			"address": "0x49580D0E1a2F3AE279Eac49f3F7a9E0f3EDa0339",
 			"source": "ReadProxy",
-			"link": "https://testnet.etherscan.io/address/0x49580D0E1a2F3AE279Eac49f3F7a9E0f3EDa0339",
+			"link": "https://testnet.bscscan.com/address/0x49580D0E1a2F3AE279Eac49f3F7a9E0f3EDa0339",
 			"timestamp": "2020-12-11T10:41:37.901Z",
 			"txn": "",
 			"network": "testnet"
@@ -40,7 +40,7 @@
 			"name": "FlexibleStorage",
 			"address": "0x8a8Ce87390EE58B1555D29e600A9B60dEAFfDb28",
 			"source": "FlexibleStorage",
-			"link": "https://testnet.etherscan.io/address/0x8a8Ce87390EE58B1555D29e600A9B60dEAFfDb28",
+			"link": "https://testnet.bscscan.com/address/0x8a8Ce87390EE58B1555D29e600A9B60dEAFfDb28",
 			"timestamp": "2020-12-11T10:41:50.528Z",
 			"txn": "",
 			"network": "testnet"
@@ -49,7 +49,7 @@
 			"name": "SystemSettings",
 			"address": "0x5cd2197264a2c74b596F21c15F6Ad7EB37A405B7",
 			"source": "SystemSettings",
-			"link": "https://testnet.etherscan.io/address/0x5cd2197264a2c74b596F21c15F6Ad7EB37A405B7",
+			"link": "https://testnet.bscscan.com/address/0x5cd2197264a2c74b596F21c15F6Ad7EB37A405B7",
 			"timestamp": "2020-12-11T10:41:56.782Z",
 			"txn": "",
 			"network": "testnet"
@@ -58,7 +58,7 @@
 			"name": "SystemStatus",
 			"address": "0x23288FecBDB1b491cfd3915978EC0D33C4C424cE",
 			"source": "SystemStatus",
-			"link": "https://testnet.etherscan.io/address/0x23288FecBDB1b491cfd3915978EC0D33C4C424cE",
+			"link": "https://testnet.bscscan.com/address/0x23288FecBDB1b491cfd3915978EC0D33C4C424cE",
 			"timestamp": "2020-12-11T10:42:01.688Z",
 			"txn": "",
 			"network": "testnet"
@@ -67,7 +67,7 @@
 			"name": "ExchangeRates",
 			"address": "0xa22e83e3115C6CBF7639A7D7bea34906833ab872",
 			"source": "ExchangeRates",
-			"link": "https://testnet.etherscan.io/address/0xa22e83e3115C6CBF7639A7D7bea34906833ab872",
+			"link": "https://testnet.bscscan.com/address/0xa22e83e3115C6CBF7639A7D7bea34906833ab872",
 			"timestamp": "2020-12-11T10:42:09.296Z",
 			"txn": "",
 			"network": "testnet"
@@ -76,7 +76,7 @@
 			"name": "RewardEscrow",
 			"address": "0xfa1cfF14334cEAf5AFa7C76490720C5e9FE18F44",
 			"source": "RewardEscrow",
-			"link": "https://testnet.etherscan.io/address/0xfa1cfF14334cEAf5AFa7C76490720C5e9FE18F44",
+			"link": "https://testnet.bscscan.com/address/0xfa1cfF14334cEAf5AFa7C76490720C5e9FE18F44",
 			"timestamp": "2020-12-11T10:42:13.911Z",
 			"txn": "",
 			"network": "testnet"
@@ -85,7 +85,7 @@
 			"name": "SynthetixEscrow",
 			"address": "0x36c2e916a9ac4C08Bc88999Be972401c9Ec60192",
 			"source": "SynthetixEscrow",
-			"link": "https://testnet.etherscan.io/address/0x36c2e916a9ac4C08Bc88999Be972401c9Ec60192",
+			"link": "https://testnet.bscscan.com/address/0x36c2e916a9ac4C08Bc88999Be972401c9Ec60192",
 			"timestamp": "2020-12-11T10:42:19.911Z",
 			"txn": "",
 			"network": "testnet"
@@ -94,7 +94,7 @@
 			"name": "SynthetixState",
 			"address": "0x34424Fb5dF5b08111cfca121b41a476548c07c0e",
 			"source": "SynthetixState",
-			"link": "https://testnet.etherscan.io/address/0x34424Fb5dF5b08111cfca121b41a476548c07c0e",
+			"link": "https://testnet.bscscan.com/address/0x34424Fb5dF5b08111cfca121b41a476548c07c0e",
 			"timestamp": "2020-12-11T10:42:26.292Z",
 			"txn": "",
 			"network": "testnet"
@@ -103,7 +103,7 @@
 			"name": "ProxyFeePool",
 			"address": "0xDfb837Bd9dc87b84512Ce452d69bBEE0c9548D18",
 			"source": "Proxy",
-			"link": "https://testnet.etherscan.io/address/0xDfb837Bd9dc87b84512Ce452d69bBEE0c9548D18",
+			"link": "https://testnet.bscscan.com/address/0xDfb837Bd9dc87b84512Ce452d69bBEE0c9548D18",
 			"timestamp": "2020-12-11T10:42:31.645Z",
 			"txn": "",
 			"network": "testnet"
@@ -112,7 +112,7 @@
 			"name": "DelegateApprovalsEternalStorage",
 			"address": "0xf224bfe171dD535d11f2160EE9f19749e3dC19a7",
 			"source": "EternalStorage",
-			"link": "https://testnet.etherscan.io/address/0xf224bfe171dD535d11f2160EE9f19749e3dC19a7",
+			"link": "https://testnet.bscscan.com/address/0xf224bfe171dD535d11f2160EE9f19749e3dC19a7",
 			"timestamp": "2020-12-11T10:42:38.236Z",
 			"txn": "",
 			"network": "testnet"
@@ -121,7 +121,7 @@
 			"name": "DelegateApprovals",
 			"address": "0x21259FDD08272F998354623242F622366f0698cB",
 			"source": "DelegateApprovals",
-			"link": "https://testnet.etherscan.io/address/0x21259FDD08272F998354623242F622366f0698cB",
+			"link": "https://testnet.bscscan.com/address/0x21259FDD08272F998354623242F622366f0698cB",
 			"timestamp": "2020-12-11T10:42:43.384Z",
 			"txn": "",
 			"network": "testnet"
@@ -130,7 +130,7 @@
 			"name": "Liquidations",
 			"address": "0x000854a37E22B15788d076F2bE6C22a15c8092A3",
 			"source": "Liquidations",
-			"link": "https://testnet.etherscan.io/address/0x000854a37E22B15788d076F2bE6C22a15c8092A3",
+			"link": "https://testnet.bscscan.com/address/0x000854a37E22B15788d076F2bE6C22a15c8092A3",
 			"timestamp": "2020-12-11T10:42:56.501Z",
 			"txn": "",
 			"network": "testnet"
@@ -139,7 +139,7 @@
 			"name": "EternalStorageLiquidations",
 			"address": "0x4bfb5C8AE99fa784a058C092760CC8A7baD3A495",
 			"source": "EternalStorage",
-			"link": "https://testnet.etherscan.io/address/0x4bfb5C8AE99fa784a058C092760CC8A7baD3A495",
+			"link": "https://testnet.bscscan.com/address/0x4bfb5C8AE99fa784a058C092760CC8A7baD3A495",
 			"timestamp": "2020-12-11T10:43:02.429Z",
 			"txn": "",
 			"network": "testnet"
@@ -148,7 +148,7 @@
 			"name": "FeePoolEternalStorage",
 			"address": "0x2F6C4420Fa79Cd356C9F790DBd1E811C3BF71769",
 			"source": "FeePoolEternalStorage",
-			"link": "https://testnet.etherscan.io/address/0x2F6C4420Fa79Cd356C9F790DBd1E811C3BF71769",
+			"link": "https://testnet.bscscan.com/address/0x2F6C4420Fa79Cd356C9F790DBd1E811C3BF71769",
 			"timestamp": "2020-12-11T10:43:08.014Z",
 			"txn": "",
 			"network": "testnet"
@@ -157,7 +157,7 @@
 			"name": "FeePool",
 			"address": "0xe0cCfBb635342D9CCBBD96752169E3Cd845e527F",
 			"source": "FeePool",
-			"link": "https://testnet.etherscan.io/address/0xe0cCfBb635342D9CCBBD96752169E3Cd845e527F",
+			"link": "https://testnet.bscscan.com/address/0xe0cCfBb635342D9CCBBD96752169E3Cd845e527F",
 			"timestamp": "2020-12-11T10:43:15.340Z",
 			"txn": "",
 			"network": "testnet"
@@ -166,7 +166,7 @@
 			"name": "FeePoolState",
 			"address": "0x2826923e5DF6728F5017e6620EC30A72A0b494D0",
 			"source": "FeePoolState",
-			"link": "https://testnet.etherscan.io/address/0x2826923e5DF6728F5017e6620EC30A72A0b494D0",
+			"link": "https://testnet.bscscan.com/address/0x2826923e5DF6728F5017e6620EC30A72A0b494D0",
 			"timestamp": "2020-12-11T10:43:31.617Z",
 			"txn": "",
 			"network": "testnet"
@@ -175,7 +175,7 @@
 			"name": "RewardsDistribution",
 			"address": "0x9D61377470Fe07AE2dD5E165A7cd2463343947a7",
 			"source": "RewardsDistribution",
-			"link": "https://testnet.etherscan.io/address/0x9D61377470Fe07AE2dD5E165A7cd2463343947a7",
+			"link": "https://testnet.bscscan.com/address/0x9D61377470Fe07AE2dD5E165A7cd2463343947a7",
 			"timestamp": "2020-12-11T10:43:38.477Z",
 			"txn": "",
 			"network": "testnet"
@@ -184,7 +184,7 @@
 			"name": "ProxyERC20",
 			"address": "0x13a8f03b903Fe204aB26372a3A5A3c6848c7BD9A",
 			"source": "ProxyERC20",
-			"link": "https://testnet.etherscan.io/address/0x13a8f03b903Fe204aB26372a3A5A3c6848c7BD9A",
+			"link": "https://testnet.bscscan.com/address/0x13a8f03b903Fe204aB26372a3A5A3c6848c7BD9A",
 			"timestamp": "2020-12-11T10:43:45.141Z",
 			"txn": "",
 			"network": "testnet"
@@ -193,7 +193,7 @@
 			"name": "TokenStateSynthetix",
 			"address": "0x8E775E0005C033324b71ff035ca77bB782b99BaC",
 			"source": "TokenState",
-			"link": "https://testnet.etherscan.io/address/0x8E775E0005C033324b71ff035ca77bB782b99BaC",
+			"link": "https://testnet.bscscan.com/address/0x8E775E0005C033324b71ff035ca77bB782b99BaC",
 			"timestamp": "2020-12-11T10:43:49.588Z",
 			"txn": "",
 			"network": "testnet"
@@ -202,7 +202,7 @@
 			"name": "Synthetix",
 			"address": "0x2ccB4a4e22Dd910968bB3aC0b347C8b1198f0D8E",
 			"source": "Synthetix",
-			"link": "https://testnet.etherscan.io/address/0x2ccB4a4e22Dd910968bB3aC0b347C8b1198f0D8E",
+			"link": "https://testnet.bscscan.com/address/0x2ccB4a4e22Dd910968bB3aC0b347C8b1198f0D8E",
 			"timestamp": "2020-12-11T10:43:56.710Z",
 			"txn": "",
 			"network": "testnet"
@@ -211,7 +211,7 @@
 			"name": "ProxySynthetix",
 			"address": "0x77470AdBB0b41da582cF577D51D640eDC03366Db",
 			"source": "Proxy",
-			"link": "https://testnet.etherscan.io/address/0x77470AdBB0b41da582cF577D51D640eDC03366Db",
+			"link": "https://testnet.bscscan.com/address/0x77470AdBB0b41da582cF577D51D640eDC03366Db",
 			"timestamp": "2020-12-11T10:44:07.403Z",
 			"txn": "",
 			"network": "testnet"
@@ -220,7 +220,7 @@
 			"name": "DebtCache",
 			"address": "0xd79ED5518a361e104fF9D3266879DEc20867BE76",
 			"source": "DebtCache",
-			"link": "https://testnet.etherscan.io/address/0xd79ED5518a361e104fF9D3266879DEc20867BE76",
+			"link": "https://testnet.bscscan.com/address/0xd79ED5518a361e104fF9D3266879DEc20867BE76",
 			"timestamp": "2020-12-11T10:44:20.357Z",
 			"txn": "",
 			"network": "testnet"
@@ -229,7 +229,7 @@
 			"name": "Exchanger",
 			"address": "0x55185618467f9755441e4C674fB2e79F58964E2F",
 			"source": "ExchangerWithVirtualSynth",
-			"link": "https://testnet.etherscan.io/address/0x55185618467f9755441e4C674fB2e79F58964E2F",
+			"link": "https://testnet.bscscan.com/address/0x55185618467f9755441e4C674fB2e79F58964E2F",
 			"timestamp": "2020-12-11T10:44:29.422Z",
 			"txn": "",
 			"network": "testnet"
@@ -238,7 +238,7 @@
 			"name": "ExchangeState",
 			"address": "0xfBF4C8cB4613dcD6eFeEd796D1a043406ee0df53",
 			"source": "ExchangeState",
-			"link": "https://testnet.etherscan.io/address/0xfBF4C8cB4613dcD6eFeEd796D1a043406ee0df53",
+			"link": "https://testnet.bscscan.com/address/0xfBF4C8cB4613dcD6eFeEd796D1a043406ee0df53",
 			"timestamp": "2020-12-11T10:44:34.306Z",
 			"txn": "",
 			"network": "testnet"
@@ -247,7 +247,7 @@
 			"name": "Issuer",
 			"address": "0xBD78952683f033eEc7ea4519266DFddB2314E2f4",
 			"source": "Issuer",
-			"link": "https://testnet.etherscan.io/address/0xBD78952683f033eEc7ea4519266DFddB2314E2f4",
+			"link": "https://testnet.bscscan.com/address/0xBD78952683f033eEc7ea4519266DFddB2314E2f4",
 			"timestamp": "2020-12-11T10:44:59.455Z",
 			"txn": "",
 			"network": "testnet"
@@ -256,7 +256,7 @@
 			"name": "TradingRewards",
 			"address": "0x4c2711759e5c00085FBD9aE6bFfa3E18CDa921D3",
 			"source": "TradingRewards",
-			"link": "https://testnet.etherscan.io/address/0x4c2711759e5c00085FBD9aE6bFfa3E18CDa921D3",
+			"link": "https://testnet.bscscan.com/address/0x4c2711759e5c00085FBD9aE6bFfa3E18CDa921D3",
 			"timestamp": "2020-12-11T10:45:05.379Z",
 			"txn": "",
 			"network": "testnet"
@@ -265,7 +265,7 @@
 			"name": "EscrowChecker",
 			"address": "0x5B7e0e52dc849Ff8317c1d82fF57321cf4Eb83c6",
 			"source": "EscrowChecker",
-			"link": "https://testnet.etherscan.io/address/0x5B7e0e52dc849Ff8317c1d82fF57321cf4Eb83c6",
+			"link": "https://testnet.bscscan.com/address/0x5B7e0e52dc849Ff8317c1d82fF57321cf4Eb83c6",
 			"timestamp": "2020-12-11T10:45:17.094Z",
 			"txn": "",
 			"network": "testnet"
@@ -274,7 +274,7 @@
 			"name": "SupplySchedule",
 			"address": "0xD986FaCF1825E5f03e0535B237806eb349D04657",
 			"source": "SupplySchedule",
-			"link": "https://testnet.etherscan.io/address/0xD986FaCF1825E5f03e0535B237806eb349D04657",
+			"link": "https://testnet.bscscan.com/address/0xD986FaCF1825E5f03e0535B237806eb349D04657",
 			"timestamp": "2020-12-11T10:45:35.008Z",
 			"txn": "",
 			"network": "testnet"
@@ -283,7 +283,7 @@
 			"name": "TokenStatesUSD",
 			"address": "0xA11134Bae92Ba3A38dF46d4218c86FF42531Ba19",
 			"source": "TokenState",
-			"link": "https://testnet.etherscan.io/address/0xA11134Bae92Ba3A38dF46d4218c86FF42531Ba19",
+			"link": "https://testnet.bscscan.com/address/0xA11134Bae92Ba3A38dF46d4218c86FF42531Ba19",
 			"timestamp": "2020-12-11T10:46:04.714Z",
 			"txn": "",
 			"network": "testnet"
@@ -292,7 +292,7 @@
 			"name": "ProxysUSD",
 			"address": "0x69C56999bCeB84027acF5a9F9d65E403A12C4Dc1",
 			"source": "ProxyERC20",
-			"link": "https://testnet.etherscan.io/address/0x69C56999bCeB84027acF5a9F9d65E403A12C4Dc1",
+			"link": "https://testnet.bscscan.com/address/0x69C56999bCeB84027acF5a9F9d65E403A12C4Dc1",
 			"timestamp": "2020-12-11T10:46:11.172Z",
 			"txn": "",
 			"network": "testnet"
@@ -301,7 +301,7 @@
 			"name": "ProxyERC20sUSD",
 			"address": "0x88a0358cF8248aBAD505b47BEA5f88f9e3F7d5cf",
 			"source": "ProxyERC20",
-			"link": "https://testnet.etherscan.io/address/0x88a0358cF8248aBAD505b47BEA5f88f9e3F7d5cf",
+			"link": "https://testnet.bscscan.com/address/0x88a0358cF8248aBAD505b47BEA5f88f9e3F7d5cf",
 			"timestamp": "2020-12-11T10:46:17.119Z",
 			"txn": "",
 			"network": "testnet"
@@ -310,7 +310,7 @@
 			"name": "SynthsUSD",
 			"address": "0xa9d2bb00d57e0e246723230947eea3318e42E80B",
 			"source": "MultiCollateralSynth",
-			"link": "https://testnet.etherscan.io/address/0xa9d2bb00d57e0e246723230947eea3318e42E80B",
+			"link": "https://testnet.bscscan.com/address/0xa9d2bb00d57e0e246723230947eea3318e42E80B",
 			"timestamp": "2020-12-11T10:46:23.728Z",
 			"txn": "",
 			"network": "testnet"
@@ -319,7 +319,7 @@
 			"name": "TokenStatesEUR",
 			"address": "0xad5fe818d2cB4cB29acDc1888d3fF75025740167",
 			"source": "TokenState",
-			"link": "https://testnet.etherscan.io/address/0xad5fe818d2cB4cB29acDc1888d3fF75025740167",
+			"link": "https://testnet.bscscan.com/address/0xad5fe818d2cB4cB29acDc1888d3fF75025740167",
 			"timestamp": "2020-12-11T10:46:46.551Z",
 			"txn": "",
 			"network": "testnet"
@@ -328,7 +328,7 @@
 			"name": "ProxysEUR",
 			"address": "0x91a9C5caA80A75CbAc6fDc72182F4d5E77b6fab4",
 			"source": "ProxyERC20",
-			"link": "https://testnet.etherscan.io/address/0x91a9C5caA80A75CbAc6fDc72182F4d5E77b6fab4",
+			"link": "https://testnet.bscscan.com/address/0x91a9C5caA80A75CbAc6fDc72182F4d5E77b6fab4",
 			"timestamp": "2020-12-11T10:46:53.079Z",
 			"txn": "",
 			"network": "testnet"
@@ -337,7 +337,7 @@
 			"name": "SynthsEUR",
 			"address": "0x7c9ac915376D7f0b2e4D81CeFC93C30daF9fcCa2",
 			"source": "Synth",
-			"link": "https://testnet.etherscan.io/address/0x7c9ac915376D7f0b2e4D81CeFC93C30daF9fcCa2",
+			"link": "https://testnet.bscscan.com/address/0x7c9ac915376D7f0b2e4D81CeFC93C30daF9fcCa2",
 			"timestamp": "2020-12-11T10:46:58.798Z",
 			"txn": "",
 			"network": "testnet"
@@ -346,7 +346,7 @@
 			"name": "TokenStatesJPY",
 			"address": "0x974192D3B5250760d1D261afE7e34ceeaFe0914D",
 			"source": "TokenState",
-			"link": "https://testnet.etherscan.io/address/0x974192D3B5250760d1D261afE7e34ceeaFe0914D",
+			"link": "https://testnet.bscscan.com/address/0x974192D3B5250760d1D261afE7e34ceeaFe0914D",
 			"timestamp": "2020-12-11T10:47:17.707Z",
 			"txn": "",
 			"network": "testnet"
@@ -355,7 +355,7 @@
 			"name": "ProxysJPY",
 			"address": "0x094dc8a2DA6294ca5FCc0F83b83bbb63a1b3B356",
 			"source": "ProxyERC20",
-			"link": "https://testnet.etherscan.io/address/0x094dc8a2DA6294ca5FCc0F83b83bbb63a1b3B356",
+			"link": "https://testnet.bscscan.com/address/0x094dc8a2DA6294ca5FCc0F83b83bbb63a1b3B356",
 			"timestamp": "2020-12-11T10:47:23.038Z",
 			"txn": "",
 			"network": "testnet"
@@ -364,7 +364,7 @@
 			"name": "SynthsJPY",
 			"address": "0x0A0EcD2f2a7274D02EFAc5335fF0FAC41bD164fc",
 			"source": "Synth",
-			"link": "https://testnet.etherscan.io/address/0x0A0EcD2f2a7274D02EFAc5335fF0FAC41bD164fc",
+			"link": "https://testnet.bscscan.com/address/0x0A0EcD2f2a7274D02EFAc5335fF0FAC41bD164fc",
 			"timestamp": "2020-12-11T10:47:30.350Z",
 			"txn": "",
 			"network": "testnet"
@@ -373,7 +373,7 @@
 			"name": "TokenStatesAUD",
 			"address": "0x17a8306a8025563e9D1a0981A43692B2a32D4574",
 			"source": "TokenState",
-			"link": "https://testnet.etherscan.io/address/0x17a8306a8025563e9D1a0981A43692B2a32D4574",
+			"link": "https://testnet.bscscan.com/address/0x17a8306a8025563e9D1a0981A43692B2a32D4574",
 			"timestamp": "2020-12-11T10:47:46.392Z",
 			"txn": "",
 			"network": "testnet"
@@ -382,7 +382,7 @@
 			"name": "ProxysAUD",
 			"address": "0xef2e4E2AF03cb3Db5F169156D58A9270256a678D",
 			"source": "ProxyERC20",
-			"link": "https://testnet.etherscan.io/address/0xef2e4E2AF03cb3Db5F169156D58A9270256a678D",
+			"link": "https://testnet.bscscan.com/address/0xef2e4E2AF03cb3Db5F169156D58A9270256a678D",
 			"timestamp": "2020-12-11T10:47:53.644Z",
 			"txn": "",
 			"network": "testnet"
@@ -391,7 +391,7 @@
 			"name": "SynthsAUD",
 			"address": "0x5C91d5Af693DD4F1576c86c9917F1AfA3130B0bf",
 			"source": "Synth",
-			"link": "https://testnet.etherscan.io/address/0x5C91d5Af693DD4F1576c86c9917F1AfA3130B0bf",
+			"link": "https://testnet.bscscan.com/address/0x5C91d5Af693DD4F1576c86c9917F1AfA3130B0bf",
 			"timestamp": "2020-12-11T10:47:59.517Z",
 			"txn": "",
 			"network": "testnet"
@@ -400,7 +400,7 @@
 			"name": "TokenStatesGBP",
 			"address": "0x2ccA9c06b595C685ecc3486E841218F427A1a2F5",
 			"source": "TokenState",
-			"link": "https://testnet.etherscan.io/address/0x2ccA9c06b595C685ecc3486E841218F427A1a2F5",
+			"link": "https://testnet.bscscan.com/address/0x2ccA9c06b595C685ecc3486E841218F427A1a2F5",
 			"timestamp": "2020-12-11T10:48:16.759Z",
 			"txn": "",
 			"network": "testnet"
@@ -409,7 +409,7 @@
 			"name": "ProxysGBP",
 			"address": "0xd3b3546cF7dFF394263276C86FE9f490dAe3B282",
 			"source": "ProxyERC20",
-			"link": "https://testnet.etherscan.io/address/0xd3b3546cF7dFF394263276C86FE9f490dAe3B282",
+			"link": "https://testnet.bscscan.com/address/0xd3b3546cF7dFF394263276C86FE9f490dAe3B282",
 			"timestamp": "2020-12-11T10:48:22.803Z",
 			"txn": "",
 			"network": "testnet"
@@ -418,7 +418,7 @@
 			"name": "SynthsGBP",
 			"address": "0xF5781BdCC3C1cfa4a988b3433F23CB8CBf3e757D",
 			"source": "PurgeableSynth",
-			"link": "https://testnet.etherscan.io/address/0xF5781BdCC3C1cfa4a988b3433F23CB8CBf3e757D",
+			"link": "https://testnet.bscscan.com/address/0xF5781BdCC3C1cfa4a988b3433F23CB8CBf3e757D",
 			"timestamp": "2020-12-11T10:48:30.092Z",
 			"txn": "",
 			"network": "testnet"
@@ -427,7 +427,7 @@
 			"name": "TokenStatesCHF",
 			"address": "0xa9359aD27958526A57ED910995392bcF2dBbf50E",
 			"source": "TokenState",
-			"link": "https://testnet.etherscan.io/address/0xa9359aD27958526A57ED910995392bcF2dBbf50E",
+			"link": "https://testnet.bscscan.com/address/0xa9359aD27958526A57ED910995392bcF2dBbf50E",
 			"timestamp": "2020-12-11T10:48:46.969Z",
 			"txn": "",
 			"network": "testnet"
@@ -436,7 +436,7 @@
 			"name": "ProxysCHF",
 			"address": "0x58F12f8b4782449726be3190e558F3818f2e6715",
 			"source": "ProxyERC20",
-			"link": "https://testnet.etherscan.io/address/0x58F12f8b4782449726be3190e558F3818f2e6715",
+			"link": "https://testnet.bscscan.com/address/0x58F12f8b4782449726be3190e558F3818f2e6715",
 			"timestamp": "2020-12-11T10:48:52.418Z",
 			"txn": "",
 			"network": "testnet"
@@ -445,7 +445,7 @@
 			"name": "SynthsCHF",
 			"address": "0xBe2ba456107b3e2f0a4ce602Fe5F8C012D6d61ef",
 			"source": "PurgeableSynth",
-			"link": "https://testnet.etherscan.io/address/0xBe2ba456107b3e2f0a4ce602Fe5F8C012D6d61ef",
+			"link": "https://testnet.bscscan.com/address/0xBe2ba456107b3e2f0a4ce602Fe5F8C012D6d61ef",
 			"timestamp": "2020-12-11T10:49:00.871Z",
 			"txn": "",
 			"network": "testnet"
@@ -454,7 +454,7 @@
 			"name": "TokenStatesXAU",
 			"address": "0xBBDac29689E9Ee87092586c62C102BBe8DaE2526",
 			"source": "TokenState",
-			"link": "https://testnet.etherscan.io/address/0xBBDac29689E9Ee87092586c62C102BBe8DaE2526",
+			"link": "https://testnet.bscscan.com/address/0xBBDac29689E9Ee87092586c62C102BBe8DaE2526",
 			"timestamp": "2020-12-11T10:49:19.690Z",
 			"txn": "",
 			"network": "testnet"
@@ -463,7 +463,7 @@
 			"name": "ProxysXAU",
 			"address": "0x235C56DA4aBd4A81C1CdB268642522a3b6f66Fb6",
 			"source": "ProxyERC20",
-			"link": "https://testnet.etherscan.io/address/0x235C56DA4aBd4A81C1CdB268642522a3b6f66Fb6",
+			"link": "https://testnet.bscscan.com/address/0x235C56DA4aBd4A81C1CdB268642522a3b6f66Fb6",
 			"timestamp": "2020-12-11T10:49:26.042Z",
 			"txn": "",
 			"network": "testnet"
@@ -472,7 +472,7 @@
 			"name": "SynthsXAU",
 			"address": "0xfa0731371A8185908e92A97531976DfDA9b99C10",
 			"source": "PurgeableSynth",
-			"link": "https://testnet.etherscan.io/address/0xfa0731371A8185908e92A97531976DfDA9b99C10",
+			"link": "https://testnet.bscscan.com/address/0xfa0731371A8185908e92A97531976DfDA9b99C10",
 			"timestamp": "2020-12-11T10:49:31.962Z",
 			"txn": "",
 			"network": "testnet"
@@ -481,7 +481,7 @@
 			"name": "TokenStatesXAG",
 			"address": "0x65E1a4971963F05d0A7c1d31a7e19DDA40dB2678",
 			"source": "TokenState",
-			"link": "https://testnet.etherscan.io/address/0x65E1a4971963F05d0A7c1d31a7e19DDA40dB2678",
+			"link": "https://testnet.bscscan.com/address/0x65E1a4971963F05d0A7c1d31a7e19DDA40dB2678",
 			"timestamp": "2020-12-11T10:49:49.788Z",
 			"txn": "",
 			"network": "testnet"
@@ -490,7 +490,7 @@
 			"name": "ProxysXAG",
 			"address": "0x3454cc7c2D15cDA6c8B1d1de543A36C31DCE3e14",
 			"source": "ProxyERC20",
-			"link": "https://testnet.etherscan.io/address/0x3454cc7c2D15cDA6c8B1d1de543A36C31DCE3e14",
+			"link": "https://testnet.bscscan.com/address/0x3454cc7c2D15cDA6c8B1d1de543A36C31DCE3e14",
 			"timestamp": "2020-12-11T10:49:56.272Z",
 			"txn": "",
 			"network": "testnet"
@@ -499,7 +499,7 @@
 			"name": "SynthsXAG",
 			"address": "0xbCa834FddB6d00E9F31eed9252acDCA516c7Baae",
 			"source": "Synth",
-			"link": "https://testnet.etherscan.io/address/0xbCa834FddB6d00E9F31eed9252acDCA516c7Baae",
+			"link": "https://testnet.bscscan.com/address/0xbCa834FddB6d00E9F31eed9252acDCA516c7Baae",
 			"timestamp": "2020-12-11T10:50:02.290Z",
 			"txn": "",
 			"network": "testnet"
@@ -508,7 +508,7 @@
 			"name": "TokenStatesBTC",
 			"address": "0xF6c167724a6149B4904125D4F04e9Be72DD53916",
 			"source": "TokenState",
-			"link": "https://testnet.etherscan.io/address/0xF6c167724a6149B4904125D4F04e9Be72DD53916",
+			"link": "https://testnet.bscscan.com/address/0xF6c167724a6149B4904125D4F04e9Be72DD53916",
 			"timestamp": "2020-12-11T10:50:20.358Z",
 			"txn": "",
 			"network": "testnet"
@@ -517,7 +517,7 @@
 			"name": "ProxysBTC",
 			"address": "0x65e98927948fEE0c7C724F6b73FEd96E39772b03",
 			"source": "ProxyERC20",
-			"link": "https://testnet.etherscan.io/address/0x65e98927948fEE0c7C724F6b73FEd96E39772b03",
+			"link": "https://testnet.bscscan.com/address/0x65e98927948fEE0c7C724F6b73FEd96E39772b03",
 			"timestamp": "2020-12-11T10:50:26.219Z",
 			"txn": "",
 			"network": "testnet"
@@ -526,7 +526,7 @@
 			"name": "SynthsBTC",
 			"address": "0xE1aF849A1187096f1344C6861681Cc479d93b382",
 			"source": "Synth",
-			"link": "https://testnet.etherscan.io/address/0xE1aF849A1187096f1344C6861681Cc479d93b382",
+			"link": "https://testnet.bscscan.com/address/0xE1aF849A1187096f1344C6861681Cc479d93b382",
 			"timestamp": "2020-12-11T10:50:32.755Z",
 			"txn": "",
 			"network": "testnet"
@@ -535,7 +535,7 @@
 			"name": "TokenStatesETH",
 			"address": "0xfbF31f4D4c0A8a7400464b2374fC9309532a8f52",
 			"source": "TokenState",
-			"link": "https://testnet.etherscan.io/address/0xfbF31f4D4c0A8a7400464b2374fC9309532a8f52",
+			"link": "https://testnet.bscscan.com/address/0xfbF31f4D4c0A8a7400464b2374fC9309532a8f52",
 			"timestamp": "2020-12-11T10:50:49.334Z",
 			"txn": "",
 			"network": "testnet"
@@ -544,7 +544,7 @@
 			"name": "ProxysETH",
 			"address": "0x4d51f4BecDd992836123949DCA6d28a8B6bAB29c",
 			"source": "ProxyERC20",
-			"link": "https://testnet.etherscan.io/address/0x4d51f4BecDd992836123949DCA6d28a8B6bAB29c",
+			"link": "https://testnet.bscscan.com/address/0x4d51f4BecDd992836123949DCA6d28a8B6bAB29c",
 			"timestamp": "2020-12-11T10:50:56.617Z",
 			"txn": "",
 			"network": "testnet"
@@ -553,7 +553,7 @@
 			"name": "SynthsETH",
 			"address": "0xf151928FBE992eDdfE8F8F593049326C4E9ABB20",
 			"source": "MultiCollateralSynth",
-			"link": "https://testnet.etherscan.io/address/0xf151928FBE992eDdfE8F8F593049326C4E9ABB20",
+			"link": "https://testnet.bscscan.com/address/0xf151928FBE992eDdfE8F8F593049326C4E9ABB20",
 			"timestamp": "2020-12-11T10:51:03.408Z",
 			"txn": "",
 			"network": "testnet"
@@ -562,7 +562,7 @@
 			"name": "TokenStatesBNB",
 			"address": "0x961784B808Ce563DF5d52721cFA9A30A9603fE9B",
 			"source": "TokenState",
-			"link": "https://testnet.etherscan.io/address/0x961784B808Ce563DF5d52721cFA9A30A9603fE9B",
+			"link": "https://testnet.bscscan.com/address/0x961784B808Ce563DF5d52721cFA9A30A9603fE9B",
 			"timestamp": "2020-12-11T10:51:20.138Z",
 			"txn": "",
 			"network": "testnet"
@@ -571,7 +571,7 @@
 			"name": "ProxysBNB",
 			"address": "0x0441845A7Ab665395501cBC47D482e38e0f38791",
 			"source": "ProxyERC20",
-			"link": "https://testnet.etherscan.io/address/0x0441845A7Ab665395501cBC47D482e38e0f38791",
+			"link": "https://testnet.bscscan.com/address/0x0441845A7Ab665395501cBC47D482e38e0f38791",
 			"timestamp": "2020-12-11T10:51:26.026Z",
 			"txn": "",
 			"network": "testnet"
@@ -580,7 +580,7 @@
 			"name": "SynthsBNB",
 			"address": "0x7c77630636Ca0EaBb9889D369053d8Fda855ddD5",
 			"source": "Synth",
-			"link": "https://testnet.etherscan.io/address/0x7c77630636Ca0EaBb9889D369053d8Fda855ddD5",
+			"link": "https://testnet.bscscan.com/address/0x7c77630636Ca0EaBb9889D369053d8Fda855ddD5",
 			"timestamp": "2020-12-11T10:51:32.435Z",
 			"txn": "",
 			"network": "testnet"
@@ -589,7 +589,7 @@
 			"name": "TokenStatesTRX",
 			"address": "0x6246dce0d450f6E96604011832816146B2DC2669",
 			"source": "TokenState",
-			"link": "https://testnet.etherscan.io/address/0x6246dce0d450f6E96604011832816146B2DC2669",
+			"link": "https://testnet.bscscan.com/address/0x6246dce0d450f6E96604011832816146B2DC2669",
 			"timestamp": "2020-12-11T10:51:49.792Z",
 			"txn": "",
 			"network": "testnet"
@@ -598,7 +598,7 @@
 			"name": "ProxysTRX",
 			"address": "0x778D354A9F9952d5De54e06E6D4Db1C749C2339b",
 			"source": "ProxyERC20",
-			"link": "https://testnet.etherscan.io/address/0x778D354A9F9952d5De54e06E6D4Db1C749C2339b",
+			"link": "https://testnet.bscscan.com/address/0x778D354A9F9952d5De54e06E6D4Db1C749C2339b",
 			"timestamp": "2020-12-11T10:51:56.298Z",
 			"txn": "",
 			"network": "testnet"
@@ -607,7 +607,7 @@
 			"name": "SynthsTRX",
 			"address": "0xCfD945e65eD27AEce96b13491F60793b30F8B834",
 			"source": "Synth",
-			"link": "https://testnet.etherscan.io/address/0xCfD945e65eD27AEce96b13491F60793b30F8B834",
+			"link": "https://testnet.bscscan.com/address/0xCfD945e65eD27AEce96b13491F60793b30F8B834",
 			"timestamp": "2020-12-11T10:52:01.692Z",
 			"txn": "",
 			"network": "testnet"
@@ -616,7 +616,7 @@
 			"name": "TokenStatesXTZ",
 			"address": "0x358e1AD31dbdFe78506c82E09616fD962C8687D1",
 			"source": "TokenState",
-			"link": "https://testnet.etherscan.io/address/0x358e1AD31dbdFe78506c82E09616fD962C8687D1",
+			"link": "https://testnet.bscscan.com/address/0x358e1AD31dbdFe78506c82E09616fD962C8687D1",
 			"timestamp": "2020-12-11T10:52:19.592Z",
 			"txn": "",
 			"network": "testnet"
@@ -625,7 +625,7 @@
 			"name": "ProxysXTZ",
 			"address": "0x46dfbdf47a51511c942569AA2C8a8895768e924a",
 			"source": "ProxyERC20",
-			"link": "https://testnet.etherscan.io/address/0x46dfbdf47a51511c942569AA2C8a8895768e924a",
+			"link": "https://testnet.bscscan.com/address/0x46dfbdf47a51511c942569AA2C8a8895768e924a",
 			"timestamp": "2020-12-11T10:52:26.002Z",
 			"txn": "",
 			"network": "testnet"
@@ -634,7 +634,7 @@
 			"name": "SynthsXTZ",
 			"address": "0x0aF53930613D7981d521745cC5A72bB68F67f461",
 			"source": "Synth",
-			"link": "https://testnet.etherscan.io/address/0x0aF53930613D7981d521745cC5A72bB68F67f461",
+			"link": "https://testnet.bscscan.com/address/0x0aF53930613D7981d521745cC5A72bB68F67f461",
 			"timestamp": "2020-12-11T10:52:32.548Z",
 			"txn": "",
 			"network": "testnet"
@@ -643,7 +643,7 @@
 			"name": "TokenStatesXRP",
 			"address": "0xF1d74E47a1D71608f231fca1ef1f102536d052Db",
 			"source": "TokenState",
-			"link": "https://testnet.etherscan.io/address/0xF1d74E47a1D71608f231fca1ef1f102536d052Db",
+			"link": "https://testnet.bscscan.com/address/0xF1d74E47a1D71608f231fca1ef1f102536d052Db",
 			"timestamp": "2020-12-11T10:52:50.151Z",
 			"txn": "",
 			"network": "testnet"
@@ -652,7 +652,7 @@
 			"name": "ProxysXRP",
 			"address": "0x436e979fA6D41382A0BD8707D488577495E7431D",
 			"source": "ProxyERC20",
-			"link": "https://testnet.etherscan.io/address/0x436e979fA6D41382A0BD8707D488577495E7431D",
+			"link": "https://testnet.bscscan.com/address/0x436e979fA6D41382A0BD8707D488577495E7431D",
 			"timestamp": "2020-12-11T10:52:55.772Z",
 			"txn": "",
 			"network": "testnet"
@@ -661,7 +661,7 @@
 			"name": "SynthsXRP",
 			"address": "0xBD68E01181aA66893Ce5861C7dD6C8B7c348c904",
 			"source": "Synth",
-			"link": "https://testnet.etherscan.io/address/0xBD68E01181aA66893Ce5861C7dD6C8B7c348c904",
+			"link": "https://testnet.bscscan.com/address/0xBD68E01181aA66893Ce5861C7dD6C8B7c348c904",
 			"timestamp": "2020-12-11T10:53:01.876Z",
 			"txn": "",
 			"network": "testnet"
@@ -670,7 +670,7 @@
 			"name": "TokenStatesLTC",
 			"address": "0x9966Cb9F0061E2eDd85Bed0f6C0275E47A6D038E",
 			"source": "TokenState",
-			"link": "https://testnet.etherscan.io/address/0x9966Cb9F0061E2eDd85Bed0f6C0275E47A6D038E",
+			"link": "https://testnet.bscscan.com/address/0x9966Cb9F0061E2eDd85Bed0f6C0275E47A6D038E",
 			"timestamp": "2020-12-11T10:53:17.013Z",
 			"txn": "",
 			"network": "testnet"
@@ -679,7 +679,7 @@
 			"name": "ProxysLTC",
 			"address": "0x42452c8c4A08e7eF6090C08eB91d44c2570dF165",
 			"source": "ProxyERC20",
-			"link": "https://testnet.etherscan.io/address/0x42452c8c4A08e7eF6090C08eB91d44c2570dF165",
+			"link": "https://testnet.bscscan.com/address/0x42452c8c4A08e7eF6090C08eB91d44c2570dF165",
 			"timestamp": "2020-12-11T10:53:23.040Z",
 			"txn": "",
 			"network": "testnet"
@@ -688,7 +688,7 @@
 			"name": "SynthsLTC",
 			"address": "0xDD3f54D1A7Aef41DFE292A1491a72d8B5cCF67Af",
 			"source": "PurgeableSynth",
-			"link": "https://testnet.etherscan.io/address/0xDD3f54D1A7Aef41DFE292A1491a72d8B5cCF67Af",
+			"link": "https://testnet.bscscan.com/address/0xDD3f54D1A7Aef41DFE292A1491a72d8B5cCF67Af",
 			"timestamp": "2020-12-11T10:53:29.744Z",
 			"txn": "",
 			"network": "testnet"
@@ -697,7 +697,7 @@
 			"name": "TokenStatesLINK",
 			"address": "0x4687BB916b13687be631307B9225E2dCA028De2B",
 			"source": "TokenState",
-			"link": "https://testnet.etherscan.io/address/0x4687BB916b13687be631307B9225E2dCA028De2B",
+			"link": "https://testnet.bscscan.com/address/0x4687BB916b13687be631307B9225E2dCA028De2B",
 			"timestamp": "2020-12-11T10:53:47.020Z",
 			"txn": "",
 			"network": "testnet"
@@ -706,7 +706,7 @@
 			"name": "ProxysLINK",
 			"address": "0x453E69d7CDFCE3D27dBf7a1B63cc8572884abf39",
 			"source": "ProxyERC20",
-			"link": "https://testnet.etherscan.io/address/0x453E69d7CDFCE3D27dBf7a1B63cc8572884abf39",
+			"link": "https://testnet.bscscan.com/address/0x453E69d7CDFCE3D27dBf7a1B63cc8572884abf39",
 			"timestamp": "2020-12-11T10:53:53.396Z",
 			"txn": "",
 			"network": "testnet"
@@ -715,7 +715,7 @@
 			"name": "SynthsLINK",
 			"address": "0xAE4d8784b4Cf5Bb2DD6173887B8C75Db8b6C0dca",
 			"source": "Synth",
-			"link": "https://testnet.etherscan.io/address/0xAE4d8784b4Cf5Bb2DD6173887B8C75Db8b6C0dca",
+			"link": "https://testnet.bscscan.com/address/0xAE4d8784b4Cf5Bb2DD6173887B8C75Db8b6C0dca",
 			"timestamp": "2020-12-11T10:53:59.493Z",
 			"txn": "",
 			"network": "testnet"
@@ -724,7 +724,7 @@
 			"name": "TokenStatesEOS",
 			"address": "0x1dC6cC1fef68378fD52cD6F41633F789C06C9bAc",
 			"source": "TokenState",
-			"link": "https://testnet.etherscan.io/address/0x1dC6cC1fef68378fD52cD6F41633F789C06C9bAc",
+			"link": "https://testnet.bscscan.com/address/0x1dC6cC1fef68378fD52cD6F41633F789C06C9bAc",
 			"timestamp": "2020-12-11T10:54:16.877Z",
 			"txn": "",
 			"network": "testnet"
@@ -733,7 +733,7 @@
 			"name": "ProxysEOS",
 			"address": "0x35606459696617eD0805D6bd33933D11b1BEf253",
 			"source": "ProxyERC20",
-			"link": "https://testnet.etherscan.io/address/0x35606459696617eD0805D6bd33933D11b1BEf253",
+			"link": "https://testnet.bscscan.com/address/0x35606459696617eD0805D6bd33933D11b1BEf253",
 			"timestamp": "2020-12-11T10:54:23.335Z",
 			"txn": "",
 			"network": "testnet"
@@ -742,7 +742,7 @@
 			"name": "SynthsEOS",
 			"address": "0xAe904B55ef8cB84076d87745bA464b4cb9A7e842",
 			"source": "Synth",
-			"link": "https://testnet.etherscan.io/address/0xAe904B55ef8cB84076d87745bA464b4cb9A7e842",
+			"link": "https://testnet.bscscan.com/address/0xAe904B55ef8cB84076d87745bA464b4cb9A7e842",
 			"timestamp": "2020-12-11T10:54:29.553Z",
 			"txn": "",
 			"network": "testnet"
@@ -751,7 +751,7 @@
 			"name": "TokenStatesBCH",
 			"address": "0x88C42B4275C54b2911A9d68a9EB87B119BaC4137",
 			"source": "TokenState",
-			"link": "https://testnet.etherscan.io/address/0x88C42B4275C54b2911A9d68a9EB87B119BaC4137",
+			"link": "https://testnet.bscscan.com/address/0x88C42B4275C54b2911A9d68a9EB87B119BaC4137",
 			"timestamp": "2020-12-11T10:54:47.186Z",
 			"txn": "",
 			"network": "testnet"
@@ -760,7 +760,7 @@
 			"name": "ProxysBCH",
 			"address": "0x6F40E2738fC403Bc6E2ba81BB2b6E5d238096af4",
 			"source": "ProxyERC20",
-			"link": "https://testnet.etherscan.io/address/0x6F40E2738fC403Bc6E2ba81BB2b6E5d238096af4",
+			"link": "https://testnet.bscscan.com/address/0x6F40E2738fC403Bc6E2ba81BB2b6E5d238096af4",
 			"timestamp": "2020-12-11T10:54:53.132Z",
 			"txn": "",
 			"network": "testnet"
@@ -769,7 +769,7 @@
 			"name": "SynthsBCH",
 			"address": "0xdb3dEA6ef1d09f99b41f8132715597CFA221A140",
 			"source": "Synth",
-			"link": "https://testnet.etherscan.io/address/0xdb3dEA6ef1d09f99b41f8132715597CFA221A140",
+			"link": "https://testnet.bscscan.com/address/0xdb3dEA6ef1d09f99b41f8132715597CFA221A140",
 			"timestamp": "2020-12-11T10:54:59.856Z",
 			"txn": "",
 			"network": "testnet"
@@ -778,7 +778,7 @@
 			"name": "TokenStatesETC",
 			"address": "0xfe4Bc12b52B8cF104Cc3771060310f86277BdfF0",
 			"source": "TokenState",
-			"link": "https://testnet.etherscan.io/address/0xfe4Bc12b52B8cF104Cc3771060310f86277BdfF0",
+			"link": "https://testnet.bscscan.com/address/0xfe4Bc12b52B8cF104Cc3771060310f86277BdfF0",
 			"timestamp": "2020-12-11T10:55:16.759Z",
 			"txn": "",
 			"network": "testnet"
@@ -787,7 +787,7 @@
 			"name": "ProxysETC",
 			"address": "0x209DBAe1639bC9A2519b5bA5351016b56F38B596",
 			"source": "ProxyERC20",
-			"link": "https://testnet.etherscan.io/address/0x209DBAe1639bC9A2519b5bA5351016b56F38B596",
+			"link": "https://testnet.bscscan.com/address/0x209DBAe1639bC9A2519b5bA5351016b56F38B596",
 			"timestamp": "2020-12-11T10:55:22.722Z",
 			"txn": "",
 			"network": "testnet"
@@ -796,7 +796,7 @@
 			"name": "SynthsETC",
 			"address": "0x79BD87192243F3084E49cA7f7EbE8a1cfAE70c3E",
 			"source": "Synth",
-			"link": "https://testnet.etherscan.io/address/0x79BD87192243F3084E49cA7f7EbE8a1cfAE70c3E",
+			"link": "https://testnet.bscscan.com/address/0x79BD87192243F3084E49cA7f7EbE8a1cfAE70c3E",
 			"timestamp": "2020-12-11T10:55:29.072Z",
 			"txn": "",
 			"network": "testnet"
@@ -805,7 +805,7 @@
 			"name": "TokenStatesDASH",
 			"address": "0xcEAaa9258c542e14cc710182e1352977f6fCEb36",
 			"source": "TokenState",
-			"link": "https://testnet.etherscan.io/address/0xcEAaa9258c542e14cc710182e1352977f6fCEb36",
+			"link": "https://testnet.bscscan.com/address/0xcEAaa9258c542e14cc710182e1352977f6fCEb36",
 			"timestamp": "2020-12-11T10:55:46.744Z",
 			"txn": "",
 			"network": "testnet"
@@ -814,7 +814,7 @@
 			"name": "ProxysDASH",
 			"address": "0x864554C48436Fe3A6f7fB2D8DA761f9D10b43987",
 			"source": "ProxyERC20",
-			"link": "https://testnet.etherscan.io/address/0x864554C48436Fe3A6f7fB2D8DA761f9D10b43987",
+			"link": "https://testnet.bscscan.com/address/0x864554C48436Fe3A6f7fB2D8DA761f9D10b43987",
 			"timestamp": "2020-12-11T10:55:52.706Z",
 			"txn": "",
 			"network": "testnet"
@@ -823,7 +823,7 @@
 			"name": "SynthsDASH",
 			"address": "0xF344071cd0600b3117CbBFc23325DADD76d31470",
 			"source": "Synth",
-			"link": "https://testnet.etherscan.io/address/0xF344071cd0600b3117CbBFc23325DADD76d31470",
+			"link": "https://testnet.bscscan.com/address/0xF344071cd0600b3117CbBFc23325DADD76d31470",
 			"timestamp": "2020-12-11T10:55:59.785Z",
 			"txn": "",
 			"network": "testnet"
@@ -832,7 +832,7 @@
 			"name": "TokenStatesXMR",
 			"address": "0xF827217996df61E1aA762cD304C28e121d2D899c",
 			"source": "TokenState",
-			"link": "https://testnet.etherscan.io/address/0xF827217996df61E1aA762cD304C28e121d2D899c",
+			"link": "https://testnet.bscscan.com/address/0xF827217996df61E1aA762cD304C28e121d2D899c",
 			"timestamp": "2020-12-11T10:56:17.080Z",
 			"txn": "",
 			"network": "testnet"
@@ -841,7 +841,7 @@
 			"name": "ProxysXMR",
 			"address": "0x1558a6b317F5fbfe8733B36f37A075B86700ED5a",
 			"source": "ProxyERC20",
-			"link": "https://testnet.etherscan.io/address/0x1558a6b317F5fbfe8733B36f37A075B86700ED5a",
+			"link": "https://testnet.bscscan.com/address/0x1558a6b317F5fbfe8733B36f37A075B86700ED5a",
 			"timestamp": "2020-12-11T10:56:23.173Z",
 			"txn": "",
 			"network": "testnet"
@@ -850,7 +850,7 @@
 			"name": "SynthsXMR",
 			"address": "0x037BE5a0710Df9175006B173507D8fCc84c7e497",
 			"source": "Synth",
-			"link": "https://testnet.etherscan.io/address/0x037BE5a0710Df9175006B173507D8fCc84c7e497",
+			"link": "https://testnet.bscscan.com/address/0x037BE5a0710Df9175006B173507D8fCc84c7e497",
 			"timestamp": "2020-12-11T10:56:29.553Z",
 			"txn": "",
 			"network": "testnet"
@@ -859,7 +859,7 @@
 			"name": "TokenStatesADA",
 			"address": "0xF6c03b7391AED985b659a5F97Ae506EF6aF8031f",
 			"source": "TokenState",
-			"link": "https://testnet.etherscan.io/address/0xF6c03b7391AED985b659a5F97Ae506EF6aF8031f",
+			"link": "https://testnet.bscscan.com/address/0xF6c03b7391AED985b659a5F97Ae506EF6aF8031f",
 			"timestamp": "2020-12-11T10:56:47.086Z",
 			"txn": "",
 			"network": "testnet"
@@ -868,7 +868,7 @@
 			"name": "ProxysADA",
 			"address": "0xB1537636A0C8e38b9634a5695a3eaF18BB696D42",
 			"source": "ProxyERC20",
-			"link": "https://testnet.etherscan.io/address/0xB1537636A0C8e38b9634a5695a3eaF18BB696D42",
+			"link": "https://testnet.bscscan.com/address/0xB1537636A0C8e38b9634a5695a3eaF18BB696D42",
 			"timestamp": "2020-12-11T10:56:52.375Z",
 			"txn": "",
 			"network": "testnet"
@@ -877,7 +877,7 @@
 			"name": "SynthsADA",
 			"address": "0x2dEBE117A905BF50D950f3b1bf11aa43D498A64D",
 			"source": "Synth",
-			"link": "https://testnet.etherscan.io/address/0x2dEBE117A905BF50D950f3b1bf11aa43D498A64D",
+			"link": "https://testnet.bscscan.com/address/0x2dEBE117A905BF50D950f3b1bf11aa43D498A64D",
 			"timestamp": "2020-12-11T10:57:00.256Z",
 			"txn": "",
 			"network": "testnet"
@@ -886,7 +886,7 @@
 			"name": "TokenStatesCEX",
 			"address": "0xdf944A9fe59F8d0005765515F85Aa29A7610D7E6",
 			"source": "TokenState",
-			"link": "https://testnet.etherscan.io/address/0xdf944A9fe59F8d0005765515F85Aa29A7610D7E6",
+			"link": "https://testnet.bscscan.com/address/0xdf944A9fe59F8d0005765515F85Aa29A7610D7E6",
 			"timestamp": "2020-12-11T10:57:17.092Z",
 			"txn": "",
 			"network": "testnet"
@@ -895,7 +895,7 @@
 			"name": "ProxysCEX",
 			"address": "0xE4abE4e69fF9Be63690dFaE5cF010B3dD22C3fed",
 			"source": "ProxyERC20",
-			"link": "https://testnet.etherscan.io/address/0xE4abE4e69fF9Be63690dFaE5cF010B3dD22C3fed",
+			"link": "https://testnet.bscscan.com/address/0xE4abE4e69fF9Be63690dFaE5cF010B3dD22C3fed",
 			"timestamp": "2020-12-11T10:57:23.554Z",
 			"txn": "",
 			"network": "testnet"
@@ -904,7 +904,7 @@
 			"name": "SynthsCEX",
 			"address": "0x8C5aD4eEa5B76549a05981C43013f0E7B7e50199",
 			"source": "PurgeableSynth",
-			"link": "https://testnet.etherscan.io/address/0x8C5aD4eEa5B76549a05981C43013f0E7B7e50199",
+			"link": "https://testnet.bscscan.com/address/0x8C5aD4eEa5B76549a05981C43013f0E7B7e50199",
 			"timestamp": "2020-12-11T10:57:28.746Z",
 			"txn": "",
 			"network": "testnet"
@@ -913,7 +913,7 @@
 			"name": "TokenStatesDEFI",
 			"address": "0xD410a16835EF1000697f8c4b80b5480EEdaaA8c2",
 			"source": "TokenState",
-			"link": "https://testnet.etherscan.io/address/0xD410a16835EF1000697f8c4b80b5480EEdaaA8c2",
+			"link": "https://testnet.bscscan.com/address/0xD410a16835EF1000697f8c4b80b5480EEdaaA8c2",
 			"timestamp": "2020-12-11T10:57:43.291Z",
 			"txn": "",
 			"network": "testnet"
@@ -922,7 +922,7 @@
 			"name": "ProxysDEFI",
 			"address": "0x188F6226D506248426a28a5f0d10E1E31930f905",
 			"source": "ProxyERC20",
-			"link": "https://testnet.etherscan.io/address/0x188F6226D506248426a28a5f0d10E1E31930f905",
+			"link": "https://testnet.bscscan.com/address/0x188F6226D506248426a28a5f0d10E1E31930f905",
 			"timestamp": "2020-12-11T10:57:50.248Z",
 			"txn": "",
 			"network": "testnet"
@@ -931,7 +931,7 @@
 			"name": "SynthsDEFI",
 			"address": "0x30F8F1f7C30Fa869917483dFb9eC41c8f1ab5ad0",
 			"source": "PurgeableSynth",
-			"link": "https://testnet.etherscan.io/address/0x30F8F1f7C30Fa869917483dFb9eC41c8f1ab5ad0",
+			"link": "https://testnet.bscscan.com/address/0x30F8F1f7C30Fa869917483dFb9eC41c8f1ab5ad0",
 			"timestamp": "2020-12-11T10:57:56.350Z",
 			"txn": "",
 			"network": "testnet"
@@ -940,7 +940,7 @@
 			"name": "TokenStateiBTC",
 			"address": "0xC53316112c71f599C1Af98F06f7A1c8254Ff3b50",
 			"source": "TokenState",
-			"link": "https://testnet.etherscan.io/address/0xC53316112c71f599C1Af98F06f7A1c8254Ff3b50",
+			"link": "https://testnet.bscscan.com/address/0xC53316112c71f599C1Af98F06f7A1c8254Ff3b50",
 			"timestamp": "2020-12-11T10:58:13.852Z",
 			"txn": "",
 			"network": "testnet"
@@ -949,7 +949,7 @@
 			"name": "ProxyiBTC",
 			"address": "0x29a9b9f532754f9b2b0c52FccA3DD9ba584DA74B",
 			"source": "ProxyERC20",
-			"link": "https://testnet.etherscan.io/address/0x29a9b9f532754f9b2b0c52FccA3DD9ba584DA74B",
+			"link": "https://testnet.bscscan.com/address/0x29a9b9f532754f9b2b0c52FccA3DD9ba584DA74B",
 			"timestamp": "2020-12-11T10:58:19.703Z",
 			"txn": "",
 			"network": "testnet"
@@ -958,7 +958,7 @@
 			"name": "SynthiBTC",
 			"address": "0xd464C4bD8e9577C58493FB07002fa6407ade9226",
 			"source": "PurgeableSynth",
-			"link": "https://testnet.etherscan.io/address/0xd464C4bD8e9577C58493FB07002fa6407ade9226",
+			"link": "https://testnet.bscscan.com/address/0xd464C4bD8e9577C58493FB07002fa6407ade9226",
 			"timestamp": "2020-12-11T10:58:26.472Z",
 			"txn": "",
 			"network": "testnet"
@@ -967,7 +967,7 @@
 			"name": "TokenStateiETH",
 			"address": "0xb2bcb95c155660da49CCd0eBCf1E5d5c2756aB6c",
 			"source": "TokenState",
-			"link": "https://testnet.etherscan.io/address/0xb2bcb95c155660da49CCd0eBCf1E5d5c2756aB6c",
+			"link": "https://testnet.bscscan.com/address/0xb2bcb95c155660da49CCd0eBCf1E5d5c2756aB6c",
 			"timestamp": "2020-12-11T10:58:44.467Z",
 			"txn": "",
 			"network": "testnet"
@@ -976,7 +976,7 @@
 			"name": "ProxyiETH",
 			"address": "0x6a57e4BD28551474BaA3C5B8a9B620899A594C78",
 			"source": "ProxyERC20",
-			"link": "https://testnet.etherscan.io/address/0x6a57e4BD28551474BaA3C5B8a9B620899A594C78",
+			"link": "https://testnet.bscscan.com/address/0x6a57e4BD28551474BaA3C5B8a9B620899A594C78",
 			"timestamp": "2020-12-11T10:58:49.985Z",
 			"txn": "",
 			"network": "testnet"
@@ -985,7 +985,7 @@
 			"name": "SynthiETH",
 			"address": "0xCB8EAb3d39D5C31715d433B8d55f2a54c98d6881",
 			"source": "PurgeableSynth",
-			"link": "https://testnet.etherscan.io/address/0xCB8EAb3d39D5C31715d433B8d55f2a54c98d6881",
+			"link": "https://testnet.bscscan.com/address/0xCB8EAb3d39D5C31715d433B8d55f2a54c98d6881",
 			"timestamp": "2020-12-11T10:58:56.329Z",
 			"txn": "",
 			"network": "testnet"
@@ -994,7 +994,7 @@
 			"name": "TokenStateiBNB",
 			"address": "0x07C2f3191C784d483AEb1981D9484B991Eb63688",
 			"source": "TokenState",
-			"link": "https://testnet.etherscan.io/address/0x07C2f3191C784d483AEb1981D9484B991Eb63688",
+			"link": "https://testnet.bscscan.com/address/0x07C2f3191C784d483AEb1981D9484B991Eb63688",
 			"timestamp": "2020-12-11T10:59:13.884Z",
 			"txn": "",
 			"network": "testnet"
@@ -1003,7 +1003,7 @@
 			"name": "ProxyiBNB",
 			"address": "0x99A9FAeA7Aa5c324Bd91DbB6178987204B2ea63F",
 			"source": "ProxyERC20",
-			"link": "https://testnet.etherscan.io/address/0x99A9FAeA7Aa5c324Bd91DbB6178987204B2ea63F",
+			"link": "https://testnet.bscscan.com/address/0x99A9FAeA7Aa5c324Bd91DbB6178987204B2ea63F",
 			"timestamp": "2020-12-11T10:59:20.567Z",
 			"txn": "",
 			"network": "testnet"
@@ -1012,7 +1012,7 @@
 			"name": "SynthiBNB",
 			"address": "0xd78853B1a6a41D6E8fc793b8304A958AE5C000A5",
 			"source": "PurgeableSynth",
-			"link": "https://testnet.etherscan.io/address/0xd78853B1a6a41D6E8fc793b8304A958AE5C000A5",
+			"link": "https://testnet.bscscan.com/address/0xd78853B1a6a41D6E8fc793b8304A958AE5C000A5",
 			"timestamp": "2020-12-11T10:59:27.027Z",
 			"txn": "",
 			"network": "testnet"
@@ -1021,7 +1021,7 @@
 			"name": "TokenStateiTRX",
 			"address": "0x225B9ca7b735A0Eb79d581daf5a87642dbC3f521",
 			"source": "TokenState",
-			"link": "https://testnet.etherscan.io/address/0x225B9ca7b735A0Eb79d581daf5a87642dbC3f521",
+			"link": "https://testnet.bscscan.com/address/0x225B9ca7b735A0Eb79d581daf5a87642dbC3f521",
 			"timestamp": "2020-12-11T10:59:44.671Z",
 			"txn": "",
 			"network": "testnet"
@@ -1030,7 +1030,7 @@
 			"name": "ProxyiTRX",
 			"address": "0x4ad9d6d2d7c447477A34382c28338F073796Ef94",
 			"source": "ProxyERC20",
-			"link": "https://testnet.etherscan.io/address/0x4ad9d6d2d7c447477A34382c28338F073796Ef94",
+			"link": "https://testnet.bscscan.com/address/0x4ad9d6d2d7c447477A34382c28338F073796Ef94",
 			"timestamp": "2020-12-11T10:59:50.727Z",
 			"txn": "",
 			"network": "testnet"
@@ -1039,7 +1039,7 @@
 			"name": "SynthiTRX",
 			"address": "0x970148AbF399B58b4aEA90613F40B830472c4b0c",
 			"source": "PurgeableSynth",
-			"link": "https://testnet.etherscan.io/address/0x970148AbF399B58b4aEA90613F40B830472c4b0c",
+			"link": "https://testnet.bscscan.com/address/0x970148AbF399B58b4aEA90613F40B830472c4b0c",
 			"timestamp": "2020-12-11T10:59:57.023Z",
 			"txn": "",
 			"network": "testnet"
@@ -1048,7 +1048,7 @@
 			"name": "TokenStateiXTZ",
 			"address": "0xe67D58151B7927ec710719e4a440E01cFAC58D81",
 			"source": "TokenState",
-			"link": "https://testnet.etherscan.io/address/0xe67D58151B7927ec710719e4a440E01cFAC58D81",
+			"link": "https://testnet.bscscan.com/address/0xe67D58151B7927ec710719e4a440E01cFAC58D81",
 			"timestamp": "2020-12-11T11:00:14.083Z",
 			"txn": "",
 			"network": "testnet"
@@ -1057,7 +1057,7 @@
 			"name": "ProxyiXTZ",
 			"address": "0x7A70FfB9e41CA8377B9D3C79563D4B97E0b25991",
 			"source": "ProxyERC20",
-			"link": "https://testnet.etherscan.io/address/0x7A70FfB9e41CA8377B9D3C79563D4B97E0b25991",
+			"link": "https://testnet.bscscan.com/address/0x7A70FfB9e41CA8377B9D3C79563D4B97E0b25991",
 			"timestamp": "2020-12-11T11:00:20.474Z",
 			"txn": "",
 			"network": "testnet"
@@ -1066,7 +1066,7 @@
 			"name": "SynthiXTZ",
 			"address": "0xAB3d730BbFa72A562184A742849327711ab8164e",
 			"source": "PurgeableSynth",
-			"link": "https://testnet.etherscan.io/address/0xAB3d730BbFa72A562184A742849327711ab8164e",
+			"link": "https://testnet.bscscan.com/address/0xAB3d730BbFa72A562184A742849327711ab8164e",
 			"timestamp": "2020-12-11T11:00:27.233Z",
 			"txn": "",
 			"network": "testnet"
@@ -1075,7 +1075,7 @@
 			"name": "TokenStateiCEX",
 			"address": "0xd94f342ED4281b271f723c24018fD36DB117380F",
 			"source": "TokenState",
-			"link": "https://testnet.etherscan.io/address/0xd94f342ED4281b271f723c24018fD36DB117380F",
+			"link": "https://testnet.bscscan.com/address/0xd94f342ED4281b271f723c24018fD36DB117380F",
 			"timestamp": "2020-12-11T11:00:44.017Z",
 			"txn": "",
 			"network": "testnet"
@@ -1084,7 +1084,7 @@
 			"name": "ProxyiCEX",
 			"address": "0x65a8528eeA24Ab6524271BD91edeE2e053ae34E0",
 			"source": "ProxyERC20",
-			"link": "https://testnet.etherscan.io/address/0x65a8528eeA24Ab6524271BD91edeE2e053ae34E0",
+			"link": "https://testnet.bscscan.com/address/0x65a8528eeA24Ab6524271BD91edeE2e053ae34E0",
 			"timestamp": "2020-12-11T11:00:49.629Z",
 			"txn": "",
 			"network": "testnet"
@@ -1093,7 +1093,7 @@
 			"name": "SynthiCEX",
 			"address": "0xf175fa28589a8D5a72C0ab43Bd47BA381A1c0739",
 			"source": "PurgeableSynth",
-			"link": "https://testnet.etherscan.io/address/0xf175fa28589a8D5a72C0ab43Bd47BA381A1c0739",
+			"link": "https://testnet.bscscan.com/address/0xf175fa28589a8D5a72C0ab43Bd47BA381A1c0739",
 			"timestamp": "2020-12-11T11:00:56.548Z",
 			"txn": "",
 			"network": "testnet"
@@ -1102,7 +1102,7 @@
 			"name": "TokenStateiDEFI",
 			"address": "0x4524d46C37c88C30C9C0Be86937a2daf7824698a",
 			"source": "TokenState",
-			"link": "https://testnet.etherscan.io/address/0x4524d46C37c88C30C9C0Be86937a2daf7824698a",
+			"link": "https://testnet.bscscan.com/address/0x4524d46C37c88C30C9C0Be86937a2daf7824698a",
 			"timestamp": "2020-12-11T11:01:13.617Z",
 			"txn": "",
 			"network": "testnet"
@@ -1111,7 +1111,7 @@
 			"name": "ProxyiDEFI",
 			"address": "0x4dEd9eeB0778086c3f55D96F4C21D07F4186499D",
 			"source": "ProxyERC20",
-			"link": "https://testnet.etherscan.io/address/0x4dEd9eeB0778086c3f55D96F4C21D07F4186499D",
+			"link": "https://testnet.bscscan.com/address/0x4dEd9eeB0778086c3f55D96F4C21D07F4186499D",
 			"timestamp": "2020-12-11T11:01:20.230Z",
 			"txn": "",
 			"network": "testnet"
@@ -1120,7 +1120,7 @@
 			"name": "SynthiDEFI",
 			"address": "0x809314431414Da8EE79c5Ba390a7116018CeEbD8",
 			"source": "PurgeableSynth",
-			"link": "https://testnet.etherscan.io/address/0x809314431414Da8EE79c5Ba390a7116018CeEbD8",
+			"link": "https://testnet.bscscan.com/address/0x809314431414Da8EE79c5Ba390a7116018CeEbD8",
 			"timestamp": "2020-12-11T11:01:26.679Z",
 			"txn": "",
 			"network": "testnet"
@@ -1129,7 +1129,7 @@
 			"name": "TokenStatesFTSE",
 			"address": "0x4820c8798F25a94488b710809fC37772b52E90a3",
 			"source": "TokenState",
-			"link": "https://testnet.etherscan.io/address/0x4820c8798F25a94488b710809fC37772b52E90a3",
+			"link": "https://testnet.bscscan.com/address/0x4820c8798F25a94488b710809fC37772b52E90a3",
 			"timestamp": "2020-12-11T11:01:43.781Z",
 			"txn": "",
 			"network": "testnet"
@@ -1138,7 +1138,7 @@
 			"name": "ProxysFTSE",
 			"address": "0xCB79dC7e212a1f43f185809b6f1F159967043D5D",
 			"source": "ProxyERC20",
-			"link": "https://testnet.etherscan.io/address/0xCB79dC7e212a1f43f185809b6f1F159967043D5D",
+			"link": "https://testnet.bscscan.com/address/0xCB79dC7e212a1f43f185809b6f1F159967043D5D",
 			"timestamp": "2020-12-11T11:01:50.820Z",
 			"txn": "",
 			"network": "testnet"
@@ -1147,7 +1147,7 @@
 			"name": "SynthsFTSE",
 			"address": "0xbe32f9cD7109D46c680D1237059cB8374D76712A",
 			"source": "Synth",
-			"link": "https://testnet.etherscan.io/address/0xbe32f9cD7109D46c680D1237059cB8374D76712A",
+			"link": "https://testnet.bscscan.com/address/0xbe32f9cD7109D46c680D1237059cB8374D76712A",
 			"timestamp": "2020-12-11T11:01:55.796Z",
 			"txn": "",
 			"network": "testnet"
@@ -1156,7 +1156,7 @@
 			"name": "TokenStatesNIKKEI",
 			"address": "0x9eF8c899bbd8bd0C17C347eDD5C7AcD51dE1b9F2",
 			"source": "TokenState",
-			"link": "https://testnet.etherscan.io/address/0x9eF8c899bbd8bd0C17C347eDD5C7AcD51dE1b9F2",
+			"link": "https://testnet.bscscan.com/address/0x9eF8c899bbd8bd0C17C347eDD5C7AcD51dE1b9F2",
 			"timestamp": "2020-12-11T11:02:13.999Z",
 			"txn": "",
 			"network": "testnet"
@@ -1165,7 +1165,7 @@
 			"name": "ProxysNIKKEI",
 			"address": "0xfeFD94ca780639e394a06876DE508a200411A71D",
 			"source": "ProxyERC20",
-			"link": "https://testnet.etherscan.io/address/0xfeFD94ca780639e394a06876DE508a200411A71D",
+			"link": "https://testnet.bscscan.com/address/0xfeFD94ca780639e394a06876DE508a200411A71D",
 			"timestamp": "2020-12-11T11:02:19.357Z",
 			"txn": "",
 			"network": "testnet"
@@ -1174,7 +1174,7 @@
 			"name": "SynthsNIKKEI",
 			"address": "0xa4E1F1D8f72E13841e5400031E7120C099bD04bd",
 			"source": "Synth",
-			"link": "https://testnet.etherscan.io/address/0xa4E1F1D8f72E13841e5400031E7120C099bD04bd",
+			"link": "https://testnet.bscscan.com/address/0xa4E1F1D8f72E13841e5400031E7120C099bD04bd",
 			"timestamp": "2020-12-11T11:02:28.472Z",
 			"txn": "",
 			"network": "testnet"
@@ -1183,7 +1183,7 @@
 			"name": "Depot",
 			"address": "0xA64673682A396bF3fAE778E82D12fCE0ee068885",
 			"source": "Depot",
-			"link": "https://testnet.etherscan.io/address/0xA64673682A396bF3fAE778E82D12fCE0ee068885",
+			"link": "https://testnet.bscscan.com/address/0xA64673682A396bF3fAE778E82D12fCE0ee068885",
 			"timestamp": "2020-12-11T11:02:46.912Z",
 			"txn": "",
 			"network": "testnet"
@@ -1192,7 +1192,7 @@
 			"name": "EtherCollateral",
 			"address": "0x0C3d872D5C7786E546346dC8459F276832c762cc",
 			"source": "EtherCollateral",
-			"link": "https://testnet.etherscan.io/address/0x0C3d872D5C7786E546346dC8459F276832c762cc",
+			"link": "https://testnet.bscscan.com/address/0x0C3d872D5C7786E546346dC8459F276832c762cc",
 			"timestamp": "2020-12-11T11:02:54.207Z",
 			"txn": "",
 			"network": "testnet"
@@ -1201,7 +1201,7 @@
 			"name": "EtherCollateralsUSD",
 			"address": "0xC24a92955d5a2663897F40FA1eCBbcC9201645C1",
 			"source": "EtherCollateralsUSD",
-			"link": "https://testnet.etherscan.io/address/0xC24a92955d5a2663897F40FA1eCBbcC9201645C1",
+			"link": "https://testnet.bscscan.com/address/0xC24a92955d5a2663897F40FA1eCBbcC9201645C1",
 			"timestamp": "2020-12-11T11:02:59.391Z",
 			"txn": "",
 			"network": "testnet"
@@ -1210,7 +1210,7 @@
 			"name": "BinaryOptionMarketFactory",
 			"address": "0xFbd514Ef9536B8181B7e8eC7141e2743eb0C8b37",
 			"source": "BinaryOptionMarketFactory",
-			"link": "https://testnet.etherscan.io/address/0xFbd514Ef9536B8181B7e8eC7141e2743eb0C8b37",
+			"link": "https://testnet.bscscan.com/address/0xFbd514Ef9536B8181B7e8eC7141e2743eb0C8b37",
 			"timestamp": "2020-12-11T11:03:07.294Z",
 			"txn": "",
 			"network": "testnet"
@@ -1219,7 +1219,7 @@
 			"name": "BinaryOptionMarketManager",
 			"address": "0x1a21554f663323fb5d2625837B0Bf76BA60279Ed",
 			"source": "BinaryOptionMarketManager",
-			"link": "https://testnet.etherscan.io/address/0x1a21554f663323fb5d2625837B0Bf76BA60279Ed",
+			"link": "https://testnet.bscscan.com/address/0x1a21554f663323fb5d2625837B0Bf76BA60279Ed",
 			"timestamp": "2020-12-11T11:03:13.871Z",
 			"txn": "",
 			"network": "testnet"
@@ -1228,7 +1228,7 @@
 			"name": "SynthUtil",
 			"address": "0x3109365d7812e61C3e4f1C8FA1ada01b5A7A0254",
 			"source": "SynthUtil",
-			"link": "https://testnet.etherscan.io/address/0x3109365d7812e61C3e4f1C8FA1ada01b5A7A0254",
+			"link": "https://testnet.bscscan.com/address/0x3109365d7812e61C3e4f1C8FA1ada01b5A7A0254",
 			"timestamp": "2020-12-11T11:03:19.308Z",
 			"txn": "",
 			"network": "testnet"
@@ -1237,7 +1237,7 @@
 			"name": "DappMaintenance",
 			"address": "0x6BC3EE938De7612FB576ef66d93161B3AFb49ED8",
 			"source": "DappMaintenance",
-			"link": "https://testnet.etherscan.io/address/0x6BC3EE938De7612FB576ef66d93161B3AFb49ED8",
+			"link": "https://testnet.bscscan.com/address/0x6BC3EE938De7612FB576ef66d93161B3AFb49ED8",
 			"timestamp": "2020-12-11T11:03:25.846Z",
 			"txn": "",
 			"network": "testnet"
@@ -1246,7 +1246,7 @@
 			"name": "BinaryOptionMarketData",
 			"address": "0xDe219E6130fEB9b6695b15B275f2F982Eaa4e144",
 			"source": "BinaryOptionMarketData",
-			"link": "https://testnet.etherscan.io/address/0xDe219E6130fEB9b6695b15B275f2F982Eaa4e144",
+			"link": "https://testnet.bscscan.com/address/0xDe219E6130fEB9b6695b15B275f2F982Eaa4e144",
 			"timestamp": "2020-12-11T11:03:31.443Z",
 			"txn": "",
 			"network": "testnet"

@@ -55,10 +55,8 @@ node publish deploy # "--help" for options
 ### Examples
 
 ```bash
-# deploy to rinkeby with 8 gwei gas
-node publish deploy -n ropsten -d publish/deployed/ropsten -g 20
-node publish deploy -n rinkeby -d publish/deployed/rinkeby -g 20
-node publish deploy -n kovan -d publish/deployed/kovan -g 8
+# deploy to testnet with 20 gwei gas
+node publish deploy -n testnet -d publish/deployed/testnet -g 20
 node publish deploy -n local -d publish/deployed/local -g 8
 ```
 
