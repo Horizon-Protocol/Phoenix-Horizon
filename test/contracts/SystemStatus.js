@@ -11,7 +11,7 @@ const { onlyGivenAddressCanInvoke, ensureOnlyExpectedMutativeFunctions } = requi
 const { toBytes32 } = require('../..');
 
 contract('SystemStatus', async accounts => {
-	const [SYSTEM, ISSUANCE, EXCHANGE, HASSET] = ['System', 'Issuance', 'Exchange', 'Hasset'].map(
+	const [SYSTEM, ISSUANCE, EXCHANGE, HASSET] = ['System', 'Issuance', 'Exchange', 'Synth'].map(
 		toBytes32
 	);
 

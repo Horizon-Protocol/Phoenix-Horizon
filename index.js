@@ -16,14 +16,11 @@ const data = {
 const assets = require('./publish/assets.json');
 const ovmIgnored = require('./publish/ovm-ignore.json');
 
-const networks = ['local', 'kovan', 'rinkeby', 'ropsten', 'mainnet', 'goerli'];
+const networks = ['local', 'testnet', 'mainnet'];
 
 const networkToChainId = {
 	mainnet: 1,
-	ropsten: 3,
-	rinkeby: 4,
-	goerli: 5,
-	kovan: 42,
+	testnet: 97,
 };
 
 const constants = {

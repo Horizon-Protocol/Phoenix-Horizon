@@ -18,15 +18,18 @@
 	},
 	{
 		"name": "sGBP",
-		"asset": "GBP"
+		"asset": "GBP",
+		"subclass": "PurgeableSynth"
 	},
 	{
 		"name": "sCHF",
-		"asset": "CHF"
+		"asset": "CHF",
+		"subclass": "PurgeableSynth"
 	},
 	{
 		"name": "sXAU",
-		"asset": "XAU"
+		"asset": "XAU",
+		"subclass": "PurgeableSynth"
 	},
 	{
 		"name": "sXAG",
@@ -43,8 +46,7 @@
 	},
 	{
 		"name": "sBNB",
-		"asset": "BNB",
-		"subclass": "PurgeableSynth"
+		"asset": "BNB"
 	},
 	{
 		"name": "sTRX",
@@ -52,8 +54,7 @@
 	},
 	{
 		"name": "sXTZ",
-		"asset": "XTZ",
-		"subclass": "PurgeableSynth"
+		"asset": "XTZ"
 	},
 	{
 		"name": "sXRP",
@@ -204,41 +205,41 @@
 	{
 		"name": "iBTC",
 		"asset": "BTC",
-		"subclass": "PurgeableSynth",
 		"inverted": {
 			"entryPoint": 10600,
 			"upperLimit": 15900,
 			"lowerLimit": 5300
-		}
+		},
+		"subclass": "PurgeableSynth"
 	},
 	{
 		"name": "iETH",
 		"asset": "ETH",
-		"subclass": "PurgeableSynth",
 		"inverted": {
-			"entryPoint": 314.54,
-			"upperLimit": 550.445,
-			"lowerLimit": 78.635
-		}
+			"entryPoint": 180.16,
+			"upperLimit": 315.28,
+			"lowerLimit": 45.04
+		},
+		"subclass": "PurgeableSynth"
 	},
 	{
 		"name": "iBNB",
 		"asset": "BNB",
-		"subclass": "PurgeableSynth",
 		"inverted": {
-			"entryPoint": 22.258,
-			"upperLimit": 33.387,
-			"lowerLimit": 11.129
-		}
+			"entryPoint": 29,
+			"upperLimit": 44,
+			"lowerLimit": 14.5
+		},
+		"subclass": "PurgeableSynth"
 	},
 	{
 		"name": "iTRX",
 		"asset": "TRX",
 		"subclass": "PurgeableSynth",
 		"inverted": {
-			"entryPoint": 0.0299,
-			"upperLimit": 0.04485,
-			"lowerLimit": 0.01495
+			"entryPoint": 0.025,
+			"upperLimit": 0.0375,
+			"lowerLimit": 0.0125
 		}
 	},
 	{
@@ -246,99 +247,9 @@
 		"asset": "XTZ",
 		"subclass": "PurgeableSynth",
 		"inverted": {
-			"entryPoint": 4.1915,
-			"upperLimit": 6.28725,
-			"lowerLimit": 2.09575
-		}
-	},
-	{
-		"name": "iXRP",
-		"asset": "XRP",
-		"subclass": "PurgeableSynth",
-		"inverted": {
-			"entryPoint": 0.3042,
-			"upperLimit": 0.4563,
-			"lowerLimit": 0.1521
-		}
-	},
-	{
-		"name": "iLINK",
-		"asset": "LINK",
-		"subclass": "PurgeableSynth",
-		"inverted": {
-			"entryPoint": 19.54,
-			"upperLimit": 29.31,
-			"lowerLimit": 9.77
-		}
-	},
-	{
-		"name": "iLTC",
-		"asset": "LTC",
-		"subclass": "PurgeableSynth",
-		"inverted": {
-			"entryPoint": 35.66,
-			"upperLimit": 53.49,
-			"lowerLimit": 17.83
-		}
-	},
-	{
-		"name": "iEOS",
-		"asset": "EOS",
-		"subclass": "PurgeableSynth",
-		"inverted": {
-			"entryPoint": 3.8502,
-			"upperLimit": 5.7753,
-			"lowerLimit": 1.9251
-		}
-	},
-	{
-		"name": "iBCH",
-		"asset": "BCH",
-		"subclass": "PurgeableSynth",
-		"inverted": {
-			"entryPoint": 314.4821,
-			"upperLimit": 471.72315,
-			"lowerLimit": 157.24105
-		}
-	},
-	{
-		"name": "iETC",
-		"asset": "ETC",
-		"subclass": "PurgeableSynth",
-		"inverted": {
-			"entryPoint": 6.16,
-			"upperLimit": 9.24,
-			"lowerLimit": 3.08
-		}
-	},
-	{
-		"name": "iDASH",
-		"asset": "DASH",
-		"subclass": "PurgeableSynth",
-		"inverted": {
-			"entryPoint": 98.6231,
-			"upperLimit": 147.93465,
-			"lowerLimit": 49.31155
-		}
-	},
-	{
-		"name": "iXMR",
-		"asset": "XMR",
-		"subclass": "PurgeableSynth",
-		"inverted": {
-			"entryPoint": 91.2236,
-			"upperLimit": 136.8354,
-			"lowerLimit": 45.6118
-		}
-	},
-	{
-		"name": "iADA",
-		"asset": "ADA",
-		"subclass": "PurgeableSynth",
-		"inverted": {
-			"entryPoint": 0.08,
-			"upperLimit": 0.12,
-			"lowerLimit": 0.04
+			"entryPoint": 1.4,
+			"upperLimit": 2.1,
+			"lowerLimit": 0.7
 		}
 	},
 	{
@@ -347,9 +258,9 @@
 		"index": "sCEX",
 		"subclass": "PurgeableSynth",
 		"inverted": {
-			"entryPoint": 943.4772,
-			"upperLimit": 1415.2158,
-			"lowerLimit": 471.7386
+			"entryPoint": 1000,
+			"upperLimit": 1500,
+			"lowerLimit": 500
 		}
 	},
 	{
@@ -358,9 +269,17 @@
 		"index": "sDEFI",
 		"subclass": "PurgeableSynth",
 		"inverted": {
-			"entryPoint": 4249.0685,
-			"upperLimit": 6373.60275,
-			"lowerLimit": 2124.53425
+			"entryPoint": 2757.0,
+			"upperLimit": 4135.5,
+			"lowerLimit": 1378.5
 		}
+	},
+	{
+		"name": "sFTSE",
+		"asset": "FTSE100"
+	},
+	{
+		"name": "sNIKKEI",
+		"asset": "NIKKEI225"
 	}
 ]
