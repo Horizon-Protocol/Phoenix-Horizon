@@ -1,6 +1,6 @@
 {
 	"name": "@phoenix-global/horizon",
-	"version": "2.33.1",
+	"version": "2.33.2",
 	"license": "MIT",
 	"author": "Horizon",
 	"description": "The smart contracts which make up the Horizon system. (phoenix.global)",
@@ -60,7 +60,7 @@
 		"publish/deployed/mainnet/*"
 	],
 	"bin": {
-		"snx": "bin.js"
+		"hzn": "bin.js"
 	},
 	"main": "index.js",
 	"browser": "browser.js",
