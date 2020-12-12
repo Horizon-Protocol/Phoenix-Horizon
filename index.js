@@ -15,7 +15,7 @@ const ovmIgnored = require('./publish/ovm-ignore.json');
 const networks = ['local', 'testnet', 'mainnet'];
 
 const networkToChainId = {
-	mainnet: 1,
+	mainnet: 56,
 	testnet: 97,
 };
 
