@@ -32,11 +32,11 @@ contract FeePool is Owned, Proxyable, LimitedSetup, MixinResolver, MixinSystemSe
     using SafeMath for uint;
     using SafeDecimalMath for uint;
 
-    // Where fees are pooled in sUSD.
+    // Where fees are pooled in hUSD.
     address public constant FEE_ADDRESS = 0xfeEFEEfeefEeFeefEEFEEfEeFeefEEFeeFEEFEeF;
 
-    // sUSD currencyKey. Fees stored and paid in sUSD
-    bytes32 private sUSD = "sUSD";
+    // hUSD currencyKey. Fees stored and paid in hUSD
+    bytes32 private hUSD = "hUSD";
 
     // This struct represents the issuance activity that's happened in a fee period.
     struct FeePeriod {
@@ -227,10 +227,10 @@ contract FeePool is Owned, Proxyable, LimitedSetup, MixinResolver, MixinSystemSe
 
     /**
      * @notice The Exchanger contract informs us when fees are paid.
-     * @param amount susd amount in fees being paid.
+     * @param amount hUSD amount in fees being paid.
      */
     function recordFeePaid(uint amount) external onlyInternalContracts {
-        // Keep track off fees in sUSD in the open fee pool period.
+        // Keep track off fees in hUSD in the open fee pool period.
         _recentFeePeriodsStorage(0).feesToDistribute = _recentFeePeriodsStorage(0).feesToDistribute.add(amount);
     }
 
@@ -315,7 +315,7 @@ contract FeePool is Owned, Proxyable, LimitedSetup, MixinResolver, MixinSystemSe
 
         require(feesClaimable, "C-Ratio below penalty threshold");
 
-        require(!anyRateIsInvalid, "A synth or SNX rate is invalid");
+        require(!anyRateIsInvalid, "A hasset or HZN rate is invalid");
 
         // Get the claimingAddress available fees and rewards
         (availableFees, availableRewards) = feesAvailable(claimingAddress);
@@ -390,11 +390,11 @@ contract FeePool is Owned, Proxyable, LimitedSetup, MixinResolver, MixinSystemSe
 
     /**
      * @notice Record the fee payment in our recentFeePeriods.
-     * @param sUSDAmount The amount of fees priced in sUSD.
+     * @param hUSDAmount The amount of fees priced in hUSD.
      */
-    function _recordFeePayment(uint sUSDAmount) internal returns (uint) {
+    function _recordFeePayment(uint hUSDAmount) internal returns (uint) {
         // Don't assign to the parameter
-        uint remainingToAllocate = sUSDAmount;
+        uint remainingToAllocate = hUSDAmount;
 
         uint feesPaid;
         // Start at the oldest period and record the amount, moving to newer periods
@@ -469,27 +469,27 @@ contract FeePool is Owned, Proxyable, LimitedSetup, MixinResolver, MixinSystemSe
     /**
      * @notice Send the fees to claiming address.
      * @param account The address to send the fees to.
-     * @param sUSDAmount The amount of fees priced in sUSD.
+     * @param hUSDAmount The amount of fees priced in hUSD.
      */
-    function _payFees(address account, uint sUSDAmount) internal notFeeAddress(account) {
-        // Grab the sUSD Synth
-        ISynth sUSDSynth = issuer().synths(sUSD);
+    function _payFees(address account, uint hUSDAmount) internal notFeeAddress(account) {
+        // Grab the hUSD Synth
+        ISynth sUSDSynth = issuer().synths(hUSD);
 
         // NOTE: we do not control the FEE_ADDRESS so it is not possible to do an
         // ERC20.approve() transaction to allow this feePool to call ERC20.transferFrom
         // to the accounts address
 
         // Burn the source amount
-        sUSDSynth.burn(FEE_ADDRESS, sUSDAmount);
+        sUSDSynth.burn(FEE_ADDRESS, hUSDAmount);
 
         // Mint their new synths
-        sUSDSynth.issue(account, sUSDAmount);
+        sUSDSynth.issue(account, hUSDAmount);
     }
 
     /**
      * @notice Send the rewards to claiming address - will be locked in rewardEscrow.
      * @param account The address to send the fees to.
-     * @param snxAmount The amount of SNX.
+     * @param snxAmount The amount of HZN.
      */
     function _payRewards(address account, uint snxAmount) internal notFeeAddress(account) {
         // Record vesting entry for claiming address and amount
@@ -498,7 +498,7 @@ contract FeePool is Owned, Proxyable, LimitedSetup, MixinResolver, MixinSystemSe
     }
 
     /**
-     * @notice The total fees available in the system to be withdrawnn in sUSD
+     * @notice The total fees available in the system to be withdrawnn in hUSD
      */
     function totalFeesAvailable() external view returns (uint) {
         uint totalFees = 0;
@@ -528,7 +528,7 @@ contract FeePool is Owned, Proxyable, LimitedSetup, MixinResolver, MixinSystemSe
     }
 
     /**
-     * @notice The fees available to be withdrawn by a specific account, priced in sUSD
+     * @notice The fees available to be withdrawn by a specific account, priced in hUSD
      * @dev Returns two amounts, one for fees and one for SNX rewards
      */
     function feesAvailable(address account) public view returns (uint, uint) {
@@ -544,7 +544,7 @@ contract FeePool is Owned, Proxyable, LimitedSetup, MixinResolver, MixinSystemSe
             totalRewards = totalRewards.add(userFees[i][1]);
         }
 
-        // And convert totalFees to sUSD
+        // And convert totalFees to hUSD
         // Return totalRewards as is in SNX amount
         return (totalFees, totalRewards);
     }
@@ -577,7 +577,7 @@ contract FeePool is Owned, Proxyable, LimitedSetup, MixinResolver, MixinSystemSe
     }
 
     /**
-     * @notice Calculates fees by period for an account, priced in sUSD
+     * @notice Calculates fees by period for an account, priced in hUSD
      * @param account The address you want to query the fees for
      */
     function feesByPeriod(address account) public view returns (uint[2][FEE_PERIOD_LENGTH] memory results) {
@@ -790,14 +790,14 @@ contract FeePool is Owned, Proxyable, LimitedSetup, MixinResolver, MixinSystemSe
         proxy._emit(abi.encode(feePeriodId), 1, FEEPERIODCLOSED_SIG, 0, 0, 0);
     }
 
-    event FeesClaimed(address account, uint sUSDAmount, uint snxRewards);
+    event FeesClaimed(address account, uint hUSDAmount, uint snxRewards);
     bytes32 private constant FEESCLAIMED_SIG = keccak256("FeesClaimed(address,uint256,uint256)");
 
     function emitFeesClaimed(
         address account,
-        uint sUSDAmount,
+        uint hUSDAmount,
         uint snxRewards
     ) internal {
-        proxy._emit(abi.encode(account, sUSDAmount, snxRewards), 1, FEESCLAIMED_SIG, 0, 0, 0);
+        proxy._emit(abi.encode(account, hUSDAmount, snxRewards), 1, FEESCLAIMED_SIG, 0, 0, 0);
     }
 }

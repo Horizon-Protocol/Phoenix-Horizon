@@ -24,7 +24,7 @@ contract('EtherCollateral (prod tests)', accounts => {
 	let network, deploymentPath;
 
 	let EtherCollateral, ReadProxyAddressResolver, Depot;
-	let SynthsETH, SynthsUSD;
+	let SynthsETH, SynthhUSD;
 
 	before('prepare', async function() {
 		network = await detectNetworkName();
@@ -38,6 +38,7 @@ contract('EtherCollateral (prod tests)', accounts => {
 			return this.skip();
 		}
 
+		console.log(config);
 		if (config.patchFreshDeployment) {
 			await simulateExchangeRates({ network, deploymentPath });
 			await takeDebtSnapshot({ network, deploymentPath });
@@ -47,7 +48,7 @@ contract('EtherCollateral (prod tests)', accounts => {
 		({
 			EtherCollateral,
 			SynthsETH,
-			SynthsUSD,
+			SynthhUSD,
 			ReadProxyAddressResolver,
 			Depot,
 		} = await connectContracts({
@@ -57,7 +58,7 @@ contract('EtherCollateral (prod tests)', accounts => {
 				{ contractName: 'Depot' },
 				{ contractName: 'ReadProxyAddressResolver' },
 				{ contractName: 'SynthsETH', abiName: 'Synth' },
-				{ contractName: 'SynthsUSD', abiName: 'Synth' },
+				{ contractName: 'SynthhUSD', abiName: 'Synth' },
 			],
 		}));
 
@@ -115,9 +116,9 @@ contract('EtherCollateral (prod tests)', accounts => {
 				if (network === 'local') {
 					const amount = toUnit('100');
 
-					const balance = await SynthsUSD.balanceOf(Depot.address);
+					const balance = await SynthhUSD.balanceOf(Depot.address);
 					if (balance.lt(amount)) {
-						await SynthsUSD.approve(Depot.address, amount, {
+						await SynthhUSD.approve(Depot.address, amount, {
 							from: user1,
 						});
 

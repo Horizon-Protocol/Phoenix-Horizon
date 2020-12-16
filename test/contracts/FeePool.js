@@ -64,7 +64,7 @@ contract('FeePool', async accounts => {
 	};
 
 	// CURRENCIES
-	const [sUSD, sAUD, SNX] = ['sUSD', 'sAUD', 'HZN'].map(toBytes32);
+	const [sUSD, sAUD, SNX] = ['hUSD', 'sAUD', 'HZN'].map(toBytes32);
 
 	let feePool,
 		debtCache,
@@ -82,7 +82,7 @@ contract('FeePool', async accounts => {
 		synths;
 
 	before(async () => {
-		synths = ['sUSD', 'sAUD'];
+		synths = ['hUSD', 'sAUD'];
 		({
 			AddressResolver: addressResolver,
 			DelegateApprovals: delegateApprovals,
@@ -94,7 +94,7 @@ contract('FeePool', async accounts => {
 			RewardEscrow: rewardEscrow,
 			Synthetix: synthetix,
 			SystemSettings: systemSettings,
-			SynthsUSD: sUSDContract,
+			SynthhUSD: sUSDContract,
 			SystemStatus: systemStatus,
 		} = await setupAllContracts({
 			accounts,
@@ -812,7 +812,7 @@ contract('FeePool', async accounts => {
 							// set all rates minus those to ignore
 							const ratesToUpdate = ['HZN']
 								.concat(synths)
-								.filter(key => key !== 'sUSD' && ![].concat(type).includes(key));
+								.filter(key => key !== 'hUSD' && ![].concat(type).includes(key));
 
 							const timestamp = await currentTime();
 
@@ -835,7 +835,7 @@ contract('FeePool', async accounts => {
 							it('reverts on claimFees', async () => {
 								await assert.revert(
 									feePool.claimFees({ from: owner }),
-									'A synth or SNX rate is invalid'
+									'A hasset or HZN rate is invalid'
 								);
 							});
 						}
@@ -843,7 +843,7 @@ contract('FeePool', async accounts => {
 				});
 			});
 
-			it('should allow a user to claim their fees in sUSD @gasprofile', async () => {
+			it('should allow a user to claim their fees in hUSD @gasprofile', async () => {
 				const length = (await feePool.FEE_PERIOD_LENGTH()).toNumber();
 
 				// Issue 10,000 sUSD for two different accounts.
@@ -873,7 +873,7 @@ contract('FeePool', async accounts => {
 				const claimFeesTx = await feePool.claimFees({ from: owner });
 
 				assert.eventEqual(claimFeesTx, 'FeesClaimed', {
-					sUSDAmount: feesAvailableUSD[0],
+					hUSDAmount: feesAvailableUSD[0],
 					snxRewards: feesAvailableUSD[1],
 				});
 
@@ -1311,7 +1311,7 @@ contract('FeePool', async accounts => {
 							// set all rates minus those to ignore
 							const ratesToUpdate = ['HZN']
 								.concat(synths)
-								.filter(key => key !== 'sUSD' && ![].concat(type).includes(key));
+								.filter(key => key !== 'hUSD' && ![].concat(type).includes(key));
 
 							const timestamp = await currentTime();
 
@@ -1334,7 +1334,7 @@ contract('FeePool', async accounts => {
 							it('reverts on claimFees', async () => {
 								await assert.revert(
 									feePool.claimOnBehalf(authoriser, { from: delegate }),
-									'A synth or SNX rate is invalid'
+									'A hasset or HZN rate is invalid'
 								);
 							});
 						}

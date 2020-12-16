@@ -23,7 +23,7 @@ const {
 const { setupAllContracts } = require('./setup');
 
 contract('PurgeableSynth', accounts => {
-	const [sUSD, SNX, sAUD, iETH] = ['sUSD', 'SNX', 'sAUD', 'iETH'].map(toBytes32);
+	const [sUSD, SNX, sAUD, iETH] = ['hUSD', 'SNX', 'sAUD', 'iETH'].map(toBytes32);
 	const synthKeys = [sUSD, sAUD, iETH];
 	const [deployerAccount, owner, oracle, , account1, account2] = accounts;
 
@@ -53,7 +53,7 @@ contract('PurgeableSynth', accounts => {
 			AddressResolver: addressResolver,
 			ExchangeRates: exchangeRates,
 			Exchanger: exchanger,
-			SynthsUSD: sUSDContract,
+			SynthhUSD: sUSDContract,
 			SynthsAUD: sAUDContract,
 			SystemStatus: systemStatus,
 			SystemSettings: systemSettings,
@@ -61,7 +61,7 @@ contract('PurgeableSynth', accounts => {
 			Issuer: issuer,
 		} = await setupAllContracts({
 			accounts,
-			synths: ['sUSD', 'sAUD'],
+			synths: ['hUSD', 'sAUD'],
 			contracts: [
 				'ExchangeRates',
 				'Exchanger',

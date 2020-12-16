@@ -23,7 +23,7 @@ const {
 } = require('../..');
 
 contract('Synth', async accounts => {
-	const [sUSD, SNX, sEUR] = ['sUSD', 'HZN', 'sEUR'].map(toBytes32);
+	const [sUSD, SNX, sEUR] = ['hUSD', 'HZN', 'sEUR'].map(toBytes32);
 
 	const [deployerAccount, owner, oracle, , account1, account2] = accounts;
 
@@ -162,7 +162,7 @@ contract('Synth', async accounts => {
 
 		['System', 'Synth'].forEach(section => {
 			describe(`when ${section} is suspended`, () => {
-				const synth = toBytes32('sUSD');
+				const synth = toBytes32('hUSD');
 				beforeEach(async () => {
 					await setStatus({ owner, systemStatus, section, suspend: true, synth });
 				});
@@ -411,7 +411,7 @@ contract('Synth', async accounts => {
 
 			['System', 'Synth'].forEach(section => {
 				describe(`when ${section} is suspended`, () => {
-					const synth = toBytes32('sUSD');
+					const synth = toBytes32('hUSD');
 					beforeEach(async () => {
 						await setStatus({ owner, systemStatus, section, suspend: true, synth });
 					});
@@ -545,7 +545,7 @@ contract('Synth', async accounts => {
 					assert.bnEqual(await sUSDContract.balanceOf(account1), expectedAmountTransferred);
 				});
 				describe('when account has more balance than transfer amount + reclaim', async () => {
-					it('should transfer 50 sUSD and burn 10 sUSD', async () => {
+					it('should transfer 50 sUSD and burn 10 hUSD', async () => {
 						const transferAmount = toUnit('50');
 						// Do a single transfer of all our sUSD.
 						await sUSDContract.transferAndSettle(account1, transferAmount, {

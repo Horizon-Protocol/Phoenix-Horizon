@@ -30,7 +30,7 @@ contract EtherCollateral is Owned, Pausable, ReentrancyGuard, MixinResolver, IEt
 
     uint256 internal constant SECONDS_IN_A_YEAR = 31536000; // Common Year
 
-    // Where fees are pooled in sUSD.
+    // Where fees are pooled in hUSD.
     address internal constant FEE_ADDRESS = 0xfeEFEEfeefEeFeefEEFEEfEeFeefEEFeeFEEFEeF;
 
     // ========== SETTER STATE VARIABLES ==========
@@ -97,7 +97,7 @@ contract EtherCollateral is Owned, Pausable, ReentrancyGuard, MixinResolver, IEt
 
     bytes32 private constant CONTRACT_SYSTEMSTATUS = "SystemStatus";
     bytes32 private constant CONTRACT_SYNTHSETH = "SynthsETH";
-    bytes32 private constant CONTRACT_SYNTHSUSD = "SynthsUSD";
+    bytes32 private constant CONTRACT_SYNTHSUSD = "SynthhUSD";
     bytes32 private constant CONTRACT_DEPOT = "Depot";
     bytes32 private constant CONTRACT_EXRATES = "ExchangeRates";
 
@@ -377,14 +377,14 @@ contract EtherCollateral is Owned, Pausable, ReentrancyGuard, MixinResolver, IEt
         // Burn all Synths issued for the loan
         synthsETH().burn(msg.sender, synthLoan.loanAmount);
 
-        // Fee Distribution. Purchase sUSD with ETH from Depot
+        // Fee Distribution. Purchase hUSD with ETH from Depot
         require(
             IERC20(address(synthsUSD())).balanceOf(address(depot())) >= depot().synthsReceivedForEther(totalFeeETH),
-            "The sUSD Depot does not have enough sUSD to buy for fees"
+            "The hUSD Depot does not have enough hUSD to buy for fees"
         );
         depot().exchangeEtherForSynths.value(totalFeeETH)();
 
-        // Transfer the sUSD to distribute to SNX holders.
+        // Transfer the hUSD to distribute to SNX holders.
         IERC20(address(synthsUSD())).transfer(FEE_ADDRESS, IERC20(address(synthsUSD())).balanceOf(address(this)));
 
         // Send remainder ETH to caller
@@ -448,7 +448,7 @@ contract EtherCollateral is Owned, Pausable, ReentrancyGuard, MixinResolver, IEt
     }
 
     function synthsUSD() internal view returns (ISynth) {
-        return ISynth(requireAndGetAddress(CONTRACT_SYNTHSUSD, "Missing SynthsUSD address"));
+        return ISynth(requireAndGetAddress(CONTRACT_SYNTHSUSD, "Missing SynthhUSD address"));
     }
 
     function depot() internal view returns (IDepot) {

@@ -210,10 +210,10 @@ const setupContract = async ({
 		Synth: [
 			tryGetAddressOf('ProxyERC20Synth'),
 			tryGetAddressOf('TokenStateSynth'),
-			tryGetProperty({ property: 'name', otherwise: 'Synthetic sUSD' }),
-			tryGetProperty({ property: 'symbol', otherwise: 'sUSD' }),
+			tryGetProperty({ property: 'name', otherwise: 'Horizon hUSD' }),
+			tryGetProperty({ property: 'symbol', otherwise: 'hUSD' }),
 			owner,
-			tryGetProperty({ property: 'currencyKey', otherwise: toBytes32('sUSD') }),
+			tryGetProperty({ property: 'currencyKey', otherwise: toBytes32('hUSD') }),
 			tryGetProperty({ property: 'totalSupply', otherwise: '0' }),
 			tryGetAddressOf('AddressResolver'),
 		],
@@ -465,7 +465,7 @@ const setupContract = async ({
 				cache['ExchangeState'].setAssociatedContract(instance.address, { from: owner }),
 
 				cache['SystemStatus'].updateAccessControl(
-					toBytes32('Hasset'),
+					toBytes32('Synth'),
 					instance.address,
 					true,
 					false,
@@ -825,11 +825,11 @@ const setupAllContracts = async ({
 		});
 	}
 
-	// SYNTHS
+	// HASSETS
 
 	const synthsToAdd = [];
 
-	// now setup each synth and its deps
+	// now setup each hasset and its deps
 	for (const synth of synths) {
 		const { token, proxy, tokenState } = await mockToken({
 			accounts,

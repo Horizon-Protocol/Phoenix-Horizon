@@ -29,7 +29,7 @@ const MockAggregator = artifacts.require('MockAggregatorV2V3');
 
 contract('Exchanger (spec tests)', async accounts => {
 	const [sUSD, sAUD, sEUR, SNX, sBTC, iBTC, sETH, iETH] = [
-		'sUSD',
+		'hUSD',
 		'sAUD',
 		'sEUR',
 		'SNX',
@@ -76,7 +76,7 @@ contract('Exchanger (spec tests)', async accounts => {
 			ExchangeState: exchangeState,
 			FeePool: feePool,
 			SystemStatus: systemStatus,
-			SynthsUSD: sUSDContract,
+			SynthhUSD: sUSDContract,
 			SynthsBTC: sBTCContract,
 			SynthsEUR: sEURContract,
 			SynthsAUD: sAUDContract,
@@ -90,7 +90,7 @@ contract('Exchanger (spec tests)', async accounts => {
 			FlexibleStorage: flexibleStorage,
 		} = await setupAllContracts({
 			accounts,
-			synths: ['sUSD', 'sETH', 'sEUR', 'sAUD', 'sBTC', 'iBTC', 'sTRX'],
+			synths: ['hUSD', 'sETH', 'sEUR', 'sAUD', 'sBTC', 'iBTC', 'sTRX'],
 			contracts: [
 				'Exchanger',
 				'ExchangeState',
@@ -1651,7 +1651,7 @@ contract('Exchanger (spec tests)', async accounts => {
 					const synthExchangeEvent = txn.logs.find(log => log.event === 'SynthExchange');
 					assert.eventEqual(synthExchangeEvent, 'SynthExchange', {
 						account: account1,
-						fromCurrencyKey: toBytes32('sUSD'),
+						fromCurrencyKey: toBytes32('hUSD'),
 						fromAmount: amountIssued,
 						toCurrencyKey: toBytes32('sAUD'),
 						toAmount: sAUDBalance,
@@ -1677,7 +1677,7 @@ contract('Exchanger (spec tests)', async accounts => {
 					const synthExchangeEvent = txn.logs.find(log => log.event === 'SynthExchange');
 					assert.eventEqual(synthExchangeEvent, 'SynthExchange', {
 						account: account1,
-						fromCurrencyKey: toBytes32('sUSD'),
+						fromCurrencyKey: toBytes32('hUSD'),
 						fromAmount: amountIssued,
 						toCurrencyKey: toBytes32('sAUD'),
 						toAmount: sAUDBalance,

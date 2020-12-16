@@ -91,7 +91,7 @@ contract('ExchangeRates (prod tests)', accounts => {
 				network,
 				deploymentPath,
 				account: user,
-				fromCurrency: 'sUSD',
+				fromCurrency: 'hUSD',
 				toCurrency: 'sETH',
 				amount: toUnit('10'),
 			});

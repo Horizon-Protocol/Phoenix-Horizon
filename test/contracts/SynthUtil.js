@@ -13,21 +13,21 @@ contract('SynthUtil', accounts => {
 	const [, ownerAccount, oracle, account2] = accounts;
 	let synthUtil, sUSDContract, synthetix, exchangeRates, timestamp, systemSettings, debtCache;
 
-	const [sUSD, sBTC, iBTC] = ['sUSD', 'sBTC', 'iBTC'].map(toBytes32);
+	const [sUSD, sBTC, iBTC] = ['hUSD', 'sBTC', 'iBTC'].map(toBytes32);
 	const synthKeys = [sUSD, sBTC, iBTC];
 	const synthPrices = [toUnit('1'), toUnit('5000'), toUnit('5000')];
 
 	before(async () => {
 		({
 			SynthUtil: synthUtil,
-			SynthsUSD: sUSDContract,
+			SynthhUSD: sUSDContract,
 			Synthetix: synthetix,
 			ExchangeRates: exchangeRates,
 			SystemSettings: systemSettings,
 			DebtCache: debtCache,
 		} = await setupAllContracts({
 			accounts,
-			synths: ['sUSD', 'sBTC', 'iBTC'],
+			synths: ['hUSD', 'sBTC', 'iBTC'],
 			contracts: [
 				'SynthUtil',
 				'Synthetix',

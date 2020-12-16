@@ -103,7 +103,7 @@ contract('TradingRewards (prod tests)', accounts => {
 				({ exchangeLogs } = await exchangeSynths({
 					network,
 					account: user,
-					fromCurrency: 'sUSD',
+					fromCurrency: 'hUSD',
 					toCurrency: 'sETH',
 					amount: toUnit('1'),
 				}));
@@ -139,7 +139,7 @@ contract('TradingRewards (prod tests)', accounts => {
 					network,
 					withTradingRewards: true,
 					account: user,
-					fromCurrency: 'sUSD',
+					fromCurrency: 'hUSD',
 					toCurrency: 'sETH',
 					amount: toUnit('1'),
 				}));

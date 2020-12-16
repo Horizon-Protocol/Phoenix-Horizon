@@ -98,7 +98,7 @@
 	"DappMaintenance": {
 		"deploy": true
 	},
-	"SynthsUSD": {
+	"SynthhUSD": {
 		"deploy": true
 	},
 	"SynthsEUR": {
@@ -128,7 +128,7 @@
 	"ProxyERC20": {
 		"deploy": true
 	},
-	"ProxyERC20sUSD": {
+	"ProxyERC20hUSD": {
 		"deploy": true
 	},
 	"ProxyFeePool": {
@@ -137,7 +137,7 @@
 	"ProxySynthetix": {
 		"deploy": true
 	},
-	"ProxysUSD": {
+	"ProxyhUSD": {
 		"deploy": true
 	},
 	"ProxysEUR": {
@@ -173,7 +173,7 @@
 	"TokenStateSynthetix": {
 		"deploy": true
 	},
-	"TokenStatesUSD": {
+	"TokenStatehUSD": {
 		"deploy": true
 	},
 	"TokenStatesEUR": {

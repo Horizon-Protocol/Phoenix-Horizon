@@ -140,7 +140,7 @@ describe('publish scripts', () => {
 		}
 
 		gasLimit = 5000000;
-		[sUSD, sBTC, sETH] = ['sUSD', 'sBTC', 'sETH'].map(toBytes32);
+		[sUSD, sBTC, sETH] = ['hUSD', 'sBTC', 'sETH'].map(toBytes32);
 		web3.eth.accounts.wallet.add(accounts.deployer.private);
 		gasPrice = web3.utils.toWei('5', 'gwei');
 	});
@@ -236,7 +236,7 @@ describe('publish scripts', () => {
 
 				sources = getSource();
 				targets = getTarget();
-				synths = getSynths().filter(({ name }) => name !== 'sUSD');
+				synths = getSynths().filter(({ name }) => name !== 'hUSD');
 
 				Synthetix = getContract({ target: 'ProxyERC20', source: 'Synthetix' });
 				FeePool = getContract({ target: 'ProxyFeePool', source: 'FeePool' });
@@ -399,7 +399,7 @@ describe('publish scripts', () => {
 							gasPrice,
 						});
 						await SystemSettings.methods
-							.setExchangeFeeRateForSynths([toBytes32('sUSD')], [newRateForsUSD])
+							.setExchangeFeeRateForSynths([toBytes32('hUSD')], [newRateForsUSD])
 							.send({
 								from: accounts.deployer.public,
 								gas: gasLimit,
@@ -464,7 +464,7 @@ describe('publish scripts', () => {
 							);
 							assert.strictEqual(
 								await Exchanger.methods
-									.feeRateForExchange(toBytes32('(ignored)'), toBytes32('sUSD'))
+									.feeRateForExchange(toBytes32('(ignored)'), toBytes32('hUSD'))
 									.call(),
 								newRateForsUSD
 							);
@@ -975,7 +975,7 @@ describe('publish scripts', () => {
 								});
 
 								await Synthetix.methods
-									.exchange(toBytes32('sUSD'), web3.utils.toWei('100'), toBytes32('iCEX'))
+									.exchange(toBytes32('hUSD'), web3.utils.toWei('100'), toBytes32('iCEX'))
 									.send({
 										from: accounts.first.public,
 										gas: gasLimit,

@@ -125,10 +125,10 @@ contract('BinaryOptionMarket @gas-skip @ovm-skip', accounts => {
 			AddressResolver: addressResolver,
 			ExchangeRates: exchangeRates,
 			FeePool: feePool,
-			SynthsUSD: sUSDSynth,
+			SynthhUSD: sUSDSynth,
 		} = await setupAllContracts({
 			accounts,
-			synths: ['sUSD'],
+			synths: ['hUSD'],
 			contracts: [
 				'BinaryOptionMarketManager',
 				'AddressResolver',

@@ -29,7 +29,7 @@ contract('EtherCollateral @ovm-skip', async accounts => {
 
 	const TEST_TIMEOUT = 160e3;
 
-	const [sETH, ETH, SNX] = ['sETH', 'ETH', 'SNX'].map(toBytes32);
+	const [sETH, ETH, SNX] = ['sETH', 'ETH', 'HZN'].map(toBytes32);
 
 	const ISSUACE_RATIO = toUnit('0.8');
 	const ZERO_BN = toUnit('0');
@@ -63,13 +63,13 @@ contract('EtherCollateral @ovm-skip', async accounts => {
 		// Ensure Depot has latest rates
 		// await updateRatesWithDefaults();
 
-		// Get sUSD from Owner
+		// Get hUSD from Owner
 		await issueSynthsUSD(synthsToDeposit, depositor);
 
 		// Approve Transaction
 		await sUSDSynth.approve(depot.address, synthsToDeposit, { from: depositor });
 
-		// Deposit sUSD in Depot
+		// Deposit hUSD in Depot
 		await depot.depositSynths(synthsToDeposit, {
 			from: depositor,
 		});
@@ -105,7 +105,7 @@ contract('EtherCollateral @ovm-skip', async accounts => {
 	};
 
 	const calculateLoanFeesUSD = async feesInETH => {
-		// Ask the Depot how many sUSD I will get for this ETH
+		// Ask the Depot how many hUSD I will get for this ETH
 		const expectedFeesUSD = await depot.synthsReceivedForEther(feesInETH);
 		// console.log('expectedFeesUSD', expectedFeesUSD.toString());
 		return expectedFeesUSD;
@@ -132,10 +132,10 @@ contract('EtherCollateral @ovm-skip', async accounts => {
 
 	// Run once at beginning - snapshots will take care of resetting this before each test
 	before(async () => {
-		// Mock SNX, sUSD and sETH
+		// Mock HZN, hUSD and sETH
 		[{ token: synthetix }, { token: sUSDSynth }, { token: sETHSynth }] = await Promise.all([
 			mockToken({ accounts, name: 'Synthetix', symbol: 'SNX' }),
-			mockToken({ accounts, synth: 'sUSD', name: 'Synthetic USD', symbol: 'sUSD' }),
+			mockToken({ accounts, synth: 'hUSD', name: 'Horizon USD', symbol: 'hUSD' }),
 			mockToken({ accounts, synth: 'sETH', name: 'Synthetic ETH', symbol: 'sETH' }),
 		]);
 
@@ -149,7 +149,7 @@ contract('EtherCollateral @ovm-skip', async accounts => {
 		} = await setupAllContracts({
 			accounts,
 			mocks: {
-				SynthsUSD: sUSDSynth,
+				SynthhUSD: sUSDSynth,
 				SynthsETH: sETHSynth,
 				Synthetix: synthetix,
 			},
@@ -204,7 +204,7 @@ contract('EtherCollateral @ovm-skip', async accounts => {
 
 		it('should access its dependencies via the address resolver', async () => {
 			assert.equal(await addressResolver.getAddress(toBytes32('SynthsETH')), sETHSynth.address);
-			assert.equal(await addressResolver.getAddress(toBytes32('SynthsUSD')), sUSDSynth.address);
+			assert.equal(await addressResolver.getAddress(toBytes32('SynthhUSD')), sUSDSynth.address);
 			assert.equal(await addressResolver.getAddress(toBytes32('Depot')), depot.address);
 		});
 
@@ -663,7 +663,7 @@ contract('EtherCollateral @ovm-skip', async accounts => {
 						let closeLoanTransaction;
 
 						beforeEach(async () => {
-							// Deposit sUSD in Depot to allow fees to be bought with ETH
+							// Deposit hUSD in Depot to allow fees to be bought with ETH
 							await depositUSDInDepot(toUnit('10000'), depotDepositor);
 							// Go into the future
 							await fastForwardAndUpdateRates(MONTH * 2);
@@ -724,7 +724,7 @@ contract('EtherCollateral @ovm-skip', async accounts => {
 							let closeLoanTransaction;
 
 							beforeEach(async () => {
-								// Deposit sUSD in Depot to allow fees to be bought with ETH
+								// Deposit hUSD in Depot to allow fees to be bought with ETH
 								await depositUSDInDepot(toUnit('100000'), depotDepositor);
 
 								// Cacluate the fees
@@ -959,7 +959,7 @@ contract('EtherCollateral @ovm-skip', async accounts => {
 			const tenETH = toUnit('10');
 
 			beforeEach(async () => {
-				// Deposit sUSD in Depot to allow fees to be bought with ETH
+				// Deposit hUSD in Depot to allow fees to be bought with ETH
 				await depositUSDInDepot(toUnit('100000'), depotDepositor);
 			});
 
@@ -1295,7 +1295,7 @@ contract('EtherCollateral @ovm-skip', async accounts => {
 						etherCollateral.closeLoan(openLoanID, {
 							from: address1,
 						}),
-						'The sUSD Depot does not have enough sUSD to buy for fees'
+						'The hUSD Depot does not have enough hUSD to buy for fees'
 					);
 				});
 			});

@@ -30,7 +30,7 @@ async function simulateExchangeRates({ network, deploymentPath }) {
 	});
 
 	let currencyKeys = await Issuer.availableCurrencyKeys();
-	currencyKeys = currencyKeys.filter(key => key !== toBytes32('sUSD'));
+	currencyKeys = currencyKeys.filter(key => key !== toBytes32('hUSD'));
 	const additionalKeys = ['ETH'].map(toBytes32); // The Depot uses the key "ETH" as opposed to "sETH" for its ether price
 	currencyKeys.push(...additionalKeys);
 	console.log(`Updating ${currencyKeys.length} exchange rates...`);

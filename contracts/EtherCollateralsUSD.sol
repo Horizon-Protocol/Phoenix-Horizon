@@ -18,7 +18,7 @@ import "./interfaces/IERC20.sol";
 import "./interfaces/IExchangeRates.sol";
 
 
-// ETH Collateral v0.3 (sUSD)
+// ETH Collateral v0.3 (hUSD)
 // https://docs.synthetix.io/contracts/source/contracts/ethercollateralsusd
 contract EtherCollateralsUSD is Owned, Pausable, ReentrancyGuard, MixinResolver, IEtherCollateralsUSD {
     using SafeMath for uint256;
@@ -32,11 +32,11 @@ contract EtherCollateralsUSD is Owned, Pausable, ReentrancyGuard, MixinResolver,
 
     uint256 internal constant SECONDS_IN_A_YEAR = 31536000; // Common Year
 
-    // Where fees are pooled in sUSD.
+    // Where fees are pooled in hUSD.
     address internal constant FEE_ADDRESS = 0xfeEFEEfeefEeFeefEEFEEfEeFeefEEFeeFEEFEeF;
 
     uint256 internal constant ACCOUNT_LOAN_LIMIT_CAP = 1000;
-    bytes32 private constant sUSD = "sUSD";
+    bytes32 private constant hUSD = "hUSD";
     bytes32 public constant COLLATERAL = "ETH";
 
     // ========== SETTER STATE VARIABLES ==========
@@ -51,7 +51,7 @@ contract EtherCollateralsUSD is Owned, Pausable, ReentrancyGuard, MixinResolver,
     // Minting fee for issuing the synths. Default 50 bips.
     uint256 public issueFeeRate = (5 * SafeDecimalMath.unit()) / 1000;
 
-    // Maximum amount of sUSD that can be issued by the EtherCollateral contract. Default 10MM
+    // Maximum amount of hUSD that can be issued by the EtherCollateral contract. Default 10MM
     uint256 public issueLimit = SafeDecimalMath.unit() * 10000000;
 
     // Minimum amount of ETH to create loan preventing griefing and gas consumption. Min 1ETH
@@ -116,7 +116,7 @@ contract EtherCollateralsUSD is Owned, Pausable, ReentrancyGuard, MixinResolver,
     /* ========== ADDRESS RESOLVER CONFIGURATION ========== */
 
     bytes32 private constant CONTRACT_SYSTEMSTATUS = "SystemStatus";
-    bytes32 private constant CONTRACT_SYNTHSUSD = "SynthsUSD";
+    bytes32 private constant CONTRACT_SYNTHSUSD = "SynthhUSD";
     bytes32 private constant CONTRACT_EXRATES = "ExchangeRates";
     bytes32 private constant CONTRACT_FEEPOOL = "FeePool";
 
@@ -407,7 +407,7 @@ contract EtherCollateralsUSD is Owned, Pausable, ReentrancyGuard, MixinResolver,
         uint256 mintingFee = _calculateMintingFee(_loanAmount);
         uint256 loanAmountMinusFee = _loanAmount.sub(mintingFee);
 
-        // Require sUSD loan to mint does not exceed cap
+        // Require hUSD loan to mint does not exceed cap
         require(totalIssuedSynths.add(_loanAmount) <= issueLimit, "Loan Amount exceeds the supply cap.");
 
         // Get a Loan ID
@@ -427,7 +427,7 @@ contract EtherCollateralsUSD is Owned, Pausable, ReentrancyGuard, MixinResolver,
             lastInterestAccrued: 0
         });
 
-        // Fee distribution. Mint the sUSD fees into the FeePool and record fees paid
+        // Fee distribution. Mint the hUSD fees into the FeePool and record fees paid
         if (mintingFee > 0) {
             synthsUSD().issue(FEE_ADDRESS, mintingFee);
             feePool().recordFeePaid(mintingFee);
@@ -511,8 +511,8 @@ contract EtherCollateralsUSD is Owned, Pausable, ReentrancyGuard, MixinResolver,
     ) external ETHRateNotInvalid {
         systemStatus().requireSystemActive();
 
-        // check msg.sender has sufficient sUSD to pay
-        require(IERC20(address(synthsUSD())).balanceOf(msg.sender) >= _repayAmount, "Not enough sUSD balance");
+        // check msg.sender has sufficient hUSD to pay
+        require(IERC20(address(synthsUSD())).balanceOf(msg.sender) >= _repayAmount, "Not enough hUSD balance");
 
         SynthLoanStruct memory synthLoan = _getLoanFromStorage(_loanCreatorsAddress, _loanID);
 
@@ -534,7 +534,7 @@ contract EtherCollateralsUSD is Owned, Pausable, ReentrancyGuard, MixinResolver,
             uint256 loanAmountAfter
         ) = _splitInterestLoanPayment(_repayAmount, accruedInterest, synthLoan.loanAmount);
 
-        // burn sUSD from msg.sender for repaid amount
+        // burn hUSD from msg.sender for repaid amount
         synthsUSD().burn(msg.sender, _repayAmount);
 
         // Send interest paid to fee pool and record loan amount paid
@@ -554,8 +554,8 @@ contract EtherCollateralsUSD is Owned, Pausable, ReentrancyGuard, MixinResolver,
     ) external nonReentrant ETHRateNotInvalid {
         systemStatus().requireSystemActive();
 
-        // check msg.sender (liquidator's wallet) has sufficient sUSD
-        require(IERC20(address(synthsUSD())).balanceOf(msg.sender) >= _debtToCover, "Not enough sUSD balance");
+        // check msg.sender (liquidator's wallet) has sufficient hUSD
+        require(IERC20(address(synthsUSD())).balanceOf(msg.sender) >= _debtToCover, "Not enough hUSD balance");
 
         SynthLoanStruct memory synthLoan = _getLoanFromStorage(_loanCreatorsAddress, _loanID);
 
@@ -575,7 +575,7 @@ contract EtherCollateralsUSD is Owned, Pausable, ReentrancyGuard, MixinResolver,
         // cap debt to liquidate
         uint256 amountToLiquidate = liquidationAmount < _debtToCover ? liquidationAmount : _debtToCover;
 
-        // burn sUSD from msg.sender for amount to liquidate
+        // burn hUSD from msg.sender for amount to liquidate
         synthsUSD().burn(msg.sender, amountToLiquidate);
 
         (uint256 interestPaid, uint256 loanAmountPaid, uint256 accruedInterestAfter, ) = _splitInterestLoanPayment(
@@ -588,7 +588,7 @@ contract EtherCollateralsUSD is Owned, Pausable, ReentrancyGuard, MixinResolver,
         _processInterestAndLoanPayment(interestPaid, loanAmountPaid);
 
         // Collateral value to redeem
-        uint256 collateralRedeemed = exchangeRates().effectiveValue(sUSD, amountToLiquidate, COLLATERAL);
+        uint256 collateralRedeemed = exchangeRates().effectiveValue(hUSD, amountToLiquidate, COLLATERAL);
 
         // Add penalty
         uint256 totalCollateralLiquidated = collateralRedeemed.multiplyDecimal(
@@ -648,7 +648,7 @@ contract EtherCollateralsUSD is Owned, Pausable, ReentrancyGuard, MixinResolver,
     }
 
     function _processInterestAndLoanPayment(uint256 interestPaid, uint256 loanAmountPaid) internal {
-        // Fee distribution. Mint the sUSD fees into the FeePool and record fees paid
+        // Fee distribution. Mint the hUSD fees into the FeePool and record fees paid
         if (interestPaid > 0) {
             synthsUSD().issue(FEE_ADDRESS, interestPaid);
             feePool().recordFeePaid(interestPaid);
@@ -709,7 +709,7 @@ contract EtherCollateralsUSD is Owned, Pausable, ReentrancyGuard, MixinResolver,
         // Burn all Synths issued for the loan + the fees
         synthsUSD().burn(msg.sender, repayAmount);
 
-        // Fee distribution. Mint the sUSD fees into the FeePool and record fees paid
+        // Fee distribution. Mint the hUSD fees into the FeePool and record fees paid
         synthsUSD().issue(FEE_ADDRESS, totalAccruedInterest);
         feePool().recordFeePaid(totalAccruedInterest);
 
@@ -717,7 +717,7 @@ contract EtherCollateralsUSD is Owned, Pausable, ReentrancyGuard, MixinResolver,
 
         if (liquidation) {
             // Send liquidator redeemed collateral + 10% penalty
-            uint256 collateralRedeemed = exchangeRates().effectiveValue(sUSD, repayAmount, COLLATERAL);
+            uint256 collateralRedeemed = exchangeRates().effectiveValue(hUSD, repayAmount, COLLATERAL);
 
             // add penalty
             uint256 totalCollateralLiquidated = collateralRedeemed.multiplyDecimal(
@@ -832,7 +832,7 @@ contract EtherCollateralsUSD is Owned, Pausable, ReentrancyGuard, MixinResolver,
     }
 
     function synthsUSD() internal view returns (ISynth) {
-        return ISynth(requireAndGetAddress(CONTRACT_SYNTHSUSD, "Missing SynthsUSD address"));
+        return ISynth(requireAndGetAddress(CONTRACT_SYNTHSUSD, "Missing SynthhUSD address"));
     }
 
     function exchangeRates() internal view returns (IExchangeRates) {

@@ -20,7 +20,7 @@ const {
 const { toBytes32 } = require('../..');
 
 contract('BaseSynthetix', async accounts => {
-	const [sUSD, sAUD, sEUR, SNX, sETH] = ['sUSD', 'sAUD', 'sEUR', 'HZN', 'sETH'].map(toBytes32);
+	const [hUSD, sAUD, sEUR, SNX, sETH] = ['hUSD', 'sAUD', 'sEUR', 'HZN', 'sETH'].map(toBytes32);
 
 	const [, owner, account1, account2, account3] = accounts;
 
@@ -43,7 +43,7 @@ contract('BaseSynthetix', async accounts => {
 			SynthetixEscrow: escrow,
 		} = await setupAllContracts({
 			accounts,
-			synths: ['sUSD', 'sETH', 'sEUR', 'sAUD'],
+			synths: ['hUSD', 'sETH', 'sEUR', 'sAUD'],
 			contracts: [
 				'BaseSynthetix',
 				'SynthetixState',
@@ -135,7 +135,7 @@ contract('BaseSynthetix', async accounts => {
 			await onlyGivenAddressCanInvoke({
 				fnc: baseSynthetix.exchange,
 				accounts,
-				args: [sUSD, amount, sETH],
+				args: [hUSD, amount, sETH],
 				reason: 'Cannot be run on this layer',
 			});
 		});
@@ -143,7 +143,7 @@ contract('BaseSynthetix', async accounts => {
 			await onlyGivenAddressCanInvoke({
 				fnc: baseSynthetix.exchangeOnBehalf,
 				accounts,
-				args: [account1, sUSD, amount, sETH],
+				args: [account1, hUSD, amount, sETH],
 				reason: 'Cannot be run on this layer',
 			});
 		});
@@ -151,7 +151,7 @@ contract('BaseSynthetix', async accounts => {
 			await onlyGivenAddressCanInvoke({
 				fnc: baseSynthetix.exchangeWithTracking,
 				accounts,
-				args: [sUSD, amount, sAUD, account1, toBytes32('1INCH')],
+				args: [hUSD, amount, sAUD, account1, toBytes32('1INCH')],
 				reason: 'Cannot be run on this layer',
 			});
 		});
@@ -159,7 +159,7 @@ contract('BaseSynthetix', async accounts => {
 			await onlyGivenAddressCanInvoke({
 				fnc: baseSynthetix.exchangeOnBehalfWithTracking,
 				accounts,
-				args: [account1, sUSD, amount, sAUD, account2, toBytes32('1INCH')],
+				args: [account1, hUSD, amount, sAUD, account2, toBytes32('1INCH')],
 				reason: 'Cannot be run on this layer',
 			});
 		});
@@ -167,7 +167,7 @@ contract('BaseSynthetix', async accounts => {
 			await onlyGivenAddressCanInvoke({
 				fnc: baseSynthetix.exchangeWithVirtual,
 				accounts,
-				args: [sUSD, amount, sAUD, toBytes32('AGGREGATOR')],
+				args: [hUSD, amount, sAUD, toBytes32('AGGREGATOR')],
 				reason: 'Cannot be run on this layer',
 			});
 		});
@@ -244,7 +244,7 @@ contract('BaseSynthetix', async accounts => {
 			it('should still have stale rates', async () => {
 				assert.equal(await baseSynthetix.anySynthOrSNXRateIsInvalid(), true);
 			});
-			describe('when SNX is also set', () => {
+			describe('when HZN is also set', () => {
 				beforeEach(async () => {
 					timestamp = await currentTime();
 
@@ -275,7 +275,7 @@ contract('BaseSynthetix', async accounts => {
 
 	describe('availableCurrencyKeys()', () => {
 		it('returns all currency keys by default', async () => {
-			assert.deepEqual(await baseSynthetix.availableCurrencyKeys(), [sUSD, sETH, sEUR, sAUD]);
+			assert.deepEqual(await baseSynthetix.availableCurrencyKeys(), [hUSD, sETH, sEUR, sAUD]);
 		});
 	});
 
@@ -350,7 +350,7 @@ contract('BaseSynthetix', async accounts => {
 			// Try to transfer 0.000000000000000001 SNX
 			await assert.revert(
 				baseSynthetix.transfer(account1, '1', { from: owner }),
-				'Cannot transfer staked or escrowed SNX'
+				'Cannot transfer staked or escrowed HZN'
 			);
 		});
 
@@ -412,7 +412,7 @@ contract('BaseSynthetix', async accounts => {
 				baseSynthetix.transferFrom(owner, account2, '1', {
 					from: account1,
 				}),
-				'Cannot transfer staked or escrowed SNX'
+				'Cannot transfer staked or escrowed HZN'
 			);
 		});
 
@@ -421,13 +421,13 @@ contract('BaseSynthetix', async accounts => {
 			const ensureTransferReverts = async () => {
 				await assert.revert(
 					baseSynthetix.transfer(account2, value, { from: account1 }),
-					'A synth or SNX rate is invalid'
+					'A hasset or HZN rate is invalid'
 				);
 				await assert.revert(
 					baseSynthetix.transferFrom(account2, account1, value, {
 						from: account3,
 					}),
-					'A synth or SNX rate is invalid'
+					'A hasset or HZN rate is invalid'
 				);
 			};
 
@@ -577,7 +577,7 @@ contract('BaseSynthetix', async accounts => {
 						// Ensure the transfer fails as all the synthetix are in escrow
 						await assert.revert(
 							baseSynthetix.transfer(account2, toUnit('990'), { from: account1 }),
-							'Cannot transfer staked or escrowed SNX'
+							'Cannot transfer staked or escrowed HZN'
 						);
 					});
 				});
@@ -598,7 +598,7 @@ contract('BaseSynthetix', async accounts => {
 				baseSynthetix.transfer(account2, toUnit(issuedSynthetixs), {
 					from: account1,
 				}),
-				'Cannot transfer staked or escrowed SNX'
+				'Cannot transfer staked or escrowed HZN'
 			);
 		});
 	});

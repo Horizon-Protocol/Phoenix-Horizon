@@ -668,7 +668,7 @@ contract('SystemStatus', async accounts => {
 					const reason = 'One or more hassets are suspended. Operation prohibited';
 					await assert.revert(systemStatus.requireSynthsActive(toBytes32('sETH'), sBTC), reason);
 					await assert.revert(systemStatus.requireSynthsActive(sBTC, toBytes32('sTRX')), reason);
-					await systemStatus.requireSynthsActive(toBytes32('sETH'), toBytes32('sUSD')); // no issues
+					await systemStatus.requireSynthsActive(toBytes32('sETH'), toBytes32('hUSD')); // no issues
 					await systemStatus.requireSynthsActive(toBytes32('iTRX'), toBytes32('iBTC')); // no issues
 				});
 				it('yet that address cannot resume', async () => {

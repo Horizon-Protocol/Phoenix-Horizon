@@ -48,7 +48,7 @@ contract('Rewards Integration Tests', async accounts => {
 
 	// CURRENCIES
 	const [sUSD, sAUD, sEUR, sBTC, SNX, iBTC, sETH, ETH] = [
-		'sUSD',
+		'hUSD',
 		'sAUD',
 		'sEUR',
 		'sBTC',
@@ -156,11 +156,11 @@ contract('Rewards Integration Tests', async accounts => {
 			RewardEscrow: rewardEscrow,
 			SupplySchedule: supplySchedule,
 			Synthetix: synthetix,
-			SynthsUSD: sUSDContract,
+			SynthhUSD: sUSDContract,
 			SystemSettings: systemSettings,
 		} = await setupAllContracts({
 			accounts,
-			synths: ['sUSD', 'sAUD', 'sEUR', 'sBTC', 'iBTC', 'sETH'],
+			synths: ['hUSD', 'sAUD', 'sEUR', 'sBTC', 'iBTC', 'sETH'],
 			contracts: [
 				'AddressResolver',
 				'Exchanger', // necessary for burnSynths to check settlement of sUSD
@@ -951,7 +951,7 @@ contract('Rewards Integration Tests', async accounts => {
 			// Now we should be able to claim them.
 			const claimFeesTx = await feePool.claimFees({ from: account2 });
 			assert.eventEqual(claimFeesTx, 'FeesClaimed', {
-				sUSDAmount: feesAvailableUSD[0],
+				hUSDAmount: feesAvailableUSD[0],
 				snxRewards: feesAvailableUSD[1],
 			});
 
@@ -984,7 +984,7 @@ contract('Rewards Integration Tests', async accounts => {
 			// however only   721,053.846153846153846153 Claimable after rounding to 18 decimals
 			const transaction = await feePool.claimFees({ from: account1 });
 			assert.eventEqual(transaction, 'FeesClaimed', {
-				sUSDAmount: feesAvailableUSDAcc1[0].sub(toUnit('0.000000000000000001')),
+				hUSDAmount: feesAvailableUSDAcc1[0].sub(toUnit('0.000000000000000001')),
 				snxRewards: feesAvailableUSDAcc1[1].sub(toUnit('0.000000000000000001')),
 			});
 		});

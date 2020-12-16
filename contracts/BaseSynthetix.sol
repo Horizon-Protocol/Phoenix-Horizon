@@ -25,7 +25,7 @@ contract BaseSynthetix is IERC20, ExternStateToken, MixinResolver, ISynthetix {
     string public constant TOKEN_NAME = "Phoenix Horizon";
     string public constant TOKEN_SYMBOL = "HZN";
     uint8 public constant DECIMALS = 18;
-    bytes32 public constant sUSD = "sUSD";
+    bytes32 public constant hUSD = "hUSD";
 
     /* ========== ADDRESS RESOLVER CONFIGURATION ========== */
 
@@ -162,8 +162,8 @@ contract BaseSynthetix is IERC20, ExternStateToken, MixinResolver, ISynthetix {
                 account,
                 tokenState.balanceOf(account)
             );
-            require(value <= transferable, "Cannot transfer staked or escrowed SNX");
-            require(!anyRateIsInvalid, "A synth or SNX rate is invalid");
+            require(value <= transferable, "Cannot transfer staked or escrowed HZN");
+            require(!anyRateIsInvalid, "A hasset or HZN rate is invalid");
         }
         return true;
     }

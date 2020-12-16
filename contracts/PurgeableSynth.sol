@@ -14,7 +14,7 @@ import "./interfaces/IExchangeRates.sol";
 contract PurgeableSynth is Synth {
     using SafeDecimalMath for uint;
 
-    // The maximum allowed amount of tokenSupply in equivalent sUSD value for this synth to permit purging
+    // The maximum allowed amount of tokenSupply in equivalent hUSD value for this synth to permit purging
     uint public maxSupplyToPurgeInUSD = 100000 * SafeDecimalMath.unit(); // 100,000
 
     bytes32 private constant CONTRACT_EXRATES = "ExchangeRates";
@@ -45,7 +45,7 @@ contract PurgeableSynth is Synth {
     function purge(address[] calldata addresses) external optionalProxy_onlyOwner {
         IExchangeRates exRates = exchangeRates();
 
-        uint maxSupplyToPurge = exRates.effectiveValue("sUSD", maxSupplyToPurgeInUSD, currencyKey);
+        uint maxSupplyToPurge = exRates.effectiveValue("hUSD", maxSupplyToPurgeInUSD, currencyKey);
 
         // Only allow purge when total supply is lte the max or the rate is frozen in ExchangeRates
         require(
@@ -59,7 +59,7 @@ contract PurgeableSynth is Synth {
             uint amountHeld = tokenState.balanceOf(holder);
 
             if (amountHeld > 0) {
-                exchanger().exchange(holder, currencyKey, amountHeld, "sUSD", holder);
+                exchanger().exchange(holder, currencyKey, amountHeld, "hUSD", holder);
                 emitPurged(holder, amountHeld);
             }
         }

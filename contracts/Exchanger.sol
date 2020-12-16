@@ -81,7 +81,7 @@ contract Exchanger is Owned, MixinResolver, MixinSystemSettings, IExchanger {
         uint timestamp;
     }
 
-    bytes32 private constant sUSD = "sUSD";
+    bytes32 private constant hUSD = "hUSD";
 
     // SIP-65: Decentralized circuit breaker
     uint public constant CIRCUIT_BREAKER_SUSPENSION_REASON = 65;
@@ -460,8 +460,8 @@ contract Exchanger is Owned, MixinResolver, MixinSystemSettings, IExchanger {
     }
 
     function _updateSNXIssuedDebtOnExchange(bytes32[2] memory currencyKeys, uint[2] memory currencyRates) internal {
-        bool includesSUSD = currencyKeys[0] == sUSD || currencyKeys[1] == sUSD;
-        uint numKeys = includesSUSD ? 2 : 3;
+        bool includesHUSD = currencyKeys[0] == hUSD || currencyKeys[1] == hUSD;
+        uint numKeys = includesHUSD ? 2 : 3;
 
         bytes32[] memory keys = new bytes32[](numKeys);
         keys[0] = currencyKeys[0];
@@ -471,8 +471,8 @@ contract Exchanger is Owned, MixinResolver, MixinSystemSettings, IExchanger {
         rates[0] = currencyRates[0];
         rates[1] = currencyRates[1];
 
-        if (!includesSUSD) {
-            keys[2] = sUSD; // And we'll also update sUSD to account for any fees if it wasn't one of the exchanged currencies
+        if (!includesHUSD) {
+            keys[2] = hUSD; // And we'll also update hUSD to account for any fees if it wasn't one of the exchanged currencies
             rates[2] = SafeDecimalMath.unit();
         }
 
@@ -561,18 +561,18 @@ contract Exchanger is Owned, MixinResolver, MixinSystemSettings, IExchanger {
 
         // Remit the fee if required
         if (fee > 0) {
-            // Normalize fee to sUSD
+            // Normalize fee to hUSD
             // Note: `fee` is being reused to avoid stack too deep errors.
-            fee = exchangeRates().effectiveValue(destinationCurrencyKey, fee, sUSD);
+            fee = exchangeRates().effectiveValue(destinationCurrencyKey, fee, hUSD);
 
-            // Remit the fee in sUSDs
-            issuer().synths(sUSD).issue(feePool().FEE_ADDRESS(), fee);
+            // Remit the fee in hUSDs
+            issuer().synths(hUSD).issue(feePool().FEE_ADDRESS(), fee);
 
             // Tell the fee pool about this
             feePool().recordFeePaid(fee);
         }
 
-        // Note: As of this point, `fee` is denominated in sUSD.
+        // Note: As of this point, `fee` is denominated in hUSD.
 
         // Nothing changes as far as issuance data goes because the total value in the system hasn't changed.
         // But we will update the debt snapshot in case exchange rates have fluctuated since the last exchange

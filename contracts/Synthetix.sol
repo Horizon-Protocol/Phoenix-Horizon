@@ -127,7 +127,7 @@ contract Synthetix is BaseSynthetix {
         // record minting event before mutation to token supply
         _supplySchedule.recordMintEvent(supplyToMint);
 
-        // Set minted SNX balance to RewardEscrow's balance
+        // Set minted HZN balance to RewardEscrow's balance
         // Minus the minterReward and set balance of minter to add reward
         uint minterReward = _supplySchedule.minterReward();
         // Get the remainder
@@ -152,7 +152,7 @@ contract Synthetix is BaseSynthetix {
         return true;
     }
 
-    function liquidateDelinquentAccount(address account, uint susdAmount)
+    function liquidateDelinquentAccount(address account, uint hUSDAmount)
         external
         systemActive
         optionalProxy
@@ -160,13 +160,13 @@ contract Synthetix is BaseSynthetix {
     {
         (uint totalRedeemed, uint amountLiquidated) = issuer().liquidateDelinquentAccount(
             account,
-            susdAmount,
+            hUSDAmount,
             messageSender
         );
 
         emitAccountLiquidated(account, totalRedeemed, amountLiquidated, messageSender);
 
-        // Transfer SNX redeemed to messageSender
+        // Transfer HZN redeemed to messageSender
         // Reverts if amount to redeem is more than balanceOf account, ie due to escrowed balance
         return _transferByProxy(account, messageSender, totalRedeemed);
     }
@@ -235,17 +235,17 @@ contract Synthetix is BaseSynthetix {
         proxy._emit(abi.encode(currencyKey, amount), 2, EXCHANGEREBATE_SIG, addressToBytes32(account), 0, 0);
     }
 
-    event AccountLiquidated(address indexed account, uint snxRedeemed, uint amountLiquidated, address liquidator);
+    event AccountLiquidated(address indexed account, uint hznRedeemed, uint amountLiquidated, address liquidator);
     bytes32 internal constant ACCOUNTLIQUIDATED_SIG = keccak256("AccountLiquidated(address,uint256,uint256,address)");
 
     function emitAccountLiquidated(
         address account,
-        uint256 snxRedeemed,
+        uint256 hznRedeemed,
         uint256 amountLiquidated,
         address liquidator
     ) internal {
         proxy._emit(
-            abi.encode(snxRedeemed, amountLiquidated, liquidator),
+            abi.encode(hznRedeemed, amountLiquidated, liquidator),
             2,
             ACCOUNTLIQUIDATED_SIG,
             addressToBytes32(account),

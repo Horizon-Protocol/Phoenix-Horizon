@@ -51,7 +51,7 @@ async function ensureAccountHassUSD({ network, deploymentPath, amount, account }
 	const sUSD = await connectContract({
 		network,
 		deploymentPath,
-		contractName: 'SynthsUSD',
+		contractName: 'SynthhUSD',
 		abiName: 'Synth',
 	});
 
@@ -91,7 +91,7 @@ async function ensureAccountHassETH({ network, deploymentPath, amount, account }
 		abiName: 'Synthetix',
 	});
 
-	await Synthetix.exchange(toBytes32('sUSD'), sUSDAmount, toBytes32('sETH'), {
+	await Synthetix.exchange(toBytes32('hUSD'), sUSDAmount, toBytes32('sETH'), {
 		from: account,
 	});
 }

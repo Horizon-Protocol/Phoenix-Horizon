@@ -1,6 +1,6 @@
 [
 	{
-		"name": "sUSD",
+		"name": "hUSD",
 		"asset": "USD",
 		"subclass": "MultiCollateralSynth"
 	},

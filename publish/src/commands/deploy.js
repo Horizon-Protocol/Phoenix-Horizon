@@ -918,15 +918,15 @@ const deploy = async ({
 	}
 
 	// ----------------
-	// Synths
+	// Hassets
 	// ----------------
-	console.log(gray(`\n------ DEPLOY SYNTHS ------\n`));
+	console.log(gray(`\n------ DEPLOY Hassets ------\n`));
 
 	// The list of synth to be added to the Issuer once dependencies have been set up
 	const synthsToAdd = [];
 
 	for (const { name: currencyKey, subclass, asset } of synths) {
-		console.log(gray(`\n   --- SYNTH ${currencyKey} ---\n`));
+		console.log(gray(`\n   --- Hasset ${currencyKey} ---\n`));
 
 		const tokenStateForSynth = await deployer.deployContract({
 			name: `TokenState${currencyKey}`,
@@ -939,7 +939,7 @@ const deploy = async ({
 		// https://docs.synthetix.io/integrations/guide/#proxy-deprecation
 		// Until this time, on mainnet we will still deploy ProxyERC20sUSD and ensure that
 		// SynthsUSD.proxy is ProxyERC20sUSD, SynthsUSD.integrationProxy is ProxysUSD
-		const synthProxyIsLegacy = currencyKey === 'sUSD' && network === 'mainnet';
+		const synthProxyIsLegacy = currencyKey === 'hUSD' && network === 'mainnet';
 
 		const proxyForSynth = await deployer.deployContract({
 			name: `Proxy${currencyKey}`,
@@ -950,7 +950,7 @@ const deploy = async ({
 
 		// additionally deploy an ERC20 proxy for the synth if it's legacy (sUSD)
 		let proxyERC20ForSynth;
-		if (currencyKey === 'sUSD') {
+		if (currencyKey === 'hUSD') {
 			proxyERC20ForSynth = await deployer.deployContract({
 				name: `ProxyERC20${currencyKey}`,
 				source: `ProxyERC20`,
@@ -981,7 +981,7 @@ const deploy = async ({
 		// MultiCollateral needs additionalConstructorArgs to be ordered
 		const additionalConstructorArgsMap = {
 			MultiCollateralSynthsETH: [toBytes32('EtherCollateral')],
-			MultiCollateralSynthsUSD: [toBytes32('EtherCollateralsUSD')],
+			MultiCollateralSynthhUSD: [toBytes32('EtherCollateralsUSD')],
 			// future subclasses...
 			// future specific synths args...
 		};
@@ -1094,7 +1094,7 @@ const deploy = async ({
 
 	await deployer.deployContract({
 		name: 'Depot',
-		deps: ['ProxySynthetix', 'SynthsUSD', 'FeePool'],
+		deps: ['ProxySynthetix', 'SynthhUSD', 'FeePool'],
 		args: [account, account, addressOf(readProxyForResolver)],
 	});
 

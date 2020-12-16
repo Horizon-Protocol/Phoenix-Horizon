@@ -55,7 +55,7 @@ contract('Exchange Rates', async accounts => {
 		'sJPY',
 		'sXTZ',
 		'sBNB',
-		'sUSD',
+		'hUSD',
 		'sEUR',
 		'sAUD',
 		'fastGasPrice',
@@ -331,7 +331,7 @@ contract('Exchange Rates', async accounts => {
 				instance.updateRates([sUSD], [web3.utils.toWei('1.0', 'ether')], timeSent, {
 					from: oracle,
 				}),
-				"Rate of sUSD cannot be updated, it's always UNIT"
+				"Rate of hUSD cannot be updated, it's always UNIT"
 			);
 		});
 
