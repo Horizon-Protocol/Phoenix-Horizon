@@ -58,7 +58,7 @@ contract Issuer is Owned, MixinResolver, MixinSystemSettings, IIssuer {
     /* ========== ENCODED NAMES ========== */
 
     bytes32 internal constant hUSD = "hUSD";
-    bytes32 internal constant sETH = "sETH";
+    bytes32 internal constant hBNB = "hBNB";
     bytes32 internal constant SNX = "HZN";
 
     // Flexible storage names
@@ -189,8 +189,8 @@ contract Issuer is Owned, MixinResolver, MixinSystemSettings, IIssuer {
             // Add ether collateral hUSD
             debt = debt.add(etherCollateralsUSD().totalIssuedSynths());
 
-            // Add ether collateral sETH
-            (uint ethRate, bool ethRateInvalid) = exRates.rateAndInvalid(sETH);
+            // Add ether collateral hBNB
+            (uint ethRate, bool ethRateInvalid) = exRates.rateAndInvalid(hBNB);
             uint ethIssuedDebt = etherCollateral().totalIssuedSynths().multiplyDecimalRound(ethRate);
             debt = debt.add(ethIssuedDebt);
             anyRateIsInvalid = anyRateIsInvalid || ethRateInvalid;

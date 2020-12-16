@@ -17,7 +17,7 @@ async function ensureAccountHasEther({ network, deploymentPath, amount, account 
 	const balance = toBN(await web3.eth.getBalance(fromAccount));
 	if (balance.lt(amount)) {
 		throw new Error(
-			`Account ${fromAccount} only has ${balance} ETH and cannot transfer ${amount} ETH to ${account} `
+			`Account ${fromAccount} only has ${balance} BNB and cannot transfer ${amount} BNB to ${account} `
 		);
 	}
 
@@ -91,7 +91,7 @@ async function ensureAccountHassETH({ network, deploymentPath, amount, account }
 		abiName: 'Synthetix',
 	});
 
-	await Synthetix.exchange(toBytes32('hUSD'), sUSDAmount, toBytes32('sETH'), {
+	await Synthetix.exchange(toBytes32('hUSD'), sUSDAmount, toBytes32('hBNB'), {
 		from: account,
 	});
 }

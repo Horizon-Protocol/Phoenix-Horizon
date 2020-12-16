@@ -92,14 +92,14 @@ contract('ExchangeRates (prod tests)', accounts => {
 				deploymentPath,
 				account: user,
 				fromCurrency: 'hUSD',
-				toCurrency: 'sETH',
+				toCurrency: 'hBNB',
 				amount: toUnit('10'),
 			});
 			waitingPeriod = Number(await SystemSettings.waitingPeriodSecs());
 		});
 		it('should settle', async () => {
 			await fastForward(waitingPeriod);
-			await Exchanger.settle(user, toBytes32('sETH'), { from: user });
+			await Exchanger.settle(user, toBytes32('hBNB'), { from: user });
 		});
 	});
 });

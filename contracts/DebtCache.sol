@@ -32,7 +32,7 @@ contract DebtCache is Owned, MixinResolver, MixinSystemSettings, IDebtCache {
     /* ========== ENCODED NAMES ========== */
 
     bytes32 internal constant hUSD = "hUSD";
-    bytes32 internal constant sETH = "sETH";
+    bytes32 internal constant hBNB = "hBNB";
 
     /* ========== ADDRESS RESOLVER CONFIGURATION ========== */
 
@@ -129,7 +129,7 @@ contract DebtCache is Owned, MixinResolver, MixinSystemSettings, IDebtCache {
             uint supply = IERC20(synthAddress).totalSupply();
 
             bool ishUSD = key == hUSD;
-            if (ishUSD || key == sETH) {
+            if (ishUSD || key == hBNB) {
                 IEtherCollateral etherCollateralContract = ishUSD
                     ? IEtherCollateral(address(etherCollateralsUSD()))
                     : etherCollateral();

@@ -104,7 +104,7 @@ contract('TradingRewards (prod tests)', accounts => {
 					network,
 					account: user,
 					fromCurrency: 'hUSD',
-					toCurrency: 'sETH',
+					toCurrency: 'hBNB',
 					amount: toUnit('1'),
 				}));
 			});
@@ -140,7 +140,7 @@ contract('TradingRewards (prod tests)', accounts => {
 					withTradingRewards: true,
 					account: user,
 					fromCurrency: 'hUSD',
-					toCurrency: 'sETH',
+					toCurrency: 'hBNB',
 					amount: toUnit('1'),
 				}));
 			});

@@ -535,7 +535,7 @@ contract('SystemSettings', async accounts => {
 
 	describe('setExchangeFeeRateForSynths()', () => {
 		describe('Given synth exchange fee rates to set', async () => {
-			const [sUSD, sETH, sAUD, sBTC] = ['hUSD', 'sETH', 'sAUD', 'sBTC'].map(toBytes32);
+			const [sUSD, sETH, sAUD, sBTC] = ['hUSD', 'hBNB', 'sAUD', 'sBTC'].map(toBytes32);
 			const fxBIPS = toUnit('0.01');
 			const cryptoBIPS = toUnit('0.03');
 

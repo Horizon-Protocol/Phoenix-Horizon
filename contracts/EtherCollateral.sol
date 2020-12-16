@@ -45,10 +45,10 @@ contract EtherCollateral is Owned, Pausable, ReentrancyGuard, MixinResolver, IEt
     // Minting fee for issuing the synths. Default 50 bips.
     uint256 public issueFeeRate = (5 * SafeDecimalMath.unit()) / 1000;
 
-    // Maximum amount of sETH that can be issued by the EtherCollateral contract. Default 5000
+    // Maximum amount of hBNB that can be issued by the EtherCollateral contract. Default 5000
     uint256 public issueLimit = SafeDecimalMath.unit() * 5000;
 
-    // Minimum amount of ETH to create loan preventing griefing and gas consumption. Min 1ETH = 0.8 sETH
+    // Minimum amount of BNB to create loan preventing griefing and gas consumption. Min 1BNB = 0.8 hBNB
     uint256 public minLoanSize = SafeDecimalMath.unit() * 1;
 
     // Maximum number of loans an account can create
@@ -96,14 +96,14 @@ contract EtherCollateral is Owned, Pausable, ReentrancyGuard, MixinResolver, IEt
     /* ========== ADDRESS RESOLVER CONFIGURATION ========== */
 
     bytes32 private constant CONTRACT_SYSTEMSTATUS = "SystemStatus";
-    bytes32 private constant CONTRACT_SYNTHSETH = "SynthsETH";
+    bytes32 private constant CONTRACT_SYNTHHBNB = "SynthhBNB";
     bytes32 private constant CONTRACT_SYNTHSUSD = "SynthhUSD";
     bytes32 private constant CONTRACT_DEPOT = "Depot";
     bytes32 private constant CONTRACT_EXRATES = "ExchangeRates";
 
     bytes32[24] private addressesToCache = [
         CONTRACT_SYSTEMSTATUS,
-        CONTRACT_SYNTHSETH,
+        CONTRACT_SYNTHHBNB,
         CONTRACT_SYNTHSUSD,
         CONTRACT_DEPOT,
         CONTRACT_EXRATES
@@ -295,7 +295,7 @@ contract EtherCollateral is Owned, Pausable, ReentrancyGuard, MixinResolver, IEt
         systemStatus().requireIssuanceActive();
 
         // Require ETH sent to be greater than minLoanSize
-        require(msg.value >= minLoanSize, "Not enough ETH to create this loan. Please see the minLoanSize");
+        require(msg.value >= minLoanSize, "Not enough BNB to create this loan. Please see the minLoanSize");
 
         // Require loanLiquidationOpen to be false or we are in liquidation phase
         require(loanLiquidationOpen == false, "Loans are now being liquidated");
@@ -306,7 +306,7 @@ contract EtherCollateral is Owned, Pausable, ReentrancyGuard, MixinResolver, IEt
         // Calculate issuance amount
         uint256 loanAmount = loanAmountFromCollateral(msg.value);
 
-        // Require sETH to mint does not exceed cap
+        // Require hBNB to mint does not exceed cap
         require(totalIssuedSynths.add(loanAmount) < issueLimit, "Loan Amount exceeds the supply cap.");
 
         // Get a Loan ID
@@ -384,10 +384,10 @@ contract EtherCollateral is Owned, Pausable, ReentrancyGuard, MixinResolver, IEt
         );
         depot().exchangeEtherForSynths.value(totalFeeETH)();
 
-        // Transfer the hUSD to distribute to SNX holders.
+        // Transfer the hUSD to distribute to HZN holders.
         IERC20(address(synthsUSD())).transfer(FEE_ADDRESS, IERC20(address(synthsUSD())).balanceOf(address(this)));
 
-        // Send remainder ETH to caller
+        // Send remainder BNB to caller
         address(msg.sender).transfer(synthLoan.collateralAmount.sub(totalFeeETH));
 
         // Tell the Dapps
@@ -444,7 +444,7 @@ contract EtherCollateral is Owned, Pausable, ReentrancyGuard, MixinResolver, IEt
     }
 
     function synthsETH() internal view returns (ISynth) {
-        return ISynth(requireAndGetAddress(CONTRACT_SYNTHSETH, "Missing SynthsETH address"));
+        return ISynth(requireAndGetAddress(CONTRACT_SYNTHHBNB, "Missing SynthhBNB address"));
     }
 
     function synthsUSD() internal view returns (ISynth) {
@@ -462,7 +462,7 @@ contract EtherCollateral is Owned, Pausable, ReentrancyGuard, MixinResolver, IEt
     /* ========== MODIFIERS ========== */
 
     modifier sETHRateNotInvalid() {
-        require(!exchangeRates().rateIsInvalid("sETH"), "Blocked as sETH rate is invalid");
+        require(!exchangeRates().rateIsInvalid("hBNB"), "Blocked as hBNB rate is invalid");
         _;
     }
 

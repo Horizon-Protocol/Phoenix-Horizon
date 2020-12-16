@@ -30,7 +30,7 @@ contract('Depot @ovm-skip', async accounts => {
 
 	const [, owner, oracle, fundsWallet, address1, address2, address3] = accounts;
 
-	const [SNX, ETH] = ['HZN', 'ETH'].map(toBytes32);
+	const [SNX, BNB] = ['HZN', 'BNB'].map(toBytes32);
 
 	const approveAndDepositSynths = async (synthsToDeposit, depositor) => {
 		// Approve Transaction
@@ -83,7 +83,7 @@ contract('Depot @ovm-skip', async accounts => {
 		snxRate = toUnit('0.1');
 		ethRate = toUnit('172');
 
-		await exchangeRates.updateRates([SNX, ETH], [snxRate, ethRate], timestamp, {
+		await exchangeRates.updateRates([SNX, BNB], [snxRate, ethRate], timestamp, {
 			from: oracle,
 		});
 	});
@@ -357,7 +357,7 @@ contract('Depot @ovm-skip', async accounts => {
 					from: address1,
 					value: 10,
 				}),
-				'Rate invalid or not a synth'
+				'Rate invalid or not a hasset'
 			);
 			const depotSynthBalanceCurrent = await synth.balanceOf(depot.address);
 			assert.bnEqual(depotSynthBalanceCurrent, depotSynthBalanceBefore);
@@ -412,7 +412,7 @@ contract('Depot @ovm-skip', async accounts => {
 		});
 	});
 
-	describe('Ensure user can exchange ETH for Synths where the amount', async () => {
+	describe('Ensure user can exchange BNB for Synths where the amount', async () => {
 		const depositor = address1;
 		const depositor2 = address2;
 		const purchaser = address3;
@@ -420,7 +420,7 @@ contract('Depot @ovm-skip', async accounts => {
 		let ethUsd;
 
 		beforeEach(async () => {
-			ethUsd = await exchangeRates.rateForCurrency(ETH);
+			ethUsd = await exchangeRates.rateForCurrency(BNB);
 
 			// Assert that there are no deposits already.
 			const depositStartIndex = await depot.depositStartIndex();
@@ -511,10 +511,10 @@ contract('Depot @ovm-skip', async accounts => {
 					});
 				}
 
-				// Exchange("ETH", msg.value, "hUSD", fulfilled);
+				// Exchange("BNB", msg.value, "hUSD", fulfilled);
 				const exchangeEvent = txn.logs.find(log => log.event === 'Exchange');
 				assert.eventEqual(exchangeEvent, 'Exchange', {
-					fromCurrency: 'ETH',
+					fromCurrency: 'BNB',
 					fromAmount: ethToSend,
 					toCurrency: 'hUSD',
 					toAmount: synthsToDeposit,
@@ -535,7 +535,7 @@ contract('Depot @ovm-skip', async accounts => {
 				// And our total should be 0 as the purchase amount was equal to the deposit
 				assert.equal(await depot.totalSellableDeposits(), 0);
 
-				// The depositor should have received the ETH
+				// The depositor should have received the BNB
 				const depositorEndingBalance = await getEthBalance(depositor);
 				assert.bnEqual(
 					web3.utils
@@ -547,7 +547,7 @@ contract('Depot @ovm-skip', async accounts => {
 			});
 
 			it('is less than one deposit (and that the queue is correctly updated)', async () => {
-				const synthsToDeposit = web3.utils.toBN(ethUsd); // ETH Price
+				const synthsToDeposit = web3.utils.toBN(ethUsd); // BNB Price
 				const ethToSend = toUnit('0.5');
 
 				// Send the synths to the Token Depot.
@@ -581,10 +581,10 @@ contract('Depot @ovm-skip', async accounts => {
 					});
 				}
 
-				// Exchange("ETH", msg.value, "hUSD", fulfilled);
+				// Exchange("BNB", msg.value, "hUSD", fulfilled);
 				const exchangeEvent = txn.logs.find(log => log.event === 'Exchange');
 				assert.eventEqual(exchangeEvent, 'Exchange', {
-					fromCurrency: 'ETH',
+					fromCurrency: 'BNB',
 					fromAmount: ethToSend,
 					toCurrency: 'hUSD',
 					toAmount: synthsToDeposit.div(web3.utils.toBN('2')),
@@ -603,8 +603,8 @@ contract('Depot @ovm-skip', async accounts => {
 			});
 
 			it('exceeds one deposit (and that the queue is correctly updated)', async () => {
-				const synthsToDeposit = toUnit('172'); // 1 ETH worth
-				const totalSynthsDeposit = toUnit('344'); // 2 ETH worth
+				const synthsToDeposit = toUnit('172'); // 1 BNB worth
+				const totalSynthsDeposit = toUnit('344'); // 2 BNB worth
 				const ethToSend = toUnit('1.5');
 
 				// Send the synths to the Token Depot.
@@ -636,12 +636,12 @@ contract('Depot @ovm-skip', async accounts => {
 					});
 				}
 
-				// Exchange("ETH", msg.value, "hUSD", fulfilled);
+				// Exchange("BNB", msg.value, "hUSD", fulfilled);
 				const exchangeEvent = transaction.logs.find(log => log.event === 'Exchange');
 				const synthsAmount = multiplyDecimal(ethToSend, ethUsd);
 
 				assert.eventEqual(exchangeEvent, 'Exchange', {
-					fromCurrency: 'ETH',
+					fromCurrency: 'BNB',
 					fromAmount: ethToSend,
 					toCurrency: 'hUSD',
 					toAmount: synthsAmount,
@@ -663,7 +663,7 @@ contract('Depot @ovm-skip', async accounts => {
 				assert.bnEqual(await depot.totalSellableDeposits(), remainingSynths);
 			});
 
-			xit('exceeds available synths (and that the remainder of the ETH is correctly refunded)', async () => {
+			xit('exceeds available synths (and that the remainder of the BNB is correctly refunded)', async () => {
 				const ethToSend = toUnit('2');
 				const synthsToDeposit = multiplyDecimal(ethToSend, ethRate); // 344
 				const purchaserInitialBalance = await getEthBalance(purchaser);
@@ -696,18 +696,18 @@ contract('Depot @ovm-skip', async accounts => {
 
 				const gasPaid = web3.utils.toBN(txn.receipt.gasUsed * GAS_PRICE);
 
-				// Exchange("ETH", msg.value, "hUSD", fulfilled);
+				// Exchange("BNB", msg.value, "hUSD", fulfilled);
 				const exchangeEvent = txn.logs.find(log => log.event === 'Exchange');
 
 				assert.eventEqual(exchangeEvent, 'Exchange', {
-					fromCurrency: 'ETH',
+					fromCurrency: 'BNB',
 					fromAmount: ethToSend,
 					toCurrency: 'hUSD',
 					toAmount: synthsToDeposit,
 				});
 
 				// We need to calculate the amount - fees the purchaser is supposed to get
-				const synthsAvailableInETH = divideDecimal(synthsToDeposit, ethUsd);
+				const synthsAvailableInBNB = divideDecimal(synthsToDeposit, ethUsd);
 
 				// Purchaser should have received the total available synths
 				const purchaserSynthBalance = await synth.balanceOf(purchaser);
@@ -718,7 +718,7 @@ contract('Depot @ovm-skip', async accounts => {
 				assert.equal(depotSynthBalance, 0);
 
 				// The purchaser should have received the refund
-				// which can be checked by initialBalance = endBalance + fees + amount of synths bought in ETH
+				// which can be checked by initialBalance = endBalance + fees + amount of synths bought in BNB
 				const purchaserEndingBalance = await getEthBalance(purchaser);
 
 				// Note: currently failing under coverage via:
@@ -730,7 +730,7 @@ contract('Depot @ovm-skip', async accounts => {
 					web3.utils
 						.toBN(purchaserEndingBalance)
 						.add(gasPaid)
-						.add(synthsAvailableInETH),
+						.add(synthsAvailableInBNB),
 					web3.utils.toBN(purchaserInitialBalance)
 				);
 			});
@@ -753,7 +753,7 @@ contract('Depot @ovm-skip', async accounts => {
 					txn = await depot.exchangeEtherForSynthsAtRate(ethRate, payload);
 					const exchangeEvent = txn.logs.find(log => log.event === 'Exchange');
 					assert.eventEqual(exchangeEvent, 'Exchange', {
-						fromCurrency: 'ETH',
+						fromCurrency: 'BNB',
 						fromAmount: ethToSend,
 						toCurrency: 'hUSD',
 						toAmount: synthsToPurchase,
@@ -773,7 +773,7 @@ contract('Depot @ovm-skip', async accounts => {
 				});
 				it('when the purchaser supplies a rate and the rate is changed in by the oracle', async () => {
 					const timestamp = await currentTime();
-					await exchangeRates.updateRates([SNX, ETH], ['0.1', '134'].map(toUnit), timestamp, {
+					await exchangeRates.updateRates([SNX, BNB], ['0.1', '134'].map(toUnit), timestamp, {
 						from: oracle,
 					});
 					await assert.revert(
@@ -805,7 +805,7 @@ contract('Depot @ovm-skip', async accounts => {
 					const exchangeEvent = txn.logs.find(log => log.event === 'Exchange');
 
 					assert.eventEqual(exchangeEvent, 'Exchange', {
-						fromCurrency: 'ETH',
+						fromCurrency: 'BNB',
 						fromAmount: ethToSend,
 						toCurrency: 'HZN',
 						toAmount: snxToPurchase,
@@ -825,7 +825,7 @@ contract('Depot @ovm-skip', async accounts => {
 				});
 				it('when the purchaser supplies a rate and the rate is changed in by the oracle', async () => {
 					const timestamp = await currentTime();
-					await exchangeRates.updateRates([SNX, ETH], ['0.1', '134'].map(toUnit), timestamp, {
+					await exchangeRates.updateRates([SNX, BNB], ['0.1', '134'].map(toUnit), timestamp, {
 						from: oracle,
 					});
 					await assert.revert(
@@ -1000,7 +1000,7 @@ contract('Depot @ovm-skip', async accounts => {
 			});
 		});
 
-		it('Ensure user can exchange ETH for Synths after a withdrawal and that the queue correctly skips the empty entry', async () => {
+		it('Ensure user can exchange BNB for Synths after a withdrawal and that the queue correctly skips the empty entry', async () => {
 			//   - e.g. Deposits of [1, 2, 3], user withdraws 2, so [1, (empty), 3], then
 			//      - User can exchange for 1, and queue is now [(empty), 3]
 			//      - User can exchange for 2 and queue is now [2]
@@ -1024,7 +1024,7 @@ contract('Depot @ovm-skip', async accounts => {
 			const queueResultForDeposit2 = await depot.deposits(1);
 			assert.equal(queueResultForDeposit2.amount, 0);
 
-			// User exchange ETH for Synths (same amount as first deposit)
+			// User exchange BNB for Synths (same amount as first deposit)
 			const ethToSend = divideDecimal(deposit1, ethRate);
 			await depot.exchangeEtherForSynths({
 				from: purchaser,
@@ -1037,7 +1037,7 @@ contract('Depot @ovm-skip', async accounts => {
 			const queueResultForDeposit1 = await depot.deposits(1);
 			assert.equal(queueResultForDeposit1.amount, 0);
 
-			// User exchange ETH for Synths
+			// User exchange BNB for Synths
 			await depot.exchangeEtherForSynths({
 				from: purchaser,
 				value: ethToSend,
@@ -1100,7 +1100,7 @@ contract('Depot @ovm-skip', async accounts => {
 		});
 	});
 
-	describe('Ensure user can exchange ETH for HZN', async () => {
+	describe('Ensure user can exchange BNB for HZN', async () => {
 		const purchaser = address1;
 
 		beforeEach(async () => {
@@ -1137,14 +1137,14 @@ contract('Depot @ovm-skip', async accounts => {
 			});
 		});
 
-		it('ensure user get the correct amount of HZN after sending ETH', async () => {
+		it('ensure user get the correct amount of HZN after sending BNB', async () => {
 			const ethToSend = toUnit('10');
 
 			const purchaserSNXStartBalance = await synthetix.balanceOf(purchaser);
 			// Purchaser should not have HZN yet
 			assert.equal(purchaserSNXStartBalance, 0);
 
-			// Purchaser sends ETH
+			// Purchaser sends BNB
 			await depot.exchangeEtherForSNX({
 				from: purchaser,
 				value: ethToSend,

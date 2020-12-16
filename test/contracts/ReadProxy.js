@@ -78,7 +78,7 @@ contract('ReadProxy', async accounts => {
 				thirdPartyContract = await artifacts.require('UsingReadProxy').new(forwarder.address);
 			});
 			it('when attempting to invoke a view that calls the forwarder it fails', async () => {
-				await assert.revert(thirdPartyContract.run(toBytes32('ETH')), 'Missing ExchangeRates');
+				await assert.revert(thirdPartyContract.run(toBytes32('BNB')), 'Missing ExchangeRates');
 			});
 
 			describe('when the resource is updated in the forwarders target', () => {
@@ -96,7 +96,7 @@ contract('ReadProxy', async accounts => {
 					});
 				});
 				it('when invoking a view that calls the forwarder it succeeds and passes thru', async () => {
-					const actual = await thirdPartyContract.run(toBytes32('ETH'));
+					const actual = await thirdPartyContract.run(toBytes32('BNB'));
 					assert.bnEqual(actual, toUnit('250'));
 				});
 			});

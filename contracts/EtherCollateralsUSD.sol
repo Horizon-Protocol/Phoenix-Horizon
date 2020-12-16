@@ -24,7 +24,7 @@ contract EtherCollateralsUSD is Owned, Pausable, ReentrancyGuard, MixinResolver,
     using SafeMath for uint256;
     using SafeDecimalMath for uint256;
 
-    bytes32 internal constant ETH = "ETH";
+    bytes32 internal constant ETH = "BNB";
 
     // ========== CONSTANTS ==========
     uint256 internal constant ONE_THOUSAND = 1e18 * 1000;
@@ -37,7 +37,7 @@ contract EtherCollateralsUSD is Owned, Pausable, ReentrancyGuard, MixinResolver,
 
     uint256 internal constant ACCOUNT_LOAN_LIMIT_CAP = 1000;
     bytes32 private constant hUSD = "hUSD";
-    bytes32 public constant COLLATERAL = "ETH";
+    bytes32 public constant COLLATERAL = "BNB";
 
     // ========== SETTER STATE VARIABLES ==========
 
@@ -388,7 +388,7 @@ contract EtherCollateralsUSD is Owned, Pausable, ReentrancyGuard, MixinResolver,
         // Require ETH sent to be greater than minLoanCollateralSize
         require(
             msg.value >= minLoanCollateralSize,
-            "Not enough ETH to create this loan. Please see the minLoanCollateralSize"
+            "Not enough BNB to create this loan. Please see the minLoanCollateralSize"
         );
 
         // Require loanLiquidationOpen to be false or we are in liquidation phase
@@ -846,7 +846,7 @@ contract EtherCollateralsUSD is Owned, Pausable, ReentrancyGuard, MixinResolver,
     /* ========== MODIFIERS ========== */
 
     modifier ETHRateNotInvalid() {
-        require(!exchangeRates().rateIsInvalid(COLLATERAL), "Blocked as ETH rate is invalid");
+        require(!exchangeRates().rateIsInvalid(COLLATERAL), "Blocked as BNB rate is invalid");
         _;
     }
 

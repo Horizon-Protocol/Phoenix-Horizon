@@ -21,7 +21,7 @@ contract Depot is Owned, Pausable, ReentrancyGuard, MixinResolver, IDepot {
     using SafeDecimalMath for uint;
 
     bytes32 internal constant SNX = "HZN";
-    bytes32 internal constant ETH = "ETH";
+    bytes32 internal constant BNB = "BNB";
 
     /* ========== STATE VARIABLES ========== */
 
@@ -63,7 +63,7 @@ contract Depot is Owned, Pausable, ReentrancyGuard, MixinResolver, IDepot {
     // The minimum amount of hUSD required to enter the FiFo queue
     uint public minimumDepositAmount = 50 * SafeDecimalMath.unit();
 
-    // A cap on the amount of hUSD you can buy with ETH in 1 transaction
+    // A cap on the amount of hUSD you can buy with BNB in 1 transaction
     uint public maxEthPurchase = 500 * SafeDecimalMath.unit();
 
     // If a user deposits a synth amount < the minimumDepositAmount the contract will keep
@@ -97,8 +97,8 @@ contract Depot is Owned, Pausable, ReentrancyGuard, MixinResolver, IDepot {
     }
 
     /**
-     * @notice Set the funds wallet where ETH raised is held
-     * @param _fundsWallet The new address to forward ETH and Synths to
+     * @notice Set the funds wallet where BNB raised is held
+     * @param _fundsWallet The new address to forward BNB and Synths to
      */
     function setFundsWallet(address payable _fundsWallet) external onlyOwner {
         fundsWallet = _fundsWallet;
@@ -119,21 +119,21 @@ contract Depot is Owned, Pausable, ReentrancyGuard, MixinResolver, IDepot {
     /* ========== MUTATIVE FUNCTIONS ========== */
 
     /**
-     * @notice Fallback function (exchanges ETH to hUSD)
+     * @notice Fallback function (exchanges BNB to hUSD)
      */
-    function() external payable nonReentrant rateNotInvalid(ETH) notPaused {
+    function() external payable nonReentrant rateNotInvalid(BNB) notPaused {
         _exchangeEtherForSynths();
     }
 
     /**
-     * @notice Exchange ETH to hUSD.
+     * @notice Exchange BNB to hUSD.
      */
     /* solhint-disable multiple-sends, reentrancy */
     function exchangeEtherForSynths()
         external
         payable
         nonReentrant
-        rateNotInvalid(ETH)
+        rateNotInvalid(BNB)
         notPaused
         returns (
             uint // Returns the number of Synths (hUSD) received
@@ -143,12 +143,12 @@ contract Depot is Owned, Pausable, ReentrancyGuard, MixinResolver, IDepot {
     }
 
     function _exchangeEtherForSynths() internal returns (uint) {
-        require(msg.value <= maxEthPurchase, "ETH amount above maxEthPurchase limit");
+        require(msg.value <= maxEthPurchase, "BNB amount above maxEthPurchase limit");
         uint ethToSend;
 
-        // The multiplication works here because exchangeRates().rateForCurrency(ETH) is specified in
+        // The multiplication works here because exchangeRates().rateForCurrency(BNB) is specified in
         // 18 decimal places, just like our currency base.
-        uint requestedToPurchase = msg.value.multiplyDecimal(exchangeRates().rateForCurrency(ETH));
+        uint requestedToPurchase = msg.value.multiplyDecimal(exchangeRates().rateForCurrency(BNB));
         uint remainingToFulfill = requestedToPurchase;
 
         // Iterate through our outstanding deposits and sell them one at a time.
@@ -171,12 +171,12 @@ contract Depot is Owned, Pausable, ReentrancyGuard, MixinResolver, IDepot {
 
                     totalSellableDeposits = totalSellableDeposits.sub(remainingToFulfill);
 
-                    // Transfer the ETH to the depositor. Send is used instead of transfer
+                    // Transfer the BNB to the depositor. Send is used instead of transfer
                     // so a non payable contract won't block the FIFO queue on a failed
-                    // ETH payable for synths transaction. The proceeds to be sent to the
+                    // BNB payable for synths transaction. The proceeds to be sent to the
                     // synthetix foundation funds wallet. This is to protect all depositors
                     // in the queue in this rare case that may occur.
-                    ethToSend = remainingToFulfill.divideDecimal(exchangeRates().rateForCurrency(ETH));
+                    ethToSend = remainingToFulfill.divideDecimal(exchangeRates().rateForCurrency(BNB));
 
                     // We need to use send here instead of transfer because transfer reverts
                     // if the recipient is a non-payable contract. Send will just tell us it
@@ -206,12 +206,12 @@ contract Depot is Owned, Pausable, ReentrancyGuard, MixinResolver, IDepot {
                     // We also need to tell our total it's decreased
                     totalSellableDeposits = totalSellableDeposits.sub(deposit.amount);
 
-                    // Now fulfill by transfering the ETH to the depositor. Send is used instead of transfer
+                    // Now fulfill by transfering the BNB to the depositor. Send is used instead of transfer
                     // so a non payable contract won't block the FIFO queue on a failed
-                    // ETH payable for synths transaction. The proceeds to be sent to the
+                    // BNB payable for synths transaction. The proceeds to be sent to the
                     // synthetix foundation funds wallet. This is to protect all depositors
                     // in the queue in this rare case that may occur.
-                    ethToSend = deposit.amount.divideDecimal(exchangeRates().rateForCurrency(ETH));
+                    ethToSend = deposit.amount.divideDecimal(exchangeRates().rateForCurrency(BNB));
 
                     // We need to use send here instead of transfer because transfer reverts
                     // if the recipient is a non-payable contract. Send will just tell us it
@@ -237,9 +237,9 @@ contract Depot is Owned, Pausable, ReentrancyGuard, MixinResolver, IDepot {
         }
 
         // Ok, if we're here and 'remainingToFulfill' isn't zero, then
-        // we need to refund the remainder of their ETH back to them.
+        // we need to refund the remainder of their BNB back to them.
         if (remainingToFulfill > 0) {
-            msg.sender.transfer(remainingToFulfill.divideDecimal(exchangeRates().rateForCurrency(ETH)));
+            msg.sender.transfer(remainingToFulfill.divideDecimal(exchangeRates().rateForCurrency(BNB)));
         }
 
         // How many did we actually give them?
@@ -247,7 +247,7 @@ contract Depot is Owned, Pausable, ReentrancyGuard, MixinResolver, IDepot {
 
         if (fulfilled > 0) {
             // Now tell everyone that we gave them that many (only if the amount is greater than 0).
-            emit Exchange("ETH", msg.value, "hUSD", fulfilled);
+            emit Exchange("BNB", msg.value, "hUSD", fulfilled);
         }
 
         return fulfilled;
@@ -256,20 +256,20 @@ contract Depot is Owned, Pausable, ReentrancyGuard, MixinResolver, IDepot {
     /* solhint-enable multiple-sends, reentrancy */
 
     /**
-     * @notice Exchange ETH to hUSD while insisting on a particular rate. This allows a user to
+     * @notice Exchange BNB to hUSD while insisting on a particular rate. This allows a user to
      *         exchange while protecting against frontrunning by the contract owner on the exchange rate.
      * @param guaranteedRate The exchange rate (ether price) which must be honored or the call will revert.
      */
     function exchangeEtherForSynthsAtRate(uint guaranteedRate)
         external
         payable
-        rateNotInvalid(ETH)
+        rateNotInvalid(BNB)
         notPaused
         returns (
             uint // Returns the number of Synths (hUSD) received
         )
     {
-        require(guaranteedRate == exchangeRates().rateForCurrency(ETH), "Guaranteed rate would not be received");
+        require(guaranteedRate == exchangeRates().rateForCurrency(BNB), "Guaranteed rate would not be received");
 
         return _exchangeEtherForSynths();
     }
@@ -278,25 +278,25 @@ contract Depot is Owned, Pausable, ReentrancyGuard, MixinResolver, IDepot {
         // How many SNX are they going to be receiving?
         uint synthetixToSend = synthetixReceivedForEther(msg.value);
 
-        // Store the ETH in our funds wallet
+        // Store the BNB in our funds wallet
         fundsWallet.transfer(msg.value);
 
         // And send them the SNX.
         synthetix().transfer(msg.sender, synthetixToSend);
 
-        emit Exchange("ETH", msg.value, "HZN", synthetixToSend);
+        emit Exchange("BNB", msg.value, "HZN", synthetixToSend);
 
         return synthetixToSend;
     }
 
     /**
-     * @notice Exchange ETH to SNX.
+     * @notice Exchange BNB to HZN.
      */
     function exchangeEtherForSNX()
         external
         payable
         rateNotInvalid(SNX)
-        rateNotInvalid(ETH)
+        rateNotInvalid(BNB)
         notPaused
         returns (
             uint // Returns the number of SNX received
@@ -306,7 +306,7 @@ contract Depot is Owned, Pausable, ReentrancyGuard, MixinResolver, IDepot {
     }
 
     /**
-     * @notice Exchange ETH to SNX while insisting on a particular set of rates. This allows a user to
+     * @notice Exchange BNB to HZN while insisting on a particular set of rates. This allows a user to
      *         exchange while protecting against frontrunning by the contract owner on the exchange rates.
      * @param guaranteedEtherRate The ether exchange rate which must be honored or the call will revert.
      * @param guaranteedSynthetixRate The synthetix exchange rate which must be honored or the call will revert.
@@ -315,13 +315,13 @@ contract Depot is Owned, Pausable, ReentrancyGuard, MixinResolver, IDepot {
         external
         payable
         rateNotInvalid(SNX)
-        rateNotInvalid(ETH)
+        rateNotInvalid(BNB)
         notPaused
         returns (
             uint // Returns the number of SNX received
         )
     {
-        require(guaranteedEtherRate == exchangeRates().rateForCurrency(ETH), "Guaranteed ether rate would not be received");
+        require(guaranteedEtherRate == exchangeRates().rateForCurrency(BNB), "Guaranteed ether rate would not be received");
         require(
             guaranteedSynthetixRate == exchangeRates().rateForCurrency(SNX),
             "Guaranteed synthetix rate would not be received"
@@ -481,8 +481,8 @@ contract Depot is Owned, Pausable, ReentrancyGuard, MixinResolver, IDepot {
      * @param amount The amount of ether (in wei) you want to ask about
      */
     function synthetixReceivedForEther(uint amount) public view returns (uint) {
-        // How much is the ETH they sent us worth in hUSD (ignoring the transfer fee)?
-        uint valueSentInSynths = amount.multiplyDecimal(exchangeRates().rateForCurrency(ETH));
+        // How much is the BNB they sent us worth in hUSD (ignoring the transfer fee)?
+        uint valueSentInSynths = amount.multiplyDecimal(exchangeRates().rateForCurrency(BNB));
 
         // Now, how many SNX will that USD amount buy?
         return synthetixReceivedForSynths(valueSentInSynths);
@@ -495,7 +495,7 @@ contract Depot is Owned, Pausable, ReentrancyGuard, MixinResolver, IDepot {
      */
     function synthsReceivedForEther(uint amount) public view returns (uint) {
         // How many synths would that amount of ether be worth?
-        return amount.multiplyDecimal(exchangeRates().rateForCurrency(ETH));
+        return amount.multiplyDecimal(exchangeRates().rateForCurrency(BNB));
     }
 
     /* ========== INTERNAL VIEWS ========== */
@@ -515,7 +515,7 @@ contract Depot is Owned, Pausable, ReentrancyGuard, MixinResolver, IDepot {
     // ========== MODIFIERS ==========
 
     modifier rateNotInvalid(bytes32 currencyKey) {
-        require(!exchangeRates().rateIsInvalid(currencyKey), "Rate invalid or not a synth");
+        require(!exchangeRates().rateIsInvalid(currencyKey), "Rate invalid or not a hasset");
         _;
     }
 

@@ -37,7 +37,7 @@ contract('ExchangerWithVirtualSynth (unit tests)', async accounts => {
 		describe('exchanging', () => {
 			describe('exchangeWithVirtual', () => {
 				describe('failure modes', () => {
-					const args = [owner, toBytes32('hUSD'), '100', toBytes32('sETH'), owner, toBytes32()];
+					const args = [owner, toBytes32('hUSD'), '100', toBytes32('hBNB'), owner, toBytes32()];
 
 					behaviors.whenInstantiated({ owner }, () => {
 						// as we aren't calling as Synthetix, we need to mock the check for synths
@@ -77,7 +77,7 @@ contract('ExchangerWithVirtualSynth (unit tests)', async accounts => {
 																		owner,
 																		toBytes32('hUSD'),
 																		'0',
-																		toBytes32('sETH'),
+																		toBytes32('hBNB'),
 																		owner,
 																		toBytes32(),
 																		{ from: this.mocks.Synthetix.address }
@@ -91,7 +91,7 @@ contract('ExchangerWithVirtualSynth (unit tests)', async accounts => {
 																		owner,
 																		toBytes32('hUSD'),
 																		'100',
-																		toBytes32('iETH'),
+																		toBytes32('iBNB'),
 																		owner,
 																		toBytes32(),
 																		{ from: this.mocks.Synthetix.address }
@@ -129,7 +129,7 @@ contract('ExchangerWithVirtualSynth (unit tests)', async accounts => {
 																owner,
 																toBytes32('hUSD'),
 																amount,
-																toBytes32('sETH'),
+																toBytes32('hBNB'),
 																owner,
 																toBytes32(),
 																{ from: this.mocks.Synthetix.address }
@@ -138,7 +138,7 @@ contract('ExchangerWithVirtualSynth (unit tests)', async accounts => {
 														it('emits a VirtualSynthCreated event with the correct underlying synth and amount', async () => {
 															assert.eventEqual(txn, 'VirtualSynthCreated', {
 																synth: this.mocks.synth.smocked.proxy.will.returnValue,
-																currencyKey: toBytes32('sETH'),
+																currencyKey: toBytes32('hBNB'),
 																amount,
 																recipient: owner,
 															});

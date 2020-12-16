@@ -20,7 +20,7 @@ const {
 const { toBytes32 } = require('../..');
 
 contract('BaseSynthetix', async accounts => {
-	const [hUSD, sAUD, sEUR, SNX, sETH] = ['hUSD', 'sAUD', 'sEUR', 'HZN', 'sETH'].map(toBytes32);
+	const [hUSD, sAUD, sEUR, SNX, sETH] = ['hUSD', 'sAUD', 'sEUR', 'HZN', 'hBNB'].map(toBytes32);
 
 	const [, owner, account1, account2, account3] = accounts;
 
@@ -43,7 +43,7 @@ contract('BaseSynthetix', async accounts => {
 			SynthetixEscrow: escrow,
 		} = await setupAllContracts({
 			accounts,
-			synths: ['hUSD', 'sETH', 'sEUR', 'sAUD'],
+			synths: ['hUSD', 'hBNB', 'sEUR', 'sAUD'],
 			contracts: [
 				'BaseSynthetix',
 				'SynthetixState',

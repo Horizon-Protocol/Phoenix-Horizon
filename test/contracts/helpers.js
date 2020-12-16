@@ -76,8 +76,8 @@ module.exports = {
 			'sEUR',
 			'sBTC',
 			'iBTC',
-			'sETH',
-			'ETH',
+			'hBNB',
+			'BNB',
 		].map(toBytes32);
 
 		await exchangeRates.updateRates(

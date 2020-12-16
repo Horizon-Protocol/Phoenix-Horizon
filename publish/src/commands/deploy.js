@@ -350,7 +350,7 @@ const deploy = async ({
 		10
 	);
 	if (useFork) {
-		// Make sure the pwned account has ETH when using a fork
+		// Make sure the pwned account has BNB when using a fork
 		const accounts = await deployer.web3.eth.getAccounts();
 
 		await deployer.web3.eth.sendTransaction({
@@ -360,7 +360,7 @@ const deploy = async ({
 		});
 	} else if (deployerBalance < 5) {
 		console.log(
-			yellow(`⚠ WARNING: Deployer account balance could be too low: ${deployerBalance} ETH`)
+			yellow(`⚠ WARNING: Deployer account balance could be too low: ${deployerBalance} BNB`)
 		);
 	}
 
@@ -980,7 +980,7 @@ const deploy = async ({
 
 		// MultiCollateral needs additionalConstructorArgs to be ordered
 		const additionalConstructorArgsMap = {
-			MultiCollateralSynthsETH: [toBytes32('EtherCollateral')],
+			MultiCollateralSynthhBNB: [toBytes32('EtherCollateral')],
 			MultiCollateralSynthhUSD: [toBytes32('EtherCollateralsUSD')],
 			// future subclasses...
 			// future specific synths args...
@@ -1554,8 +1554,8 @@ const deploy = async ({
 
 			// override individual currencyKey / synths exchange rates
 			const synthExchangeRateOverride = {
-				sETH: w3utils.toWei('0.003'),
-				iETH: w3utils.toWei('0.003'),
+				hBNB: w3utils.toWei('0.003'),
+				iBNB: w3utils.toWei('0.003'),
 				sBTC: w3utils.toWei('0.003'),
 				iBTC: w3utils.toWei('0.003'),
 			};

@@ -23,7 +23,7 @@ const {
 const { setupAllContracts } = require('./setup');
 
 contract('PurgeableSynth', accounts => {
-	const [sUSD, SNX, sAUD, iETH] = ['hUSD', 'SNX', 'sAUD', 'iETH'].map(toBytes32);
+	const [sUSD, SNX, sAUD, iETH] = ['hUSD', 'SNX', 'sAUD', 'iBNB'].map(toBytes32);
 	const synthKeys = [sUSD, sAUD, iETH];
 	const [deployerAccount, owner, oracle, , account1, account2] = accounts;
 
@@ -121,7 +121,7 @@ contract('PurgeableSynth', accounts => {
 			// Create iETH as a PurgeableSynth as we do not create any PurgeableSynth
 			// in the migration script
 			const { synth, tokenState, proxy } = await deploySynth({
-				currencyKey: 'iETH',
+				currencyKey: 'iBNB',
 			});
 			await tokenState.setAssociatedContract(synth.address, { from: owner });
 			await proxy.setTarget(synth.address, { from: owner });
@@ -172,12 +172,12 @@ contract('PurgeableSynth', accounts => {
 				await debtCache.takeDebtSnapshot();
 			});
 
-			describe('and a user holds 100K USD worth of purgeable synth iETH', () => {
+			describe('and a user holds 100K USD worth of purgeable synth iBNB', () => {
 				let amountToExchange;
 				let usersUSDBalance;
 				let balanceBeforePurge;
 				beforeEach(async () => {
-					// issue the user 100K USD worth of iETH
+					// issue the user 100K USD worth of iBNB
 					amountToExchange = toUnit(1e5);
 					const iETHAmount = await exchangeRates.effectiveValue(sUSD, amountToExchange, iETH);
 					await issueSynthsToUser({
@@ -295,7 +295,7 @@ contract('PurgeableSynth', accounts => {
 					});
 				});
 
-				describe('when the user holds 5000 USD worth of the purgeable synth iETH', () => {
+				describe('when the user holds 5000 USD worth of the purgeable synth iBNB', () => {
 					let balanceBeforePurgeUser2;
 					beforeEach(async () => {
 						// Note: 5000 is chosen to be large enough to accommodate exchange fees which

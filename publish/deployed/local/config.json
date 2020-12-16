@@ -209,13 +209,13 @@
 	"SynthsETH": {
 		"deploy": true
 	},
-	"TokenStatesBNB": {
+	"TokenStatehBNB": {
 		"deploy": true
 	},
-	"ProxysBNB": {
+	"ProxyhBNB": {
 		"deploy": true
 	},
-	"SynthsBNB": {
+	"SynthhBNB": {
 		"deploy": true
 	},
 	"TokenStatesTRX": {

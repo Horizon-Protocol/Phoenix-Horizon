@@ -1075,7 +1075,7 @@ contract('Exchange Rates', async accounts => {
 	});
 
 	describe('inverted prices', () => {
-		const inverseRates = ['iBTC', 'iETH', 'sEUR', 'sBNB'];
+		const inverseRates = ['iBTC', 'iBNB', 'sEUR', 'sBNB'];
 		const [iBTC, iETH, sEUR, sBNB] = inverseRates.map(toBytes32);
 		it('rateIsFrozen for a regular synth returns false', async () => {
 			assert.equal(false, await instance.rateIsFrozen(sEUR));
@@ -1398,7 +1398,7 @@ contract('Exchange Rates', async accounts => {
 			});
 			it('and the list of invertedKeys lists them both', async () => {
 				assert.equal('iBTC', bytesToString(await instance.invertedKeys(0)));
-				assert.equal('iETH', bytesToString(await instance.invertedKeys(1)));
+				assert.equal('iBNB', bytesToString(await instance.invertedKeys(1)));
 				await assert.invalidOpcode(instance.invertedKeys(2));
 			});
 			it('rateIsFrozen must be false for both', async () => {
@@ -1700,7 +1700,7 @@ contract('Exchange Rates', async accounts => {
 
 						it('and the list of invertedKeys still lists them both', async () => {
 							assert.equal('iBTC', bytesToString(await instance.invertedKeys(0)));
-							assert.equal('iETH', bytesToString(await instance.invertedKeys(1)));
+							assert.equal('iBNB', bytesToString(await instance.invertedKeys(1)));
 							await assert.invalidOpcode(instance.invertedKeys(2));
 						});
 
@@ -1837,8 +1837,8 @@ contract('Exchange Rates', async accounts => {
 							lowerLimit: 0,
 						});
 					});
-					it('and the list of invertedKeys contains only iETH', async () => {
-						assert.equal('iETH', bytesToString(await instance.invertedKeys(0)));
+					it('and the list of invertedKeys contains only iBNB', async () => {
+						assert.equal('iBNB', bytesToString(await instance.invertedKeys(0)));
 						await assert.invalidOpcode(instance.invertedKeys(1));
 					});
 

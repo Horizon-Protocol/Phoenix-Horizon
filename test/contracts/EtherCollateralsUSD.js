@@ -32,7 +32,7 @@ contract('EtherCollateralsUSD', async accounts => {
 
 	const TEST_TIMEOUT = 160e3;
 
-	const [ETH] = ['ETH'].map(toBytes32);
+	const [ETH] = ['BNB'].map(toBytes32);
 	const ETH_RATE = 100;
 
 	const ISSUACE_RATIO = toUnit('0.666666666666666667');
@@ -483,7 +483,7 @@ contract('EtherCollateralsUSD', async accounts => {
 				it('then calling openLoan() reverts', async () => {
 					await assert.revert(
 						etherCollateral.openLoan(testLoanAmount, { value: toUnit('1'), from: address1 }),
-						'Blocked as ETH rate is invalid'
+						'Blocked as BNB rate is invalid'
 					);
 				});
 				describe('when ETH gets a rate', () => {
@@ -502,7 +502,7 @@ contract('EtherCollateralsUSD', async accounts => {
 				await etherCollateral.setMinLoanCollateralSize(toUnit('2'), { from: owner });
 				await assert.revert(
 					etherCollateral.openLoan(testLoanAmount, { value: toUnit('1'), from: address1 }),
-					'Not enough ETH to create this loan. Please see the minLoanCollateralSize'
+					'Not enough BNB to create this loan. Please see the minLoanCollateralSize'
 				);
 			});
 			it('attempting to issue more than the cap (issueLimit)', async () => {
@@ -1246,7 +1246,7 @@ contract('EtherCollateralsUSD', async accounts => {
 								etherCollateral.closeLoan(loanID, {
 									from: address1,
 								}),
-								'Blocked as ETH rate is invalid'
+								'Blocked as BNB rate is invalid'
 							);
 						});
 						describe('when hUSD gets a rate', () => {
@@ -1555,7 +1555,7 @@ contract('EtherCollateralsUSD', async accounts => {
 								etherCollateral.liquidateUnclosedLoan(alice, loanID, {
 									from: bob,
 								}),
-								'Blocked as ETH rate is invalid'
+								'Blocked as BNB rate is invalid'
 							);
 						});
 						describe('when hUSD gets a rate', () => {

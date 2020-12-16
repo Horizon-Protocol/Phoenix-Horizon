@@ -85,7 +85,7 @@ contract('Liquidations', accounts => {
 
 	const updateRatesWithDefaults = async () => {
 		timestamp = await currentTime();
-		// SNX is 6 dolla
+		// HZN is 6 dollar
 		await updateSNXPrice('6');
 	};
 
@@ -152,7 +152,7 @@ contract('Liquidations', accounts => {
 			await updateRatesWithDefaults();
 		});
 		describe('system staleness checks', () => {
-			describe('when SNX is stale', () => {
+			describe('when HZN is stale', () => {
 				beforeEach(async () => {
 					const rateStalePeriod = await exchangeRates.rateStalePeriod();
 
@@ -162,13 +162,13 @@ contract('Liquidations', accounts => {
 				it('when flagAccountForLiquidation() is invoked, it reverts for rate stale', async () => {
 					await assert.revert(
 						liquidations.flagAccountForLiquidation(alice, { from: owner }),
-						'Rate invalid or not a synth'
+						'Rate invalid or not a hasset'
 					);
 				});
 				it('when checkAndRemoveAccountInLiquidation() is invoked, it reverts for rate stale', async () => {
 					await assert.revert(
 						liquidations.checkAndRemoveAccountInLiquidation(alice, { from: owner }),
-						'Rate invalid or not a synth'
+						'Rate invalid or not a hasset'
 					);
 				});
 			});
@@ -269,7 +269,7 @@ contract('Liquidations', accounts => {
 						penalty = toUnit('0.1');
 						await systemSettings.setLiquidationPenalty(penalty, { from: owner });
 					});
-					it('calculates sUSD to fix ratio from 200%, with $600 SNX collateral and $300 debt', async () => {
+					it('calculates hUSD to fix ratio from 200%, with $600 HZN collateral and $300 debt', async () => {
 						const expectedAmount = toUnit('260.869565217391304347');
 
 						// amount of debt to redeem to fix
@@ -291,7 +291,7 @@ contract('Liquidations', accounts => {
 
 						assert.bnEqual(collateralRatio, ratio);
 					});
-					it('calculates sUSD to fix ratio from 300%, with $600 SNX collateral and $200 debt', async () => {
+					it('calculates hUSD to fix ratio from 300%, with $600 HZN collateral and $200 debt', async () => {
 						debtBefore = toUnit('200');
 						const expectedAmount = toUnit('144.927536231884057971');
 
@@ -359,14 +359,14 @@ contract('Liquidations', accounts => {
 			});
 			describe('when Alice is undercollateralized', () => {
 				beforeEach(async () => {
-					// wen SNX 6 dolla
+					// wen HZN 6 dollar
 					await updateSNXPrice('6');
 
 					// Alice issues sUSD $600
 					await synthetix.transfer(alice, toUnit('800'), { from: owner });
 					await synthetix.issueMaxSynths({ from: alice });
 
-					// Drop SNX value to $1 (Collateral worth $800 after)
+					// Drop HZN value to $1 (Collateral worth $800 after)
 					await updateSNXPrice('1');
 				});
 				it('and liquidation Collateral Ratio is 200%', async () => {
@@ -413,7 +413,7 @@ contract('Liquidations', accounts => {
 							deadline: liquidationDeadline,
 						});
 					});
-					describe('when deadline has passed and Alice issuance ratio is fixed as SNX price increases', () => {
+					describe('when deadline has passed and Alice issuance ratio is fixed as HZN price increases', () => {
 						beforeEach(async () => {
 							const delay = await liquidations.liquidationDelay();
 
@@ -494,7 +494,7 @@ contract('Liquidations', accounts => {
 							);
 						});
 					});
-					describe('when the price of SNX increases', () => {
+					describe('when the price of HZN increases', () => {
 						let removeFlagTransaction;
 						beforeEach(async () => {
 							await updateSNXPrice('6');
@@ -556,10 +556,10 @@ contract('Liquidations', accounts => {
 							it('then Bob still has 100hUSD', async () => {
 								assert.bnEqual(await sUSDContract.balanceOf(bob), sUSD100);
 							});
-							it('then Bob still has 0 SNX', async () => {
+							it('then Bob still has 0 HZN', async () => {
 								assert.bnEqual(await synthetix.balanceOf(bob), 0);
 							});
-							it('then Alice still has 800 SNX', async () => {
+							it('then Alice still has 800 HZN', async () => {
 								assert.bnEqual(await synthetix.collateral(alice), toUnit('800'));
 							});
 						});
@@ -682,7 +682,7 @@ contract('Liquidations', accounts => {
 							describe('when Bobs liquidates alice for 100 sUSD but only has 99 sUSD then revert', async () => {
 								const sUSD99 = toUnit('99');
 								beforeEach(async () => {
-									// send bob some SNX
+									// send bob some HZN
 									await synthetix.transfer(bob, toUnit('10000'), {
 										from: owner,
 									});
@@ -714,7 +714,7 @@ contract('Liquidations', accounts => {
 									assert.notEqual(deadline, 0);
 								});
 							});
-							describe('when Bob liquidates alice for 100 sUSD to get 110 SNX', () => {
+							describe('when Bob liquidates alice for 100 sUSD to get 110 HZN', () => {
 								const SNX110 = toUnit('110');
 								let aliceDebtBefore;
 								let aliceSNXBefore;
@@ -747,16 +747,16 @@ contract('Liquidations', accounts => {
 									const difference = aliceDebtBefore.sub(aliceDebtAfter);
 									assert.bnEqual(difference, sUSD100);
 								});
-								it('then Alice has less SNX + penalty', async () => {
+								it('then Alice has less HZN + penalty', async () => {
 									const aliceSNXAfter = await synthetix.collateral(alice);
 									const difference = aliceSNXBefore.sub(aliceSNXAfter);
 									assert.bnEqual(difference, SNX110);
 								});
-								it('then Bob has extra 100 SNX + the 10 SNX penalty (110)', async () => {
+								it('then Bob has extra 100 HZN + the 10 HZN penalty (110)', async () => {
 									const snxBalance = await synthetix.balanceOf(bob);
 									assert.bnEqual(snxBalance, bobSNXBefore.add(SNX110));
 								});
-								it('then Alice SNX balance is 690', async () => {
+								it('then Alice HZN balance is 690', async () => {
 									const aliceSNXAfter = await synthetix.collateral(alice);
 									assert.bnEqual(aliceSNXAfter, toUnit('690'));
 								});
@@ -777,7 +777,7 @@ contract('Liquidations', accounts => {
 									const SNX55 = toUnit('55');
 									let carolSNXBefore;
 									beforeEach(async () => {
-										// send Carol some SNX for sUSD
+										// send Carol some HZN for hUSD
 										await synthetix.transfer(carol, toUnit('1000'), {
 											from: owner,
 										});
@@ -806,16 +806,16 @@ contract('Liquidations', accounts => {
 											const difference = aliceDebtBefore.sub(aliceDebtAfter);
 											assert.bnEqual(difference, sUSD50);
 										});
-										it('then Alice has less SNX + penalty', async () => {
+										it('then Alice has less HZN + penalty', async () => {
 											const aliceSNXAfter = await synthetix.collateral(alice);
 											const difference = aliceSNXBefore.sub(aliceSNXAfter);
 											assert.bnEqual(difference, SNX55);
 										});
-										it('then Carol has extra 50 SNX + the 5 SNX penalty (55)', async () => {
+										it('then Carol has extra 50 HZN + the 5 HZN penalty (55)', async () => {
 											const snxBalance = await synthetix.balanceOf(carol);
 											assert.bnEqual(snxBalance, carolSNXBefore.add(SNX55));
 										});
-										it('then Alice SNX balance is 635', async () => {
+										it('then Alice HZN balance is 635', async () => {
 											const aliceSNXAfter = await synthetix.collateral(alice);
 											assert.bnEqual(aliceSNXAfter, toUnit('635'));
 										});
@@ -851,12 +851,12 @@ contract('Liquidations', accounts => {
 											const difference = aliceDebtBefore.sub(aliceDebtAfter);
 											assert.bnEqual(difference, sUSD50);
 										});
-										it('then Alice has less SNX + penalty', async () => {
+										it('then Alice has less HZN + penalty', async () => {
 											const aliceSNXAfter = await synthetix.collateral(alice);
 											const difference = aliceSNXBefore.sub(aliceSNXAfter);
 											assert.bnEqual(difference, SNX55);
 										});
-										it('then Carol has extra 50 SNX + the 5 SNX penalty (55)', async () => {
+										it('then Carol has extra 50 HZN + the 5 HZN penalty (55)', async () => {
 											const snxBalance = await synthetix.balanceOf(carol);
 											assert.bnEqual(snxBalance, carolSNXBefore.add(SNX55));
 										});
@@ -879,7 +879,6 @@ contract('Liquidations', accounts => {
 											);
 										});
 										it('then events AccountLiquidated are emitted', async () => {
-											console.log(liquidationTransaction.logs);
 											assert.eventEqual(liquidationTransaction, 'AccountLiquidated', {
 												account: alice,
 												hznRedeemed: SNX55,

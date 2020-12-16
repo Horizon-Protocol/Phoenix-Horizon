@@ -41,12 +41,12 @@
 	},
 	{
 		"name": "sETH",
-		"asset": "ETH",
-		"subclass": "MultiCollateralSynth"
+		"asset": "ETH"
 	},
 	{
-		"name": "sBNB",
-		"asset": "BNB"
+		"name": "hBNB",
+		"asset": "BNB",
+		"subclass": "MultiCollateralSynth"
 	},
 	{
 		"name": "sTRX",

@@ -24,7 +24,7 @@ contract('EtherCollateral (prod tests)', accounts => {
 	let network, deploymentPath;
 
 	let EtherCollateral, ReadProxyAddressResolver, Depot;
-	let SynthsETH, SynthhUSD;
+	let SynthhBNB, SynthhUSD;
 
 	before('prepare', async function() {
 		network = await detectNetworkName();
@@ -47,7 +47,7 @@ contract('EtherCollateral (prod tests)', accounts => {
 
 		({
 			EtherCollateral,
-			SynthsETH,
+			SynthhBNB,
 			SynthhUSD,
 			ReadProxyAddressResolver,
 			Depot,
@@ -57,7 +57,7 @@ contract('EtherCollateral (prod tests)', accounts => {
 				{ contractName: 'EtherCollateral' },
 				{ contractName: 'Depot' },
 				{ contractName: 'ReadProxyAddressResolver' },
-				{ contractName: 'SynthsETH', abiName: 'Synth' },
+				{ contractName: 'SynthhBNB', abiName: 'Synth' },
 				{ contractName: 'SynthhUSD', abiName: 'Synth' },
 			],
 		}));
@@ -97,7 +97,7 @@ contract('EtherCollateral (prod tests)', accounts => {
 
 		before(async () => {
 			ethBalance = await web3.eth.getBalance(user1);
-			sEthBalance = await SynthsETH.balanceOf(user1);
+			sEthBalance = await SynthhBNB.balanceOf(user1);
 
 			tx = await EtherCollateral.openLoan({
 				from: user1,
@@ -129,19 +129,19 @@ contract('EtherCollateral (prod tests)', accounts => {
 				}
 
 				ethBalance = await web3.eth.getBalance(user1);
-				sEthBalance = await SynthsETH.balanceOf(user1);
+				sEthBalance = await SynthhBNB.balanceOf(user1);
 
 				await EtherCollateral.closeLoan(loanID, {
 					from: user1,
 				});
 			});
 
-			it('reimburses ETH', async () => {
+			it('reimburses BNB', async () => {
 				assert.bnGt(web3.utils.toBN(await web3.eth.getBalance(user1)), web3.utils.toBN(ethBalance));
 			});
 
-			it('deducts sETH', async () => {
-				assert.bnLt(await SynthsETH.balanceOf(user1), sEthBalance);
+			it('deducts hBNB', async () => {
+				assert.bnLt(await SynthhBNB.balanceOf(user1), sEthBalance);
 			});
 		});
 	});

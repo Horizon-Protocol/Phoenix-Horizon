@@ -152,18 +152,18 @@ contract('AddressResolver', accounts => {
 			let sETHContract;
 			let sUSDContract;
 			beforeEach(async () => {
-				({ SynthsETH: sETHContract, SynthhUSD: sUSDContract } = await setupAllContracts({
+				({ SynthhBNB: sETHContract, SynthhUSD: sUSDContract } = await setupAllContracts({
 					accounts,
 					existing: {
 						AddressResolver: resolver,
 					},
-					synths: ['hUSD', 'sETH', 'sEUR', 'sAUD'],
+					synths: ['hUSD', 'hBNB', 'sEUR', 'sAUD'],
 					contracts: ['Synthetix'],
 				}));
 			});
 			it('when getSynth() is invoked with these synth keys, they are returned correctly', async () => {
 				assert.equal(await resolver.getSynth(toBytes32('hUSD')), sUSDContract.address);
-				assert.equal(await resolver.getSynth(toBytes32('sETH')), sETHContract.address);
+				assert.equal(await resolver.getSynth(toBytes32('hBNB')), sETHContract.address);
 			});
 		});
 	});

@@ -25,7 +25,7 @@ const {
 } = require('../..');
 
 contract('Synthetix', async accounts => {
-	const [sUSD, sAUD, sEUR, sETH] = ['hUSD', 'sAUD', 'sEUR', 'sETH'].map(toBytes32);
+	const [sUSD, sAUD, sEUR, sETH] = ['hUSD', 'sAUD', 'sEUR', 'hBNB'].map(toBytes32);
 
 	const [, owner, account1, account2] = accounts;
 
@@ -51,7 +51,7 @@ contract('Synthetix', async accounts => {
 			SupplySchedule: supplySchedule,
 		} = await setupAllContracts({
 			accounts,
-			synths: ['hUSD', 'sETH', 'sEUR', 'sAUD'],
+			synths: ['hUSD', 'hBNB', 'sEUR', 'sAUD'],
 			contracts: [
 				'Synthetix',
 				'SynthetixState',
@@ -342,7 +342,7 @@ contract('Synthetix', async accounts => {
 			it('should transfer using the ERC20 transferFrom function @gasprofile', async () => {
 				const previousOwnerBalance = await synthetix.balanceOf(owner);
 
-				// Approve account1 to act on our behalf for 10 SNX.
+				// Approve account1 to act on our behalf for 10 HZN.
 				await synthetix.approve(account1, toUnit('10'), { from: owner });
 
 				// Assert that transferFrom works.
@@ -350,7 +350,7 @@ contract('Synthetix', async accounts => {
 					from: account1,
 				});
 
-				// Assert that account2 has 10 SNX and owner has 10 less SNX
+				// Assert that account2 has 10 HZN and owner has 10 less HZN
 				assert.bnEqual(await synthetix.balanceOf(account2), toUnit('10'));
 				assert.bnEqual(await synthetix.balanceOf(owner), previousOwnerBalance.sub(toUnit('10')));
 
@@ -460,7 +460,7 @@ contract('Synthetix', async accounts => {
 			it('should transfer using the ERC20 transferFrom function @gasprofile', async () => {
 				const previousOwnerBalance = await synthetix.balanceOf(owner);
 
-				// Approve account1 to act on our behalf for 10 SNX.
+				// Approve account1 to act on our behalf for 10 HZN.
 				await synthetix.approve(account1, toUnit('10'), { from: owner });
 
 				// Assert that transferFrom works.
@@ -468,7 +468,7 @@ contract('Synthetix', async accounts => {
 					from: account1,
 				});
 
-				// Assert that account2 has 10 SNX and owner has 10 less SNX
+				// Assert that account2 has 10 HZN and owner has 10 less HZN
 				assert.bnEqual(await synthetix.balanceOf(account2), toUnit('10'));
 				assert.bnEqual(await synthetix.balanceOf(owner), previousOwnerBalance.sub(toUnit('10')));
 

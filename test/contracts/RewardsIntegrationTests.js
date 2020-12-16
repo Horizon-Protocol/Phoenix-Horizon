@@ -54,8 +54,8 @@ contract('Rewards Integration Tests', async accounts => {
 		'sBTC',
 		'HZN',
 		'iBTC',
-		'sETH',
-		'ETH',
+		'hBNB',
+		'BNB',
 	].map(toBytes32);
 
 	const synthKeys = [sUSD, sAUD, sEUR, sBTC, iBTC, sETH, ETH];
@@ -160,7 +160,7 @@ contract('Rewards Integration Tests', async accounts => {
 			SystemSettings: systemSettings,
 		} = await setupAllContracts({
 			accounts,
-			synths: ['hUSD', 'sAUD', 'sEUR', 'sBTC', 'iBTC', 'sETH'],
+			synths: ['hUSD', 'sAUD', 'sEUR', 'sBTC', 'iBTC', 'hBNB'],
 			contracts: [
 				'AddressResolver',
 				'Exchanger', // necessary for burnSynths to check settlement of sUSD

@@ -25,7 +25,7 @@ const {
 } = require('../..');
 
 contract('DebtCache', async accounts => {
-	const [hUSD, sAUD, sEUR, SNX, sETH] = ['hUSD', 'sAUD', 'sEUR', 'HZN', 'sETH'].map(toBytes32);
+	const [hUSD, sAUD, sEUR, SNX, sETH] = ['hUSD', 'sAUD', 'sEUR', 'HZN', 'hBNB'].map(toBytes32);
 	const synthKeys = [hUSD, sAUD, sEUR, sETH, SNX];
 
 	const [, owner, oracle, account1, account2] = accounts;
@@ -49,14 +49,14 @@ contract('DebtCache', async accounts => {
 	// run this once before all tests to prepare our environment, snapshots on beforeEach will take
 	// care of resetting to this state
 	before(async () => {
-		synths = ['hUSD', 'sAUD', 'sEUR', 'sETH'];
+		synths = ['hUSD', 'sAUD', 'sEUR', 'hBNB'];
 		({
 			Synthetix: synthetix,
 			SystemStatus: systemStatus,
 			SystemSettings: systemSettings,
 			ExchangeRates: exchangeRates,
 			SynthhUSD: hUSDContract,
-			SynthsETH: sETHContract,
+			SynthhBNB: sETHContract,
 			SynthsAUD: sAUDContract,
 			SynthsEUR: sEURContract,
 			FeePool: feePool,

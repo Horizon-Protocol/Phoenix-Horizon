@@ -32,11 +32,11 @@ contract('Exchanger (spec tests)', async accounts => {
 		'hUSD',
 		'sAUD',
 		'sEUR',
-		'SNX',
+		'HZN',
 		'sBTC',
 		'iBTC',
-		'sETH',
-		'iETH',
+		'hBNB',
+		'iBNB',
 	].map(toBytes32);
 
 	const trackingCode = toBytes32('1INCH');
@@ -81,7 +81,7 @@ contract('Exchanger (spec tests)', async accounts => {
 			SynthsEUR: sEURContract,
 			SynthsAUD: sAUDContract,
 			SynthiBTC: iBTCContract,
-			SynthsETH: sETHContract,
+			SynthhBNB: sETHContract,
 			SystemSettings: systemSettings,
 			DelegateApprovals: delegateApprovals,
 			AddressResolver: resolver,
@@ -90,7 +90,7 @@ contract('Exchanger (spec tests)', async accounts => {
 			FlexibleStorage: flexibleStorage,
 		} = await setupAllContracts({
 			accounts,
-			synths: ['hUSD', 'sETH', 'sEUR', 'sAUD', 'sBTC', 'iBTC', 'sTRX'],
+			synths: ['hUSD', 'hBNB', 'sEUR', 'sAUD', 'sBTC', 'iBTC', 'sTRX'],
 			contracts: [
 				'Exchanger',
 				'ExchangeState',
@@ -197,10 +197,10 @@ contract('Exchanger (spec tests)', async accounts => {
 				PRICE_DEVIATION_THRESHOLD_FACTOR
 			);
 		});
-		describe('when a user exchanges into sETH over the default threshold factor', () => {
+		describe('when a user exchanges into hBNB over the default threshold factor', () => {
 			beforeEach(async () => {
 				await fastForward(10);
-				// base rate of sETH is 100 from shared setup above
+				// base rate of hBNB is 100 from shared setup above
 				await exchangeRates.updateRates([sETH], [toUnit('300')], await currentTime(), {
 					from: oracle,
 				});
@@ -212,10 +212,10 @@ contract('Exchanger (spec tests)', async accounts => {
 				assert.equal(reason, '65');
 			});
 		});
-		describe('when a user exchanges into sETH under the default threshold factor', () => {
+		describe('when a user exchanges into hBNB under the default threshold factor', () => {
 			beforeEach(async () => {
 				await fastForward(10);
-				// base rate of sETH is 100 from shared setup above
+				// base rate of hBNB is 100 from shared setup above
 				await exchangeRates.updateRates([sETH], [toUnit('33')], await currentTime(), {
 					from: oracle,
 				});
@@ -232,10 +232,10 @@ contract('Exchanger (spec tests)', async accounts => {
 				beforeEach(async () => {
 					await systemSettings.setPriceDeviationThresholdFactor(toUnit('3.1'), { from: owner });
 				});
-				describe('when a user exchanges into sETH over the default threshold factor, but under the new one', () => {
+				describe('when a user exchanges into hBNB over the default threshold factor, but under the new one', () => {
 					beforeEach(async () => {
 						await fastForward(10);
-						// base rate of sETH is 100 from shared setup above
+						// base rate of hBNB is 100 from shared setup above
 						await exchangeRates.updateRates([sETH], [toUnit('300')], await currentTime(), {
 							from: oracle,
 						});
@@ -247,10 +247,10 @@ contract('Exchanger (spec tests)', async accounts => {
 						assert.equal(reason, '0');
 					});
 				});
-				describe('when a user exchanges into sETH under the default threshold factor, but under the new one', () => {
+				describe('when a user exchanges into hBNB under the default threshold factor, but under the new one', () => {
 					beforeEach(async () => {
 						await fastForward(10);
-						// base rate of sETH is 100 from shared setup above
+						// base rate of hBNB is 100 from shared setup above
 						await exchangeRates.updateRates([sETH], [toUnit('33')], await currentTime(), {
 							from: oracle,
 						});
@@ -618,9 +618,9 @@ contract('Exchanger (spec tests)', async accounts => {
 				});
 			});
 		});
-		describe('given the sEUR rate is 2, and sETH is 100, sBTC is 9000', () => {
+		describe('given the sEUR rate is 2, and hBNB is 100, sBTC is 9000', () => {
 			beforeEach(async () => {
-				// set sUSD:sEUR as 2:1, sUSD:sETH at 100:1, sUSD:sBTC at 9000:1
+				// set sUSD:sEUR as 2:1, sUSD:hBNB at 100:1, sUSD:sBTC at 9000:1
 				await exchangeRates.updateRates(
 					[sEUR, sETH, sBTC],
 					['2', '100', '9000'].map(toUnit),
@@ -1218,7 +1218,7 @@ contract('Exchanger (spec tests)', async accounts => {
 											assert.equal(settlement.reclaimAmount, '0', 'Nothing can be reclaimAmount');
 											assert.equal(settlement.rebateAmount, '0', 'Nothing can be rebateAmount');
 										});
-										describe('when another minute elapses and the sETH price changes', () => {
+										describe('when another minute elapses and the hBNB price changes', () => {
 											beforeEach(async () => {
 												await fastForward(60);
 												timestamp = await currentTime();
@@ -2067,7 +2067,7 @@ contract('Exchanger (spec tests)', async accounts => {
 							}
 						);
 					});
-					describe('when a user holds holds 100,000 SNX', () => {
+					describe('when a user holds holds 100,000 HZN', () => {
 						beforeEach(async () => {
 							await synthetix.transfer(account1, toUnit(1e5), {
 								from: owner,
@@ -2081,13 +2081,13 @@ contract('Exchanger (spec tests)', async accounts => {
 									from: oracle,
 								});
 							});
-							describe('when the user tries to mint 1% of their SNX value', () => {
+							describe('when the user tries to mint 1% of their HZN value', () => {
 								const amountIssued = toUnit(1e3);
 								beforeEach(async () => {
 									// Issue
 									await sUSDContract.issue(account1, amountIssued);
 								});
-								describe('when the user tries to exchange some sUSD into iBTC', () => {
+								describe('when the user tries to exchange some hUSD into iBTC', () => {
 									const assertExchangeSucceeded = async ({
 										amountExchanged,
 										txn,
@@ -2728,7 +2728,7 @@ contract('Exchanger (spec tests)', async accounts => {
 			});
 		};
 
-		describe(`when the price of sETH is ${baseRate}`, () => {
+		describe(`when the price of hBNB is ${baseRate}`, () => {
 			updateRate({ target: sETH, rate: baseRate });
 
 			describe('when price spike deviation is set to a factor of 2', () => {
@@ -2746,7 +2746,7 @@ contract('Exchanger (spec tests)', async accounts => {
 						assert.equal(await exchanger.lastExchangeRate(sETH), '0');
 						assert.equal(await exchanger.lastExchangeRate(sEUR), '0');
 					});
-					describe('when a user exchanges into sETH from sUSD', () => {
+					describe('when a user exchanges into hBNB from sUSD', () => {
 						beforeEach(async () => {
 							await synthetix.exchange(sUSD, toUnit('100'), sETH, { from: account1 });
 						});
@@ -2757,7 +2757,7 @@ contract('Exchanger (spec tests)', async accounts => {
 							assert.bnEqual(await exchanger.lastExchangeRate(sETH), toUnit(baseRate.toString()));
 						});
 					});
-					describe('when a user exchanges from sETH into another synth', () => {
+					describe('when a user exchanges from hBNB into another synth', () => {
 						beforeEach(async () => {
 							await sETHContract.issue(account1, toUnit('1'));
 							await synthetix.exchange(sETH, toUnit('1'), sEUR, { from: account1 });
@@ -2769,9 +2769,9 @@ contract('Exchanger (spec tests)', async accounts => {
 							// Rate of 2 from shared setup code above
 							assert.bnEqual(await exchanger.lastExchangeRate(sEUR), toUnit('2'));
 						});
-						describe('when the price of sETH changes slightly', () => {
+						describe('when the price of hBNB changes slightly', () => {
 							updateRate({ target: sETH, rate: baseRate * 1.1 });
-							describe('and another user exchanges sETH to sUSD', () => {
+							describe('and another user exchanges hBNB to sUSD', () => {
 								beforeEach(async () => {
 									await sETHContract.issue(account2, toUnit('1'));
 									await synthetix.exchange(sETH, toUnit('1'), sUSD, { from: account2 });
@@ -2787,9 +2787,9 @@ contract('Exchanger (spec tests)', async accounts => {
 								});
 							});
 						});
-						describe('when the price of sETH is over a deviation', () => {
+						describe('when the price of hBNB is over a deviation', () => {
 							beforeEach(async () => {
-								// sETH over deviation and sEUR slight change
+								// hBNB over deviation and sEUR slight change
 								await fastForward(10);
 								await exchangeRates.updateRates(
 									[sETH, sEUR],
@@ -2800,7 +2800,7 @@ contract('Exchanger (spec tests)', async accounts => {
 									}
 								);
 							});
-							describe('and another user exchanges sETH to sEUR', () => {
+							describe('and another user exchanges hBNB to sEUR', () => {
 								beforeEach(async () => {
 									await sETHContract.issue(account2, toUnit('1'));
 									await synthetix.exchange(sETH, toUnit('1'), sEUR, { from: account2 });
@@ -2818,7 +2818,7 @@ contract('Exchanger (spec tests)', async accounts => {
 						});
 						describe('when the price of sEUR is over a deviation', () => {
 							beforeEach(async () => {
-								// sEUR over deviation and sETH slight change
+								// sEUR over deviation and hBNB slight change
 								await fastForward(10);
 								await exchangeRates.updateRates(
 									[sETH, sEUR],
@@ -2829,7 +2829,7 @@ contract('Exchanger (spec tests)', async accounts => {
 									}
 								);
 							});
-							describe('and another user exchanges sEUR to sETH', () => {
+							describe('and another user exchanges sEUR to hBNB', () => {
 								beforeEach(async () => {
 									await sETHContract.issue(account2, toUnit('1'));
 									await synthetix.exchange(sETH, toUnit('1'), sEUR, { from: account2 });
@@ -2870,7 +2870,7 @@ contract('Exchanger (spec tests)', async accounts => {
 							});
 						});
 					});
-					describe('when there is a last rate into sETH via an exchange', () => {
+					describe('when there is a last rate into hBNB via an exchange', () => {
 						beforeEach(async () => {
 							await synthetix.exchange(sUSD, toUnit('1'), sETH, { from: account2 });
 						});
@@ -2885,7 +2885,7 @@ contract('Exchanger (spec tests)', async accounts => {
 						});
 					});
 
-					describe('when there is a last price out of sETH via an exchange', () => {
+					describe('when there is a last price out of hBNB via an exchange', () => {
 						beforeEach(async () => {
 							await sETHContract.issue(account2, toUnit('1'));
 							await synthetix.exchange(sETH, toUnit('0.001'), sUSD, { from: account2 });
@@ -2903,7 +2903,7 @@ contract('Exchanger (spec tests)', async accounts => {
 				});
 
 				describe('suspension is triggered via exchanging', () => {
-					describe('given the user has some sETH', () => {
+					describe('given the user has some hBNB', () => {
 						beforeEach(async () => {
 							await sETHContract.issue(account1, toUnit('1'));
 						});
@@ -3172,11 +3172,11 @@ contract('Exchanger (spec tests)', async accounts => {
 				});
 
 				describe('settlement ignores deviations', () => {
-					describe('when a user exchange 100 sUSD into sETH', () => {
+					describe('when a user exchange 100 sUSD into hBNB', () => {
 						beforeEach(async () => {
 							await synthetix.exchange(sUSD, toUnit('100'), sETH, { from: account1 });
 						});
-						describe('and the sETH rate moves up by a factor of 2 to 200', () => {
+						describe('and the hBNB rate moves up by a factor of 2 to 200', () => {
 							updateRate({ target: sETH, rate: baseRate * 2 });
 
 							it('then settlementOwing is 0 for rebate and reclaim, with 1 entry', async () => {
@@ -3191,7 +3191,7 @@ contract('Exchanger (spec tests)', async accounts => {
 						});
 
 						describe('multiple entries to settle', () => {
-							describe('when the sETH rate moves down by 20%', () => {
+							describe('when the hBNB rate moves down by 20%', () => {
 								updateRate({ target: sETH, rate: baseRate * 0.8 });
 
 								describe('and the waiting period expires', () => {
@@ -3212,11 +3212,11 @@ contract('Exchanger (spec tests)', async accounts => {
 										assert.equal(numEntries, '1');
 									});
 
-									describe('and the user makes another exchange into sETH', () => {
+									describe('and the user makes another exchange into hBNB', () => {
 										beforeEach(async () => {
 											await synthetix.exchange(sUSD, toUnit('100'), sETH, { from: account1 });
 										});
-										describe('and the sETH rate moves up by a factor of 2 to 200, causing the second entry to be skipped', () => {
+										describe('and the hBNB rate moves up by a factor of 2 to 200, causing the second entry to be skipped', () => {
 											updateRate({ target: sETH, rate: baseRate * 2 });
 
 											it('then settlementOwing is existing rebate with 0 reclaim, with 2 entries', async () => {
@@ -3231,7 +3231,7 @@ contract('Exchanger (spec tests)', async accounts => {
 											});
 										});
 
-										describe('and the sETH rate goes back up 25% (from 80 to 100)', () => {
+										describe('and the hBNB rate goes back up 25% (from 80 to 100)', () => {
 											updateRate({ target: sETH, rate: baseRate });
 											describe('and the waiting period expires', () => {
 												beforeEach(async () => {
@@ -3248,11 +3248,11 @@ contract('Exchanger (spec tests)', async accounts => {
 													assert.bnClose(rebateAmount, toUnit('0.25'), (1e16).toString());
 													assert.equal(numEntries, '2');
 												});
-												describe('and the user makes another exchange into sETH', () => {
+												describe('and the user makes another exchange into hBNB', () => {
 													beforeEach(async () => {
 														await synthetix.exchange(sUSD, toUnit('100'), sETH, { from: account1 });
 													});
-													describe('and the sETH rate moves down by a factor of 2 to 50, causing the third entry to be skipped', () => {
+													describe('and the hBNB rate moves down by a factor of 2 to 50, causing the third entry to be skipped', () => {
 														updateRate({ target: sETH, rate: baseRate * 0.5 });
 
 														it('then settlementOwing is existing rebate and reclaim, with 3 entries', async () => {
