@@ -30,7 +30,7 @@ contract('BinaryOptionMarketData @gas-skip @ovm-skip', accounts => {
 				accounts[0], // manager
 				accounts[1], // creator
 				[toUnit(2), toUnit(0.05)], // Capital requirement, skew limit
-				toBytes32('sAUD'), // oracle key
+				toBytes32('hAUD'), // oracle key
 				toUnit(1), // strike price
 				true,
 				[setupTime + 100, setupTime + 200, setupTime + 300], // bidding end, maturity, expiry

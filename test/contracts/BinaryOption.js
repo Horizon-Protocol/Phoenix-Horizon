@@ -52,7 +52,7 @@ contract('BinaryOption @gas-skip @ovm-skip', accounts => {
 	describe('Basic Parameters', () => {
 		it('Static parameters are set properly', async () => {
 			assert.equal(await option.name(), 'HZN Binary Option');
-			assert.equal(await option.symbol(), 'sOPT');
+			assert.equal(await option.symbol(), 'hOPT');
 			assert.bnEqual(await option.decimals(), toBN(18));
 			assert.equal(await option.market(), market.address);
 		});

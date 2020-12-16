@@ -140,7 +140,7 @@ describe('publish scripts', () => {
 		}
 
 		gasLimit = 5000000;
-		[sUSD, sBTC, sETH] = ['hUSD', 'sBTC', 'sETH'].map(toBytes32);
+		[sUSD, sBTC, sETH] = ['hUSD', 'hBTC', 'hBNB'].map(toBytes32);
 		web3.eth.accounts.wallet.add(accounts.deployer.private);
 		gasPrice = web3.utils.toWei('5', 'gwei');
 	});
@@ -897,7 +897,7 @@ describe('publish scripts', () => {
 											yes: true,
 											privateKey: accounts.deployer.private,
 											subclass: 'PurgeableSynth',
-											synthsToReplace: ['sBTC'],
+											synthsToReplace: ['hBTC'],
 											methodCallGasLimit: gasLimit,
 										});
 									});
@@ -910,7 +910,7 @@ describe('publish scripts', () => {
 												yes: true,
 												privateKey: accounts.deployer.private,
 												addresses: [accounts.first.public],
-												synthsToPurge: ['sBTC'],
+												synthsToPurge: ['hBTC'],
 												gasLimit,
 											});
 										});
@@ -1295,7 +1295,7 @@ describe('publish scripts', () => {
 						});
 						it('then the aggregator must be set for the sEUR price', async () => {
 							const sEURAggregator = await callMethodWithRetry(
-								ExchangeRates.methods.aggregators(toBytes32('sEUR'))
+								ExchangeRates.methods.aggregators(toBytes32('hEUR'))
 							);
 							assert.strictEqual(sEURAggregator, mockAggregator.options.address);
 						});
@@ -1304,7 +1304,7 @@ describe('publish scripts', () => {
 							beforeEach(async () => {
 								// update rates
 								const synthsToUpdate = synths
-									.filter(({ name }) => name !== 'sEUR')
+									.filter(({ name }) => name !== 'hEUR')
 									.concat({ asset: 'SNX', rate: 1 });
 
 								for (const { asset } of synthsToUpdate) {
@@ -1334,7 +1334,7 @@ describe('publish scripts', () => {
 								describe('then the price from exchange rates for that currency key uses the aggregator', () => {
 									it('correctly returns the rate', async () => {
 										const response = await callMethodWithRetry(
-											ExchangeRates.methods.rateForCurrency(toBytes32('sEUR'))
+											ExchangeRates.methods.rateForCurrency(toBytes32('hEUR'))
 										);
 										assert.strictEqual(web3.utils.fromWei(response), rate);
 									});
@@ -1408,8 +1408,8 @@ describe('publish scripts', () => {
 									'Synthetix',
 									'SynthetixEscrow',
 									'SynthetixState',
-									'SynthsETH',
-									'SynthsUSD',
+									'SynthhBNB',
+									'SynthhUSD',
 									'SystemStatus',
 								].map(contractName =>
 									callMethodWithRetry(

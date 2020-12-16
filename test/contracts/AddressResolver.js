@@ -157,7 +157,7 @@ contract('AddressResolver', accounts => {
 					existing: {
 						AddressResolver: resolver,
 					},
-					synths: ['hUSD', 'hBNB', 'sEUR', 'sAUD'],
+					synths: ['hUSD', 'hBNB', 'hEUR', 'hAUD'],
 					contracts: ['Synthetix'],
 				}));
 			});

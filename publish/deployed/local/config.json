@@ -101,28 +101,28 @@
 	"SynthhUSD": {
 		"deploy": true
 	},
-	"SynthsEUR": {
+	"SynthhEUR": {
 		"deploy": true
 	},
-	"SynthsJPY": {
+	"SynthhJPY": {
 		"deploy": true
 	},
-	"SynthsAUD": {
+	"SynthhAUD": {
 		"deploy": true
 	},
-	"SynthsGBP": {
+	"SynthhGBP": {
 		"deploy": true
 	},
-	"SynthsCHF": {
+	"SynthhCHF": {
 		"deploy": true
 	},
-	"SynthsXAU": {
+	"SynthhXAU": {
 		"deploy": true
 	},
-	"SynthsXAG": {
+	"SynthhXAG": {
 		"deploy": true
 	},
-	"SynthsBTC": {
+	"SynthhBTC": {
 		"deploy": true
 	},
 	"ProxyERC20": {
@@ -140,28 +140,28 @@
 	"ProxyhUSD": {
 		"deploy": true
 	},
-	"ProxysEUR": {
+	"ProxyhEUR": {
 		"deploy": true
 	},
-	"ProxysJPY": {
+	"ProxyhJPY": {
 		"deploy": true
 	},
-	"ProxysAUD": {
+	"ProxyhAUD": {
 		"deploy": true
 	},
-	"ProxysGBP": {
+	"ProxyhGBP": {
 		"deploy": true
 	},
-	"ProxysCHF": {
+	"ProxyhCHF": {
 		"deploy": true
 	},
-	"ProxysXAU": {
+	"ProxyhXAU": {
 		"deploy": true
 	},
-	"ProxysXAG": {
+	"ProxyhXAG": {
 		"deploy": true
 	},
-	"ProxysBTC": {
+	"ProxyhBTC": {
 		"deploy": true
 	},
 	"SafeDecimalMath": {
@@ -176,37 +176,37 @@
 	"TokenStatehUSD": {
 		"deploy": true
 	},
-	"TokenStatesEUR": {
+	"TokenStatehEUR": {
 		"deploy": true
 	},
-	"TokenStatesJPY": {
+	"TokenStatehJPY": {
 		"deploy": true
 	},
-	"TokenStatesAUD": {
+	"TokenStatehAUD": {
 		"deploy": true
 	},
-	"TokenStatesGBP": {
+	"TokenStatehGBP": {
 		"deploy": true
 	},
-	"TokenStatesCHF": {
+	"TokenStatehCHF": {
 		"deploy": true
 	},
-	"TokenStatesXAU": {
+	"TokenStatehXAU": {
 		"deploy": true
 	},
-	"TokenStatesXAG": {
+	"TokenStatehXAG": {
 		"deploy": true
 	},
-	"TokenStatesBTC": {
+	"TokenStatehBTC": {
 		"deploy": true
 	},
-	"TokenStatesETH": {
+	"TokenStatehETH": {
 		"deploy": true
 	},
-	"ProxysETH": {
+	"ProxyhETH": {
 		"deploy": true
 	},
-	"SynthsETH": {
+	"SynthhETH": {
 		"deploy": true
 	},
 	"TokenStatehBNB": {
@@ -218,22 +218,22 @@
 	"SynthhBNB": {
 		"deploy": true
 	},
-	"TokenStatesTRX": {
+	"TokenStatehTRX": {
 		"deploy": true
 	},
-	"ProxysTRX": {
+	"ProxyhTRX": {
 		"deploy": true
 	},
-	"SynthsTRX": {
+	"SynthhTRX": {
 		"deploy": true
 	},
-	"TokenStatesXTZ": {
+	"TokenStatehXTZ": {
 		"deploy": true
 	},
-	"ProxysXTZ": {
+	"ProxyhXTZ": {
 		"deploy": true
 	},
-	"SynthsXTZ": {
+	"SynthhXTZ": {
 		"deploy": true
 	},
 	"TokenStateiBTC": {
@@ -281,13 +281,13 @@
 	"SynthiXTZ": {
 		"deploy": true
 	},
-	"TokenStatesCEX": {
+	"TokenStatehCEX": {
 		"deploy": true
 	},
-	"ProxysCEX": {
+	"ProxyhCEX": {
 		"deploy": true
 	},
-	"SynthsCEX": {
+	"SynthhCEX": {
 		"deploy": true
 	},
 	"TokenStateiCEX": {
@@ -299,94 +299,94 @@
 	"SynthiCEX": {
 		"deploy": true
 	},
-	"TokenStatesXRP": {
+	"TokenStatehXRP": {
 		"deploy": true
 	},
-	"ProxysXRP": {
+	"ProxyhXRP": {
 		"deploy": true
 	},
-	"SynthsXRP": {
+	"SynthhXRP": {
 		"deploy": true
 	},
-	"TokenStatesLTC": {
+	"TokenStatehLTC": {
 		"deploy": true
 	},
-	"ProxysLTC": {
+	"ProxyhLTC": {
 		"deploy": true
 	},
-	"SynthsLTC": {
+	"SynthhLTC": {
 		"deploy": true
 	},
-	"TokenStatesLINK": {
+	"TokenStatehLINK": {
 		"deploy": true
 	},
-	"ProxysLINK": {
+	"ProxyhLINK": {
 		"deploy": true
 	},
-	"SynthsLINK": {
+	"SynthhLINK": {
 		"deploy": true
 	},
-	"TokenStatesEOS": {
+	"TokenStatehEOS": {
 		"deploy": true
 	},
-	"ProxysEOS": {
+	"ProxyhEOS": {
 		"deploy": true
 	},
-	"SynthsEOS": {
+	"SynthhEOS": {
 		"deploy": true
 	},
-	"TokenStatesBCH": {
+	"TokenStatehBCH": {
 		"deploy": true
 	},
-	"ProxysBCH": {
+	"ProxyhBCH": {
 		"deploy": true
 	},
-	"SynthsBCH": {
+	"SynthhBCH": {
 		"deploy": true
 	},
-	"TokenStatesETC": {
+	"TokenStatehETC": {
 		"deploy": true
 	},
-	"ProxysETC": {
+	"ProxyhETC": {
 		"deploy": true
 	},
-	"SynthsETC": {
+	"SynthhETC": {
 		"deploy": true
 	},
-	"TokenStatesDASH": {
+	"TokenStatehDASH": {
 		"deploy": true
 	},
-	"ProxysDASH": {
+	"ProxyhDASH": {
 		"deploy": true
 	},
-	"SynthsDASH": {
+	"SynthhDASH": {
 		"deploy": true
 	},
-	"TokenStatesXMR": {
+	"TokenStatehXMR": {
 		"deploy": true
 	},
-	"ProxysXMR": {
+	"ProxyhXMR": {
 		"deploy": true
 	},
-	"SynthsXMR": {
+	"SynthhXMR": {
 		"deploy": true
 	},
-	"TokenStatesADA": {
+	"TokenStatehADA": {
 		"deploy": true
 	},
-	"ProxysADA": {
+	"ProxyhADA": {
 		"deploy": true
 	},
-	"SynthsADA": {
+	"SynthhADA": {
 		"deploy": true
 	},
-	"TokenStatesDEFI": {
+	"TokenStatehDEFI": {
 		"deploy": true
 	},
-	"ProxysDEFI": {
+	"ProxyhDEFI": {
 		"deploy": true
 	},
-	"SynthsDEFI": {
+	"SynthhDEFI": {
 		"deploy": true
 	},
 	"TokenStateiDEFI": {
@@ -398,22 +398,22 @@
 	"SynthiDEFI": {
 		"deploy": true
 	},
-	"TokenStatesFTSE": {
+	"TokenStatehFTSE": {
 		"deploy": true
 	},
-	"ProxysFTSE": {
+	"ProxyhFTSE": {
 		"deploy": true
 	},
-	"SynthsFTSE": {
+	"SynthhFTSE": {
 		"deploy": true
 	},
-	"TokenStatesNIKKEI": {
+	"TokenStatehNIKKEI": {
 		"deploy": true
 	},
-	"ProxysNIKKEI": {
+	"ProxyhNIKKEI": {
 		"deploy": true
 	},
-	"SynthsNIKKEI": {
+	"SynthhNIKKEI": {
 		"deploy": true
 	}
 }

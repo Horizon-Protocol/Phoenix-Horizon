@@ -32,7 +32,7 @@ const computePrices = (longs, shorts, debt, fee) => {
 contract('BinaryOptionMarketManager @gas-skip @ovm-skip', accounts => {
 	const [initialCreator, managerOwner, bidder, dummy] = accounts;
 
-	const sUSDQty = toUnit(10000);
+	const hUSDQty = toUnit(10000);
 
 	const capitalRequirement = toUnit(2);
 	const skewLimit = toUnit(0.05);
@@ -44,9 +44,9 @@ contract('BinaryOptionMarketManager @gas-skip @ovm-skip', accounts => {
 	const initialCreatorFee = toUnit(0.002);
 	const initialRefundFee = toUnit(0.02);
 
-	let manager, factory, systemStatus, exchangeRates, addressResolver, sUSDSynth, oracle;
+	let manager, factory, systemStatus, exchangeRates, addressResolver, hUSDSynth, oracle;
 
-	const sAUDKey = toBytes32('sAUD');
+	const hAUDKey = toBytes32('hAUD');
 	const iAUDKey = toBytes32('iAUD');
 
 	const Side = {
@@ -76,7 +76,7 @@ contract('BinaryOptionMarketManager @gas-skip @ovm-skip', accounts => {
 			SystemStatus: systemStatus,
 			AddressResolver: addressResolver,
 			ExchangeRates: exchangeRates,
-			SynthhUSD: sUSDSynth,
+			SynthhUSD: hUSDSynth,
 		} = await setupAllContracts({
 			accounts,
 			synths: ['hUSD'],
@@ -92,15 +92,15 @@ contract('BinaryOptionMarketManager @gas-skip @ovm-skip', accounts => {
 
 		oracle = await exchangeRates.oracle();
 
-		await exchangeRates.updateRates([sAUDKey], [toUnit(5)], await currentTime(), {
+		await exchangeRates.updateRates([hAUDKey], [toUnit(5)], await currentTime(), {
 			from: oracle,
 		});
 
 		await Promise.all([
-			sUSDSynth.issue(initialCreator, sUSDQty),
-			sUSDSynth.approve(manager.address, sUSDQty, { from: initialCreator }),
-			sUSDSynth.issue(bidder, sUSDQty),
-			sUSDSynth.approve(manager.address, sUSDQty, { from: bidder }),
+			hUSDSynth.issue(initialCreator, hUSDQty),
+			hUSDSynth.approve(manager.address, hUSDQty, { from: initialCreator }),
+			hUSDSynth.issue(bidder, hUSDQty),
+			hUSDSynth.approve(manager.address, hUSDQty, { from: bidder }),
 		]);
 	});
 
@@ -352,7 +352,7 @@ contract('BinaryOptionMarketManager @gas-skip @ovm-skip', accounts => {
 				args: [
 					initialCreator,
 					[capitalRequirement, skewLimit],
-					sAUDKey,
+					hAUDKey,
 					toUnit(1),
 					true,
 					[now + 100, now + 200, now + expiryDuration + 200],
@@ -379,7 +379,7 @@ contract('BinaryOptionMarketManager @gas-skip @ovm-skip', accounts => {
 			const now = await currentTime();
 
 			const result = await manager.createMarket(
-				sAUDKey,
+				hAUDKey,
 				toUnit(1),
 				true,
 				[now + 100, now + 200],
@@ -390,7 +390,7 @@ contract('BinaryOptionMarketManager @gas-skip @ovm-skip', accounts => {
 			assert.eventEqual(result.logs[0], 'OwnerChanged', { newOwner: manager.address });
 			assert.eventEqual(result.logs[1], 'MarketCreated', {
 				creator: initialCreator,
-				oracleKey: sAUDKey,
+				oracleKey: hAUDKey,
 				strikePrice: toUnit(1),
 				biddingEndDate: toBN(now + 100),
 				maturityDate: toBN(now + 200),
@@ -427,7 +427,7 @@ contract('BinaryOptionMarketManager @gas-skip @ovm-skip', accounts => {
 			assert.bnEqual(times.maturity, toBN(now + 200));
 			assert.bnEqual(times.expiry, toBN(now + 200).add(expiryDuration));
 			const oracleDetails = await market.oracleDetails();
-			assert.equal(oracleDetails.key, sAUDKey);
+			assert.equal(oracleDetails.key, hAUDKey);
 			assert.bnEqual(oracleDetails.strikePrice, toUnit(1));
 			assert.bnEqual(oracleDetails.finalPrice, toBN(0));
 			assert.equal(await market.creator(), initialCreator);
@@ -454,12 +454,12 @@ contract('BinaryOptionMarketManager @gas-skip @ovm-skip', accounts => {
 		it('Cannot create markets for invalid keys.', async () => {
 			const now = await currentTime();
 
-			const sUSDKey = toBytes32('hUSD');
+			const HUSDKey = toBytes32('hUSD');
 			const nonRate = toBytes32('nonExistent');
 
 			await assert.revert(
 				manager.createMarket(
-					sUSDKey,
+					HUSDKey,
 					toUnit(1),
 					true,
 					[now + 100, now + 200],
@@ -517,7 +517,7 @@ contract('BinaryOptionMarketManager @gas-skip @ovm-skip', accounts => {
 			const now = await currentTime();
 			await assert.revert(
 				manager.createMarket(
-					sAUDKey,
+					hAUDKey,
 					toUnit(1),
 					true,
 					[now + 100, now + 200],
@@ -529,11 +529,11 @@ contract('BinaryOptionMarketManager @gas-skip @ovm-skip', accounts => {
 				'SafeMath: subtraction overflow'
 			);
 
-			await sUSDSynth.issue(dummy, sUSDQty);
+			await hUSDSynth.issue(dummy, hUSDQty);
 
 			await assert.revert(
 				manager.createMarket(
-					sAUDKey,
+					hAUDKey,
 					toUnit(1),
 					true,
 					[now + 100, now + 200],
@@ -545,10 +545,10 @@ contract('BinaryOptionMarketManager @gas-skip @ovm-skip', accounts => {
 				'SafeMath: subtraction overflow'
 			);
 
-			await sUSDSynth.approve(manager.address, sUSDQty, { from: dummy });
+			await hUSDSynth.approve(manager.address, hUSDQty, { from: dummy });
 
 			await manager.createMarket(
-				sAUDKey,
+				hAUDKey,
 				toUnit(1),
 				true,
 				[now + 100, now + 200],
@@ -563,7 +563,7 @@ contract('BinaryOptionMarketManager @gas-skip @ovm-skip', accounts => {
 			const now = await currentTime();
 			await assert.revert(
 				manager.createMarket(
-					sAUDKey,
+					hAUDKey,
 					toUnit(1),
 					true,
 					[now + 100, now + 200],
@@ -580,7 +580,7 @@ contract('BinaryOptionMarketManager @gas-skip @ovm-skip', accounts => {
 			const now = await currentTime();
 			await assert.revert(
 				manager.createMarket(
-					sAUDKey,
+					hAUDKey,
 					toUnit(1),
 					true,
 					[now + 100, now + maxTimeToMaturity + 200],
@@ -597,7 +597,7 @@ contract('BinaryOptionMarketManager @gas-skip @ovm-skip', accounts => {
 			const now = await currentTime();
 			await assert.revert(
 				manager.createMarket(
-					sAUDKey,
+					hAUDKey,
 					toUnit(1),
 					true,
 					[now + 100, now + 200],
@@ -610,7 +610,7 @@ contract('BinaryOptionMarketManager @gas-skip @ovm-skip', accounts => {
 			);
 			await assert.revert(
 				manager.createMarket(
-					sAUDKey,
+					hAUDKey,
 					toUnit(1),
 					true,
 					[now + 100, now + 200],
@@ -633,7 +633,7 @@ contract('BinaryOptionMarketManager @gas-skip @ovm-skip', accounts => {
 			const now = await currentTime();
 			await assert.revert(
 				manager.createMarket(
-					sAUDKey,
+					hAUDKey,
 					toUnit(1),
 					true,
 					[now + 100, now + 200],
@@ -651,7 +651,7 @@ contract('BinaryOptionMarketManager @gas-skip @ovm-skip', accounts => {
 			const now = await currentTime();
 			await assert.revert(
 				manager.createMarket(
-					sAUDKey,
+					hAUDKey,
 					toUnit(1),
 					true,
 					[now + 100, now + 200],
@@ -687,7 +687,7 @@ contract('BinaryOptionMarketManager @gas-skip @ovm-skip', accounts => {
 			const now = await currentTime();
 			await assert.revert(
 				manager.createMarket(
-					sAUDKey,
+					hAUDKey,
 					toUnit(1),
 					true,
 					[now + 100, now + 200],
@@ -701,7 +701,7 @@ contract('BinaryOptionMarketManager @gas-skip @ovm-skip', accounts => {
 
 			await manager.setMarketCreationEnabled(true, { from: managerOwner });
 			const tx = await manager.createMarket(
-				sAUDKey,
+				hAUDKey,
 				toUnit(1),
 				true,
 				[now + 100, now + 200],
@@ -718,7 +718,7 @@ contract('BinaryOptionMarketManager @gas-skip @ovm-skip', accounts => {
 			const now = await currentTime();
 			await assert.revert(
 				manager.createMarket(
-					sAUDKey,
+					hAUDKey,
 					toUnit(1),
 					true,
 					[now - 1, now + 100],
@@ -735,7 +735,7 @@ contract('BinaryOptionMarketManager @gas-skip @ovm-skip', accounts => {
 			const now = await currentTime();
 			await assert.revert(
 				manager.createMarket(
-					sAUDKey,
+					hAUDKey,
 					toUnit(1),
 					true,
 					[now + 100, now + 99],
@@ -755,7 +755,7 @@ contract('BinaryOptionMarketManager @gas-skip @ovm-skip', accounts => {
 			const [newMarket, newerMarket] = await Promise.all([
 				createMarket(
 					manager,
-					sAUDKey,
+					hAUDKey,
 					toUnit(1),
 					true,
 					[now + 100, now + 200],
@@ -764,7 +764,7 @@ contract('BinaryOptionMarketManager @gas-skip @ovm-skip', accounts => {
 				),
 				createMarket(
 					manager,
-					sAUDKey,
+					hAUDKey,
 					toUnit(1),
 					true,
 					[now + 100, now + 200],
@@ -778,7 +778,7 @@ contract('BinaryOptionMarketManager @gas-skip @ovm-skip', accounts => {
 
 			assert.bnEqual(await manager.totalDeposited(), toUnit(7));
 			await fastForward(expiryDuration + 1000);
-			await exchangeRates.updateRates([sAUDKey], [toUnit(5)], await currentTime(), {
+			await exchangeRates.updateRates([hAUDKey], [toUnit(5)], await currentTime(), {
 				from: oracle,
 			});
 			await manager.resolveMarket(newAddress);
@@ -800,7 +800,7 @@ contract('BinaryOptionMarketManager @gas-skip @ovm-skip', accounts => {
 			const now = await currentTime();
 			const newMarket = await createMarket(
 				manager,
-				sAUDKey,
+				hAUDKey,
 				toUnit(1),
 				true,
 				[now + 100, now + 200],
@@ -817,7 +817,7 @@ contract('BinaryOptionMarketManager @gas-skip @ovm-skip', accounts => {
 			const now = await currentTime();
 			const newMarket = await createMarket(
 				manager,
-				sAUDKey,
+				hAUDKey,
 				toUnit(1),
 				true,
 				[now + 100, now + 200],
@@ -826,7 +826,7 @@ contract('BinaryOptionMarketManager @gas-skip @ovm-skip', accounts => {
 			);
 
 			await fastForward(300);
-			await exchangeRates.updateRates([sAUDKey], [toUnit(5)], await currentTime(), {
+			await exchangeRates.updateRates([hAUDKey], [toUnit(5)], await currentTime(), {
 				from: oracle,
 			});
 			await manager.resolveMarket(newMarket.address);
@@ -840,7 +840,7 @@ contract('BinaryOptionMarketManager @gas-skip @ovm-skip', accounts => {
 			const now = await currentTime();
 			const newMarket = await createMarket(
 				manager,
-				sAUDKey,
+				hAUDKey,
 				toUnit(1),
 				true,
 				[now + 100, now + 200],
@@ -848,7 +848,7 @@ contract('BinaryOptionMarketManager @gas-skip @ovm-skip', accounts => {
 				initialCreator
 			);
 			await fastForward(expiryDuration + 1000);
-			await exchangeRates.updateRates([sAUDKey], [toUnit(5)], await currentTime(), {
+			await exchangeRates.updateRates([hAUDKey], [toUnit(5)], await currentTime(), {
 				from: oracle,
 			});
 			await manager.resolveMarket(newMarket.address);
@@ -870,7 +870,7 @@ contract('BinaryOptionMarketManager @gas-skip @ovm-skip', accounts => {
 			const now = await currentTime();
 			const newMarket = await createMarket(
 				manager,
-				sAUDKey,
+				hAUDKey,
 				toUnit(1),
 				true,
 				[now + 100, now + 200],
@@ -878,7 +878,7 @@ contract('BinaryOptionMarketManager @gas-skip @ovm-skip', accounts => {
 				initialCreator
 			);
 			await fastForward(expiryDuration + 1000);
-			await exchangeRates.updateRates([sAUDKey], [toUnit(5)], await currentTime(), {
+			await exchangeRates.updateRates([hAUDKey], [toUnit(5)], await currentTime(), {
 				from: oracle,
 			});
 			await manager.resolveMarket(newMarket.address);
@@ -896,7 +896,7 @@ contract('BinaryOptionMarketManager @gas-skip @ovm-skip', accounts => {
 			const now = await currentTime();
 			const market = await createMarket(
 				manager,
-				sAUDKey,
+				hAUDKey,
 				toUnit(1),
 				true,
 				[now + 100, now + 200],
@@ -919,7 +919,7 @@ contract('BinaryOptionMarketManager @gas-skip @ovm-skip', accounts => {
 				[toUnit(1), toUnit(2), toUnit(3)].map(price =>
 					createMarket(
 						manager,
-						sAUDKey,
+						hAUDKey,
 						price,
 						true,
 						[now + 100, now + 200],
@@ -929,7 +929,7 @@ contract('BinaryOptionMarketManager @gas-skip @ovm-skip', accounts => {
 				)
 			);
 			await Promise.all(
-				markets.map(market => sUSDSynth.approve(market.address, sUSDQty, { from: bidder }))
+				markets.map(market => hUSDSynth.approve(market.address, hUSDQty, { from: bidder }))
 			);
 
 			assert.bnEqual(await manager.totalDeposited(), toUnit(6));
@@ -941,7 +941,7 @@ contract('BinaryOptionMarketManager @gas-skip @ovm-skip', accounts => {
 			assert.bnEqual(await manager.totalDeposited(), toUnit(12));
 
 			await fastForward(expiryDuration + 1000);
-			await exchangeRates.updateRates([sAUDKey], [toUnit(2)], await currentTime(), {
+			await exchangeRates.updateRates([hAUDKey], [toUnit(2)], await currentTime(), {
 				from: oracle,
 			});
 			await Promise.all(markets.map(m => manager.resolveMarket(m.address)));
@@ -975,7 +975,7 @@ contract('BinaryOptionMarketManager @gas-skip @ovm-skip', accounts => {
 					.map(() =>
 						createMarket(
 							manager,
-							sAUDKey,
+							hAUDKey,
 							toUnit(1),
 							true,
 							[now + 100, now + 200],
@@ -1006,7 +1006,7 @@ contract('BinaryOptionMarketManager @gas-skip @ovm-skip', accounts => {
 
 			// Resolve all the even markets, ensuring they have been transferred.
 			await fastForward(expiryDuration + 1000);
-			await exchangeRates.updateRates([sAUDKey], [toUnit(2)], await currentTime(), {
+			await exchangeRates.updateRates([hAUDKey], [toUnit(2)], await currentTime(), {
 				from: oracle,
 			});
 			await Promise.all(evenMarkets.map(m => manager.resolveMarket(m)));
@@ -1067,7 +1067,7 @@ contract('BinaryOptionMarketManager @gas-skip @ovm-skip', accounts => {
 				markets.push(
 					await createMarket(
 						manager,
-						sAUDKey,
+						hAUDKey,
 						toUnit(i),
 						true,
 						[now + 100, now + 200],
@@ -1140,7 +1140,7 @@ contract('BinaryOptionMarketManager @gas-skip @ovm-skip', accounts => {
 			const now = await currentTime();
 			await createMarket(
 				manager,
-				sAUDKey,
+				hAUDKey,
 				toUnit(1),
 				true,
 				[now + 100, now + 200],
@@ -1166,7 +1166,7 @@ contract('BinaryOptionMarketManager @gas-skip @ovm-skip', accounts => {
 			const now = await currentTime();
 			await createMarket(
 				manager,
-				sAUDKey,
+				hAUDKey,
 				toUnit(1),
 				true,
 				[now + 100, now + 200],
@@ -1180,7 +1180,7 @@ contract('BinaryOptionMarketManager @gas-skip @ovm-skip', accounts => {
 			let now = await currentTime();
 			await createMarket(
 				manager,
-				sAUDKey,
+				hAUDKey,
 				toUnit(1),
 				true,
 				[now + 100, now + 200],
@@ -1191,7 +1191,7 @@ contract('BinaryOptionMarketManager @gas-skip @ovm-skip', accounts => {
 			now = await currentTime();
 			const newMarket = await createMarket(
 				manager,
-				sAUDKey,
+				hAUDKey,
 				toUnit(1),
 				true,
 				[now + 100, now + 200],
@@ -1201,7 +1201,7 @@ contract('BinaryOptionMarketManager @gas-skip @ovm-skip', accounts => {
 
 			assert.bnEqual(await manager.totalDeposited(), toUnit(7));
 			await fastForward(expiryDuration + 1000);
-			await exchangeRates.updateRates([sAUDKey], [toUnit(5)], await currentTime(), {
+			await exchangeRates.updateRates([hAUDKey], [toUnit(5)], await currentTime(), {
 				from: oracle,
 			});
 			await manager.resolveMarket(newMarket.address);
@@ -1214,7 +1214,7 @@ contract('BinaryOptionMarketManager @gas-skip @ovm-skip', accounts => {
 			const now = await currentTime();
 			const market = await createMarket(
 				manager,
-				sAUDKey,
+				hAUDKey,
 				toUnit(1),
 				true,
 				[now + 100, now + 200],
@@ -1223,8 +1223,8 @@ contract('BinaryOptionMarketManager @gas-skip @ovm-skip', accounts => {
 			);
 			const initialDebt = await manager.totalDeposited();
 
-			await sUSDSynth.issue(bidder, sUSDQty);
-			await sUSDSynth.approve(market.address, sUSDQty, { from: bidder });
+			await hUSDSynth.issue(bidder, hUSDQty);
+			await hUSDSynth.approve(market.address, hUSDQty, { from: bidder });
 
 			await market.bid(Side.Long, toUnit(1), { from: bidder });
 			assert.bnEqual(await manager.totalDeposited(), initialDebt.add(toUnit(1)));
@@ -1237,7 +1237,7 @@ contract('BinaryOptionMarketManager @gas-skip @ovm-skip', accounts => {
 			const now = await currentTime();
 			const market = await createMarket(
 				manager,
-				sAUDKey,
+				hAUDKey,
 				toUnit(1),
 				true,
 				[now + 100, now + 200],
@@ -1246,8 +1246,8 @@ contract('BinaryOptionMarketManager @gas-skip @ovm-skip', accounts => {
 			);
 			const initialDebt = await manager.totalDeposited();
 
-			await sUSDSynth.issue(bidder, sUSDQty);
-			await sUSDSynth.approve(market.address, sUSDQty, { from: bidder });
+			await hUSDSynth.issue(bidder, hUSDQty);
+			await hUSDSynth.approve(market.address, hUSDQty, { from: bidder });
 
 			await market.bid(Side.Long, toUnit(1), { from: bidder });
 			await market.bid(Side.Short, toUnit(2), { from: bidder });
@@ -1274,7 +1274,7 @@ contract('BinaryOptionMarketManager @gas-skip @ovm-skip', accounts => {
 				markets.push(
 					await createMarket(
 						manager,
-						sAUDKey,
+						hAUDKey,
 						toUnit(p),
 						true,
 						[now + 100, now + 200],
@@ -1311,9 +1311,9 @@ contract('BinaryOptionMarketManager @gas-skip @ovm-skip', accounts => {
 			await newManager.setResolverAndSyncCache(addressResolver.address, { from: managerOwner });
 
 			await Promise.all(
-				markets.map(m => sUSDSynth.approve(m.address, toUnit(1000), { from: bidder }))
+				markets.map(m => hUSDSynth.approve(m.address, toUnit(1000), { from: bidder }))
 			);
-			await sUSDSynth.approve(newManager.address, toUnit(1000), { from: bidder });
+			await hUSDSynth.approve(newManager.address, toUnit(1000), { from: bidder });
 
 			await newManager.setMigratingManager(manager.address, { from: managerOwner });
 		});
@@ -1433,10 +1433,10 @@ contract('BinaryOptionMarketManager @gas-skip @ovm-skip', accounts => {
 			});
 
 			// And a new market can still be created
-			await sUSDSynth.approve(newManager.address, toUnit('1000'));
+			await hUSDSynth.approve(newManager.address, toUnit('1000'));
 			const now = await currentTime();
 			await newManager.createMarket(
-				sAUDKey,
+				hAUDKey,
 				toUnit(1),
 				true,
 				[now + 100, now + 200],
@@ -1513,7 +1513,7 @@ contract('BinaryOptionMarketManager @gas-skip @ovm-skip', accounts => {
 			now = await currentTime();
 			await createMarket(
 				newManager,
-				sAUDKey,
+				hAUDKey,
 				toUnit(10),
 				true,
 				[now + 100, now + 200],
@@ -1524,7 +1524,7 @@ contract('BinaryOptionMarketManager @gas-skip @ovm-skip', accounts => {
 			assert.bnEqual(await newManager.numActiveMarkets(), toBN(3));
 
 			await fastForward(expiryDuration + 1000);
-			await exchangeRates.updateRates([sAUDKey], [toUnit(5)], await currentTime(), {
+			await exchangeRates.updateRates([hAUDKey], [toUnit(5)], await currentTime(), {
 				from: oracle,
 			});
 			await newManager.resolveMarket(markets[2].address);

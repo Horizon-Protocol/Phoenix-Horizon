@@ -47,25 +47,25 @@ contract('Rewards Integration Tests', async accounts => {
 	// };
 
 	// CURRENCIES
-	const [sUSD, sAUD, sEUR, sBTC, SNX, iBTC, sETH, ETH] = [
+	const [hUSD, hAUD, hEUR, hBTC, HZN, iBTC, hBNB, BNB] = [
 		'hUSD',
-		'sAUD',
-		'sEUR',
-		'sBTC',
+		'hAUD',
+		'hEUR',
+		'hBTC',
 		'HZN',
 		'iBTC',
 		'hBNB',
 		'BNB',
 	].map(toBytes32);
 
-	const synthKeys = [sUSD, sAUD, sEUR, sBTC, iBTC, sETH, ETH];
+	const synthKeys = [hUSD, hAUD, hEUR, hBTC, iBTC, hBNB, BNB];
 
 	// Updates rates with defaults so they're not stale.
 	const updateRatesWithDefaults = async () => {
 		const timestamp = await currentTime();
 
 		await exchangeRates.updateRates(
-			[sAUD, sEUR, SNX, sBTC, iBTC, sETH, ETH],
+			[hAUD, hEUR, HZN, hBTC, iBTC, hBNB, BNB],
 			['0.5', '1.25', '0.1', '5000', '4000', '172', '172'].map(toUnit),
 			timestamp,
 			{
@@ -142,7 +142,7 @@ contract('Rewards Integration Tests', async accounts => {
 		systemSettings,
 		rewardEscrow,
 		periodOneMintableSupplyMinusMinterReward,
-		sUSDContract,
+		hUSDContract,
 		MINTER_SNX_REWARD;
 
 	// run this once before all tests to prepare our environment, snapshots on beforeEach will take
@@ -156,11 +156,11 @@ contract('Rewards Integration Tests', async accounts => {
 			RewardEscrow: rewardEscrow,
 			SupplySchedule: supplySchedule,
 			Synthetix: synthetix,
-			SynthhUSD: sUSDContract,
+			SynthhUSD: hUSDContract,
 			SystemSettings: systemSettings,
 		} = await setupAllContracts({
 			accounts,
-			synths: ['hUSD', 'sAUD', 'sEUR', 'sBTC', 'iBTC', 'hBNB'],
+			synths: ['hUSD', 'hAUD', 'hEUR', 'hBTC', 'iBTC', 'hBNB'],
 			contracts: [
 				'AddressResolver',
 				'Exchanger', // necessary for burnSynths to check settlement of sUSD
@@ -467,7 +467,7 @@ contract('Rewards Integration Tests', async accounts => {
 			// await logFeePeriods();
 
 			// Account 1 leaves the system in week 2
-			const burnableTotal = await synthetix.debtBalanceOf(account1, sUSD);
+			const burnableTotal = await synthetix.debtBalanceOf(account1, hUSD);
 			await synthetix.burnSynths(burnableTotal, { from: account1 });
 			// await logFeesByPeriod(account1);
 
@@ -515,7 +515,7 @@ contract('Rewards Integration Tests', async accounts => {
 			assert.bnClose(account1Escrowed[1], third(periodOneMintableSupplyMinusMinterReward), 1);
 
 			// Account 1 leaves the system
-			const burnableTotal = await synthetix.debtBalanceOf(account1, sUSD);
+			const burnableTotal = await synthetix.debtBalanceOf(account1, hUSD);
 			await synthetix.burnSynths(burnableTotal, { from: account1 });
 
 			// FastForward into the second mintable week
@@ -577,8 +577,8 @@ contract('Rewards Integration Tests', async accounts => {
 			await synthetix.issueSynths(tenK, { from: account1 });
 			await synthetix.issueSynths(tenK, { from: account2 });
 
-			await synthetix.exchange(sUSD, tenK, sBTC, { from: account1 });
-			await synthetix.exchange(sUSD, tenK, sBTC, { from: account2 });
+			await synthetix.exchange(hUSD, tenK, hBTC, { from: account1 });
+			await synthetix.exchange(hUSD, tenK, hBTC, { from: account2 });
 
 			await fastForwardAndCloseFeePeriod();
 			// //////////////////////////////////////////////
@@ -609,7 +609,7 @@ contract('Rewards Integration Tests', async accounts => {
 
 			// Increase sBTC price by 100%
 			const timestamp = await currentTime();
-			await exchangeRates.updateRates([sBTC], ['10000'].map(toUnit), timestamp, {
+			await exchangeRates.updateRates([hBTC], ['10000'].map(toUnit), timestamp, {
 				from: oracle,
 			});
 			await debtCache.takeDebtSnapshot();
@@ -628,9 +628,9 @@ contract('Rewards Integration Tests', async accounts => {
 			await synthetix.mint({ from: owner });
 
 			// Do some exchanging to generateFees
-			const { amountReceived } = await exchanger.getAmountsForExchange(tenK, sUSD, sBTC);
-			await synthetix.exchange(sBTC, amountReceived, sUSD, { from: account1 });
-			await synthetix.exchange(sBTC, amountReceived, sUSD, { from: account2 });
+			const { amountReceived } = await exchanger.getAmountsForExchange(tenK, hUSD, hBTC);
+			await synthetix.exchange(hBTC, amountReceived, hUSD, { from: account1 });
+			await synthetix.exchange(hBTC, amountReceived, hUSD, { from: account2 });
 
 			// Close so we can claim
 			await fastForwardAndCloseFeePeriod();
@@ -894,11 +894,11 @@ contract('Rewards Integration Tests', async accounts => {
 
 		it('should apply no penalty when users claim rewards above the penalty threshold ratio of 1%', async () => {
 			// Decrease SNX collateral price by .9%
-			const currentRate = await exchangeRates.rateForCurrency(SNX);
+			const currentRate = await exchangeRates.rateForCurrency(HZN);
 			const newRate = currentRate.sub(multiplyDecimal(currentRate, toUnit('0.009')));
 
 			const timestamp = await currentTime();
-			await exchangeRates.updateRates([SNX], [newRate], timestamp, {
+			await exchangeRates.updateRates([HZN], [newRate], timestamp, {
 				from: oracle,
 			});
 
@@ -917,9 +917,9 @@ contract('Rewards Integration Tests', async accounts => {
 		});
 		it('should block user from claiming fees and rewards when users claim rewards >10% threshold collateralisation ratio', async () => {
 			// But if the price of SNX decreases a lot...
-			const newRate = (await exchangeRates.rateForCurrency(SNX)).sub(toUnit('0.09'));
+			const newRate = (await exchangeRates.rateForCurrency(HZN)).sub(toUnit('0.09'));
 			const timestamp = await currentTime();
-			await exchangeRates.updateRates([SNX], [newRate], timestamp, {
+			await exchangeRates.updateRates([HZN], [newRate], timestamp, {
 				from: oracle,
 			});
 
@@ -937,8 +937,8 @@ contract('Rewards Integration Tests', async accounts => {
 			await synthetix.issueSynths(oneThousand, { from: account2 });
 			await synthetix.issueSynths(oneThousand, { from: account1 });
 
-			await synthetix.exchange(sUSD, oneThousand, sAUD, { from: account2 });
-			await synthetix.exchange(sUSD, oneThousand, sAUD, { from: account1 });
+			await synthetix.exchange(hUSD, oneThousand, hAUD, { from: account2 });
+			await synthetix.exchange(hUSD, oneThousand, hAUD, { from: account1 });
 
 			await fastForwardAndCloseFeePeriod();
 		});
@@ -946,7 +946,7 @@ contract('Rewards Integration Tests', async accounts => {
 		it('then account gets remainder of fees/rewards available after wei rounding', async () => {
 			// Assert that we have correct values in the fee pool
 			const feesAvailableUSD = await feePool.feesAvailable(account2);
-			const oldsUSDBalance = await sUSDContract.balanceOf(account2);
+			const oldhUSDBalance = await hUSDContract.balanceOf(account2);
 
 			// Now we should be able to claim them.
 			const claimFeesTx = await feePool.claimFees({ from: account2 });
@@ -955,9 +955,9 @@ contract('Rewards Integration Tests', async accounts => {
 				snxRewards: feesAvailableUSD[1],
 			});
 
-			const newUSDBalance = await sUSDContract.balanceOf(account2);
+			const newUSDBalance = await hUSDContract.balanceOf(account2);
 			// We should have our fees
-			assert.bnEqual(newUSDBalance, oldsUSDBalance.add(feesAvailableUSD[0]));
+			assert.bnEqual(newUSDBalance, oldhUSDBalance.add(feesAvailableUSD[0]));
 
 			const period = await feePool.recentFeePeriods(1);
 			period.index = 1;

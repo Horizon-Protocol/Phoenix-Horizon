@@ -21,7 +21,7 @@ contract BinaryOption is IERC20, IBinaryOption {
     /* ========== STATE VARIABLES ========== */
 
     string public constant name = "HZN Binary Option";
-    string public constant symbol = "sOPT";
+    string public constant symbol = "hOPT";
     uint8 public constant decimals = 18;
 
     BinaryOptionMarket public market;

@@ -240,7 +240,7 @@ contract('Synthetix (prod tests)', accounts => {
 
 			// // clear out any pending settlements
 			await Exchanger.settle(user1, toBytes32('hBNB'), { from: user1 });
-			await Exchanger.settle(user1, toBytes32('sBTC'), { from: user1 });
+			await Exchanger.settle(user1, toBytes32('hBTC'), { from: user1 });
 		});
 
 		describe('when user exchanges hUSD into hBNB using a Virtualsynths', () => {
@@ -394,9 +394,9 @@ contract('Synthetix (prod tests)', accounts => {
 
 				const SynthsBTC = await connectContract({
 					network,
-					contractName: 'ProxysBTC',
+					contractName: 'ProxyhBTC',
 					abiName: 'Synth',
-					alias: 'SynthsBTC',
+					alias: 'SynthhBTC',
 				});
 
 				vSynth = await artifacts.require('VirtualSynth').at(decoded.vSynth);
