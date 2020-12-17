@@ -14,7 +14,7 @@ contract SystemStatus is Owned, ISystemStatus {
     bytes32 public constant SECTION_SYSTEM = "System";
     bytes32 public constant SECTION_ISSUANCE = "Issuance";
     bytes32 public constant SECTION_EXCHANGE = "Exchange";
-    bytes32 public constant SECTION_HASSET = "Synth";
+    bytes32 public constant SECTION_HASSET = "Hasset";
 
     Suspension public systemSuspension;
 

@@ -134,7 +134,7 @@ contract Exchanger is Owned, MixinResolver, MixinSystemSettings, IExchanger {
     }
 
     function synthetix() internal view returns (ISynthetix) {
-        return ISynthetix(requireAndGetAddress(CONTRACT_SYNTHETIX, "Missing Synthetix address"));
+        return ISynthetix(requireAndGetAddress(CONTRACT_SYNTHETIX, "Missing Horizon address"));
     }
 
     function feePool() internal view returns (IFeePool) {
@@ -649,7 +649,7 @@ contract Exchanger is Owned, MixinResolver, MixinSystemSettings, IExchanger {
     function suspendSynthWithInvalidRate(bytes32 currencyKey) external {
         systemStatus().requireSystemActive();
         require(issuer().synths(currencyKey) != ISynth(0), "No such hasset");
-        require(_isSynthRateInvalid(currencyKey, exchangeRates().rateForCurrency(currencyKey)), "Synth price is valid");
+        require(_isSynthRateInvalid(currencyKey, exchangeRates().rateForCurrency(currencyKey)), "Hasset price is valid");
         systemStatus().suspendSynth(currencyKey, CIRCUIT_BREAKER_SUSPENSION_REASON);
     }
 
@@ -666,7 +666,7 @@ contract Exchanger is Owned, MixinResolver, MixinSystemSettings, IExchanger {
         uint sourceAmount,
         bytes32 destinationCurrencyKey
     ) internal view {
-        require(sourceCurrencyKey != destinationCurrencyKey, "Can't be same synth");
+        require(sourceCurrencyKey != destinationCurrencyKey, "Can't be same hasset");
         require(sourceAmount > 0, "Zero amount");
 
         bytes32[] memory synthKeys = new bytes32[](2);
@@ -932,7 +932,7 @@ contract Exchanger is Owned, MixinResolver, MixinSystemSettings, IExchanger {
         ISynthetix _synthetix = synthetix();
         require(
             msg.sender == address(_synthetix) || _synthetix.synthsByAddress(msg.sender) != bytes32(0),
-            "Exchanger: Only synthetix or a synth contract can perform this action"
+            "Exchanger: Only horizon or a hasset contract can perform this action"
         );
         _;
     }

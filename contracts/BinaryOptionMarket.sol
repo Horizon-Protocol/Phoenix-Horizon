@@ -69,7 +69,7 @@ contract BinaryOptionMarket is Owned, MixinResolver, IBinaryOptionMarket {
 
     bytes32 internal constant CONTRACT_SYSTEMSTATUS = "SystemStatus";
     bytes32 internal constant CONTRACT_EXRATES = "ExchangeRates";
-    bytes32 internal constant CONTRACT_SYNTHSUSD = "SynthhUSD";
+    bytes32 internal constant CONTRACT_SYNTHSUSD = "HassethUSD";
     bytes32 internal constant CONTRACT_FEEPOOL = "FeePool";
 
     bytes32[24] internal addressesToCache = [CONTRACT_SYSTEMSTATUS, CONTRACT_EXRATES, CONTRACT_SYNTHSUSD, CONTRACT_FEEPOOL];
@@ -135,7 +135,7 @@ contract BinaryOptionMarket is Owned, MixinResolver, IBinaryOptionMarket {
     }
 
     function _sUSD() internal view returns (IERC20) {
-        return IERC20(requireAndGetAddress(CONTRACT_SYNTHSUSD, "Missing SynthhUSD"));
+        return IERC20(requireAndGetAddress(CONTRACT_SYNTHSUSD, "Missing HassethUSD"));
     }
 
     function _feePool() internal view returns (IFeePool) {

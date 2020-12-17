@@ -20,7 +20,7 @@ contract('SynthUtil', accounts => {
 	before(async () => {
 		({
 			SynthUtil: synthUtil,
-			SynthhUSD: sUSDContract,
+			HassethUSD: sUSDContract,
 			Synthetix: synthetix,
 			ExchangeRates: exchangeRates,
 			SystemSettings: systemSettings,

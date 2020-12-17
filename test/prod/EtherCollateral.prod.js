@@ -24,7 +24,7 @@ contract('EtherCollateral (prod tests)', accounts => {
 	let network, deploymentPath;
 
 	let EtherCollateral, ReadProxyAddressResolver, Depot;
-	let SynthhBNB, SynthhUSD;
+	let HassethBNB, HassethUSD;
 
 	before('prepare', async function() {
 		network = await detectNetworkName();
@@ -47,8 +47,8 @@ contract('EtherCollateral (prod tests)', accounts => {
 
 		({
 			EtherCollateral,
-			SynthhBNB,
-			SynthhUSD,
+			HassethBNB,
+			HassethUSD,
 			ReadProxyAddressResolver,
 			Depot,
 		} = await connectContracts({
@@ -57,8 +57,8 @@ contract('EtherCollateral (prod tests)', accounts => {
 				{ contractName: 'EtherCollateral' },
 				{ contractName: 'Depot' },
 				{ contractName: 'ReadProxyAddressResolver' },
-				{ contractName: 'SynthhBNB', abiName: 'Synth' },
-				{ contractName: 'SynthhUSD', abiName: 'Synth' },
+				{ contractName: 'HassethBNB', abiName: 'Synth' },
+				{ contractName: 'HassethUSD', abiName: 'Synth' },
 			],
 		}));
 
@@ -97,7 +97,7 @@ contract('EtherCollateral (prod tests)', accounts => {
 
 		before(async () => {
 			ethBalance = await web3.eth.getBalance(user1);
-			sEthBalance = await SynthhBNB.balanceOf(user1);
+			sEthBalance = await HassethBNB.balanceOf(user1);
 
 			tx = await EtherCollateral.openLoan({
 				from: user1,
@@ -116,9 +116,9 @@ contract('EtherCollateral (prod tests)', accounts => {
 				if (network === 'local') {
 					const amount = toUnit('100');
 
-					const balance = await SynthhUSD.balanceOf(Depot.address);
+					const balance = await HassethUSD.balanceOf(Depot.address);
 					if (balance.lt(amount)) {
-						await SynthhUSD.approve(Depot.address, amount, {
+						await HassethUSD.approve(Depot.address, amount, {
 							from: user1,
 						});
 
@@ -129,7 +129,7 @@ contract('EtherCollateral (prod tests)', accounts => {
 				}
 
 				ethBalance = await web3.eth.getBalance(user1);
-				sEthBalance = await SynthhBNB.balanceOf(user1);
+				sEthBalance = await HassethBNB.balanceOf(user1);
 
 				await EtherCollateral.closeLoan(loanID, {
 					from: user1,
@@ -141,7 +141,7 @@ contract('EtherCollateral (prod tests)', accounts => {
 			});
 
 			it('deducts hBNB', async () => {
-				assert.bnLt(await SynthhBNB.balanceOf(user1), sEthBalance);
+				assert.bnLt(await HassethBNB.balanceOf(user1), sEthBalance);
 			});
 		});
 	});

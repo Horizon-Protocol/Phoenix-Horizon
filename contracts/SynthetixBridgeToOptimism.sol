@@ -48,11 +48,11 @@ contract SynthetixBridgeToOptimism is Owned, MixinResolver, ISynthetixBridgeToOp
     }
 
     function synthetix() internal view returns (ISynthetix) {
-        return ISynthetix(requireAndGetAddress(CONTRACT_SYNTHETIX, "Missing Synthetix address"));
+        return ISynthetix(requireAndGetAddress(CONTRACT_SYNTHETIX, "Missing Horizon address"));
     }
 
     function synthetixERC20() internal view returns (IERC20) {
-        return IERC20(requireAndGetAddress(CONTRACT_SYNTHETIX, "Missing Synthetix address"));
+        return IERC20(requireAndGetAddress(CONTRACT_SYNTHETIX, "Missing Horizon address"));
     }
 
     function issuer() internal view returns (IIssuer) {

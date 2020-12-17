@@ -48,7 +48,7 @@ contract('Liquidations', accounts => {
 			AddressResolver: addressResolver,
 			ExchangeRates: exchangeRates,
 			Liquidations: liquidations,
-			SynthhUSD: hUSDContract,
+			HassethUSD: hUSDContract,
 			Synthetix: synthetix,
 			SynthetixState: synthetixState,
 			SystemSettings: systemSettings,

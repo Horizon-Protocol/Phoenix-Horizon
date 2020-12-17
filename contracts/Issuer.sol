@@ -428,8 +428,8 @@ contract Issuer is Owned, MixinResolver, MixinSystemSettings, IIssuer {
 
     function _addSynth(ISynth synth) internal {
         bytes32 currencyKey = synth.currencyKey();
-        require(synths[currencyKey] == ISynth(0), "Synth exists");
-        require(synthsByAddress[address(synth)] == bytes32(0), "Synth address already exists");
+        require(synths[currencyKey] == ISynth(0), "Hasset exists");
+        require(synthsByAddress[address(synth)] == bytes32(0), "Hasset address already exists");
 
         availableSynths.push(synth);
         synths[currencyKey] = synth;
@@ -458,9 +458,9 @@ contract Issuer is Owned, MixinResolver, MixinSystemSettings, IIssuer {
 
     function _removeSynth(bytes32 currencyKey) internal {
         address synthToRemove = address(synths[currencyKey]);
-        require(synthToRemove != address(0), "Synth does not exist");
-        require(IERC20(synthToRemove).totalSupply() == 0, "Synth supply exists");
-        require(currencyKey != hUSD, "Cannot remove synth");
+        require(synthToRemove != address(0), "Hasset does not exist");
+        require(IERC20(synthToRemove).totalSupply() == 0, "Hasset supply exists");
+        require(currencyKey != hUSD, "Cannot remove hasset");
 
         // Remove the synth from the availableSynths array.
         for (uint i = 0; i < availableSynths.length; i++) {

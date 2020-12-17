@@ -62,7 +62,7 @@ contract('Depot @ovm-skip', async accounts => {
 			accounts,
 			mocks: {
 				// mocks necessary for address resolver imports
-				SynthhUSD: synth,
+				HassethUSD: synth,
 			},
 			contracts: [
 				'Depot',

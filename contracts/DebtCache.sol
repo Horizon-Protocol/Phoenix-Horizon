@@ -125,7 +125,7 @@ contract DebtCache is Owned, MixinResolver, MixinSystemSettings, IDebtCache {
         for (uint i = 0; i < numValues; i++) {
             bytes32 key = currencyKeys[i];
             address synthAddress = address(synths[i]);
-            require(synthAddress != address(0), "Synth does not exist");
+            require(synthAddress != address(0), "Hasset does not exist");
             uint supply = IERC20(synthAddress).totalSupply();
 
             bool ishUSD = key == hUSD;
@@ -204,7 +204,7 @@ contract DebtCache is Owned, MixinResolver, MixinSystemSettings, IDebtCache {
 
     // This function exists in case a synth is ever somehow removed without its snapshot being updated.
     function purgeCachedSynthDebt(bytes32 currencyKey) external onlyOwner {
-        require(issuer().synths(currencyKey) == ISynth(0), "Synth exists");
+        require(issuer().synths(currencyKey) == ISynth(0), "Hasset exists");
         delete _cachedSynthDebt[currencyKey];
     }
 
@@ -286,7 +286,7 @@ contract DebtCache is Owned, MixinResolver, MixinSystemSettings, IDebtCache {
             uint debt = _cachedDebt;
             // This requirement should never fail, as the total debt snapshot is the sum of the individual synth
             // debt snapshots.
-            require(cachedSum <= debt, "Cached synth sum exceeds total debt");
+            require(cachedSum <= debt, "Cached hasset sum exceeds total debt");
             debt = debt.sub(cachedSum).add(currentSum);
             _cachedDebt = debt;
             emit DebtCacheUpdated(debt);

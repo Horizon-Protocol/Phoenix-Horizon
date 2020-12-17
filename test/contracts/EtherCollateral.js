@@ -29,7 +29,7 @@ contract('EtherCollateral @ovm-skip', async accounts => {
 
 	const TEST_TIMEOUT = 160e3;
 
-	const [sETH, ETH, SNX] = ['hBNB', 'BNB', 'HZN'].map(toBytes32);
+	const [hBNB, BNB, HZN] = ['hBNB', 'BNB', 'HZN'].map(toBytes32);
 
 	const ISSUACE_RATIO = toUnit('0.8');
 	const ZERO_BN = toUnit('0');
@@ -37,13 +37,13 @@ contract('EtherCollateral @ovm-skip', async accounts => {
 	const [, owner, oracle, depotDepositor, address1, address2, address3] = accounts;
 
 	let etherCollateral,
-		synthetix,
+		horizon,
 		feePool,
 		exchangeRates,
 		depot,
 		addressResolver,
-		sUSDSynth,
-		sETHSynth,
+		hUSDHasset,
+		hETHHasset,
 		systemStatus,
 		FEE_ADDRESS;
 
@@ -54,7 +54,7 @@ contract('EtherCollateral @ovm-skip', async accounts => {
 
 	const issueSynthsUSD = async (issueAmount, receiver) => {
 		// Set up the depositor with an amount of synths to deposit.
-		await sUSDSynth.transfer(receiver, issueAmount, {
+		await hUSDHasset.transfer(receiver, issueAmount, {
 			from: owner,
 		});
 	};
@@ -67,7 +67,7 @@ contract('EtherCollateral @ovm-skip', async accounts => {
 		await issueSynthsUSD(synthsToDeposit, depositor);
 
 		// Approve Transaction
-		await sUSDSynth.approve(depot.address, synthsToDeposit, { from: depositor });
+		await hUSDHasset.approve(depot.address, synthsToDeposit, { from: depositor });
 
 		// Deposit hUSD in Depot
 		await depot.depositSynths(synthsToDeposit, {
@@ -116,7 +116,7 @@ contract('EtherCollateral @ovm-skip', async accounts => {
 
 		// Depot requires SNX and BNB rates
 		await exchangeRates.updateRates(
-			[SNX, sETH, ETH],
+			[HZN, hBNB, BNB],
 			['0.1', '172', '172'].map(toUnit),
 			timestamp,
 			{
@@ -133,7 +133,7 @@ contract('EtherCollateral @ovm-skip', async accounts => {
 	// Run once at beginning - snapshots will take care of resetting this before each test
 	before(async () => {
 		// Mock HZN, hUSD and hBNB
-		[{ token: synthetix }, { token: sUSDSynth }, { token: sETHSynth }] = await Promise.all([
+		[{ token: horizon }, { token: hUSDHasset }, { token: hETHHasset }] = await Promise.all([
 			mockToken({ accounts, name: 'Horizon', symbol: 'HZN' }),
 			mockToken({ accounts, synth: 'hUSD', name: 'Horizon USD', symbol: 'hUSD' }),
 			mockToken({ accounts, synth: 'hBNB', name: 'Horizon BNB', symbol: 'hBNB' }),
@@ -149,9 +149,9 @@ contract('EtherCollateral @ovm-skip', async accounts => {
 		} = await setupAllContracts({
 			accounts,
 			mocks: {
-				SynthhUSD: sUSDSynth,
-				SynthhBNB: sETHSynth,
-				Synthetix: synthetix,
+				HassethUSD: hUSDHasset,
+				HassethBNB: hETHHasset,
+				Synthetix: horizon,
 			},
 			contracts: [
 				'Depot',
@@ -203,8 +203,8 @@ contract('EtherCollateral @ovm-skip', async accounts => {
 		});
 
 		it('should access its dependencies via the address resolver', async () => {
-			assert.equal(await addressResolver.getAddress(toBytes32('SynthhBNB')), sETHSynth.address);
-			assert.equal(await addressResolver.getAddress(toBytes32('SynthhUSD')), sUSDSynth.address);
+			assert.equal(await addressResolver.getAddress(toBytes32('HassethBNB')), hETHHasset.address);
+			assert.equal(await addressResolver.getAddress(toBytes32('HassethUSD')), hUSDHasset.address);
 			assert.equal(await addressResolver.getAddress(toBytes32('Depot')), depot.address);
 		});
 
@@ -573,7 +573,7 @@ contract('EtherCollateral @ovm-skip', async accounts => {
 				assert.bnEqual(synthLoan.timeClosed, ZERO_BN);
 			});
 			it('add the loan issue amount to creators balance', async () => {
-				const sETHBalance = await sETHSynth.balanceOf(address1);
+				const sETHBalance = await hETHHasset.balanceOf(address1);
 				assert.bnEqual(sETHBalance, expectedsETHLoanAmount);
 			});
 			it('add the BNB collateral balance to the contract', async () => {
@@ -1078,7 +1078,7 @@ contract('EtherCollateral @ovm-skip', async accounts => {
 
 				it('when hBNB balance is less than loanAmount, then it reverts', async () => {
 					// "Burn" some of accounts hBNB by sending to the owner
-					await sETHSynth.transfer(owner, toUnit('4'), { from: address1 });
+					await hETHHasset.transfer(owner, toUnit('4'), { from: address1 });
 					await assert.revert(etherCollateral.closeLoan(loanID, { from: address1 }));
 				});
 
@@ -1227,7 +1227,7 @@ contract('EtherCollateral @ovm-skip', async accounts => {
 				});
 
 				it('increase the FeePool sUSD balance', async () => {
-					assert.bnEqual(await sUSDSynth.balanceOf(FEE_ADDRESS), expectedFeesUSD);
+					assert.bnEqual(await hUSDHasset.balanceOf(FEE_ADDRESS), expectedFeesUSD);
 				});
 
 				it('Depots totalSellableDeposits has reduced by the expected fees sUSD amount', async () => {
@@ -1248,7 +1248,7 @@ contract('EtherCollateral @ovm-skip', async accounts => {
 
 				it('decrease the sUSD balance in Depot', async () => {
 					const expectedBalance = oneThousandsUSD.sub(expectedFeesUSD);
-					assert.bnEqual(await sUSDSynth.balanceOf(depot.address), expectedBalance);
+					assert.bnEqual(await hUSDHasset.balanceOf(depot.address), expectedBalance);
 				});
 
 				it('decrease the BNB balance in the EtherCollateral contract', async () => {
@@ -1330,7 +1330,7 @@ contract('EtherCollateral @ovm-skip', async accounts => {
 		it('when bob attempts to liquidate alices loan and he has no hBNB then it reverts', async () => {
 			await assert.revert(
 				etherCollateral.liquidateUnclosedLoan(alice, loanID, { from: bob }),
-				'You do not have the required Synth balance to close this loan.'
+				'You do not have the required Hasset balance to close this loan.'
 			);
 		});
 		it('when alice create a loan then it reverts', async () => {
@@ -1340,7 +1340,7 @@ contract('EtherCollateral @ovm-skip', async accounts => {
 			);
 		});
 		it('then alice has a hBNB loan balance', async () => {
-			assert.bnEqual(await sETHSynth.balanceOf(alice), expectedsETHLoanAmount);
+			assert.bnEqual(await hETHHasset.balanceOf(alice), expectedsETHLoanAmount);
 		});
 		describe('when loanLiquidation is open', () => {
 			beforeEach(async () => {
@@ -1362,10 +1362,10 @@ contract('EtherCollateral @ovm-skip', async accounts => {
 						assert.ok(synthLoan.timeClosed > synthLoan.timeCreated, true);
 					});
 					it('then alice hBNB balance is still intact', async () => {
-						assert.ok(await sETHSynth.balanceOf(alice), expectedsETHLoanAmount);
+						assert.ok(await hETHHasset.balanceOf(alice), expectedsETHLoanAmount);
 					});
 					it('then chads hBNB balance is 0 as it was burnt to repay the loan', async () => {
-						assert.ok(await sETHSynth.balanceOf(chad), 0);
+						assert.ok(await hETHHasset.balanceOf(chad), 0);
 					});
 					it('then emits a LoanLiquidated event', async () => {
 						assert.eventsEqual(
@@ -1394,7 +1394,7 @@ contract('EtherCollateral @ovm-skip', async accounts => {
 
 			describe('when bob has some hBNB', () => {
 				beforeEach(async () => {
-					await sETHSynth.transfer(bob, await sETHSynth.balanceOf(alice), { from: alice });
+					await hETHHasset.transfer(bob, await hETHHasset.balanceOf(alice), { from: alice });
 				});
 				describe('and bob liquidates alices hBNB loan for her BNB', async () => {
 					let liquidateLoanTransaction;
@@ -1408,10 +1408,10 @@ contract('EtherCollateral @ovm-skip', async accounts => {
 						assert.ok(synthLoan.timeClosed > synthLoan.timeCreated, true);
 					});
 					it('then alice hBNB balance is 0 (because she transfered it to bob)', async () => {
-						assert.ok(await sETHSynth.balanceOf(alice), 0);
+						assert.ok(await hETHHasset.balanceOf(alice), 0);
 					});
 					it('then bobs hBNB balance is 0 as it was burnt to repay the loan', async () => {
-						assert.ok(await sETHSynth.balanceOf(bob), 0);
+						assert.ok(await hETHHasset.balanceOf(bob), 0);
 					});
 					it('then emits a LoanLiquidated event', async () => {
 						assert.eventsEqual(

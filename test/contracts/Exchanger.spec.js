@@ -76,12 +76,12 @@ contract('Exchanger (spec tests)', async accounts => {
 			ExchangeState: exchangeState,
 			FeePool: feePool,
 			SystemStatus: systemStatus,
-			SynthhUSD: hUSDContract,
-			SynthhBTC: hBTCContract,
-			SynthhEUR: hEURContract,
-			SynthhAUD: hAUDContract,
-			SynthiBTC: iBTCContract,
-			SynthhBNB: hBNBContract,
+			HassethUSD: hUSDContract,
+			HassethBTC: hBTCContract,
+			HassethEUR: hEURContract,
+			HassethAUD: hAUDContract,
+			HassetiBTC: iBTCContract,
+			HassethBNB: hBNBContract,
 			SystemSettings: systemSettings,
 			DelegateApprovals: delegateApprovals,
 			AddressResolver: resolver,
@@ -1563,7 +1563,7 @@ contract('Exchanger (spec tests)', async accounts => {
 				fnc: exchanger.exchange,
 				accounts,
 				args: [account1, hUSD, toUnit('100'), hAUD, account1],
-				reason: 'Only synthetix or a synth contract can perform this action',
+				reason: 'Only horizon or a hasset contract can perform this action',
 			});
 		});
 
@@ -1609,7 +1609,7 @@ contract('Exchanger (spec tests)', async accounts => {
 				fnc: exchanger.exchangeWithTracking,
 				accounts,
 				args: [account1, hUSD, toUnit('100'), hAUD, account2, account3, trackingCode],
-				reason: 'Only synthetix or a synth contract can perform this action',
+				reason: 'Only horizon or a hasset contract can perform this action',
 			});
 		});
 
@@ -1798,7 +1798,7 @@ contract('Exchanger (spec tests)', async accounts => {
 							fnc: exchanger.exchangeOnBehalf,
 							accounts,
 							args: [authoriser, delegate, hUSD, toUnit('100'), hAUD],
-							reason: 'Only synthetix or a synth contract can perform this action',
+							reason: 'Only horizon or a hasset contract can perform this action',
 						});
 					});
 
@@ -1902,7 +1902,7 @@ contract('Exchanger (spec tests)', async accounts => {
 							fnc: exchanger.exchangeOnBehalfWithTracking,
 							accounts,
 							args: [authoriser, delegate, hUSD, toUnit('100'), hAUD, authoriser, trackingCode],
-							reason: 'Only synthetix or a synth contract can perform this action',
+							reason: 'Only horizon or a hasset contract can perform this action',
 						});
 					});
 

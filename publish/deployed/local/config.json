@@ -98,31 +98,31 @@
 	"DappMaintenance": {
 		"deploy": true
 	},
-	"SynthhUSD": {
+	"HassethUSD": {
 		"deploy": true
 	},
-	"SynthhEUR": {
+	"HassethEUR": {
 		"deploy": true
 	},
-	"SynthhJPY": {
+	"HassethJPY": {
 		"deploy": true
 	},
-	"SynthhAUD": {
+	"HassethAUD": {
 		"deploy": true
 	},
-	"SynthhGBP": {
+	"HassethGBP": {
 		"deploy": true
 	},
-	"SynthhCHF": {
+	"HassethCHF": {
 		"deploy": true
 	},
-	"SynthhXAU": {
+	"HassethXAU": {
 		"deploy": true
 	},
-	"SynthhXAG": {
+	"HassethXAG": {
 		"deploy": true
 	},
-	"SynthhBTC": {
+	"HassethBTC": {
 		"deploy": true
 	},
 	"ProxyERC20": {
@@ -206,7 +206,7 @@
 	"ProxyhETH": {
 		"deploy": true
 	},
-	"SynthhETH": {
+	"HassethETH": {
 		"deploy": true
 	},
 	"TokenStatehBNB": {
@@ -215,7 +215,7 @@
 	"ProxyhBNB": {
 		"deploy": true
 	},
-	"SynthhBNB": {
+	"HassethBNB": {
 		"deploy": true
 	},
 	"TokenStatehTRX": {
@@ -224,7 +224,7 @@
 	"ProxyhTRX": {
 		"deploy": true
 	},
-	"SynthhTRX": {
+	"HassethTRX": {
 		"deploy": true
 	},
 	"TokenStatehXTZ": {
@@ -233,7 +233,7 @@
 	"ProxyhXTZ": {
 		"deploy": true
 	},
-	"SynthhXTZ": {
+	"HassethXTZ": {
 		"deploy": true
 	},
 	"TokenStateiBTC": {
@@ -242,7 +242,7 @@
 	"ProxyiBTC": {
 		"deploy": true
 	},
-	"SynthiBTC": {
+	"HassetiBTC": {
 		"deploy": true
 	},
 	"TokenStateiETH": {
@@ -251,7 +251,7 @@
 	"ProxyiETH": {
 		"deploy": true
 	},
-	"SynthiETH": {
+	"HassetiETH": {
 		"deploy": true
 	},
 	"TokenStateiBNB": {
@@ -260,7 +260,7 @@
 	"ProxyiBNB": {
 		"deploy": true
 	},
-	"SynthiBNB": {
+	"HassetiBNB": {
 		"deploy": true
 	},
 	"TokenStateiTRX": {
@@ -269,7 +269,7 @@
 	"ProxyiTRX": {
 		"deploy": true
 	},
-	"SynthiTRX": {
+	"HassetiTRX": {
 		"deploy": true
 	},
 	"TokenStateiXTZ": {
@@ -278,7 +278,7 @@
 	"ProxyiXTZ": {
 		"deploy": true
 	},
-	"SynthiXTZ": {
+	"HassetiXTZ": {
 		"deploy": true
 	},
 	"TokenStatehCEX": {
@@ -287,7 +287,7 @@
 	"ProxyhCEX": {
 		"deploy": true
 	},
-	"SynthhCEX": {
+	"HassethCEX": {
 		"deploy": true
 	},
 	"TokenStateiCEX": {
@@ -296,7 +296,7 @@
 	"ProxyiCEX": {
 		"deploy": true
 	},
-	"SynthiCEX": {
+	"HassetiCEX": {
 		"deploy": true
 	},
 	"TokenStatehXRP": {
@@ -305,7 +305,7 @@
 	"ProxyhXRP": {
 		"deploy": true
 	},
-	"SynthhXRP": {
+	"HassethXRP": {
 		"deploy": true
 	},
 	"TokenStatehLTC": {
@@ -314,7 +314,7 @@
 	"ProxyhLTC": {
 		"deploy": true
 	},
-	"SynthhLTC": {
+	"HassethLTC": {
 		"deploy": true
 	},
 	"TokenStatehLINK": {
@@ -323,7 +323,7 @@
 	"ProxyhLINK": {
 		"deploy": true
 	},
-	"SynthhLINK": {
+	"HassethLINK": {
 		"deploy": true
 	},
 	"TokenStatehEOS": {
@@ -332,7 +332,7 @@
 	"ProxyhEOS": {
 		"deploy": true
 	},
-	"SynthhEOS": {
+	"HassethEOS": {
 		"deploy": true
 	},
 	"TokenStatehBCH": {
@@ -341,7 +341,7 @@
 	"ProxyhBCH": {
 		"deploy": true
 	},
-	"SynthhBCH": {
+	"HassethBCH": {
 		"deploy": true
 	},
 	"TokenStatehETC": {
@@ -350,7 +350,7 @@
 	"ProxyhETC": {
 		"deploy": true
 	},
-	"SynthhETC": {
+	"HassethETC": {
 		"deploy": true
 	},
 	"TokenStatehDASH": {
@@ -359,7 +359,7 @@
 	"ProxyhDASH": {
 		"deploy": true
 	},
-	"SynthhDASH": {
+	"HassethDASH": {
 		"deploy": true
 	},
 	"TokenStatehXMR": {
@@ -368,7 +368,7 @@
 	"ProxyhXMR": {
 		"deploy": true
 	},
-	"SynthhXMR": {
+	"HassethXMR": {
 		"deploy": true
 	},
 	"TokenStatehADA": {
@@ -377,7 +377,7 @@
 	"ProxyhADA": {
 		"deploy": true
 	},
-	"SynthhADA": {
+	"HassethADA": {
 		"deploy": true
 	},
 	"TokenStatehDEFI": {
@@ -386,7 +386,7 @@
 	"ProxyhDEFI": {
 		"deploy": true
 	},
-	"SynthhDEFI": {
+	"HassethDEFI": {
 		"deploy": true
 	},
 	"TokenStateiDEFI": {
@@ -395,7 +395,7 @@
 	"ProxyiDEFI": {
 		"deploy": true
 	},
-	"SynthiDEFI": {
+	"HassetiDEFI": {
 		"deploy": true
 	},
 	"TokenStatehFTSE": {
@@ -404,7 +404,7 @@
 	"ProxyhFTSE": {
 		"deploy": true
 	},
-	"SynthhFTSE": {
+	"HassethFTSE": {
 		"deploy": true
 	},
 	"TokenStatehNIKKEI": {
@@ -413,7 +413,7 @@
 	"ProxyhNIKKEI": {
 		"deploy": true
 	},
-	"SynthhNIKKEI": {
+	"HassethNIKKEI": {
 		"deploy": true
 	}
 }

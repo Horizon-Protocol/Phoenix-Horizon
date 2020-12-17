@@ -141,7 +141,7 @@ contract('EtherCollateralsUSD', async accounts => {
 		} = await setupAllContracts({
 			accounts,
 			mocks: {
-				SynthhUSD: hUSDSynth,
+				HassethUSD: hUSDSynth,
 				Synthetix: synthetix,
 			},
 			contracts: [
@@ -218,7 +218,7 @@ contract('EtherCollateralsUSD', async accounts => {
 		});
 
 		it('should access its dependencies via the address resolver', async () => {
-			assert.equal(await addressResolver.getAddress(toBytes32('SynthhUSD')), hUSDSynth.address);
+			assert.equal(await addressResolver.getAddress(toBytes32('HassethUSD')), hUSDSynth.address);
 			assert.equal(await addressResolver.getAddress(toBytes32('FeePool')), feePool.address);
 			assert.equal(
 				await addressResolver.getAddress(toBytes32('ExchangeRates')),
@@ -1408,7 +1408,7 @@ contract('EtherCollateralsUSD', async accounts => {
 		it('when bob attempts to liquidate alices loan and he has no hUSD then it reverts', async () => {
 			await assert.revert(
 				etherCollateral.liquidateUnclosedLoan(alice, loanID, { from: bob }),
-				'You do not have the required Synth balance to close this loan.'
+				'You do not have the required Hasset balance to close this loan.'
 			);
 		});
 		it('when alice create a loan then it reverts', async () => {

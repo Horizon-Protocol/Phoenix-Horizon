@@ -21,7 +21,7 @@ contract SynthUtil {
     }
 
     function _synthetix() internal view returns (ISynthetix) {
-        return ISynthetix(addressResolverProxy.requireAndGetAddress(CONTRACT_SYNTHETIX, "Missing Synthetix address"));
+        return ISynthetix(addressResolverProxy.requireAndGetAddress(CONTRACT_SYNTHETIX, "Missing Horizon address"));
     }
 
     function _exchangeRates() internal view returns (IExchangeRates) {

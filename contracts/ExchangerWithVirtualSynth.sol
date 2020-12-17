@@ -19,7 +19,7 @@ contract ExchangerWithVirtualSynth is Exchanger {
         bytes32 currencyKey
     ) internal returns (IVirtualSynth vSynth) {
         // prevent inverse synths from being allowed due to purgeability
-        require(currencyKey[0] != 0x69, "Cannot virtualize this synth");
+        require(currencyKey[0] != 0x69, "Cannot virtualize this hasset");
 
         vSynth = new VirtualSynth(synth, resolver, recipient, amount, currencyKey);
         emit VirtualSynthCreated(address(synth), recipient, address(vSynth), currencyKey, amount);

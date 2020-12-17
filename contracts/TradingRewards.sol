@@ -62,7 +62,7 @@ contract TradingRewards is ITradingRewards, ReentrancyGuard, Owned, Pausable, Mi
     /* ========== VIEWS ========== */
 
     function synthetix() internal view returns (IERC20) {
-        return IERC20(requireAndGetAddress(CONTRACT_SYNTHETIX, "Missing Synthetix address"));
+        return IERC20(requireAndGetAddress(CONTRACT_SYNTHETIX, "Missing Horizon address"));
     }
 
     function exchanger() internal view returns (IExchanger) {

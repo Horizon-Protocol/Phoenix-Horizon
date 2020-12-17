@@ -152,7 +152,7 @@ contract('AddressResolver', accounts => {
 			let sETHContract;
 			let sUSDContract;
 			beforeEach(async () => {
-				({ SynthhBNB: sETHContract, SynthhUSD: sUSDContract } = await setupAllContracts({
+				({ HassethBNB: sETHContract, HassethUSD: sUSDContract } = await setupAllContracts({
 					accounts,
 					existing: {
 						AddressResolver: resolver,

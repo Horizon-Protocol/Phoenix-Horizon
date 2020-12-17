@@ -60,7 +60,7 @@ contract TokenExchanger is Owned {
     }
 
     modifier synthetixProxyIsSet {
-        require(integrationProxy != address(0), "Synthetix Integration proxy address not set");
+        require(integrationProxy != address(0), "Horizon Integration proxy address not set");
         _;
     }
 

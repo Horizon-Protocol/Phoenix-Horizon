@@ -74,9 +74,9 @@ contract('TradingRewards', accounts => {
 				AddressResolver: resolver,
 				Exchanger: exchanger,
 				ExchangeRates: exchangeRates,
-				SynthhUSD: hUSDContract,
-				SynthhBNB: hBNBContract,
-				SynthhBTC: hBTCContract,
+				HassethUSD: hUSDContract,
+				HassethBNB: hBNBContract,
+				HassethBTC: hBTCContract,
 				SystemSettings: systemSettings,
 			} = await setupAllContracts({
 				accounts,

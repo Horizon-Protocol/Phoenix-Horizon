@@ -20,7 +20,7 @@ const {
 const { toBytes32 } = require('../..');
 
 contract('BaseSynthetix', async accounts => {
-	const [hUSD, sAUD, sEUR, SNX, sETH] = ['hUSD', 'hAUD', 'hEUR', 'HZN', 'hBNB'].map(toBytes32);
+	const [hUSD, hAUD, hEUR, HZN, hBNB] = ['hUSD', 'hAUD', 'hEUR', 'HZN', 'hBNB'].map(toBytes32);
 
 	const [, owner, account1, account2, account3] = accounts;
 
@@ -135,7 +135,7 @@ contract('BaseSynthetix', async accounts => {
 			await onlyGivenAddressCanInvoke({
 				fnc: baseSynthetix.exchange,
 				accounts,
-				args: [hUSD, amount, sETH],
+				args: [hUSD, amount, hBNB],
 				reason: 'Cannot be run on this layer',
 			});
 		});
@@ -143,7 +143,7 @@ contract('BaseSynthetix', async accounts => {
 			await onlyGivenAddressCanInvoke({
 				fnc: baseSynthetix.exchangeOnBehalf,
 				accounts,
-				args: [account1, hUSD, amount, sETH],
+				args: [account1, hUSD, amount, hBNB],
 				reason: 'Cannot be run on this layer',
 			});
 		});
@@ -151,7 +151,7 @@ contract('BaseSynthetix', async accounts => {
 			await onlyGivenAddressCanInvoke({
 				fnc: baseSynthetix.exchangeWithTracking,
 				accounts,
-				args: [hUSD, amount, sAUD, account1, toBytes32('1INCH')],
+				args: [hUSD, amount, hAUD, account1, toBytes32('1INCH')],
 				reason: 'Cannot be run on this layer',
 			});
 		});
@@ -159,7 +159,7 @@ contract('BaseSynthetix', async accounts => {
 			await onlyGivenAddressCanInvoke({
 				fnc: baseSynthetix.exchangeOnBehalfWithTracking,
 				accounts,
-				args: [account1, hUSD, amount, sAUD, account2, toBytes32('1INCH')],
+				args: [account1, hUSD, amount, hAUD, account2, toBytes32('1INCH')],
 				reason: 'Cannot be run on this layer',
 			});
 		});
@@ -167,7 +167,7 @@ contract('BaseSynthetix', async accounts => {
 			await onlyGivenAddressCanInvoke({
 				fnc: baseSynthetix.exchangeWithVirtual,
 				accounts,
-				args: [hUSD, amount, sAUD, toBytes32('AGGREGATOR')],
+				args: [hUSD, amount, hAUD, toBytes32('AGGREGATOR')],
 				reason: 'Cannot be run on this layer',
 			});
 		});
@@ -175,7 +175,7 @@ contract('BaseSynthetix', async accounts => {
 			await onlyGivenAddressCanInvoke({
 				fnc: baseSynthetix.settle,
 				accounts,
-				args: [sAUD],
+				args: [hAUD],
 				reason: 'Cannot be run on this layer',
 			});
 		});
@@ -234,7 +234,7 @@ contract('BaseSynthetix', async accounts => {
 				timestamp = await currentTime();
 
 				await exchangeRates.updateRates(
-					[sAUD, sEUR, sETH],
+					[hAUD, hEUR, hBNB],
 					['0.5', '1.25', '100'].map(toUnit),
 					timestamp,
 					{ from: oracle }
@@ -248,7 +248,7 @@ contract('BaseSynthetix', async accounts => {
 				beforeEach(async () => {
 					timestamp = await currentTime();
 
-					await exchangeRates.updateRates([SNX], ['1'].map(toUnit), timestamp, { from: oracle });
+					await exchangeRates.updateRates([HZN], ['1'].map(toUnit), timestamp, { from: oracle });
 				});
 				it('then no stale rates', async () => {
 					assert.equal(await baseSynthetix.anySynthOrSNXRateIsInvalid(), false);
@@ -260,7 +260,7 @@ contract('BaseSynthetix', async accounts => {
 
 						timestamp = await currentTime();
 
-						await exchangeRates.updateRates([SNX, sAUD], ['0.1', '0.78'].map(toUnit), timestamp, {
+						await exchangeRates.updateRates([HZN, hAUD], ['0.1', '0.78'].map(toUnit), timestamp, {
 							from: oracle,
 						});
 					});
@@ -275,13 +275,13 @@ contract('BaseSynthetix', async accounts => {
 
 	describe('availableCurrencyKeys()', () => {
 		it('returns all currency keys by default', async () => {
-			assert.deepEqual(await baseSynthetix.availableCurrencyKeys(), [hUSD, sETH, sEUR, sAUD]);
+			assert.deepEqual(await baseSynthetix.availableCurrencyKeys(), [hUSD, hBNB, hEUR, hAUD]);
 		});
 	});
 
 	describe('isWaitingPeriod()', () => {
 		it('returns false by default', async () => {
-			assert.isFalse(await baseSynthetix.isWaitingPeriod(sETH));
+			assert.isFalse(await baseSynthetix.isWaitingPeriod(hBNB));
 		});
 	});
 
@@ -467,7 +467,7 @@ contract('BaseSynthetix', async accounts => {
 					const timestamp = await currentTime();
 
 					// now give some synth rates
-					await exchangeRates.updateRates([sAUD, sEUR], ['0.5', '1.25'].map(toUnit), timestamp, {
+					await exchangeRates.updateRates([hAUD, hEUR], ['0.5', '1.25'].map(toUnit), timestamp, {
 						from: oracle,
 					});
 					await debtCache.takeDebtSnapshot();
@@ -475,7 +475,7 @@ contract('BaseSynthetix', async accounts => {
 					await ensureTransferReverts();
 
 					// the remainder of the synths have prices
-					await exchangeRates.updateRates([sETH], ['100'].map(toUnit), timestamp, {
+					await exchangeRates.updateRates([hBNB], ['100'].map(toUnit), timestamp, {
 						from: oracle,
 					});
 					await debtCache.takeDebtSnapshot();
@@ -483,7 +483,7 @@ contract('BaseSynthetix', async accounts => {
 					await ensureTransferReverts();
 
 					// now give SNX rate
-					await exchangeRates.updateRates([SNX], ['1'].map(toUnit), timestamp, {
+					await exchangeRates.updateRates([HZN], ['1'].map(toUnit), timestamp, {
 						from: oracle,
 					});
 
@@ -500,7 +500,7 @@ contract('BaseSynthetix', async accounts => {
 					const timestamp = await currentTime();
 
 					// now give SNX rate
-					await exchangeRates.updateRates([SNX], ['1'].map(toUnit), timestamp, {
+					await exchangeRates.updateRates([HZN], ['1'].map(toUnit), timestamp, {
 						from: oracle,
 					});
 					await debtCache.takeDebtSnapshot();
@@ -508,7 +508,7 @@ contract('BaseSynthetix', async accounts => {
 					await ensureTransferReverts();
 
 					// now give some synth rates
-					await exchangeRates.updateRates([sAUD, sEUR], ['0.5', '1.25'].map(toUnit), timestamp, {
+					await exchangeRates.updateRates([hAUD, hEUR], ['0.5', '1.25'].map(toUnit), timestamp, {
 						from: oracle,
 					});
 					await debtCache.takeDebtSnapshot();
@@ -516,7 +516,7 @@ contract('BaseSynthetix', async accounts => {
 					await ensureTransferReverts();
 
 					// now give the remainder of synths rates
-					await exchangeRates.updateRates([sETH], ['100'].map(toUnit), timestamp, {
+					await exchangeRates.updateRates([hBNB], ['100'].map(toUnit), timestamp, {
 						from: oracle,
 					});
 					await debtCache.takeDebtSnapshot();

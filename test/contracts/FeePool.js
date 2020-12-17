@@ -94,7 +94,7 @@ contract('FeePool', async accounts => {
 			RewardEscrow: rewardEscrow,
 			Synthetix: synthetix,
 			SystemSettings: systemSettings,
-			SynthhUSD: hUSDContract,
+			HassethUSD: hUSDContract,
 			SystemStatus: systemStatus,
 		} = await setupAllContracts({
 			accounts,

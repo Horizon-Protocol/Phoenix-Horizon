@@ -156,7 +156,7 @@ contract('Rewards Integration Tests', async accounts => {
 			RewardEscrow: rewardEscrow,
 			SupplySchedule: supplySchedule,
 			Synthetix: synthetix,
-			SynthhUSD: hUSDContract,
+			HassethUSD: hUSDContract,
 			SystemSettings: systemSettings,
 		} = await setupAllContracts({
 			accounts,

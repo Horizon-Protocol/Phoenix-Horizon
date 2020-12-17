@@ -1408,8 +1408,8 @@ describe('publish scripts', () => {
 									'Synthetix',
 									'SynthetixEscrow',
 									'SynthetixState',
-									'SynthhBNB',
-									'SynthhUSD',
+									'HassethBNB',
+									'HassethUSD',
 									'SystemStatus',
 								].map(contractName =>
 									callMethodWithRetry(

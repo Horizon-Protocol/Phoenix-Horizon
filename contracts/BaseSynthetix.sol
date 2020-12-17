@@ -62,7 +62,7 @@ contract BaseSynthetix is IERC20, ExternStateToken, MixinResolver, ISynthetix {
     /* ========== VIEWS ========== */
 
     function synthetixState() internal view returns (ISynthetixState) {
-        return ISynthetixState(requireAndGetAddress(CONTRACT_SYNTHETIXSTATE, "Missing SynthetixState address"));
+        return ISynthetixState(requireAndGetAddress(CONTRACT_SYNTHETIXSTATE, "Missing HorizonState address"));
     }
 
     function systemStatus() internal view returns (ISystemStatus) {

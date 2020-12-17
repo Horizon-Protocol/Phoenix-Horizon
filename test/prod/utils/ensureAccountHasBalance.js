@@ -51,7 +51,7 @@ async function ensureAccountHassUSD({ network, deploymentPath, amount, account }
 	const sUSD = await connectContract({
 		network,
 		deploymentPath,
-		contractName: 'SynthhUSD',
+		contractName: 'HassethUSD',
 		abiName: 'Synth',
 	});
 

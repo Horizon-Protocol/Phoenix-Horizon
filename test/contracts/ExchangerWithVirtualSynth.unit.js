@@ -47,7 +47,7 @@ contract('ExchangerWithVirtualSynth (unit tests)', async accounts => {
 									fnc: this.instance.exchangeWithVirtual,
 									args,
 									accounts: accounts.filter(a => a !== this.mocks.Synthetix.address),
-									reason: 'Exchanger: Only synthetix or a synth contract can perform this action',
+									reason: 'Exchanger: Only horizon or a hasset contract can perform this action',
 									// address: this.mocks.Synthetix.address (doesnt work as this reverts due to lack of mocking setup)
 								});
 							});
@@ -96,7 +96,7 @@ contract('ExchangerWithVirtualSynth (unit tests)', async accounts => {
 																		toBytes32(),
 																		{ from: this.mocks.Synthetix.address }
 																	),
-																	'Cannot virtualize this synth'
+																	'Cannot virtualize this hasset'
 																);
 															});
 														});

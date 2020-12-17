@@ -36,7 +36,7 @@ contract('VirtualSynth (unit tests)', async accounts => {
 			const amount = '1001';
 			behaviors.whenInstantiated({ amount, user: owner, synth: 'hBTC' }, () => {
 				it('then each constructor arg is set correctly', async () => {
-					assert.equal(trimUtf8EscapeChars(await this.instance.name()), 'Virtual Synth hBTC');
+					assert.equal(trimUtf8EscapeChars(await this.instance.name()), 'Virtual Hasset hBTC');
 					assert.equal(trimUtf8EscapeChars(await this.instance.symbol()), 'vhBTC');
 					assert.equal(await this.instance.decimals(), '18');
 				});

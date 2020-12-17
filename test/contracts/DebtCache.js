@@ -55,10 +55,10 @@ contract('DebtCache', async accounts => {
 			SystemStatus: systemStatus,
 			SystemSettings: systemSettings,
 			ExchangeRates: exchangeRates,
-			SynthhUSD: hUSDContract,
-			SynthhBNB: hBNBContract,
-			SynthhAUD: hAUDContract,
-			SynthhEUR: hEURContract,
+			HassethUSD: hUSDContract,
+			HassethBNB: hBNBContract,
+			HassethAUD: hAUDContract,
+			HassethEUR: hEURContract,
 			FeePool: feePool,
 			DebtCache: debtCache,
 			Issuer: issuer,
@@ -689,7 +689,7 @@ contract('DebtCache', async accounts => {
 			});
 
 			it('Synth snapshots cannot be purged while the synth exists', async () => {
-				await assert.revert(debtCache.purgeCachedSynthDebt(hAUD, { from: owner }), 'Synth exists');
+				await assert.revert(debtCache.purgeCachedSynthDebt(hAUD, { from: owner }), 'Hasset exists');
 			});
 
 			it('Synth snapshots can be purged without updating the snapshot', async () => {

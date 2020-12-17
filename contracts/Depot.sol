@@ -73,7 +73,7 @@ contract Depot is Owned, Pausable, ReentrancyGuard, MixinResolver, IDepot {
 
     /* ========== ADDRESS RESOLVER CONFIGURATION ========== */
 
-    bytes32 private constant CONTRACT_SYNTHSUSD = "SynthhUSD";
+    bytes32 private constant CONTRACT_SYNTHSUSD = "HassethUSD";
     bytes32 private constant CONTRACT_EXRATES = "ExchangeRates";
     bytes32 private constant CONTRACT_SYNTHETIX = "Synthetix";
 
@@ -501,11 +501,11 @@ contract Depot is Owned, Pausable, ReentrancyGuard, MixinResolver, IDepot {
     /* ========== INTERNAL VIEWS ========== */
 
     function synthsUSD() internal view returns (IERC20) {
-        return IERC20(requireAndGetAddress(CONTRACT_SYNTHSUSD, "Missing SynthhUSD address"));
+        return IERC20(requireAndGetAddress(CONTRACT_SYNTHSUSD, "Missing HassethUSD address"));
     }
 
     function synthetix() internal view returns (IERC20) {
-        return IERC20(requireAndGetAddress(CONTRACT_SYNTHETIX, "Missing Synthetix address"));
+        return IERC20(requireAndGetAddress(CONTRACT_SYNTHETIX, "Missing Horizon address"));
     }
 
     function exchangeRates() internal view returns (IExchangeRates) {

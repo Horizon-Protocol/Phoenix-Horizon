@@ -328,7 +328,7 @@ const deploy = async ({
 	}
 
 	const newSynthsToAdd = synths
-		.filter(({ name }) => !config[`Synth${name}`])
+		.filter(({ name }) => !config[`Hasset${name}`])
 		.map(({ name }) => name);
 
 	let aggregatedPriceResults = 'N/A';
@@ -392,11 +392,11 @@ const deploy = async ({
 			(latestSolTimestamp > earliestCompiledTimestamp
 				? yellow(' ⚠⚠⚠ this is later than the last build! Is this intentional?')
 				: green(' ✅')),
-		'Add any new synths found?': addNewSynths
+		'Add any new hassets found?': addNewSynths
 			? green('✅ YES\n\t\t\t\t') + newSynthsToAdd.join(', ')
 			: yellow('⚠ NO'),
 		'Deployer account:': account,
-		'Synthetix totalSupply': `${Math.round(w3utils.fromWei(currentSynthetixSupply) / 1e6)}m`,
+		'Horizon totalSupply': `${Math.round(w3utils.fromWei(currentSynthetixSupply) / 1e6)}m`,
 		'ExchangeRates Oracle': oracleExrates,
 		'Last Mint Event': `${currentLastMintEvent} (${new Date(currentLastMintEvent * 1000)})`,
 		'Current Weeks Of Inflation': currentWeekOfInflation,
@@ -735,12 +735,10 @@ const deploy = async ({
 			contract: 'SystemStatus',
 			target: systemStatus,
 			read: 'accessControl',
-			readArg: [toBytes32('Synth'), addressOf(exchanger)],
-			// readArg: [toBytes32('Hasset'), addressOf(exchanger)],
+			readArg: [toBytes32('Hasset'), addressOf(exchanger)],
 			expected: ({ canSuspend } = {}) => canSuspend,
 			write: 'updateAccessControl',
-			writeArg: [toBytes32('Synth'), addressOf(exchanger), true, false],
-			// writeArg: [toBytes32('Hasset'), addressOf(exchanger), true, false],
+			writeArg: [toBytes32('Hasset'), addressOf(exchanger), true, false],
 		});
 	}
 
@@ -896,6 +894,7 @@ const deploy = async ({
 	if (config['Synthetix'].deploy || config['SynthetixEscrow'].deploy) {
 		// Note: currently on mainnet SynthetixEscrow.methods.synthetix() does NOT exist
 		// it is "havven" and the ABI we have here is not sufficient
+		// TODO new `mainnet` should change this
 		if (network === 'mainnet') {
 			await runStep({
 				contract: 'SynthetixEscrow',
@@ -938,7 +937,7 @@ const deploy = async ({
 		// Legacy proxy will be around until May 30, 2020
 		// https://docs.synthetix.io/integrations/guide/#proxy-deprecation
 		// Until this time, on mainnet we will still deploy ProxyERC20sUSD and ensure that
-		// SynthsUSD.proxy is ProxyERC20sUSD, SynthsUSD.integrationProxy is ProxysUSD
+		// HassethUSD.proxy is ProxyERC20hUSD, HassethUSD.integrationProxy is ProxyhUSD
 		const synthProxyIsLegacy = currencyKey === 'hUSD' && network === 'mainnet';
 
 		const proxyForSynth = await deployer.deployContract({
@@ -948,7 +947,7 @@ const deploy = async ({
 			force: addNewSynths,
 		});
 
-		// additionally deploy an ERC20 proxy for the synth if it's legacy (sUSD)
+		// additionally deploy an ERC20 proxy for the hasset if it's legacy (hUSD)
 		let proxyERC20ForSynth;
 		if (currencyKey === 'hUSD') {
 			proxyERC20ForSynth = await deployer.deployContract({
@@ -961,13 +960,13 @@ const deploy = async ({
 
 		const currencyKeyInBytes = toBytes32(currencyKey);
 
-		const synthConfig = config[`Synth${currencyKey}`] || {};
+		const synthConfig = config[`Hasset${currencyKey}`] || {};
 
 		// track the original supply if we're deploying a new synth contract for an existing synth
 		let originalTotalSupply = 0;
 		if (synthConfig.deploy) {
 			try {
-				const oldSynth = deployer.getExistingContract({ contract: `Synth${currencyKey}` });
+				const oldSynth = deployer.getExistingContract({ contract: `Hasset${currencyKey}` });
 				originalTotalSupply = await oldSynth.methods.totalSupply().call();
 			} catch (err) {
 				if (!freshDeploy) {
@@ -986,13 +985,13 @@ const deploy = async ({
 			// future specific synths args...
 		};
 
-		// user confirm totalSupply is correct for oldSynth before deploy new Synth
+		// user confirm totalSupply is correct for oldHasset before deploy new Hasset
 		if (synthConfig.deploy && !yes && originalTotalSupply > 0) {
 			try {
 				await confirmAction(
 					yellow(
 						`⚠⚠⚠ WARNING: Please confirm - ${network}:\n` +
-							`Synth${currencyKey} totalSupply is ${originalTotalSupply} \n`
+							`Hasset${currencyKey} totalSupply is ${originalTotalSupply} \n`
 					) +
 						gray('-'.repeat(50)) +
 						'\nDo you want to continue? (y/n) '
@@ -1005,13 +1004,13 @@ const deploy = async ({
 
 		const sourceContract = subclass || 'Synth';
 		const synth = await deployer.deployContract({
-			name: `Synth${currencyKey}`,
+			name: `Hasset${currencyKey}`,
 			source: sourceContract,
 			deps: [`TokenState${currencyKey}`, `Proxy${currencyKey}`, 'Synthetix', 'FeePool'],
 			args: [
 				proxyERC20ForSynth ? addressOf(proxyERC20ForSynth) : addressOf(proxyForSynth),
 				addressOf(tokenStateForSynth),
-				`Synth ${currencyKey}`,
+				`Hasset ${currencyKey}`,
 				currencyKey,
 				account,
 				currencyKeyInBytes,
@@ -1045,7 +1044,7 @@ const deploy = async ({
 
 			// Migration Phrase 2: if there's a ProxyERC20sUSD then the Synth's proxy must use it
 			await runStep({
-				contract: `Synth${currencyKey}`,
+				contract: `Hasset${currencyKey}`,
 				target: synth,
 				read: 'proxy',
 				expected: input => input === addressOf(proxyERC20ForSynth || proxyForSynth),
@@ -1094,7 +1093,7 @@ const deploy = async ({
 
 	await deployer.deployContract({
 		name: 'Depot',
-		deps: ['ProxySynthetix', 'SynthhUSD', 'FeePool'],
+		deps: ['ProxySynthetix', 'HassethUSD', 'FeePool'],
 		args: [account, account, addressOf(readProxyForResolver)],
 	});
 
@@ -1444,7 +1443,7 @@ const deploy = async ({
 						.call();
 
 					// and total supply, if any
-					const synth = deployer.deployedContracts[`Synth${currencyKey}`];
+					const synth = deployer.deployedContracts[`Hasset${currencyKey}`];
 					const totalSynthSupply = await synth.methods.totalSupply().call();
 					console.log(gray(`totalSupply of ${currencyKey}: ${Number(totalSynthSupply)}`));
 

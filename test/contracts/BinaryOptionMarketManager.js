@@ -76,7 +76,7 @@ contract('BinaryOptionMarketManager @gas-skip @ovm-skip', accounts => {
 			SystemStatus: systemStatus,
 			AddressResolver: addressResolver,
 			ExchangeRates: exchangeRates,
-			SynthhUSD: hUSDSynth,
+			HassethUSD: hUSDSynth,
 		} = await setupAllContracts({
 			accounts,
 			synths: ['hUSD'],

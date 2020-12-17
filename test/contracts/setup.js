@@ -465,7 +465,7 @@ const setupContract = async ({
 				cache['ExchangeState'].setAssociatedContract(instance.address, { from: owner }),
 
 				cache['SystemStatus'].updateAccessControl(
-					toBytes32('Synth'),
+					toBytes32('Hasset'),
 					instance.address,
 					true,
 					false,
@@ -836,13 +836,13 @@ const setupAllContracts = async ({
 			synth,
 			supply: 0, // add synths with 0 supply initially
 			skipInitialAllocation: true,
-			name: `Synth ${synth}`,
+			name: `Hasset ${synth}`,
 			symbol: synth,
 		});
 
 		returnObj[`ProxyERC20${synth}`] = proxy;
 		returnObj[`TokenState${synth}`] = tokenState;
-		returnObj[`Synth${synth}`] = token;
+		returnObj[`Hasset${synth}`] = token;
 
 		// We'll defer adding the tokens into the Issuer as it must
 		// be synchronised with the FlexibleStorage address first.

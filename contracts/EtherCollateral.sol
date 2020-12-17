@@ -96,8 +96,8 @@ contract EtherCollateral is Owned, Pausable, ReentrancyGuard, MixinResolver, IEt
     /* ========== ADDRESS RESOLVER CONFIGURATION ========== */
 
     bytes32 private constant CONTRACT_SYSTEMSTATUS = "SystemStatus";
-    bytes32 private constant CONTRACT_SYNTHHBNB = "SynthhBNB";
-    bytes32 private constant CONTRACT_SYNTHSUSD = "SynthhUSD";
+    bytes32 private constant CONTRACT_SYNTHHBNB = "HassethBNB";
+    bytes32 private constant CONTRACT_SYNTHSUSD = "HassethUSD";
     bytes32 private constant CONTRACT_DEPOT = "Depot";
     bytes32 private constant CONTRACT_EXRATES = "ExchangeRates";
 
@@ -360,7 +360,7 @@ contract EtherCollateral is Owned, Pausable, ReentrancyGuard, MixinResolver, IEt
         require(synthLoan.timeClosed == 0, "Loan already closed");
         require(
             IERC20(address(synthsETH())).balanceOf(msg.sender) >= synthLoan.loanAmount,
-            "You do not have the required Synth balance to close this loan."
+            "You do not have the required Hasset balance to close this loan."
         );
 
         // Record loan as closed
@@ -444,11 +444,11 @@ contract EtherCollateral is Owned, Pausable, ReentrancyGuard, MixinResolver, IEt
     }
 
     function synthsETH() internal view returns (ISynth) {
-        return ISynth(requireAndGetAddress(CONTRACT_SYNTHHBNB, "Missing SynthhBNB address"));
+        return ISynth(requireAndGetAddress(CONTRACT_SYNTHHBNB, "Missing HassethBNB address"));
     }
 
     function synthsUSD() internal view returns (ISynth) {
-        return ISynth(requireAndGetAddress(CONTRACT_SYNTHSUSD, "Missing SynthhUSD address"));
+        return ISynth(requireAndGetAddress(CONTRACT_SYNTHSUSD, "Missing HassethUSD address"));
     }
 
     function depot() internal view returns (IDepot) {

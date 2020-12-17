@@ -68,10 +68,10 @@ contract('Issuer (via Synthetix)', async accounts => {
 			ExchangeRates: exchangeRates,
 			SynthetixEscrow: escrow,
 			RewardEscrow: rewardEscrow,
-			SynthhUSD: hUSDContract,
-			SynthhBNB: hBNBContract,
-			SynthhAUD: hAUDContract,
-			SynthhEUR: hEURContract,
+			HassethUSD: hUSDContract,
+			HassethBNB: hBNBContract,
+			HassethAUD: hAUDContract,
+			HassethEUR: hEURContract,
 			FeePool: feePool,
 			DebtCache: debtCache,
 			Issuer: issuer,
@@ -610,7 +610,7 @@ contract('Issuer (via Synthetix)', async accounts => {
 					});
 
 					await issuer.addSynth(synth.address, { from: owner });
-					await assert.revert(issuer.addSynth(synth.address, { from: owner }), 'Synth exists');
+					await assert.revert(issuer.addSynth(synth.address, { from: owner }), 'Hasset exists');
 				});
 
 				it('should disallow double adding a Synth contract with the same currencyKey', async () => {
@@ -633,7 +633,7 @@ contract('Issuer (via Synthetix)', async accounts => {
 					});
 
 					await issuer.addSynth(synth1.address, { from: owner });
-					await assert.revert(issuer.addSynth(synth2.address, { from: owner }), 'Synth exists');
+					await assert.revert(issuer.addSynth(synth2.address, { from: owner }), 'Hasset exists');
 				});
 
 				describe('when another synth is added with 0 supply', () => {
@@ -698,7 +698,7 @@ contract('Issuer (via Synthetix)', async accounts => {
 							// Assert that we can't remove the synth now
 							await assert.revert(
 								issuer.removeSynth(currencyKey, { from: owner }),
-								'Synth supply exists'
+								'Hasset supply exists'
 							);
 						});
 					});
@@ -824,7 +824,7 @@ contract('Issuer (via Synthetix)', async accounts => {
 
 						await assert.revert(
 							issuer.addSynths([synth.address, synth.address], { from: owner }),
-							'Synth exists'
+							'Hasset exists'
 						);
 					});
 
@@ -849,7 +849,7 @@ contract('Issuer (via Synthetix)', async accounts => {
 
 						await assert.revert(
 							issuer.addSynths([synth1.address, synth2.address], { from: owner }),
-							'Synth exists'
+							'Hasset exists'
 						);
 					});
 
@@ -869,7 +869,7 @@ contract('Issuer (via Synthetix)', async accounts => {
 						// Assert that we can't remove the synth
 						await assert.revert(
 							issuer.removeSynths([currencyKey, fakeCurrencyKey], { from: owner }),
-							'Synth does not exist'
+							'Hasset does not exist'
 						);
 					});
 
@@ -877,7 +877,7 @@ contract('Issuer (via Synthetix)', async accounts => {
 						// Assert that we can't remove sUSD
 						await assert.revert(
 							issuer.removeSynths([currencyKey, hUSD], { from: owner }),
-							'Cannot remove synth'
+							'Cannot remove hasset'
 						);
 					});
 
@@ -928,7 +928,7 @@ contract('Issuer (via Synthetix)', async accounts => {
 
 						await assert.revert(
 							issuer.removeSynths([currencyKey, currencyKey2], { from: owner }),
-							'Synth supply exists'
+							'Hasset supply exists'
 						);
 					});
 				});
