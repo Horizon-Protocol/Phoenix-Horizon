@@ -1,100 +1,100 @@
 [
 	{
-		"name": "sUSD",
+		"name": "hUSD",
 		"asset": "USD",
 		"subclass": "MultiCollateralSynth"
 	},
 	{
-		"name": "sEUR",
+		"name": "hEUR",
 		"asset": "EUR"
 	},
 	{
-		"name": "sJPY",
+		"name": "hJPY",
 		"asset": "JPY"
 	},
 	{
-		"name": "sAUD",
+		"name": "hAUD",
 		"asset": "AUD"
 	},
 	{
-		"name": "sGBP",
+		"name": "hGBP",
 		"asset": "GBP",
 		"subclass": "PurgeableSynth"
 	},
 	{
-		"name": "sCHF",
+		"name": "hCHF",
 		"asset": "CHF",
 		"subclass": "PurgeableSynth"
 	},
 	{
-		"name": "sXAU",
+		"name": "hXAU",
 		"asset": "XAU",
 		"subclass": "PurgeableSynth"
 	},
 	{
-		"name": "sXAG",
+		"name": "hXAG",
 		"asset": "XAG"
 	},
 	{
-		"name": "sBTC",
+		"name": "hBTC",
 		"asset": "BTC"
 	},
 	{
-		"name": "sETH",
-		"asset": "ETH",
+		"name": "hETH",
+		"asset": "ETH"
+	},
+	{
+		"name": "hBNB",
+		"asset": "BNB",
 		"subclass": "MultiCollateralSynth"
 	},
 	{
-		"name": "sBNB",
-		"asset": "BNB"
-	},
-	{
-		"name": "sTRX",
+		"name": "hTRX",
 		"asset": "TRX"
 	},
 	{
-		"name": "sXTZ",
+		"name": "hXTZ",
 		"asset": "XTZ"
 	},
 	{
-		"name": "sXRP",
+		"name": "hXRP",
 		"asset": "XRP"
 	},
 	{
-		"name": "sLTC",
+		"name": "hLTC",
 		"asset": "LTC",
 		"subclass": "PurgeableSynth"
 	},
 	{
-		"name": "sLINK",
+		"name": "hLINK",
 		"asset": "LINK"
 	},
 	{
-		"name": "sEOS",
+		"name": "hEOS",
 		"asset": "EOS"
 	},
 	{
-		"name": "sBCH",
+		"name": "hBCH",
 		"asset": "BCH"
 	},
 	{
-		"name": "sETC",
+		"name": "hETC",
 		"asset": "ETC"
 	},
 	{
-		"name": "sDASH",
+		"name": "hDASH",
 		"asset": "DASH"
 	},
 	{
-		"name": "sXMR",
+		"name": "hXMR",
 		"asset": "XMR"
 	},
 	{
-		"name": "sADA",
+		"name": "hADA",
 		"asset": "ADA"
 	},
 	{
-		"name": "sCEX",
+		"name": "hCEX",
 		"asset": "CEX",
 		"index": [
 			{
@@ -136,7 +136,7 @@
 		"subclass": "PurgeableSynth"
 	},
 	{
-		"name": "sDEFI",
+		"name": "hDEFI",
 		"asset": "DEFI",
 		"index": [
 			{
@@ -255,7 +255,7 @@
 	{
 		"name": "iCEX",
 		"asset": "CEX",
-		"index": "sCEX",
+		"index": "hCEX",
 		"subclass": "PurgeableSynth",
 		"inverted": {
 			"entryPoint": 1000,
@@ -266,7 +266,7 @@
 	{
 		"name": "iDEFI",
 		"asset": "DEFI",
-		"index": "sDEFI",
+		"index": "hDEFI",
 		"subclass": "PurgeableSynth",
 		"inverted": {
 			"entryPoint": 2757.0,
@@ -275,11 +275,11 @@
 		}
 	},
 	{
-		"name": "sFTSE",
+		"name": "hFTSE",
 		"asset": "FTSE100"
 	},
 	{
-		"name": "sNIKKEI",
+		"name": "hNIKKEI",
 		"asset": "NIKKEI225"
 	}
 ]
