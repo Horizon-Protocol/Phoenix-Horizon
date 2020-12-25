@@ -21,7 +21,7 @@ const {
 } = require('../util');
 
 const DEFAULTS = {
-	network: 'kovan',
+	network: 'testnet',
 	gasLimit: 3e6,
 	gasPrice: '1',
 	batchSize: 15,
@@ -50,18 +50,18 @@ const purgeSynths = async ({
 	});
 
 	if (synthsToPurge.length < 1) {
-		console.log(gray('No synths provided. Please use --synths-to-remove option'));
+		console.log(gray('No hassets provided. Please use --synths-to-remove option'));
 		return;
 	}
 
 	// sanity-check the synth list
 	for (const synth of synthsToPurge) {
 		if (synths.filter(({ name }) => name === synth).length < 1) {
-			console.error(red(`Synth ${synth} not found!`));
+			console.error(red(`Hasset ${synth} not found!`));
 			process.exitCode = 1;
 			return;
-		} else if (['sUSD'].indexOf(synth) >= 0) {
-			console.error(red(`Synth ${synth} cannot be purged`));
+		} else if (['hUSD'].indexOf(synth) >= 0) {
+			console.error(red(`Hasset ${synth} cannot be purged`));
 			process.exitCode = 1;
 			return;
 		}
@@ -96,7 +96,7 @@ const purgeSynths = async ({
 				cyan(
 					`${yellow(
 						'⚠ WARNING'
-					)}: This action will purge the following synths from the Synthetix contract on ${network}:\n- ${synthsToPurge.join(
+					)}: This action will purge the following synths from the Horizon contract on ${network}:\n- ${synthsToPurge.join(
 						'\n- '
 					)}`
 				) + '\nDo you want to continue? (y/n) '
@@ -114,7 +114,7 @@ const purgeSynths = async ({
 	let totalBatches = 0;
 	for (const currencyKey of synthsToPurge) {
 		const { address: synthAddress, source: synthSource } = deployment.targets[
-			`Synth${currencyKey}`
+			`Hasset${currencyKey}`
 		];
 
 		const { abi: synthABI } = deployment.sources[synthSource];
@@ -139,7 +139,7 @@ const purgeSynths = async ({
 		if (synthAddress !== currentSynthInSNX) {
 			console.error(
 				red(
-					`Synth address in Synthetix for ${currencyKey} is different from what's deployed in Synthetix to the local ${DEPLOYMENT_FILENAME} of ${network} \ndeployed: ${yellow(
+					`Hasset address in Horizon for ${currencyKey} is different from what's deployed in Horizon to the local ${DEPLOYMENT_FILENAME} of ${network} \ndeployed: ${yellow(
 						currentSynthInSNX
 					)}\nlocal:    ${yellow(synthAddress)}`
 				)
@@ -150,7 +150,7 @@ const purgeSynths = async ({
 
 		// step 1. fetch all holders via ethplorer api
 		if (network === 'mainnet') {
-			const topTokenHoldersUrl = `http://api.ethplorer.io/getTopTokenHolders/${proxyAddress}`;
+			const topTokenHoldersUrl = `http://api.bscscan.com/getTopTokenHolders/${proxyAddress}`;
 			const response = await axios.get(topTokenHoldersUrl, {
 				params: {
 					apiKey: process.env.ETHPLORER_API_KEY || 'freekey',
@@ -193,7 +193,7 @@ const purgeSynths = async ({
 			} else {
 				await performTransactionalStep({
 					account,
-					contract: `Synth${currencyKey}`,
+					contract: `Hasset${currencyKey}`,
 					target: Synth,
 					write: 'purge',
 					writeArg: [entries], // explicitly pass array of args so array not splat as params

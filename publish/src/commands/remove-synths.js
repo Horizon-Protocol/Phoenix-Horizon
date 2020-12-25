@@ -22,7 +22,7 @@ const {
 } = require('../util');
 
 const DEFAULTS = {
-	network: 'kovan',
+	network: 'testnet',
 	gasLimit: 3e5,
 	gasPrice: '1',
 };
@@ -62,11 +62,11 @@ const removeSynths = async ({
 	// sanity-check the synth list
 	for (const synth of synthsToRemove) {
 		if (synths.filter(({ name }) => name === synth).length < 1) {
-			console.error(red(`Synth ${synth} not found!`));
+			console.error(red(`Hasset ${synth} not found!`));
 			process.exitCode = 1;
 			return;
 		} else if (['sUSD'].indexOf(synth) >= 0) {
-			console.error(red(`Synth ${synth} cannot be removed`));
+			console.error(red(`Hasset ${synth} cannot be removed`));
 			process.exitCode = 1;
 			return;
 		}
@@ -93,7 +93,7 @@ const removeSynths = async ({
 				cyan(
 					`${yellow(
 						'⚠ WARNING'
-					)}: This action will remove the following synths from the Synthetix contract on ${network}:\n- ${synthsToRemove.join(
+					)}: This action will remove the following synths from the Horizon contract on ${network}:\n- ${synthsToRemove.join(
 						'\n- '
 					)}`
 				) + '\nDo you want to continue? (y/n) '
@@ -121,7 +121,7 @@ const removeSynths = async ({
 
 	for (const currencyKey of synthsToRemove) {
 		const { address: synthAddress, source: synthSource } = deployment.targets[
-			`Synth${currencyKey}`
+			`Hasset${currencyKey}`
 		];
 		const { abi: synthABI } = deployment.sources[synthSource];
 		const Synth = new web3.eth.Contract(synthABI, synthAddress);
@@ -131,7 +131,7 @@ const removeSynths = async ({
 		if (synthAddress !== currentSynthInSNX) {
 			console.error(
 				red(
-					`Synth address in Synthetix for ${currencyKey} is different from what's deployed in Synthetix to the local ${DEPLOYMENT_FILENAME} of ${network} \ndeployed: ${yellow(
+					`Hasset address in Horizon for ${currencyKey} is different from what's deployed in Horizon to the local ${DEPLOYMENT_FILENAME} of ${network} \ndeployed: ${yellow(
 						currentSynthInSNX
 					)}\nlocal:    ${yellow(synthAddress)}`
 				)
@@ -145,9 +145,9 @@ const removeSynths = async ({
 		if (Number(totalSupply) > 0) {
 			console.error(
 				red(
-					`Cannot remove as Synth${currencyKey}.totalSupply is non-zero: ${yellow(
+					`Cannot remove as Hasset${currencyKey}.totalSupply is non-zero: ${yellow(
 						totalSupply
-					)}\nThe Synth must be purged of holders.`
+					)}\nThe Hasset must be purged of holders.`
 				)
 			);
 			process.exitCode = 1;

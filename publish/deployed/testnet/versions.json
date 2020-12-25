@@ -502,12 +502,12 @@
 			},
 			"TokenStatehCEX": {
 				"address": "0xdcD39F29952E636d9dcB15eEb0EA20b262Aa0a4E",
-				"status": "current",
+				"status": "deleted",
 				"keccak256": "0x6e250a86522d7b26ae0bf75338ce0a23ff357d0c91bdaa79d50341130dffd2dd"
 			},
 			"ProxyhCEX": {
 				"address": "0x3a240a10B95f0E1c0495A77F761508886F04De6B",
-				"status": "current",
+				"status": "deleted",
 				"keccak256": "0x18a038e2315820928c7d17fe96859add18e5f0ad4d957357cf3733d02082c0f2"
 			},
 			"HassethCEX": {
@@ -517,12 +517,12 @@
 			},
 			"TokenStatehDEFI": {
 				"address": "0x65Cf8fCC8A8979E1dA35232385b5b2CAb81c4D5b",
-				"status": "current",
+				"status": "deleted",
 				"keccak256": "0x6e250a86522d7b26ae0bf75338ce0a23ff357d0c91bdaa79d50341130dffd2dd"
 			},
 			"ProxyhDEFI": {
 				"address": "0x781398a99a27E94A7D6Af9a51E4250246Dc88F16",
-				"status": "current",
+				"status": "deleted",
 				"keccak256": "0x18a038e2315820928c7d17fe96859add18e5f0ad4d957357cf3733d02082c0f2"
 			},
 			"HassethDEFI": {
@@ -607,12 +607,12 @@
 			},
 			"TokenStateiCEX": {
 				"address": "0x791F9731E22cdfa858540F4738e09757E3c48254",
-				"status": "current",
+				"status": "deleted",
 				"keccak256": "0x6e250a86522d7b26ae0bf75338ce0a23ff357d0c91bdaa79d50341130dffd2dd"
 			},
 			"ProxyiCEX": {
 				"address": "0x805EE3F848383e7309648609cA2449bB2B16D6F8",
-				"status": "current",
+				"status": "deleted",
 				"keccak256": "0x18a038e2315820928c7d17fe96859add18e5f0ad4d957357cf3733d02082c0f2"
 			},
 			"HassetiCEX": {
@@ -622,12 +622,12 @@
 			},
 			"TokenStateiDEFI": {
 				"address": "0xd15d3f105eFFb9b2d4cBbC0b9589bCafBaD0843e",
-				"status": "current",
+				"status": "deleted",
 				"keccak256": "0x6e250a86522d7b26ae0bf75338ce0a23ff357d0c91bdaa79d50341130dffd2dd"
 			},
 			"ProxyiDEFI": {
 				"address": "0x9aFBCA7F31E2C8DCBdBf59f3c489774dD07D7400",
-				"status": "current",
+				"status": "deleted",
 				"keccak256": "0x18a038e2315820928c7d17fe96859add18e5f0ad4d957357cf3733d02082c0f2"
 			},
 			"HassetiDEFI": {
@@ -637,12 +637,12 @@
 			},
 			"TokenStatehFTSE": {
 				"address": "0x02C55d52814B81a74f34E44DC123CF4890052148",
-				"status": "current",
+				"status": "deleted",
 				"keccak256": "0x6e250a86522d7b26ae0bf75338ce0a23ff357d0c91bdaa79d50341130dffd2dd"
 			},
 			"ProxyhFTSE": {
 				"address": "0x59b8a63550403f008C0F662d7460D42A533C2354",
-				"status": "current",
+				"status": "deleted",
 				"keccak256": "0x18a038e2315820928c7d17fe96859add18e5f0ad4d957357cf3733d02082c0f2"
 			},
 			"HassethFTSE": {
@@ -652,12 +652,12 @@
 			},
 			"TokenStatehNIKKEI": {
 				"address": "0x463188bd258BD0cC9e5c9C791f69D88D9f7Ad6DA",
-				"status": "current",
+				"status": "deleted",
 				"keccak256": "0x6e250a86522d7b26ae0bf75338ce0a23ff357d0c91bdaa79d50341130dffd2dd"
 			},
 			"ProxyhNIKKEI": {
 				"address": "0x786b8BC345dBe08dBfB5A404a730219c50fa3e75",
-				"status": "current",
+				"status": "deleted",
 				"keccak256": "0x18a038e2315820928c7d17fe96859add18e5f0ad4d957357cf3733d02082c0f2"
 			},
 			"HassethNIKKEI": {

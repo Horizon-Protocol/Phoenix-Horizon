@@ -281,19 +281,7 @@
 	"HassetiXTZ": {
 		"deploy": false
 	},
-	"TokenStatehCEX": {
-		"deploy": false
-	},
-	"ProxyhCEX": {
-		"deploy": false
-	},
 	"HassethCEX": {
-		"deploy": false
-	},
-	"TokenStateiCEX": {
-		"deploy": false
-	},
-	"ProxyiCEX": {
 		"deploy": false
 	},
 	"HassetiCEX": {
@@ -380,37 +368,13 @@
 	"HassethADA": {
 		"deploy": false
 	},
-	"TokenStatehDEFI": {
-		"deploy": false
-	},
-	"ProxyhDEFI": {
-		"deploy": false
-	},
 	"HassethDEFI": {
-		"deploy": false
-	},
-	"TokenStateiDEFI": {
-		"deploy": false
-	},
-	"ProxyiDEFI": {
 		"deploy": false
 	},
 	"HassetiDEFI": {
 		"deploy": false
 	},
-	"TokenStatehFTSE": {
-		"deploy": false
-	},
-	"ProxyhFTSE": {
-		"deploy": false
-	},
 	"HassethFTSE": {
-		"deploy": false
-	},
-	"TokenStatehNIKKEI": {
-		"deploy": false
-	},
-	"ProxyhNIKKEI": {
 		"deploy": false
 	},
 	"HassethNIKKEI": {
