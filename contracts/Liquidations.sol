@@ -58,7 +58,7 @@ contract Liquidations is Owned, MixinResolver, MixinSystemSettings, ILiquidation
 
     /* ========== VIEWS ========== */
     function synthetix() internal view returns (ISynthetix) {
-        return ISynthetix(requireAndGetAddress(CONTRACT_SYNTHETIX, "Missing Synthetix address"));
+        return ISynthetix(requireAndGetAddress(CONTRACT_SYNTHETIX, "Missing Horizon address"));
     }
 
     function systemStatus() internal view returns (ISystemStatus) {

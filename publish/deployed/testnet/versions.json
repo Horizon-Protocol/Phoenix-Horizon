@@ -44,8 +44,9 @@
 			},
 			"ExchangeRates": {
 				"address": "0x5323A0625Ec5264125c2DF228e02e2d2b3E4200A",
-				"status": "current",
-				"keccak256": "0x9d77038021b9e08c08615fe55465f61ff08f2cb9451a322c133d6b6880ddedd4"
+				"status": "replaced",
+				"keccak256": "0x9d77038021b9e08c08615fe55465f61ff08f2cb9451a322c133d6b6880ddedd4",
+				"replaced_in": "v0.0.4-beta"
 			},
 			"RewardEscrow": {
 				"address": "0x3b1D35bF2DB19C2F5e52f8801cb3b23169ef7f6D",
@@ -134,13 +135,15 @@
 			},
 			"Exchanger": {
 				"address": "0xcBE53BB1d61A17a4E07d71d9833200D834a1C434",
-				"status": "current",
-				"keccak256": "0x1ca72154444fc49aa0d568da60ea3939346c271c9f3f5d223fc96664414f78ae"
+				"status": "replaced",
+				"keccak256": "0x1ca72154444fc49aa0d568da60ea3939346c271c9f3f5d223fc96664414f78ae",
+				"replaced_in": "v0.0.3-beta"
 			},
 			"ExchangeState": {
 				"address": "0x6857b7575cCA90Ccd55e62f9Ab333a77b5b3bca8",
-				"status": "current",
-				"keccak256": "0xab03df560c5772f6ffb929debfd9fc5d9be42b198410677c0d4d0ccdb4fc2720"
+				"status": "replaced",
+				"keccak256": "0xab03df560c5772f6ffb929debfd9fc5d9be42b198410677c0d4d0ccdb4fc2720",
+				"replaced_in": "v0.0.6-beta"
 			},
 			"Issuer": {
 				"address": "0xbDcaFdc9470B730fbAA7a07F1075E781A51Da8AD",
@@ -701,6 +704,69 @@
 				"address": "0x863F41D7cffDCaaD4475CC4B1C2A3c420484DbEa",
 				"status": "current",
 				"keccak256": "0x8528056d94154ff5b64be337f623ac32ac9876003cc61d87f524d50da4d3f5f9"
+			}
+		}
+	},
+	"v0.0.3-beta": {
+		"tag": "v0.0.3-beta",
+		"fulltag": "v0.0.3-beta",
+		"network": "testnet",
+		"date": "2020-12-18T11:12:27+08:00",
+		"commit": "19c8314bbee5ecad4d79f7304b1ff708c4eed097",
+		"contracts": {
+			"Exchanger": {
+				"address": "0x521B66c925424Ab695Db6c0014c7F282f36E2f3d",
+				"status": "current",
+				"keccak256": "0x0e740d746cbe9cad27edc968172ff00ee140d0395cf7b3ce05cb2b75dc6787e1"
+			}
+		}
+	},
+	"v0.0.4-beta": {
+		"tag": "v0.0.4-beta",
+		"fulltag": "v0.0.4-beta",
+		"network": "testnet",
+		"date": "2020-12-18T11:12:27+08:00",
+		"commit": "19c8314bbee5ecad4d79f7304b1ff708c4eed097",
+		"contracts": {
+			"ExchangeRates": {
+				"address": "0xB3936E14dbF87e492c3AD59eaB123942f58F7879",
+				"status": "replaced",
+				"keccak256": "0x286f09e804f3cf0f7c6e9fc2fcf772242b29336eca20396cce8cc689b2d6476f",
+				"replaced_in": "v0.0.5-beta"
+			}
+		}
+	},
+	"v0.0.5-beta": {
+		"tag": "v0.0.5-beta",
+		"fulltag": "v0.0.5-beta",
+		"network": "testnet",
+		"date": "2020-12-18T11:12:27+08:00",
+		"commit": "19c8314bbee5ecad4d79f7304b1ff708c4eed097",
+		"contracts": {
+			"ExchangeRates": {
+				"address": "0x840925Fd4B9a22A5FB220ebb908C05be05C52364",
+				"status": "replaced",
+				"keccak256": "0xcb8b19feba33fe880e486abe84e9dc7733c4f43b407c179e9833441b9898a3c0",
+				"replaced_in": "v0.0.6-beta"
+			}
+		}
+	},
+	"v0.0.6-beta": {
+		"tag": "v0.0.6-beta",
+		"fulltag": "v0.0.6-beta",
+		"network": "testnet",
+		"date": "2020-12-18T11:12:27+08:00",
+		"commit": "19c8314bbee5ecad4d79f7304b1ff708c4eed097",
+		"contracts": {
+			"ExchangeRates": {
+				"address": "0x44665e7D5ccA7095EE334F65B4468c83e7dF01A9",
+				"status": "current",
+				"keccak256": "0x35633c890216d1ff564b00faaf269f08e605c1982f59465744ef9cab4fc3dd4d"
+			},
+			"ExchangeState": {
+				"address": "0xD4744d95aaE2ca6eC323e593790e5a8f6561BfE8",
+				"status": "current",
+				"keccak256": "0xda95150d8c65707a9fe913da7e01186679e80612ebd59f059655da83144dc2bf"
 			}
 		}
 	}

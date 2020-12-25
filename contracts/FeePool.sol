@@ -545,7 +545,7 @@ contract FeePool is Owned, Proxyable, LimitedSetup, MixinResolver, MixinSystemSe
         }
 
         // And convert totalFees to hUSD
-        // Return totalRewards as is in SNX amount
+        // Return totalRewards as is in HZN amount
         return (totalFees, totalRewards);
     }
 

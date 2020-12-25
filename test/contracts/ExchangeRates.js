@@ -49,7 +49,7 @@ const createRandomKeysAndRates = quantity => {
 };
 
 contract('Exchange Rates', async accounts => {
-	const [deployerAccount, owner, oracle, accountOne, accountTwo] = accounts;
+	const [deployerAccount, owner, oracle, bandProtocolOracle, accountOne, accountTwo] = accounts;
 	const [HZN, hJPY, hXTZ, hBNB, hUSD, hEUR, hAUD, fastGasPrice] = [
 		'HZN',
 		'hJPY',
@@ -109,6 +109,7 @@ contract('Exchange Rates', async accounts => {
 				'freezeRate',
 				'removeAggregator',
 				'removeInversePricing',
+				'setBandProtocolOracle', // new oracle
 				'setInversePricing',
 				'setOracle',
 				'updateRates',
@@ -465,6 +466,41 @@ contract('Exchange Rates', async accounts => {
 			assert.eventEqual(txn, 'OracleUpdated', {
 				newOracle: accountOne,
 			});
+		});
+	});
+
+	// new oracle BandProtocolOracleUpdated
+	// TODO link oracle test-case
+	describe('setBandProtocolOracle()', () => {
+		it("only the owner should be able to change the bandProtocolOracle's address", async () => {
+			await onlyGivenAddressCanInvoke({
+				fnc: instance.setBandProtocolOracle,
+				args: [bandProtocolOracle],
+				address: owner,
+				accounts,
+				skipPassCheck: true,
+			});
+
+			await instance.setBandProtocolOracle(accountOne, { from: owner });
+
+			assert.equal(await instance.bandProtocolOracle.call(), accountOne);
+			assert.notEqual(await instance.bandProtocolOracle.call(), bandProtocolOracle);
+		});
+
+		it('should emit event on successful bandProtocolOracle address update', async () => {
+			// Ensure bandProtocolOracle is set to bandProtocolOracle address originally
+			await instance.setBandProtocolOracle(bandProtocolOracle, { from: owner });
+			assert.equal(await instance.bandProtocolOracle.call(), bandProtocolOracle);
+
+			const txn = await instance.setBandProtocolOracle(accountOne, { from: owner });
+			assert.eventEqual(txn, 'BandProtocolOracleUpdated', {
+				newBandProtocolOracle: accountOne,
+			});
+		});
+
+		it('remove bandProtocolOracle address', async () => {
+			await instance.setBandProtocolOracle(ZERO_ADDRESS, { from: owner });
+			assert.equal(await instance.bandProtocolOracle.call(), ZERO_ADDRESS);
 		});
 	});
 

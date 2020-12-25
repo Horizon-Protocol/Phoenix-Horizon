@@ -1,4 +1,5 @@
 pragma solidity ^0.5.16;
+pragma experimental ABIEncoderV2;
 
 // Inheritance
 import "./Owned.sol";
@@ -17,16 +18,38 @@ import "@chainlink/contracts-0.0.10/src/v0.5/interfaces/FlagsInterface.sol";
 import "./interfaces/IExchanger.sol";
 
 
+interface IStdReference {
+    // A structure returned whenever someone requests for standard reference data.
+    struct ReferenceData {
+        uint256 rate; // base/quote exchange rate, multiplied by 1e18.
+        uint256 lastUpdatedBase; // UNIX epoch of the last time when base price gets updated.
+        uint256 lastUpdatedQuote; // UNIX epoch of the last time when quote price gets updated.
+    }
+
+    // Returns the price data for the given base/quote pair. Revert if not available.
+    function getReferenceData(string calldata _base, string calldata _quote) external view returns (ReferenceData memory);
+
+    // Similar to getReferenceData, but with multiple base/quote pairs at once.
+    function getReferenceDataBulk(string[] calldata _bases, string[] calldata _quotes)
+        external
+        view
+        returns (ReferenceData[] memory);
+}
+
+
 // https://docs.synthetix.io/contracts/source/contracts/exchangerates
 contract ExchangeRates is Owned, MixinResolver, MixinSystemSettings, IExchangeRates {
     using SafeMath for uint;
     using SafeDecimalMath for uint;
 
-    // Exchange rates and update times stored by currency code, e.g. 'SNX', or 'hUSD'
+    // Exchange rates and update times stored by currency code, e.g. 'HZN', or 'hUSD'
     mapping(bytes32 => mapping(uint => RateAndUpdatedTime)) private _rates;
 
     // The address of the oracle which pushes rate updates to this contract
     address public oracle;
+
+    // The address of the BandProtocol address
+    IStdReference public bandProtocolOracle;
 
     // Decentralized oracle networks that feed into pricing aggregators
     mapping(bytes32 => AggregatorV2V3Interface) public aggregators;
@@ -46,6 +69,11 @@ contract ExchangeRates is Owned, MixinResolver, MixinSystemSettings, IExchangeRa
     mapping(bytes32 => uint) public currentRoundForRate;
 
     mapping(bytes32 => uint) public roundFrozen;
+
+    /* ========== ENCODED NAMES ========== */
+    bytes32 private constant HZN = "HZN";
+    // TODO use SNX as HZN's price at testnet
+    bytes32 private constant SNX = "SNX";
 
     /* ========== ADDRESS RESOLVER CONFIGURATION ========== */
     bytes32 private constant CONTRACT_EXCHANGER = "Exchanger";
@@ -77,6 +105,11 @@ contract ExchangeRates is Owned, MixinResolver, MixinSystemSettings, IExchangeRa
     function setOracle(address _oracle) external onlyOwner {
         oracle = _oracle;
         emit OracleUpdated(oracle);
+    }
+
+    function setBandProtocolOracle(IStdReference _bandProtocolOracle) external onlyOwner {
+        bandProtocolOracle = _bandProtocolOracle;
+        emit BandProtocolOracleUpdated(bandProtocolOracle);
     }
 
     /* ========== MUTATIVE FUNCTIONS ========== */
@@ -447,19 +480,24 @@ contract ExchangeRates is Owned, MixinResolver, MixinSystemSettings, IExchangeRa
     }
 
     function getFlagsForRates(bytes32[] memory currencyKeys) internal view returns (bool[] memory flagList) {
-        FlagsInterface _flags = FlagsInterface(getAggregatorWarningFlags());
+        // FlagsInterface _flags = FlagsInterface(getAggregatorWarningFlags());
 
-        // fetch all flags at once
-        if (_flags != FlagsInterface(0)) {
-            address[] memory _aggregators = new address[](currencyKeys.length);
+        // // fetch all flags at once
+        // if (_flags != FlagsInterface(0)) {
+        //     address[] memory _aggregators = new address[](currencyKeys.length);
 
-            for (uint i = 0; i < currencyKeys.length; i++) {
-                _aggregators[i] = address(aggregators[currencyKeys[i]]);
-            }
+        //     for (uint i = 0; i < currencyKeys.length; i++) {
+        //         _aggregators[i] = address(aggregators[currencyKeys[i]]);
+        //     }
 
-            flagList = _flags.getFlags(_aggregators);
-        } else {
-            flagList = new bool[](currencyKeys.length);
+        //     flagList = _flags.getFlags(_aggregators);
+        // } else {
+        //     flagList = new bool[](currencyKeys.length);
+        // }
+        // set all currency flag to true
+        flagList = new bool[](currencyKeys.length);
+        for (uint i = 0; i < currencyKeys.length; i++) {
+            flagList[i] = true;
         }
     }
 
@@ -573,36 +611,71 @@ contract ExchangeRates is Owned, MixinResolver, MixinSystemSettings, IExchangeRa
         }
     }
 
-    function _formatAggregatorAnswer(bytes32 currencyKey, int256 rate) internal view returns (uint) {
+    function _formatAggregatorAnswer(bytes32 currencyKey, uint256 rate) internal view returns (uint) {
         require(rate >= 0, "Negative rate not supported");
-        if (currencyKeyDecimals[currencyKey] > 0) {
-            uint multiplier = 10**uint(SafeMath.sub(18, currencyKeyDecimals[currencyKey]));
-            return uint(uint(rate).mul(multiplier));
-        }
+        // if (currencyKeyDecimals[currencyKey] > 0) {
+        //     uint multiplier = 10**uint(SafeMath.sub(18, 0));
+        //     uint multiplier = 10**uint(SafeMath.sub(18, currencyKeyDecimals[currencyKey]));
+        //     return uint(uint(rate).mul(multiplier));
+        // }
         return uint(rate);
     }
 
+    function bytes32ToString(bytes32 _bytes32, uint8 offset) public pure returns (string memory) {
+        uint8 i = 0;
+        while (i < 32 && _bytes32[i] != 0) {
+            i++;
+        }
+        bytes memory bytesArray = new bytes(i - offset);
+        for (i = 0 + offset; i < 32 && _bytes32[i] != 0; i++) {
+            bytesArray[i - offset] = _bytes32[i];
+        }
+        return string(bytesArray);
+    }
+
     function _getRateAndUpdatedTime(bytes32 currencyKey) internal view returns (RateAndUpdatedTime memory) {
-        AggregatorV2V3Interface aggregator = aggregators[currencyKey];
+        // AggregatorV2V3Interface aggregator = aggregators[currencyKey];
+        //
+        // if (aggregator != AggregatorV2V3Interface(0)) {
+        //     // this view from the aggregator is the most gas efficient but it can throw when there's no data,
+        //     // so let's call it low-level to suppress any reverts
+        //     bytes memory payload = abi.encodeWithSignature("latestRoundData()");
+        //     // solhint-disable avoid-low-level-calls
+        //     (bool success, bytes memory returnData) = address(aggregator).staticcall(payload);
+        //
+        //     if (success) {
+        //         (uint80 roundId, int256 answer, , uint256 updatedAt, ) = abi.decode(
+        //             returnData,
+        //             (uint80, int256, uint256, uint256, uint80)
+        //         );
+        //         return
+        //             RateAndUpdatedTime({
+        //                 rate: uint216(_rateOrInverted(currencyKey, _formatAggregatorAnswer(currencyKey, answer), roundId)),
+        //                 time: uint40(updatedAt)
+        //             });
+        //     }
+        // } else {
 
-        if (aggregator != AggregatorV2V3Interface(0)) {
-            // this view from the aggregator is the most gas efficient but it can throw when there's no data,
-            // so let's call it low-level to suppress any reverts
-            bytes memory payload = abi.encodeWithSignature("latestRoundData()");
-            // solhint-disable avoid-low-level-calls
-            (bool success, bytes memory returnData) = address(aggregator).staticcall(payload);
-
-            if (success) {
-                (uint80 roundId, int256 answer, , uint256 updatedAt, ) = abi.decode(
-                    returnData,
-                    (uint80, int256, uint256, uint256, uint80)
-                );
-                return
-                    RateAndUpdatedTime({
-                        rate: uint216(_rateOrInverted(currencyKey, _formatAggregatorAnswer(currencyKey, answer), roundId)),
-                        time: uint40(updatedAt)
-                    });
+        // TODO change HZN Token's price feed for testnet
+        if (bandProtocolOracle != IStdReference(0) && currencyKey != HZN) {
+            // remove asset prefix
+            uint8 offset = 1;
+            // pass remove prefix for HZN currencyKey
+            if (currencyKey == HZN) {
+                currencyKey = SNX;
+                offset = 0;
             }
+            string memory stringCurrencyKey = bytes32ToString(currencyKey, offset);
+            IStdReference.ReferenceData memory answer = bandProtocolOracle.getReferenceData(stringCurrencyKey, "USD");
+            uint256 updatedAt = answer.lastUpdatedBase >= answer.lastUpdatedQuote
+                ? answer.lastUpdatedBase
+                : answer.lastUpdatedQuote;
+            uint roundId = currentRoundForRate[currencyKey];
+            return
+                RateAndUpdatedTime({
+                    rate: uint216(_rateOrInverted(currencyKey, _formatAggregatorAnswer(currencyKey, answer.rate), roundId)),
+                    time: uint40(updatedAt)
+                });
         } else {
             uint roundId = currentRoundForRate[currencyKey];
             RateAndUpdatedTime memory entry = _rates[currencyKey][roundId];
@@ -622,26 +695,24 @@ contract ExchangeRates is Owned, MixinResolver, MixinSystemSettings, IExchangeRa
     }
 
     function _getRateAndTimestampAtRound(bytes32 currencyKey, uint roundId) internal view returns (uint rate, uint time) {
-        AggregatorV2V3Interface aggregator = aggregators[currencyKey];
+        // AggregatorV2V3Interface aggregator = aggregators[currencyKey];
 
-        if (aggregator != AggregatorV2V3Interface(0)) {
-            // this view from the aggregator is the most gas efficient but it can throw when there's no data,
-            // so let's call it low-level to suppress any reverts
-            bytes memory payload = abi.encodeWithSignature("getRoundData(uint80)", roundId);
-            // solhint-disable avoid-low-level-calls
-            (bool success, bytes memory returnData) = address(aggregator).staticcall(payload);
+        // if (aggregator != AggregatorV2V3Interface(0)) {
+        //     // this view from the aggregator is the most gas efficient but it can throw when there's no data,
+        //     // so let's call it low-level to suppress any reverts
+        //     bytes memory payload = abi.encodeWithSignature("getRoundData(uint80)", roundId);
+        //     // solhint-disable avoid-low-level-calls
+        //     (bool success, bytes memory returnData) = address(aggregator).staticcall(payload);
 
-            if (success) {
-                (, int256 answer, , uint256 updatedAt, ) = abi.decode(
-                    returnData,
-                    (uint80, int256, uint256, uint256, uint80)
-                );
-                return (_rateOrInverted(currencyKey, _formatAggregatorAnswer(currencyKey, answer), roundId), updatedAt);
-            }
-        } else {
-            RateAndUpdatedTime memory update = _rates[currencyKey][roundId];
-            return (_rateOrInverted(currencyKey, update.rate, roundId), update.time);
-        }
+        //     if (success) {
+        //         (, int256 answer, , uint256 updatedAt, ) = abi.decode(
+        //             returnData,
+        //             (uint80, int256, uint256, uint256, uint80)
+        //         );
+        //         return (_rateOrInverted(currencyKey, _formatAggregatorAnswer(currencyKey, answer), roundId), updatedAt);
+        //     }
+        RateAndUpdatedTime memory update = _rates[currencyKey][roundId];
+        return (_rateOrInverted(currencyKey, update.rate, roundId), update.time);
     }
 
     function _getRate(bytes32 currencyKey) internal view returns (uint256) {
@@ -717,6 +788,7 @@ contract ExchangeRates is Owned, MixinResolver, MixinSystemSettings, IExchangeRa
     /* ========== EVENTS ========== */
 
     event OracleUpdated(address newOracle);
+    event BandProtocolOracleUpdated(IStdReference newBandProtocolOracle);
     event RatesUpdated(bytes32[] currencyKeys, uint[] newRates);
     event RateDeleted(bytes32 currencyKey);
     event InversePriceConfigured(bytes32 currencyKey, uint entryPoint, uint upperLimit, uint lowerLimit);

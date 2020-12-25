@@ -12,21 +12,7 @@ const { ensureNetwork, loadConnections, stringify } = require('../util');
 // The block where Synthetix first had SIP-37 added (when ExchangeState was added)
 const fromBlockMap = {
 	// these were from when ExchangeState was first deployed (SIP-37)
-	// kovan: 16814289,
-	// rinkeby: 6001476,
-	// ropsten: 7363114,
-	// mainnet: 9518299,
-
-	// blocks from the Acrux deploy (everything prior to this has been settled)
-	// kovan: 19220640,
-	// rinkeby: 6750628,
-	ropsten: 8195362,
-	// mainnet: 10364175,
-
-	// blocks from the Pollux deploy
-	kovan: 20528323,
-	rinkeby: 7100439,
-	// Note: ropsten was not settled. Needs to be done after https://github.com/Synthetixio/synthetix/pull/699
+	testnet: 4573446,
 	mainnet: 10772929,
 };
 
@@ -85,10 +71,10 @@ const settle = async ({
 
 	if (balance < '0.1') {
 		if (dryRun) {
-			console.log(green('[DRY RUN] Sending'), yellow(ethToSeed), green('ETH to address'));
+			console.log(green('[DRY RUN] Sending'), yellow(ethToSeed), green('BNB to address'));
 		} else {
 			console.log(
-				green(`Sending ${yellow(ethToSeed)} ETH to address from`),
+				green(`Sending ${yellow(ethToSeed)} BNB to address from`),
 				yellow(deployer.address)
 			);
 			const { transactionHash } = await web3.eth.sendTransaction({
@@ -191,7 +177,7 @@ const settle = async ({
 								.effectiveValue(
 									toCurrencyKey,
 									reclaimAmount > rebateAmount ? reclaimAmount.toString() : rebateAmount.toString(),
-									toBytes32('sUSD')
+									toBytes32('hUSD')
 								)
 								.call(blockNumber)
 					  )
