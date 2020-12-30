@@ -32,7 +32,7 @@ contract RewardEscrow is Owned, IRewardEscrow {
     /* An account's total vested reward synthetix. */
     mapping(address => uint) public totalVestedAccountBalance;
 
-    /* The total remaining escrowed balance, for verifying the actual synthetix balance of this contract against. */
+    /* The total remaining escrowed balance, for verifying the actual horizon balance of this contract against. */
     uint public totalEscrowedBalance;
 
     uint internal constant TIME_INDEX = 0;
@@ -213,7 +213,7 @@ contract RewardEscrow is Owned, IRewardEscrow {
      * Note; although this function could technically be used to produce unbounded
      * arrays, it's only withinn the 4 year period of the weekly inflation schedule.
      * @param account The account to append a new vesting entry to.
-     * @param quantity The quantity of SNX that will be escrowed.
+     * @param quantity The quantity of HZN that will be escrowed.
      */
     function appendVestingEntry(address account, uint quantity) external onlyFeePool {
         _appendVestingEntry(account, quantity);

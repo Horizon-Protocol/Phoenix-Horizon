@@ -15,7 +15,7 @@ const {
 const DEFAULTS = {
 	gasPrice: '1',
 	gasLimit: 1.5e6, // 1.5m
-	network: 'kovan',
+	network: 'testnet',
 };
 
 const {

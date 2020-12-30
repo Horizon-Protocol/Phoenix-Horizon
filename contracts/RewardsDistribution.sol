@@ -160,10 +160,10 @@ contract RewardsDistribution is Owned, IRewardsDistribution {
             if (distributions[i].destination != address(0) || distributions[i].amount != 0) {
                 remainder = remainder.sub(distributions[i].amount);
 
-                // Transfer the SNX
+                // Transfer the HZN
                 IERC20(synthetixProxy).transfer(distributions[i].destination, distributions[i].amount);
 
-                // If the contract implements RewardsDistributionRecipient.sol, inform it how many SNX its received.
+                // If the contract implements RewardsDistributionRecipient.sol, inform it how many HZN its received.
                 bytes memory payload = abi.encodeWithSignature("notifyRewardAmount(uint256)", distributions[i].amount);
 
                 // solhint-disable avoid-low-level-calls

@@ -496,9 +496,6 @@ contract ExchangeRates is Owned, MixinResolver, MixinSystemSettings, IExchangeRa
         // }
         // set all currency flag to true
         flagList = new bool[](currencyKeys.length);
-        for (uint i = 0; i < currencyKeys.length; i++) {
-            flagList[i] = true;
-        }
     }
 
     function _setRate(

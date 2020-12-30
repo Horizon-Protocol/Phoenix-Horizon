@@ -235,12 +235,12 @@ contract FeePool is Owned, Proxyable, LimitedSetup, MixinResolver, MixinSystemSe
     }
 
     /**
-     * @notice The RewardsDistribution contract informs us how many SNX rewards are sent to RewardEscrow to be claimed.
+     * @notice The RewardsDistribution contract informs us how many HZN rewards are sent to RewardEscrow to be claimed.
      */
     function setRewardsToDistribute(uint amount) external {
         address rewardsAuthority = address(rewardsDistribution());
         require(messageSender == rewardsAuthority || msg.sender == rewardsAuthority, "Caller is not rewardsAuthority");
-        // Add the amount of SNX rewards to distribute on top of any rolling unclaimed amount
+        // Add the amount of HZN rewards to distribute on top of any rolling unclaimed amount
         _recentFeePeriodsStorage(0).rewardsToDistribute = _recentFeePeriodsStorage(0).rewardsToDistribute.add(amount);
     }
 
@@ -287,9 +287,7 @@ contract FeePool is Owned, Proxyable, LimitedSetup, MixinResolver, MixinSystemSe
     /**
      * @notice Claim fees for last period when available or not already withdrawn.
      */
-    function claimFees() external issuanceActive optionalProxy returns (bool) {
-        return _claimFees(messageSender);
-    }
+    function claimFees() external issuanceActive optionalProxy returns (bool) {}
 
     /**
      * @notice Delegated claimFees(). Call from the deletegated address
@@ -376,7 +374,7 @@ contract FeePool is Owned, Proxyable, LimitedSetup, MixinResolver, MixinSystemSe
     }
 
     /**
-     * @notice Owner can escrow SNX. Owner to send the tokens to the RewardEscrow
+     * @notice Owner can escrow HZN. Owner to send the tokens to the RewardEscrow
      * @param account Address to escrow tokens for
      * @param quantity Amount of tokens to escrow
      */

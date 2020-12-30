@@ -21,7 +21,7 @@ contract SynthetixEscrow is Owned, LimitedSetup(8 weeks), IHasBalance {
     ISynthetix public synthetix;
 
     /* Lists of (timestamp, quantity) pairs per account, sorted in ascending time order.
-     * These are the times at which each given quantity of SNX vests. */
+     * These are the times at which each given quantity of HZN vests. */
     mapping(address => uint[2][]) public vestingSchedules;
 
     /* An account's total vested synthetix balance to save recomputing this for fee extraction purposes. */
@@ -102,7 +102,7 @@ contract SynthetixEscrow is Owned, LimitedSetup(8 weeks), IHasBalance {
 
     /**
      * @notice Obtain the next schedule entry that will vest for a given user.
-     * @return A pair of uints: (timestamp, synthetix quantity). */
+     * @return A pair of uints: (timestamp, horizon quantity). */
     function getNextVestingEntry(address account) public view returns (uint[2] memory) {
         uint index = getNextVestingIndex(account);
         if (index == numVestingEntries(account)) {
