@@ -1,6 +1,6 @@
 {
 	"name": "@phoenix-global/horizon",
-	"version": "2.33.5",
+	"version": "2.33.6",
 	"license": "MIT",
 	"author": "Horizon",
 	"description": "The smart contracts which make up the Horizon system. (phoenix.global)",
