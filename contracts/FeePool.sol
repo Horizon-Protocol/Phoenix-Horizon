@@ -287,7 +287,9 @@ contract FeePool is Owned, Proxyable, LimitedSetup, MixinResolver, MixinSystemSe
     /**
      * @notice Claim fees for last period when available or not already withdrawn.
      */
-    function claimFees() external issuanceActive optionalProxy returns (bool) {}
+    function claimFees() external issuanceActive optionalProxy returns (bool) {
+        return _claimFees(messageSender);
+    }
 
     /**
      * @notice Delegated claimFees(). Call from the deletegated address
