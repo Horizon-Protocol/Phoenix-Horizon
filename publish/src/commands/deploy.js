@@ -894,26 +894,14 @@ const deploy = async ({
 	if (config['Synthetix'].deploy || config['SynthetixEscrow'].deploy) {
 		// Note: currently on mainnet SynthetixEscrow.methods.synthetix() does NOT exist
 		// it is "havven" and the ABI we have here is not sufficient
-		// TODO new `mainnet` should change this
-		if (network === 'mainnet') {
-			await runStep({
-				contract: 'SynthetixEscrow',
-				target: synthetixEscrow,
-				read: 'havven',
-				expected: input => input === addressOf(proxyERC20Synthetix),
-				write: 'setHavven',
-				writeArg: addressOf(proxyERC20Synthetix),
-			});
-		} else {
-			await runStep({
-				contract: 'SynthetixEscrow',
-				target: synthetixEscrow,
-				read: 'synthetix',
-				expected: input => input === addressOf(proxyERC20Synthetix),
-				write: 'setSynthetix',
-				writeArg: addressOf(proxyERC20Synthetix),
-			});
-		}
+		await runStep({
+			contract: 'SynthetixEscrow',
+			target: synthetixEscrow,
+			read: 'synthetix',
+			expected: input => input === addressOf(proxyERC20Synthetix),
+			write: 'setSynthetix',
+			writeArg: addressOf(proxyERC20Synthetix),
+		});
 	}
 
 	// ----------------
@@ -937,8 +925,8 @@ const deploy = async ({
 		// Legacy proxy will be around until May 30, 2020
 		// https://docs.synthetix.io/integrations/guide/#proxy-deprecation
 		// Until this time, on mainnet we will still deploy ProxyERC20sUSD and ensure that
-		// HassethUSD.proxy is ProxyERC20hUSD, HassethUSD.integrationProxy is ProxyhUSD
-		const synthProxyIsLegacy = currencyKey === 'hUSD' && network === 'mainnet';
+		// HassetzUSD.proxy is ProxyERC20zUSD, HassetzUSD.integrationProxy is ProxyzUSD
+		const synthProxyIsLegacy = currencyKey === 'zUSD' && network === 'mainnet';
 
 		const proxyForSynth = await deployer.deployContract({
 			name: `Proxy${currencyKey}`,
@@ -949,7 +937,7 @@ const deploy = async ({
 
 		// additionally deploy an ERC20 proxy for the hasset if it's legacy (hUSD)
 		let proxyERC20ForSynth;
-		if (currencyKey === 'hUSD') {
+		if (currencyKey === 'zUSD') {
 			proxyERC20ForSynth = await deployer.deployContract({
 				name: `ProxyERC20${currencyKey}`,
 				source: `ProxyERC20`,
@@ -979,8 +967,8 @@ const deploy = async ({
 
 		// MultiCollateral needs additionalConstructorArgs to be ordered
 		const additionalConstructorArgsMap = {
-			MultiCollateralSynthhBNB: [toBytes32('EtherCollateral')],
-			MultiCollateralSynthhUSD: [toBytes32('EtherCollateralsUSD')],
+			MultiCollateralSynthzBNB: [toBytes32('EtherCollateral')],
+			MultiCollateralSynthzUSD: [toBytes32('EtherCollateralsUSD')],
 			// future subclasses...
 			// future specific synths args...
 		};
@@ -1093,7 +1081,7 @@ const deploy = async ({
 
 	await deployer.deployContract({
 		name: 'Depot',
-		deps: ['ProxySynthetix', 'HassethUSD', 'FeePool'],
+		deps: ['ProxySynthetix', 'HassetzUSD', 'FeePool'],
 		args: [account, account, addressOf(readProxyForResolver)],
 	});
 

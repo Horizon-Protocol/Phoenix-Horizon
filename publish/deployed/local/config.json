@@ -98,37 +98,13 @@
 	"DappMaintenance": {
 		"deploy": true
 	},
-	"HassethUSD": {
-		"deploy": true
-	},
-	"HassethEUR": {
-		"deploy": true
-	},
-	"HassethJPY": {
-		"deploy": true
-	},
-	"HassethAUD": {
-		"deploy": true
-	},
-	"HassethGBP": {
-		"deploy": true
-	},
-	"HassethCHF": {
-		"deploy": true
-	},
-	"HassethXAU": {
-		"deploy": true
-	},
-	"HassethXAG": {
-		"deploy": true
-	},
-	"HassethBTC": {
+	"HassetzUSD": {
 		"deploy": true
 	},
 	"ProxyERC20": {
 		"deploy": true
 	},
-	"ProxyERC20hUSD": {
+	"ProxyERC20zUSD": {
 		"deploy": true
 	},
 	"ProxyFeePool": {
@@ -137,31 +113,7 @@
 	"ProxySynthetix": {
 		"deploy": true
 	},
-	"ProxyhUSD": {
-		"deploy": true
-	},
-	"ProxyhEUR": {
-		"deploy": true
-	},
-	"ProxyhJPY": {
-		"deploy": true
-	},
-	"ProxyhAUD": {
-		"deploy": true
-	},
-	"ProxyhGBP": {
-		"deploy": true
-	},
-	"ProxyhCHF": {
-		"deploy": true
-	},
-	"ProxyhXAU": {
-		"deploy": true
-	},
-	"ProxyhXAG": {
-		"deploy": true
-	},
-	"ProxyhBTC": {
+	"ProxyzUSD": {
 		"deploy": true
 	},
 	"SafeDecimalMath": {
@@ -173,247 +125,16 @@
 	"TokenStateSynthetix": {
 		"deploy": true
 	},
-	"TokenStatehUSD": {
+	"TokenStatezUSD": {
 		"deploy": true
 	},
-	"TokenStatehEUR": {
+	"TokenStatezBNB": {
 		"deploy": true
 	},
-	"TokenStatehJPY": {
+	"ProxyzBNB": {
 		"deploy": true
 	},
-	"TokenStatehAUD": {
-		"deploy": true
-	},
-	"TokenStatehGBP": {
-		"deploy": true
-	},
-	"TokenStatehCHF": {
-		"deploy": true
-	},
-	"TokenStatehXAU": {
-		"deploy": true
-	},
-	"TokenStatehXAG": {
-		"deploy": true
-	},
-	"TokenStatehBTC": {
-		"deploy": true
-	},
-	"TokenStatehETH": {
-		"deploy": true
-	},
-	"ProxyhETH": {
-		"deploy": true
-	},
-	"HassethETH": {
-		"deploy": true
-	},
-	"TokenStatehBNB": {
-		"deploy": true
-	},
-	"ProxyhBNB": {
-		"deploy": true
-	},
-	"HassethBNB": {
-		"deploy": true
-	},
-	"TokenStatehTRX": {
-		"deploy": true
-	},
-	"ProxyhTRX": {
-		"deploy": true
-	},
-	"HassethTRX": {
-		"deploy": true
-	},
-	"TokenStatehXTZ": {
-		"deploy": true
-	},
-	"ProxyhXTZ": {
-		"deploy": true
-	},
-	"HassethXTZ": {
-		"deploy": true
-	},
-	"TokenStateiBTC": {
-		"deploy": true
-	},
-	"ProxyiBTC": {
-		"deploy": true
-	},
-	"HassetiBTC": {
-		"deploy": true
-	},
-	"TokenStateiETH": {
-		"deploy": true
-	},
-	"ProxyiETH": {
-		"deploy": true
-	},
-	"HassetiETH": {
-		"deploy": true
-	},
-	"TokenStateiBNB": {
-		"deploy": true
-	},
-	"ProxyiBNB": {
-		"deploy": true
-	},
-	"HassetiBNB": {
-		"deploy": true
-	},
-	"TokenStateiTRX": {
-		"deploy": true
-	},
-	"ProxyiTRX": {
-		"deploy": true
-	},
-	"HassetiTRX": {
-		"deploy": true
-	},
-	"TokenStateiXTZ": {
-		"deploy": true
-	},
-	"ProxyiXTZ": {
-		"deploy": true
-	},
-	"HassetiXTZ": {
-		"deploy": true
-	},
-	"TokenStatehCEX": {
-		"deploy": true
-	},
-	"ProxyhCEX": {
-		"deploy": true
-	},
-	"HassethCEX": {
-		"deploy": true
-	},
-	"TokenStateiCEX": {
-		"deploy": true
-	},
-	"ProxyiCEX": {
-		"deploy": true
-	},
-	"HassetiCEX": {
-		"deploy": true
-	},
-	"TokenStatehXRP": {
-		"deploy": true
-	},
-	"ProxyhXRP": {
-		"deploy": true
-	},
-	"HassethXRP": {
-		"deploy": true
-	},
-	"TokenStatehLTC": {
-		"deploy": true
-	},
-	"ProxyhLTC": {
-		"deploy": true
-	},
-	"HassethLTC": {
-		"deploy": true
-	},
-	"TokenStatehLINK": {
-		"deploy": true
-	},
-	"ProxyhLINK": {
-		"deploy": true
-	},
-	"HassethLINK": {
-		"deploy": true
-	},
-	"TokenStatehEOS": {
-		"deploy": true
-	},
-	"ProxyhEOS": {
-		"deploy": true
-	},
-	"HassethEOS": {
-		"deploy": true
-	},
-	"TokenStatehBCH": {
-		"deploy": true
-	},
-	"ProxyhBCH": {
-		"deploy": true
-	},
-	"HassethBCH": {
-		"deploy": true
-	},
-	"TokenStatehETC": {
-		"deploy": true
-	},
-	"ProxyhETC": {
-		"deploy": true
-	},
-	"HassethETC": {
-		"deploy": true
-	},
-	"TokenStatehDASH": {
-		"deploy": true
-	},
-	"ProxyhDASH": {
-		"deploy": true
-	},
-	"HassethDASH": {
-		"deploy": true
-	},
-	"TokenStatehXMR": {
-		"deploy": true
-	},
-	"ProxyhXMR": {
-		"deploy": true
-	},
-	"HassethXMR": {
-		"deploy": true
-	},
-	"TokenStatehADA": {
-		"deploy": true
-	},
-	"ProxyhADA": {
-		"deploy": true
-	},
-	"HassethADA": {
-		"deploy": true
-	},
-	"TokenStatehDEFI": {
-		"deploy": true
-	},
-	"ProxyhDEFI": {
-		"deploy": true
-	},
-	"HassethDEFI": {
-		"deploy": true
-	},
-	"TokenStateiDEFI": {
-		"deploy": true
-	},
-	"ProxyiDEFI": {
-		"deploy": true
-	},
-	"HassetiDEFI": {
-		"deploy": true
-	},
-	"TokenStatehFTSE": {
-		"deploy": true
-	},
-	"ProxyhFTSE": {
-		"deploy": true
-	},
-	"HassethFTSE": {
-		"deploy": true
-	},
-	"TokenStatehNIKKEI": {
-		"deploy": true
-	},
-	"ProxyhNIKKEI": {
-		"deploy": true
-	},
-	"HassethNIKKEI": {
+	"HassetzBNB": {
 		"deploy": true
 	}
 }

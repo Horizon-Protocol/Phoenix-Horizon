@@ -52,7 +52,7 @@ class Deployer {
 
 		if (useFork) {
 			this.web3.eth.defaultAccount = getUsers({ network, user: 'owner' }).address; // protocolDAO
-		} else if (network === 'local') {
+		} else if (!privateKey && network === 'local') {
 			// Deterministic account #0 when using `npx buidler node`
 			this.web3.eth.defaultAccount = '0xc783df8a850f42e7F7e57013759C285caa701eB6';
 		} else {
@@ -102,6 +102,12 @@ class Deployer {
 
 		const compiled = this.compiled[source];
 
+		if (!compiled) {
+			throw new Error(
+				`No compiled source for: ${name}. The source file is set to ${source}.sol - is that correct?`
+			);
+		}
+
 		if (!this.ignoreSafetyChecks) {
 			const compilerVersion = compiled.metadata.compiler.version;
 			const compiledForOvm = compiled.metadata.compiler.version.includes('ovm');
@@ -124,12 +130,6 @@ class Deployer {
 			: '';
 		const existingABI = this.deployment.sources[source] ? this.deployment.sources[source].abi : '';
 
-		if (!compiled) {
-			throw new Error(
-				`No compiled source for: ${name}. The source file is set to ${source}.sol - is that correct?`
-			);
-		}
-
 		// Any contract after SafeDecimalMath can automatically get linked.
 		// Doing this with bytecode that doesn't require the library is a no-op.
 		let bytecode = compiled.evm.bytecode.object;
@@ -148,7 +148,9 @@ class Deployer {
 		let deployedContract;
 
 		if (deploy) {
-			console.log(gray(` - Attempting to deploy ${name}`));
+			console.log(
+				gray(` - Attempting to deploy ${name}${name !== source ? ` (with source ${source})` : ''}`)
+			);
 			let gasUsed;
 			if (dryRun) {
 				this._dryRunCounter++;
@@ -258,6 +260,20 @@ class Deployer {
 		force = false,
 		dryRun = this.dryRun,
 	}) {
+		const forbiddenAddress = (this.deployedContracts['AddressResolver'] || { options: {} }).options
+			.address;
+		for (const arg of args) {
+			if (
+				forbiddenAddress &&
+				typeof arg === 'string' &&
+				arg.toLowerCase() === forbiddenAddress.toLowerCase()
+			) {
+				throw Error(
+					`new ${name}(): Cannot use the AddressResolver as a constructor arg. Use ReadProxyForResolver instead.`
+				);
+			}
+		}
+
 		// Deploys contract according to configuration
 		const deployedContract = await this._deploy({ name, source, args, deps, force, dryRun });
 

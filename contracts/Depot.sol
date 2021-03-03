@@ -55,15 +55,15 @@ contract Depot is Owned, Pausable, ReentrancyGuard, MixinResolver, IDepot {
     // The ending index of our queue exclusive
     uint public depositEndIndex;
 
-    /* This is a convenience variable so users and dApps can just query how much hUSD
+    /* This is a convenience variable so users and dApps can just query how much zUSD
        we have available for purchase without having to iterate the mapping with a
        O(n) amount of calls for something we'll probably want to display quite regularly. */
     uint public totalSellableDeposits;
 
-    // The minimum amount of hUSD required to enter the FiFo queue
+    // The minimum amount of zUSD required to enter the FiFo queue
     uint public minimumDepositAmount = 50 * SafeDecimalMath.unit();
 
-    // A cap on the amount of hUSD you can buy with BNB in 1 transaction
+    // A cap on the amount of zUSD you can buy with BNB in 1 transaction
     uint public maxEthPurchase = 500 * SafeDecimalMath.unit();
 
     // If a user deposits a synth amount < the minimumDepositAmount the contract will keep
@@ -73,7 +73,7 @@ contract Depot is Owned, Pausable, ReentrancyGuard, MixinResolver, IDepot {
 
     /* ========== ADDRESS RESOLVER CONFIGURATION ========== */
 
-    bytes32 private constant CONTRACT_SYNTHSUSD = "HassethUSD";
+    bytes32 private constant CONTRACT_SYNTHSUSD = "HassetzUSD";
     bytes32 private constant CONTRACT_EXRATES = "ExchangeRates";
     bytes32 private constant CONTRACT_SYNTHETIX = "Synthetix";
 
@@ -106,8 +106,8 @@ contract Depot is Owned, Pausable, ReentrancyGuard, MixinResolver, IDepot {
     }
 
     /**
-     * @notice Set the minimum deposit amount required to depoist hUSD into the FIFO queue
-     * @param _amount The new new minimum number of hUSD required to deposit
+     * @notice Set the minimum deposit amount required to depoist zUSD into the FIFO queue
+     * @param _amount The new new minimum number of zUSD required to deposit
      */
     function setMinimumDepositAmount(uint _amount) external onlyOwner {
         // Do not allow us to set it less than 1 dollar opening up to fractional desposits in the queue again
@@ -119,14 +119,14 @@ contract Depot is Owned, Pausable, ReentrancyGuard, MixinResolver, IDepot {
     /* ========== MUTATIVE FUNCTIONS ========== */
 
     /**
-     * @notice Fallback function (exchanges BNB to hUSD)
+     * @notice Fallback function (exchanges BNB to zUSD)
      */
     function() external payable nonReentrant rateNotInvalid(BNB) notPaused {
         _exchangeEtherForSynths();
     }
 
     /**
-     * @notice Exchange BNB to hUSD.
+     * @notice Exchange BNB to zUSD.
      */
     /* solhint-disable multiple-sends, reentrancy */
     function exchangeEtherForSynths()
@@ -136,7 +136,7 @@ contract Depot is Owned, Pausable, ReentrancyGuard, MixinResolver, IDepot {
         rateNotInvalid(BNB)
         notPaused
         returns (
-            uint // Returns the number of Synths (hUSD) received
+            uint // Returns the number of Synths (zUSD) received
         )
     {
         return _exchangeEtherForSynths();
@@ -247,7 +247,7 @@ contract Depot is Owned, Pausable, ReentrancyGuard, MixinResolver, IDepot {
 
         if (fulfilled > 0) {
             // Now tell everyone that we gave them that many (only if the amount is greater than 0).
-            emit Exchange("BNB", msg.value, "hUSD", fulfilled);
+            emit Exchange("BNB", msg.value, "zUSD", fulfilled);
         }
 
         return fulfilled;
@@ -256,7 +256,7 @@ contract Depot is Owned, Pausable, ReentrancyGuard, MixinResolver, IDepot {
     /* solhint-enable multiple-sends, reentrancy */
 
     /**
-     * @notice Exchange BNB to hUSD while insisting on a particular rate. This allows a user to
+     * @notice Exchange BNB to zUSD while insisting on a particular rate. This allows a user to
      *         exchange while protecting against frontrunning by the contract owner on the exchange rate.
      * @param guaranteedRate The exchange rate (ether price) which must be honored or the call will revert.
      */
@@ -266,7 +266,7 @@ contract Depot is Owned, Pausable, ReentrancyGuard, MixinResolver, IDepot {
         rateNotInvalid(BNB)
         notPaused
         returns (
-            uint // Returns the number of Synths (hUSD) received
+            uint // Returns the number of Synths (zUSD) received
         )
     {
         require(guaranteedRate == exchangeRates().rateForCurrency(BNB), "Guaranteed rate would not be received");
@@ -342,13 +342,13 @@ contract Depot is Owned, Pausable, ReentrancyGuard, MixinResolver, IDepot {
         // And send them the SNX.
         synthetix().transfer(msg.sender, synthetixToSend);
 
-        emit Exchange("hUSD", synthAmount, "HZN", synthetixToSend);
+        emit Exchange("zUSD", synthAmount, "HZN", synthetixToSend);
 
         return synthetixToSend;
     }
 
     /**
-     * @notice Exchange hUSD for HZN
+     * @notice Exchange zUSD for HZN
      * @param synthAmount The amount of synths the user wishes to exchange.
      */
     function exchangeSynthsForSNX(uint synthAmount)
@@ -363,7 +363,7 @@ contract Depot is Owned, Pausable, ReentrancyGuard, MixinResolver, IDepot {
     }
 
     /**
-     * @notice Exchange hUSD for HZN while insisting on a particular rate. This allows a user to
+     * @notice Exchange zUSD for HZN while insisting on a particular rate. This allows a user to
      *         exchange while protecting against frontrunning by the contract owner on the exchange rate.
      * @param synthAmount The amount of synths the user wishes to exchange.
      * @param guaranteedRate A rate (synthetix price) the caller wishes to insist upon.
@@ -436,7 +436,7 @@ contract Depot is Owned, Pausable, ReentrancyGuard, MixinResolver, IDepot {
 
     /**
      * @notice depositSynths: Allows users to deposit synths via the approve / transferFrom workflow
-     * @param amount The amount of hUSD you wish to deposit (must have been approved first)
+     * @param amount The amount of zUSD you wish to deposit (must have been approved first)
      */
     function depositSynths(uint amount) external {
         // Grab the amount of synths. Will fail if not approved first
@@ -481,7 +481,7 @@ contract Depot is Owned, Pausable, ReentrancyGuard, MixinResolver, IDepot {
      * @param amount The amount of ether (in wei) you want to ask about
      */
     function synthetixReceivedForEther(uint amount) public view returns (uint) {
-        // How much is the BNB they sent us worth in hUSD (ignoring the transfer fee)?
+        // How much is the BNB they sent us worth in zUSD (ignoring the transfer fee)?
         uint valueSentInSynths = amount.multiplyDecimal(exchangeRates().rateForCurrency(BNB));
 
         // Now, how many SNX will that USD amount buy?
@@ -501,7 +501,7 @@ contract Depot is Owned, Pausable, ReentrancyGuard, MixinResolver, IDepot {
     /* ========== INTERNAL VIEWS ========== */
 
     function synthsUSD() internal view returns (IERC20) {
-        return IERC20(requireAndGetAddress(CONTRACT_SYNTHSUSD, "Missing HassethUSD address"));
+        return IERC20(requireAndGetAddress(CONTRACT_SYNTHSUSD, "Missing HassetzUSD address"));
     }
 
     function synthetix() internal view returns (IERC20) {

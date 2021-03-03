@@ -31,8 +31,8 @@ contract DebtCache is Owned, MixinResolver, MixinSystemSettings, IDebtCache {
 
     /* ========== ENCODED NAMES ========== */
 
-    bytes32 internal constant hUSD = "hUSD";
-    bytes32 internal constant hBNB = "hBNB";
+    bytes32 internal constant zUSD = "zUSD";
+    bytes32 internal constant zBNB = "zBNB";
 
     /* ========== ADDRESS RESOLVER CONFIGURATION ========== */
 
@@ -128,9 +128,9 @@ contract DebtCache is Owned, MixinResolver, MixinSystemSettings, IDebtCache {
             require(synthAddress != address(0), "Hasset does not exist");
             uint supply = IERC20(synthAddress).totalSupply();
 
-            bool ishUSD = key == hUSD;
-            if (ishUSD || key == hBNB) {
-                IEtherCollateral etherCollateralContract = ishUSD
+            bool iszUSD = key == zUSD;
+            if (iszUSD || key == zBNB) {
+                IEtherCollateral etherCollateralContract = iszUSD
                     ? IEtherCollateral(address(etherCollateralsUSD()))
                     : etherCollateral();
                 uint etherCollateralSupply = etherCollateralContract.totalIssuedSynths();

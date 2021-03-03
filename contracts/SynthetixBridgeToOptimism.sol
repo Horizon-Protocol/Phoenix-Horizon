@@ -92,7 +92,7 @@ contract SynthetixBridgeToOptimism is Owned, MixinResolver, ISynthetixBridgeToOp
 
     // invoked by user on L1
     function deposit(uint amount) external requireActive {
-        require(issuer().debtBalanceOf(msg.sender, "hUSD") == 0, "Cannot deposit with debt");
+        require(issuer().debtBalanceOf(msg.sender, "zUSD") == 0, "Cannot deposit with debt");
 
         // now remove their reward escrow
         // Note: escrowSummary would lose the fidelity of the weekly escrows, so this may not be sufficient

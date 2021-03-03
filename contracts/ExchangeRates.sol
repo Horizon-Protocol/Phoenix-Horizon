@@ -42,7 +42,7 @@ contract ExchangeRates is Owned, MixinResolver, MixinSystemSettings, IExchangeRa
     using SafeMath for uint;
     using SafeDecimalMath for uint;
 
-    // Exchange rates and update times stored by currency code, e.g. 'HZN', or 'hUSD'
+    // Exchange rates and update times stored by currency code, e.g. 'HZN', or 'zUSD'
     mapping(bytes32 => mapping(uint => RateAndUpdatedTime)) private _rates;
 
     // The address of the oracle which pushes rate updates to this contract
@@ -94,8 +94,8 @@ contract ExchangeRates is Owned, MixinResolver, MixinSystemSettings, IExchangeRa
 
         oracle = _oracle;
 
-        // The hUSD rate is always 1 and is never stale.
-        _setRate("hUSD", SafeDecimalMath.unit(), now);
+        // The zUSD rate is always 1 and is never stale.
+        _setRate("zUSD", SafeDecimalMath.unit(), now);
 
         internalUpdateRates(_currencyKeys, _newRates, now);
     }
@@ -408,7 +408,7 @@ contract ExchangeRates is Owned, MixinResolver, MixinSystemSettings, IExchangeRa
     function rateAndInvalid(bytes32 currencyKey) external view returns (uint rate, bool isInvalid) {
         RateAndUpdatedTime memory rateAndTime = _getRateAndUpdatedTime(currencyKey);
 
-        if (currencyKey == "hUSD") {
+        if (currencyKey == "zUSD") {
             return (rateAndTime.rate, false);
         }
         return (
@@ -434,7 +434,7 @@ contract ExchangeRates is Owned, MixinResolver, MixinSystemSettings, IExchangeRa
             // do one lookup of the rate & time to minimize gas
             RateAndUpdatedTime memory rateEntry = _getRateAndUpdatedTime(currencyKeys[i]);
             rates[i] = rateEntry.rate;
-            if (!anyRateInvalid && currencyKeys[i] != "hUSD") {
+            if (!anyRateInvalid && currencyKeys[i] != "zUSD") {
                 anyRateInvalid = flagList[i] || _rateIsStaleWithTime(_rateStalePeriod, rateEntry.time);
             }
         }
@@ -528,7 +528,7 @@ contract ExchangeRates is Owned, MixinResolver, MixinSystemSettings, IExchangeRa
             // truely worthless and still valid. In this scenario, we should
             // delete the rate and remove it from the system.
             require(newRates[i] != 0, "Zero is not a valid rate, please call deleteRate instead.");
-            require(currencyKey != "hUSD", "Rate of hUSD cannot be updated, it's always UNIT.");
+            require(currencyKey != "zUSD", "Rate of zUSD cannot be updated, it's always UNIT.");
 
             // We should only update the rate if it's at least the same age as the last rate we've got.
             if (timeSent < _getUpdatedTime(currencyKey)) {
@@ -749,8 +749,8 @@ contract ExchangeRates is Owned, MixinResolver, MixinSystemSettings, IExchangeRa
     }
 
     function _rateIsStale(bytes32 currencyKey, uint _rateStalePeriod) internal view returns (bool) {
-        // hUSD is a special case and is never stale (check before an SLOAD of getRateAndUpdatedTime)
-        if (currencyKey == "hUSD") return false;
+        // zUSD is a special case and is never stale (check before an SLOAD of getRateAndUpdatedTime)
+        if (currencyKey == "zUSD") return false;
 
         return _rateIsStaleWithTime(_rateStalePeriod, _getUpdatedTime(currencyKey));
     }
@@ -765,8 +765,8 @@ contract ExchangeRates is Owned, MixinResolver, MixinSystemSettings, IExchangeRa
     }
 
     function _rateIsFlagged(bytes32 currencyKey, FlagsInterface flags) internal view returns (bool) {
-        // hUSD is a special case and is never invalid
-        if (currencyKey == "hUSD") return false;
+        // zUSD is a special case and is never invalid
+        if (currencyKey == "zUSD") return false;
         address aggregator = address(aggregators[currencyKey]);
         // when no aggregator or when the flags haven't been setup
         if (aggregator == address(0) || flags == FlagsInterface(0)) {

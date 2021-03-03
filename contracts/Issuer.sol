@@ -57,8 +57,8 @@ contract Issuer is Owned, MixinResolver, MixinSystemSettings, IIssuer {
 
     /* ========== ENCODED NAMES ========== */
 
-    bytes32 internal constant hUSD = "hUSD";
-    bytes32 internal constant hBNB = "hBNB";
+    bytes32 internal constant hUSD = "zUSD";
+    bytes32 internal constant zBNB = "zBNB";
     bytes32 internal constant SNX = "HZN";
 
     // Flexible storage names
@@ -186,11 +186,11 @@ contract Issuer is Owned, MixinResolver, MixinSystemSettings, IIssuer {
 
         // Add total issued synths from Ether Collateral back into the total if not excluded
         if (!excludeEtherCollateral) {
-            // Add ether collateral hUSD
+            // Add ether collateral zUSD
             debt = debt.add(etherCollateralsUSD().totalIssuedSynths());
 
-            // Add ether collateral hBNB
-            (uint ethRate, bool ethRateInvalid) = exRates.rateAndInvalid(hBNB);
+            // Add ether collateral zBNB
+            (uint ethRate, bool ethRateInvalid) = exRates.rateAndInvalid(zBNB);
             uint ethIssuedDebt = etherCollateral().totalIssuedSynths().multiplyDecimalRound(ethRate);
             debt = debt.add(ethIssuedDebt);
             anyRateIsInvalid = anyRateIsInvalid || ethRateInvalid;
@@ -282,7 +282,7 @@ contract Issuer is Owned, MixinResolver, MixinSystemSettings, IIssuer {
     }
 
     function _maxIssuableSynths(address _issuer) internal view returns (uint, bool) {
-        // What is the value of their SNX balance in hUSD
+        // What is the value of their HZN balance in zUSD
         (uint snxRate, bool isInvalid) = exchangeRates().rateAndInvalid(SNX);
         uint destinationValue = _snxToUSD(_collateral(_issuer), snxRate);
 
@@ -560,18 +560,18 @@ contract Issuer is Owned, MixinResolver, MixinSystemSettings, IIssuer {
         uint hUSDAmount,
         address liquidator
     ) external onlySynthetix returns (uint totalRedeemed, uint amountToLiquidate) {
-        // Ensure waitingPeriod and hUSD balance is settled as burning impacts the size of debt pool
-        require(!exchanger().hasWaitingPeriodOrSettlementOwing(liquidator, hUSD), "hUSD needs to be settled");
+        // Ensure waitingPeriod and zUSD balance is settled as burning impacts the size of debt pool
+        require(!exchanger().hasWaitingPeriodOrSettlementOwing(liquidator, hUSD), "zUSD needs to be settled");
 
         // Check account is liquidation open
         require(liquidations().isOpenForLiquidation(account), "Account not open for liquidation");
 
-        // require liquidator has enough hUSD
-        require(IERC20(address(synths[hUSD])).balanceOf(liquidator) >= hUSDAmount, "Not enough hUSD");
+        // require liquidator has enough zUSD
+        require(IERC20(address(synths[hUSD])).balanceOf(liquidator) >= hUSDAmount, "Not enough zUSD");
 
         uint liquidationPenalty = liquidations().liquidationPenalty();
 
-        // What is their debt in hUSD?
+        // What is their debt in zUSD?
         (uint debtBalance, uint totalDebtIssued, bool anyRateIsInvalid) = _debtBalanceOfAndTotalDebt(account, hUSD);
         (uint snxRate, bool snxRateInvalid) = exchangeRates().rateAndInvalid(SNX);
         _requireRatesNotInvalid(anyRateIsInvalid || snxRateInvalid);
@@ -592,20 +592,20 @@ contract Issuer is Owned, MixinResolver, MixinSystemSettings, IIssuer {
         totalRedeemed = snxRedeemed.multiplyDecimal(SafeDecimalMath.unit().add(liquidationPenalty));
 
         // if total SNX to redeem is greater than account's collateral
-        // account is under collateralised, liquidate all collateral and reduce hUSD to burn
+        // account is under collateralised, liquidate all collateral and reduce zUSD to burn
         // an insurance fund will be added to cover these undercollateralised positions
         if (totalRedeemed > collateralForAccount) {
             // set totalRedeemed to all collateral
             totalRedeemed = collateralForAccount;
 
-            // whats the equivalent hUSD to burn for all collateral less penalty
+            // whats the equivalent zUSD to burn for all collateral less penalty
             amountToLiquidate = _snxToUSD(
                 collateralForAccount.divideDecimal(SafeDecimalMath.unit().add(liquidationPenalty)),
                 snxRate
             );
         }
 
-        // burn hUSD from messageSender (liquidator) and reduce account's debt
+        // burn zUSD from messageSender (liquidator) and reduce account's debt
         _burnSynths(account, liquidator, amountToLiquidate, debtBalance, totalDebtIssued);
 
         if (amountToLiquidate == amountToFixRatio) {
@@ -665,7 +665,7 @@ contract Issuer is Owned, MixinResolver, MixinSystemSettings, IIssuer {
         uint existingDebt,
         uint totalDebtIssued
     ) internal returns (uint amountBurnt) {
-        // liquidation requires hUSD to be already settled / not in waiting period
+        // liquidation requires zUSD to be already settled / not in waiting period
 
         // If they're trying to burn more debt than they actually owe, rather than fail the transaction, let's just
         // clear their debt and leave them be.
@@ -684,7 +684,7 @@ contract Issuer is Owned, MixinResolver, MixinSystemSettings, IIssuer {
         _appendAccountIssuanceRecord(debtAccount);
     }
 
-    // If burning to target, `amount` is ignored, and the correct quantity of hUSD is burnt to reach the target
+    // If burning to target, `amount` is ignored, and the correct quantity of zUSD is burnt to reach the target
     // c-ratio, allowing fees to be claimed. In this case, pending settlements will be skipped as the user
     // will still have debt remaining after reaching their target.
     function _voluntaryBurnSynths(
@@ -695,7 +695,7 @@ contract Issuer is Owned, MixinResolver, MixinSystemSettings, IIssuer {
         if (!burnToTarget) {
             // If not burning to target, then burning requires that the minimum stake time has elapsed.
             require(_canBurnSynths(from), "Minimum stake time not reached");
-            // First settle anything pending into hUSD as burning or issuing impacts the size of the debt pool
+            // First settle anything pending into zUSD as burning or issuing impacts the size of the debt pool
             (, uint refunded, uint numEntriesSettled) = exchanger().settle(from, hUSD);
             if (numEntriesSettled > 0) {
                 amount = exchanger().calculateAmountAfterSettlement(from, hUSD, amount, refunded);

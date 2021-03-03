@@ -25,7 +25,7 @@ contract BaseSynthetix is IERC20, ExternStateToken, MixinResolver, ISynthetix {
     string public constant TOKEN_NAME = "Phoenix Horizon";
     string public constant TOKEN_SYMBOL = "HZN";
     uint8 public constant DECIMALS = 18;
-    bytes32 public constant hUSD = "hUSD";
+    bytes32 public constant zUSD = "zUSD";
 
     /* ========== ADDRESS RESOLVER CONFIGURATION ========== */
 

@@ -152,7 +152,7 @@ contract Synthetix is BaseSynthetix {
         return true;
     }
 
-    function liquidateDelinquentAccount(address account, uint hUSDAmount)
+    function liquidateDelinquentAccount(address account, uint zUSDAmount)
         external
         systemActive
         optionalProxy
@@ -160,7 +160,7 @@ contract Synthetix is BaseSynthetix {
     {
         (uint totalRedeemed, uint amountLiquidated) = issuer().liquidateDelinquentAccount(
             account,
-            hUSDAmount,
+            zUSDAmount,
             messageSender
         );
 
