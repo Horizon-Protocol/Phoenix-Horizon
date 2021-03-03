@@ -92,7 +92,7 @@ const persistTokens = async ({
 			chainId,
 			address,
 			symbol,
-			name: symbol === 'HZN' ? 'Phoenix Horizon' : `Synth ${name}`,
+			name: symbol === 'HZN' ? 'Horizon Protocol' : `Synth ${name}`,
 			decimals,
 			logoURI: baseURI + (symbol === 'HZN' ? '/snx/SNX.svg' : `/synths/${symbol}.svg`),
 			tags: []

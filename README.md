@@ -1,20 +1,20 @@
-# Horizon
+# Horizon Protocol
 
 Please note that this repository is under development.
 
-Horizon is a crypto-backed synthetic asset platform.
+Horizon Protocol is a crypto-backed synthetic asset platform.
 
-It is a multi-token system, powered by HZN, the Phoenix Horizon Token. HZN holders can stake HZN to issue Hassets, on-chain Horizon assets via the [Mintr dApp](https://mintr.phoenix.global).
-Hassets can be traded using [horizon.exchange](https://horizon.exchange).
+It is a multi-token system, powered by HZN, the Horizon Protocol Token. HZN holders can stake HZN to issue Hassets, on-chain Horizon assets via the [Genesis dApp](https://genesis.horizonprotocol.com).
+Hassets can be traded using upcoming [Exchange](https://exchange.horizonprotocol.com).
 
 Horizon uses a proxy system so that upgrades will not be disruptive to the functionality of the contract. This smooths user interaction, since new functionality will become available without any interruption in their experience. It is also transparent to the community at large, since each upgrade is accompanied by events announcing those upgrades.
 
-Prices are committed on chain by a trusted oracle. Moving to a decentralised oracle is phased in with the first phase completed for all forex prices using [Chainlink](https://feeds.chain.link/).
+Prices are committed on chain by a trusted oracle. Moving to a decentralised oracle is phased in with the first phase completed for all forex prices using [BandProtocol](https://cosmoscan.io/).
 
 ## DApps
 
-- [mintr.phoenix.global](https://mintr.phoenix.global)
-- [horizon.exchange](https://horizon.exchange)
+- [Genesis](https://mintr.horizonprotocol.com)
+- [Exchange](https://exchange.horizonprotocol.com)
 
 ---
 
@@ -30,21 +30,21 @@ When a new version of the contracts makes its way through all testnets, it event
 
 ### Solidity API
 
-All interfaces are available via the path [`Phoenix-Horizon/contracts/interfaces`](./contracts/interfaces/).
+All interfaces are available via the path [`Horizon-Smart-Contract/Horizon-Smart-Contract/contracts/interfaces`](./contracts/interfaces/).
 
-:zap: In your code, the key is to use `IAddressResolver` which can be tied to the immutable proxy. You can then fetch `Horizon`, `FeePool`, `Depot`, et al via `IAddressResolver.getAddress(bytes32 name)` where `name` is the `bytes32` version of the contract name (case-sensitive). Or you can fetch any hasset using `IAddressResolver.getSynth(bytes32 hasset)` where `hasset` is the `bytes32` name of the hasset (e.g. `iETH`, `hUSD`, `hDEFI`).
+:zap: In your code, the key is to use `IAddressResolver` which can be tied to the immutable proxy. You can then fetch `Horizon`, `FeePool`, `Depot`, et al via `IAddressResolver.getAddress(bytes32 name)` where `name` is the `bytes32` version of the contract name (case-sensitive). Or you can fetch any zasset using `IAddressResolver.getSynth(bytes32 zasset)` where `zasset` is the `bytes32` name of the zasset (e.g. `iETH`, `zUSD`, `zDEFI`).
 
 E.g.
 
-`npm install Horizon`
+`npm install @horizon-protocol/smart-contract`
 
 then you can write Solidity as below (using a compiler that links named imports via `node_modules`):
 
 ```solidity
 pragma solidity 0.5.16;
 
-import 'horizon/contracts/interfaces/IAddressResolver.sol';
-import 'horizon/contracts/interfaces/IHorizon.sol';
+import 'Horizon-Smart-Contract/contracts/interfaces/IAddressResolver.sol';
+import 'Horizon-Smart-Contract/contracts/interfaces/IHorizon.sol';
 
 
 contract MyContract {
@@ -83,9 +83,9 @@ contract MyContract {
 - `getSource({ network })` Return `abi` and `bytecode` for a contract `source`.
 - `getSuspensionReasons({ code })` Return mapping of `SystemStatus` suspension codes to string reasons.
 - `getStakingRewards({ network })` Return the list of staking reward contracts available.
-- `getHassets({ network })` Return the list of hassets for a network.
+- `getSynths({ network })` Return the list of zassets for a network.
 - `getTarget({ network })` Return the information about a contract's `address` and `source` file. The contract names are those specified in doc web.
-- `getTokens({ network })` Return the list of tokens (hassets and `HZN`) used in the system, along with their addresses.
+- `getTokens({ network })` Return the list of tokens (zassets and `HZN`) used in the system, along with their addresses.
 - `getUsers({ network })` Return the list of user accounts within the Horizon protocol (e.g. `owner`, `fee`, etc).
 - `getVersions({ network, byContract = false })` Return the list of deployed versions to the network keyed by tagged version. If `byContract` is `true`, it keys by `contract` name.
 - `networks` Return the list of supported networks.
@@ -146,7 +146,7 @@ hzn.getAST({ source: 'Horizon.sol' });
 
 // Get the path to the network
 hzn.getPathToNetwork({ network: 'mainnet' });
-//'.../Phoenix-Horizon/publish/deployed/mainnet'
+//'.../Horizon-Smart-Contract/publish/deployed/mainnet'
 
 // retrieve an object detailing the contract ABI and bytecode
 hzn.getSource({ network: 'testnet', contract: 'Proxy' });
@@ -167,9 +167,9 @@ hzn.getSuspensionReasons();
 };
 */
 
-// retrieve the array of hassets used
-hzn.getHassets({ network: 'testnet' }).map(({ name }) => name);
-// ['hUSD', 'hEUR', ...]
+// retrieve the array of zassets used
+hzn.getSynths({ network: 'testnet' }).map(({ name }) => name);
+// ['zUSD', 'zEUR', ...]
 
 // retrieve an object detailing the contract deployed to the given network.
 hzn.getTarget({ network: 'testnet', contract: 'ProxyHorizon' });
@@ -219,7 +219,7 @@ hzn.getVersions();
 hzn.networks;
 // [ 'local', 'kovan', 'rinkeby', 'ropsten', 'mainnet' ]
 
-hzn.toBytes32('hUSD');
+hzn.toBytes32('zUSD');
 // '0x7355534400000000000000000000000000000000000000000000000000000000'
 ```
 
@@ -245,7 +245,7 @@ $ npx horizon ast contracts/Synth.sol
   ]
 }
 
-$ npx horizon bytes32 hUSD
+$ npx horizon bytes32 zUSD
 0x7355534400000000000000000000000000000000000000000000000000000000
 
 $ npx horizon networks
@@ -260,8 +260,8 @@ $ npx horizon source --network testnet --contract Proxy
 $ npx horizon suspension-reason --code 2
 Market Closure
 
-$ npx horizon hassets --network testnet --key name
-["hUSD", "hEUR", ... ]
+$ npx horizon zassets --network testnet --key name
+["zUSD", "zEUR", ... ]
 
 $ npx horizon target --network testnet --contract ProxyHorizon
 {
