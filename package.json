@@ -3,7 +3,7 @@
 	"version": "2.33.6",
 	"license": "MIT",
 	"author": "Horizon",
-	"description": "The smart contracts which make up the Horizon system. (phoenix.global)",
+	"description": "The smart contracts which make up the Horizon system.",
 	"scripts": {
 		"clean-install": "rm -rf build && rm ./package-lock.json && rm -rf node_modules/* && npm install",
 		"compile:legacy": "buidler compile --config legacy/buidler.legacy.js",
@@ -36,12 +36,12 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/PhoenixGlobal/Phoenix-Horizon.git"
+		"url": "git+https://github.com/Horizon-Protocol/Horizon-Smart-Contract.git"
 	},
 	"keywords": [
-		"Horizon",
+		"Horizon Protocol",
 		"HZN",
-		"hUSD",
+		"zUSD",
 		"Solidity",
 		"BinanceSmartChain",
 		"BSC",
@@ -66,7 +66,7 @@
 	"main": "index.js",
 	"browser": "browser.js",
 	"bugs": {
-		"url": "https://github.com/PhoenixGlobal/Phoenix-Horizon/issues"
+		"url": "https://github.com/Horizon-Protocol/Horizon-Smart-Contract/issues"
 	},
 	"homepage": "https://www.horizonprotocol.com/",
 	"directories": {

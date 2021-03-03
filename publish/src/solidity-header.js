@@ -40,10 +40,9 @@ module.exports = {
 ██║  ██║ ╚██████╔╝ ██║  ██║ ██║ ███████╗ ╚██████╔╝ ██║ ╚████║
 ╚═╝  ╚═╝  ╚═════╝  ╚═╝  ╚═╝ ╚═╝ ╚══════╝  ╚═════╝  ╚═╝  ╚═══╝
 
-* PhoenixGlobal: ${contract}
+* Horizon Protocol: ${contract}
 *
-* Latest source (may be newer): https://github.com/PhoenixGlobal/Phoenix-Horizon/blob/master/contracts/${contract}
-* Docs: https://docs.synthetix.io/contracts/${contract.split(/\./)[0]}
+* Latest source (may be newer): https://github.com/Horizon-Protocol/Horizon-Smart-Contract/blob/master/contracts/${contract}
 *
 * Contract Dependencies: ${deps.length ? '\n*\t- ' + deps.join('\n*\t- ') : '(none)'}
 * Libraries: ${libraries.length ? '\n*\t- ' + libraries.join('\n*\t- ') : '(none)'}
@@ -51,7 +50,7 @@ module.exports = {
 * MIT License
 * ===========
 *
-* Copyright (c) ${new Date().getFullYear()} PhoenixGlobal
+* Copyright (c) ${new Date().getFullYear()} Horizon Protocol
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
