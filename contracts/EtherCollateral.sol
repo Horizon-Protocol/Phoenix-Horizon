@@ -30,7 +30,7 @@ contract EtherCollateral is Owned, Pausable, ReentrancyGuard, MixinResolver, IEt
 
     uint256 internal constant SECONDS_IN_A_YEAR = 31536000; // Common Year
 
-    // Where fees are pooled in hUSD.
+    // Where fees are pooled in zUSD.
     address internal constant FEE_ADDRESS = 0xfeEFEEfeefEeFeefEEFEEfEeFeefEEFeeFEEFEeF;
 
     // ========== SETTER STATE VARIABLES ==========
@@ -45,10 +45,10 @@ contract EtherCollateral is Owned, Pausable, ReentrancyGuard, MixinResolver, IEt
     // Minting fee for issuing the synths. Default 50 bips.
     uint256 public issueFeeRate = (5 * SafeDecimalMath.unit()) / 1000;
 
-    // Maximum amount of hBNB that can be issued by the EtherCollateral contract. Default 5000
+    // Maximum amount of zBNB that can be issued by the EtherCollateral contract. Default 5000
     uint256 public issueLimit = SafeDecimalMath.unit() * 5000;
 
-    // Minimum amount of BNB to create loan preventing griefing and gas consumption. Min 1BNB = 0.8 hBNB
+    // Minimum amount of BNB to create loan preventing griefing and gas consumption. Min 1BNB = 0.8 zBNB
     uint256 public minLoanSize = SafeDecimalMath.unit() * 1;
 
     // Maximum number of loans an account can create
@@ -96,15 +96,15 @@ contract EtherCollateral is Owned, Pausable, ReentrancyGuard, MixinResolver, IEt
     /* ========== ADDRESS RESOLVER CONFIGURATION ========== */
 
     bytes32 private constant CONTRACT_SYSTEMSTATUS = "SystemStatus";
-    bytes32 private constant CONTRACT_SYNTHHBNB = "HassethBNB";
-    bytes32 private constant CONTRACT_SYNTHSUSD = "HassethUSD";
+    bytes32 private constant CONTRACT_SYNTHZBNB = "HassetzBNB";
+    bytes32 private constant CONTRACT_SYNTHZUSD = "HassetzUSD";
     bytes32 private constant CONTRACT_DEPOT = "Depot";
     bytes32 private constant CONTRACT_EXRATES = "ExchangeRates";
 
     bytes32[24] private addressesToCache = [
         CONTRACT_SYSTEMSTATUS,
-        CONTRACT_SYNTHHBNB,
-        CONTRACT_SYNTHSUSD,
+        CONTRACT_SYNTHZBNB,
+        CONTRACT_SYNTHZUSD,
         CONTRACT_DEPOT,
         CONTRACT_EXRATES
     ];
@@ -306,7 +306,7 @@ contract EtherCollateral is Owned, Pausable, ReentrancyGuard, MixinResolver, IEt
         // Calculate issuance amount
         uint256 loanAmount = loanAmountFromCollateral(msg.value);
 
-        // Require hBNB to mint does not exceed cap
+        // Require zBNB to mint does not exceed cap
         require(totalIssuedSynths.add(loanAmount) < issueLimit, "Loan Amount exceeds the supply cap.");
 
         // Get a Loan ID
@@ -377,14 +377,14 @@ contract EtherCollateral is Owned, Pausable, ReentrancyGuard, MixinResolver, IEt
         // Burn all Synths issued for the loan
         synthsETH().burn(msg.sender, synthLoan.loanAmount);
 
-        // Fee Distribution. Purchase hUSD with ETH from Depot
+        // Fee Distribution. Purchase zUSD with BNB from Depot
         require(
             IERC20(address(synthsUSD())).balanceOf(address(depot())) >= depot().synthsReceivedForEther(totalFeeETH),
-            "The hUSD Depot does not have enough hUSD to buy for fees"
+            "The zUSD Depot does not have enough zUSD to buy for fees"
         );
         depot().exchangeEtherForSynths.value(totalFeeETH)();
 
-        // Transfer the hUSD to distribute to HZN holders.
+        // Transfer the zUSD to distribute to HZN holders.
         IERC20(address(synthsUSD())).transfer(FEE_ADDRESS, IERC20(address(synthsUSD())).balanceOf(address(this)));
 
         // Send remainder BNB to caller
@@ -444,11 +444,11 @@ contract EtherCollateral is Owned, Pausable, ReentrancyGuard, MixinResolver, IEt
     }
 
     function synthsETH() internal view returns (ISynth) {
-        return ISynth(requireAndGetAddress(CONTRACT_SYNTHHBNB, "Missing HassethBNB address"));
+        return ISynth(requireAndGetAddress(CONTRACT_SYNTHZBNB, "Missing HassetzBNB address"));
     }
 
     function synthsUSD() internal view returns (ISynth) {
-        return ISynth(requireAndGetAddress(CONTRACT_SYNTHSUSD, "Missing HassethUSD address"));
+        return ISynth(requireAndGetAddress(CONTRACT_SYNTHZUSD, "Missing HassetzUSD address"));
     }
 
     function depot() internal view returns (IDepot) {
@@ -462,7 +462,7 @@ contract EtherCollateral is Owned, Pausable, ReentrancyGuard, MixinResolver, IEt
     /* ========== MODIFIERS ========== */
 
     modifier sETHRateNotInvalid() {
-        require(!exchangeRates().rateIsInvalid("hBNB"), "Blocked as hBNB rate is invalid");
+        require(!exchangeRates().rateIsInvalid("zBNB"), "Blocked as zBNB rate is invalid");
         _;
     }
 

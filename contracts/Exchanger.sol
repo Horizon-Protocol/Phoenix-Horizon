@@ -81,7 +81,7 @@ contract Exchanger is Owned, MixinResolver, MixinSystemSettings, IExchanger {
         uint timestamp;
     }
 
-    bytes32 private constant hUSD = "hUSD";
+    bytes32 private constant hUSD = "zUSD";
 
     // SIP-65: Decentralized circuit breaker
     uint public constant CIRCUIT_BREAKER_SUSPENSION_REASON = 65;
@@ -472,7 +472,7 @@ contract Exchanger is Owned, MixinResolver, MixinSystemSettings, IExchanger {
         rates[1] = currencyRates[1];
 
         if (!includesHUSD) {
-            keys[2] = hUSD; // And we'll also update hUSD to account for any fees if it wasn't one of the exchanged currencies
+            keys[2] = hUSD; // And we'll also update zUSD to account for any fees if it wasn't one of the exchanged currencies
             rates[2] = SafeDecimalMath.unit();
         }
 
@@ -561,18 +561,18 @@ contract Exchanger is Owned, MixinResolver, MixinSystemSettings, IExchanger {
 
         // Remit the fee if required
         if (fee > 0) {
-            // Normalize fee to hUSD
+            // Normalize fee to zUSD
             // Note: `fee` is being reused to avoid stack too deep errors.
             fee = exchangeRates().effectiveValue(destinationCurrencyKey, fee, hUSD);
 
-            // Remit the fee in hUSDs
+            // Remit the fee in zUSDs
             issuer().synths(hUSD).issue(feePool().FEE_ADDRESS(), fee);
 
             // Tell the fee pool about this
             feePool().recordFeePaid(fee);
         }
 
-        // Note: As of this point, `fee` is denominated in hUSD.
+        // Note: As of this point, `fee` is denominated in zUSD.
 
         // Nothing changes as far as issuance data goes because the total value in the system hasn't changed.
         // But we will update the debt snapshot in case exchange rates have fluctuated since the last exchange

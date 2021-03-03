@@ -138,6 +138,7 @@ task('test:prod', 'run poduction tests against a running fork')
 
 		bre.config.deploymentPath = taskArguments.deploymentPath;
 		bre.config.patchFreshDeployment = taskArguments.patchFreshDeployment;
+		// bre.config.patchFreshDeployment = true;
 		bre.config.useOvm = taskArguments.useOvm;
 		bre.config.paths.tests = './test/prod/';
 

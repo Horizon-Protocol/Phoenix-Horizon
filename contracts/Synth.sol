@@ -23,7 +23,7 @@ contract Synth is Owned, IERC20, ExternStateToken, MixinResolver, ISynth {
 
     uint8 public constant DECIMALS = 18;
 
-    // Where fees are pooled in hUSD
+    // Where fees are pooled in zUSD
     address public constant FEE_ADDRESS = 0xfeEFEEfeefEeFeefEEFEEfEeFeefEEFeeFEEFEeF;
 
     /* ========== ADDRESS RESOLVER CONFIGURATION ========== */
@@ -62,7 +62,7 @@ contract Synth is Owned, IERC20, ExternStateToken, MixinResolver, ISynth {
     function transfer(address to, uint value) public optionalProxy returns (bool) {
         _ensureCanTransfer(messageSender, value);
 
-        // transfers to FEE_ADDRESS will be exchanged into hUSD and recorded as fee
+        // transfers to FEE_ADDRESS will be exchanged into zUSD and recorded as fee
         if (to == FEE_ADDRESS) {
             return _transferToFeeAddress(to, value);
         }
@@ -125,21 +125,21 @@ contract Synth is Owned, IERC20, ExternStateToken, MixinResolver, ISynth {
 
     /**
      * @notice _transferToFeeAddress function
-     * non-hUSD synths are exchanged into hUSD via synthInitiatedExchange
+     * non-zUSD synths are exchanged into zUSD via synthInitiatedExchange
      * notify feePool to record amount as fee paid to feePool */
     function _transferToFeeAddress(address to, uint value) internal returns (bool) {
         uint amountInUSD;
 
-        // hUSD can be transferred to FEE_ADDRESS directly
-        if (currencyKey == "hUSD") {
+        // zUSD can be transferred to FEE_ADDRESS directly
+        if (currencyKey == "zUSD") {
             amountInUSD = value;
             super._internalTransfer(messageSender, to, value);
         } else {
-            // else exchange synth into hUSD and send to FEE_ADDRESS
-            amountInUSD = exchanger().exchange(messageSender, currencyKey, value, "hUSD", FEE_ADDRESS);
+            // else exchange synth into zUSD and send to FEE_ADDRESS
+            amountInUSD = exchanger().exchange(messageSender, currencyKey, value, "zUSD", FEE_ADDRESS);
         }
 
-        // Notify feePool to record hUSD to distribute as fees
+        // Notify feePool to record zUSD to distribute as fees
         feePool().recordFeePaid(amountInUSD);
 
         return true;

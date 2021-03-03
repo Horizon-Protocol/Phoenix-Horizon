@@ -65,7 +65,7 @@ const removeSynths = async ({
 			console.error(red(`Hasset ${synth} not found!`));
 			process.exitCode = 1;
 			return;
-		} else if (['sUSD'].indexOf(synth) >= 0) {
+		} else if (['zUSD'].indexOf(synth) >= 0) {
 			console.error(red(`Hasset ${synth} cannot be removed`));
 			process.exitCode = 1;
 			return;

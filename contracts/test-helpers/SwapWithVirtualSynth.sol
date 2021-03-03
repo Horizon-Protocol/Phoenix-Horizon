@@ -134,7 +134,7 @@ contract SwapWithVirtualSynth {
         incomingPool.exchange(1, 3, amount, 0);
 
         // now exchange my sUSD to sBTC
-        (, IVirtualSynth vSynth) = synthetix.exchangeWithVirtual("hUSD", sUSD.balanceOf(address(this)), "hBTC", bytes32(0));
+        (, IVirtualSynth vSynth) = synthetix.exchangeWithVirtual("zUSD", sUSD.balanceOf(address(this)), "zBTC", bytes32(0));
 
         // wrap this vSynth in a new token ERC20 contract
         VirtualToken vToken = new VirtualToken(vSynth, outgoingPool, WBTC);

@@ -32,11 +32,11 @@ contract FeePool is Owned, Proxyable, LimitedSetup, MixinResolver, MixinSystemSe
     using SafeMath for uint;
     using SafeDecimalMath for uint;
 
-    // Where fees are pooled in hUSD.
+    // Where fees are pooled in zUSD.
     address public constant FEE_ADDRESS = 0xfeEFEEfeefEeFeefEEFEEfEeFeefEEFeeFEEFEeF;
 
-    // hUSD currencyKey. Fees stored and paid in hUSD
-    bytes32 private hUSD = "hUSD";
+    // zUSD currencyKey. Fees stored and paid in zUSD
+    bytes32 private zUSD = "zUSD";
 
     // This struct represents the issuance activity that's happened in a fee period.
     struct FeePeriod {
@@ -227,10 +227,10 @@ contract FeePool is Owned, Proxyable, LimitedSetup, MixinResolver, MixinSystemSe
 
     /**
      * @notice The Exchanger contract informs us when fees are paid.
-     * @param amount hUSD amount in fees being paid.
+     * @param amount zUSD amount in fees being paid.
      */
     function recordFeePaid(uint amount) external onlyInternalContracts {
-        // Keep track off fees in hUSD in the open fee pool period.
+        // Keep track off fees in zUSD in the open fee pool period.
         _recentFeePeriodsStorage(0).feesToDistribute = _recentFeePeriodsStorage(0).feesToDistribute.add(amount);
     }
 
@@ -390,11 +390,11 @@ contract FeePool is Owned, Proxyable, LimitedSetup, MixinResolver, MixinSystemSe
 
     /**
      * @notice Record the fee payment in our recentFeePeriods.
-     * @param hUSDAmount The amount of fees priced in hUSD.
+     * @param zUSDAmount The amount of fees priced in zUSD.
      */
-    function _recordFeePayment(uint hUSDAmount) internal returns (uint) {
+    function _recordFeePayment(uint zUSDAmount) internal returns (uint) {
         // Don't assign to the parameter
-        uint remainingToAllocate = hUSDAmount;
+        uint remainingToAllocate = zUSDAmount;
 
         uint feesPaid;
         // Start at the oldest period and record the amount, moving to newer periods
@@ -469,21 +469,21 @@ contract FeePool is Owned, Proxyable, LimitedSetup, MixinResolver, MixinSystemSe
     /**
      * @notice Send the fees to claiming address.
      * @param account The address to send the fees to.
-     * @param hUSDAmount The amount of fees priced in hUSD.
+     * @param zUSDAmount The amount of fees priced in zUSD.
      */
-    function _payFees(address account, uint hUSDAmount) internal notFeeAddress(account) {
-        // Grab the hUSD Synth
-        ISynth sUSDSynth = issuer().synths(hUSD);
+    function _payFees(address account, uint zUSDAmount) internal notFeeAddress(account) {
+        // Grab the zUSD Synth
+        ISynth sUSDSynth = issuer().synths(zUSD);
 
         // NOTE: we do not control the FEE_ADDRESS so it is not possible to do an
         // ERC20.approve() transaction to allow this feePool to call ERC20.transferFrom
         // to the accounts address
 
         // Burn the source amount
-        sUSDSynth.burn(FEE_ADDRESS, hUSDAmount);
+        sUSDSynth.burn(FEE_ADDRESS, zUSDAmount);
 
         // Mint their new synths
-        sUSDSynth.issue(account, hUSDAmount);
+        sUSDSynth.issue(account, zUSDAmount);
     }
 
     /**
@@ -498,7 +498,7 @@ contract FeePool is Owned, Proxyable, LimitedSetup, MixinResolver, MixinSystemSe
     }
 
     /**
-     * @notice The total fees available in the system to be withdrawnn in hUSD
+     * @notice The total fees available in the system to be withdrawnn in zUSD
      */
     function totalFeesAvailable() external view returns (uint) {
         uint totalFees = 0;
@@ -528,7 +528,7 @@ contract FeePool is Owned, Proxyable, LimitedSetup, MixinResolver, MixinSystemSe
     }
 
     /**
-     * @notice The fees available to be withdrawn by a specific account, priced in hUSD
+     * @notice The fees available to be withdrawn by a specific account, priced in zUSD
      * @dev Returns two amounts, one for fees and one for SNX rewards
      */
     function feesAvailable(address account) public view returns (uint, uint) {
@@ -544,7 +544,7 @@ contract FeePool is Owned, Proxyable, LimitedSetup, MixinResolver, MixinSystemSe
             totalRewards = totalRewards.add(userFees[i][1]);
         }
 
-        // And convert totalFees to hUSD
+        // And convert totalFees to zUSD
         // Return totalRewards as is in HZN amount
         return (totalFees, totalRewards);
     }
@@ -577,7 +577,7 @@ contract FeePool is Owned, Proxyable, LimitedSetup, MixinResolver, MixinSystemSe
     }
 
     /**
-     * @notice Calculates fees by period for an account, priced in hUSD
+     * @notice Calculates fees by period for an account, priced in zUSD
      * @param account The address you want to query the fees for
      */
     function feesByPeriod(address account) public view returns (uint[2][FEE_PERIOD_LENGTH] memory results) {
@@ -790,14 +790,14 @@ contract FeePool is Owned, Proxyable, LimitedSetup, MixinResolver, MixinSystemSe
         proxy._emit(abi.encode(feePeriodId), 1, FEEPERIODCLOSED_SIG, 0, 0, 0);
     }
 
-    event FeesClaimed(address account, uint hUSDAmount, uint snxRewards);
+    event FeesClaimed(address account, uint zUSDAmount, uint snxRewards);
     bytes32 private constant FEESCLAIMED_SIG = keccak256("FeesClaimed(address,uint256,uint256)");
 
     function emitFeesClaimed(
         address account,
-        uint hUSDAmount,
+        uint zUSDAmount,
         uint snxRewards
     ) internal {
-        proxy._emit(abi.encode(account, hUSDAmount, snxRewards), 1, FEESCLAIMED_SIG, 0, 0, 0);
+        proxy._emit(abi.encode(account, zUSDAmount, snxRewards), 1, FEESCLAIMED_SIG, 0, 0, 0);
     }
 }
