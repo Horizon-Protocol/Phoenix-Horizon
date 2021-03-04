@@ -83,7 +83,7 @@ contract MyContract {
 - `getSource({ network })` Return `abi` and `bytecode` for a contract `source`.
 - `getSuspensionReasons({ code })` Return mapping of `SystemStatus` suspension codes to string reasons.
 - `getStakingRewards({ network })` Return the list of staking reward contracts available.
-- `getSynths({ network })` Return the list of zassets for a network.
+- `getZassets({ network })` Return the list of zassets for a network.
 - `getTarget({ network })` Return the information about a contract's `address` and `source` file. The contract names are those specified in doc web.
 - `getTokens({ network })` Return the list of tokens (zassets and `HZN`) used in the system, along with their addresses.
 - `getUsers({ network })` Return the list of user accounts within the Horizon protocol (e.g. `owner`, `fee`, etc).
