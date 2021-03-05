@@ -98,7 +98,7 @@
 	"DappMaintenance": {
 		"deploy": false
 	},
-	"HassetzUSD": {
+	"ZassetzUSD": {
 		"deploy": false
 	},
 	"ProxyERC20": {
@@ -134,7 +134,7 @@
 	"ProxyzBNB": {
 		"deploy": false
 	},
-	"HassetzBNB": {
+	"ZassetzBNB": {
 		"deploy": false
 	}
 }

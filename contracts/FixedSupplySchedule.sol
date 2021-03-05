@@ -23,7 +23,7 @@ contract FixedSupplySchedule is Owned, MixinResolver, ISupplySchedule {
 
     /* ========== CONSTANTS ========== */
 
-    // Max SNX rewards for minter
+    // Max HZN rewards for minter
     uint public constant MAX_MINTER_REWARD = 200 ether; //1 ether == 1e18
 
     // Default mintPeriodDuration
@@ -47,7 +47,7 @@ contract FixedSupplySchedule is Owned, MixinResolver, ISupplySchedule {
     uint public fixedPeriodicSupply;
     // The period that the suply schedule ends
     uint public supplyEnd;
-    // The number of SNX rewarded to the caller of Synthetix.mint()
+    // The number of HZN rewarded to the caller of Synthetix.mint()
     uint public minterReward;
 
     /* ========== ADDRESS RESOLVER CONFIGURATION ========== */
@@ -105,7 +105,7 @@ contract FixedSupplySchedule is Owned, MixinResolver, ISupplySchedule {
     }
 
     /**
-     * @return The amount of SNX mintable for the inflationary supply
+     * @return The amount of HZN mintable for the inflationary supply
      */
     function mintableSupply() external view returns (uint) {
         uint totalAmount;
@@ -165,7 +165,7 @@ contract FixedSupplySchedule is Owned, MixinResolver, ISupplySchedule {
      * @notice Record the mint event from Synthetix by incrementing the inflation
      * period counter for the number of periods minted (probabaly always 1)
      * and store the time of the event.
-     * @param supplyMinted the amount of SNX the total supply was inflated by.
+     * @param supplyMinted the amount of HZN the total supply was inflated by.
      * */
     function recordMintEvent(uint supplyMinted) external onlySynthetix returns (bool) {
         uint numberOfPeriodsIssued = periodsSinceLastIssuance();
@@ -184,11 +184,11 @@ contract FixedSupplySchedule is Owned, MixinResolver, ISupplySchedule {
     // ========== SETTERS ========== */
 
     /**
-     * @notice Sets the reward amount of SNX for the caller of the public
+     * @notice Sets the reward amount of HZN for the caller of the public
      * function Synthetix.mint().
      * This incentivises anyone to mint the inflationary supply and the mintr
      * Reward will be deducted from the inflationary supply and sent to the caller.
-     * @param amount the amount of SNX to reward the minter.
+     * @param amount the amount of HZN to reward the minter.
      * */
     function setMinterReward(uint amount) external onlyOwner {
         require(amount <= MAX_MINTER_REWARD, "Reward can't exceed max minter reward");
@@ -213,7 +213,7 @@ contract FixedSupplySchedule is Owned, MixinResolver, ISupplySchedule {
     event SupplyMinted(uint supplyMinted, uint numberOfPeriodsIssued, uint lastMintEvent, uint timestamp);
 
     /**
-     * @notice Emitted when the SNX minter reward amount is updated
+     * @notice Emitted when the HZN minter reward amount is updated
      * */
     event MinterRewardUpdated(uint newRewardAmount);
 }

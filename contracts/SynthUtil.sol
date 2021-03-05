@@ -14,7 +14,7 @@ contract SynthUtil {
 
     bytes32 internal constant CONTRACT_SYNTHETIX = "Synthetix";
     bytes32 internal constant CONTRACT_EXRATES = "ExchangeRates";
-    bytes32 internal constant hUSD = "zUSD";
+    bytes32 internal constant zUSD = "zUSD";
 
     constructor(address resolver) public {
         addressResolverProxy = IAddressResolver(resolver);
@@ -57,14 +57,14 @@ contract SynthUtil {
         uint numSynths = synthetix.availableSynthCount();
         bytes32[] memory currencyKeys = new bytes32[](numSynths);
         uint[] memory balances = new uint[](numSynths);
-        uint[] memory hUSDBalances = new uint[](numSynths);
+        uint[] memory zUSDBalances = new uint[](numSynths);
         for (uint i = 0; i < numSynths; i++) {
             ISynth synth = synthetix.availableSynths(i);
             currencyKeys[i] = synth.currencyKey();
             balances[i] = IERC20(address(synth)).balanceOf(account);
-            hUSDBalances[i] = exchangeRates.effectiveValue(currencyKeys[i], balances[i], hUSD);
+            zUSDBalances[i] = exchangeRates.effectiveValue(currencyKeys[i], balances[i], zUSD);
         }
-        return (currencyKeys, balances, hUSDBalances);
+        return (currencyKeys, balances, zUSDBalances);
     }
 
     function frozenSynths() external view returns (bytes32[] memory) {
@@ -101,13 +101,13 @@ contract SynthUtil {
         uint256 numSynths = synthetix.availableSynthCount();
         bytes32[] memory currencyKeys = new bytes32[](numSynths);
         uint256[] memory balances = new uint256[](numSynths);
-        uint256[] memory hUSDBalances = new uint256[](numSynths);
+        uint256[] memory zUSDBalances = new uint256[](numSynths);
         for (uint256 i = 0; i < numSynths; i++) {
             ISynth synth = synthetix.availableSynths(i);
             currencyKeys[i] = synth.currencyKey();
             balances[i] = IERC20(address(synth)).totalSupply();
-            hUSDBalances[i] = exchangeRates.effectiveValue(currencyKeys[i], balances[i], hUSD);
+            zUSDBalances[i] = exchangeRates.effectiveValue(currencyKeys[i], balances[i], zUSD);
         }
-        return (currencyKeys, balances, hUSDBalances);
+        return (currencyKeys, balances, zUSDBalances);
     }
 }

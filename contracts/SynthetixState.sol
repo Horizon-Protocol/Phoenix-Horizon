@@ -96,11 +96,11 @@ contract SynthetixState is Owned, State, LimitedSetup, ISynthetixState {
     //  * @notice Import issuer data from the old Synthetix contract before multicurrency
     //  * @dev Only callable by the contract owner, and only for 1 week after deployment.
     //  */
-    // function importIssuerData(address[] accounts, uint[] sUSDAmounts) external onlyOwner onlyDuringSetup {
-    //     require(accounts.length == sUSDAmounts.length, "Length mismatch");
+    // function importIssuerData(address[] accounts, uint[] zUSDAmounts) external onlyOwner onlyDuringSetup {
+    //     require(accounts.length == zUSDAmounts.length, "Length mismatch");
 
     //     for (uint8 i = 0; i < accounts.length; i++) {
-    //         _addToDebtRegister(accounts[i], sUSDAmounts[i]);
+    //         _addToDebtRegister(accounts[i], zUSDAmounts[i]);
     //     }
     // }
 

@@ -62,13 +62,13 @@ contract BinaryOptionMarketManager is Owned, Pausable, MixinResolver, IBinaryOpt
     /* ---------- Address Resolver Configuration ---------- */
 
     bytes32 internal constant CONTRACT_SYSTEMSTATUS = "SystemStatus";
-    bytes32 internal constant CONTRACT_SYNTHSUSD = "HassetzUSD";
+    bytes32 internal constant CONTRACT_ZASSETZUSD = "ZassetzUSD";
     bytes32 internal constant CONTRACT_EXRATES = "ExchangeRates";
     bytes32 internal constant CONTRACT_BINARYOPTIONMARKETFACTORY = "BinaryOptionMarketFactory";
 
     bytes32[24] internal addressesToCache = [
         CONTRACT_SYSTEMSTATUS,
-        CONTRACT_SYNTHSUSD,
+        CONTRACT_ZASSETZUSD,
         CONTRACT_EXRATES,
         CONTRACT_BINARYOPTIONMARKETFACTORY
     ];
@@ -108,8 +108,8 @@ contract BinaryOptionMarketManager is Owned, Pausable, MixinResolver, IBinaryOpt
         return ISystemStatus(requireAndGetAddress(CONTRACT_SYSTEMSTATUS, "Missing SystemStatus address"));
     }
 
-    function _sUSD() internal view returns (IERC20) {
-        return IERC20(requireAndGetAddress(CONTRACT_SYNTHSUSD, "Missing HassetzUSD address"));
+    function _zUSD() internal view returns (IERC20) {
+        return IERC20(requireAndGetAddress(CONTRACT_ZASSETZUSD, "Missing ZassetzUSD address"));
     }
 
     function _exchangeRates() internal view returns (IExchangeRates) {
@@ -280,7 +280,7 @@ contract BinaryOptionMarketManager is Owned, Pausable, MixinResolver, IBinaryOpt
         // The debt can't be incremented in the new market's constructor because until construction is complete,
         // the manager doesn't know its address in order to grant it permission.
         totalDeposited = totalDeposited.add(initialDeposit);
-        _sUSD().transferFrom(msg.sender, address(market), initialDeposit);
+        _zUSD().transferFrom(msg.sender, address(market), initialDeposit);
 
         emit MarketCreated(address(market), msg.sender, oracleKey, strikePrice, biddingEnd, maturity, expiry);
         return market;

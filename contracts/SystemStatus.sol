@@ -14,7 +14,7 @@ contract SystemStatus is Owned, ISystemStatus {
     bytes32 public constant SECTION_SYSTEM = "System";
     bytes32 public constant SECTION_ISSUANCE = "Issuance";
     bytes32 public constant SECTION_EXCHANGE = "Exchange";
-    bytes32 public constant SECTION_HASSET = "Hasset";
+    bytes32 public constant SECTION_ZASSET = "Zasset";
 
     Suspension public systemSuspension;
 
@@ -28,7 +28,7 @@ contract SystemStatus is Owned, ISystemStatus {
         _internalUpdateAccessControl(SECTION_SYSTEM, _owner, true, true);
         _internalUpdateAccessControl(SECTION_ISSUANCE, _owner, true, true);
         _internalUpdateAccessControl(SECTION_EXCHANGE, _owner, true, true);
-        _internalUpdateAccessControl(SECTION_HASSET, _owner, true, true);
+        _internalUpdateAccessControl(SECTION_ZASSET, _owner, true, true);
     }
 
     /* ========== VIEWS ========== */
@@ -51,7 +51,7 @@ contract SystemStatus is Owned, ISystemStatus {
     function requireSynthActive(bytes32 currencyKey) external view {
         // Synth exchange and transfer requires the system be active
         _internalRequireSystemActive();
-        require(!synthSuspension[currencyKey].suspended, "Hasset is suspended. Operation prohibited");
+        require(!synthSuspension[currencyKey].suspended, "Zasset is suspended. Operation prohibited");
     }
 
     function requireSynthsActive(bytes32 sourceCurrencyKey, bytes32 destinationCurrencyKey) external view {
@@ -60,7 +60,7 @@ contract SystemStatus is Owned, ISystemStatus {
 
         require(
             !synthSuspension[sourceCurrencyKey].suspended && !synthSuspension[destinationCurrencyKey].suspended,
-            "One or more hassets are suspended. Operation prohibited"
+            "One or more zassets are suspended. Operation prohibited"
         );
     }
 
@@ -135,14 +135,14 @@ contract SystemStatus is Owned, ISystemStatus {
     }
 
     function suspendSynth(bytes32 currencyKey, uint256 reason) external {
-        _requireAccessToSuspend(SECTION_HASSET);
+        _requireAccessToSuspend(SECTION_ZASSET);
         synthSuspension[currencyKey].suspended = true;
         synthSuspension[currencyKey].reason = uint248(reason);
         emit SynthSuspended(currencyKey, reason);
     }
 
     function resumeSynth(bytes32 currencyKey) external {
-        _requireAccessToResume(SECTION_HASSET);
+        _requireAccessToResume(SECTION_ZASSET);
         emit SynthResumed(currencyKey, uint256(synthSuspension[currencyKey].reason));
         delete synthSuspension[currencyKey];
     }
@@ -176,7 +176,7 @@ contract SystemStatus is Owned, ISystemStatus {
             section == SECTION_SYSTEM ||
                 section == SECTION_ISSUANCE ||
                 section == SECTION_EXCHANGE ||
-                section == SECTION_HASSET,
+                section == SECTION_ZASSET,
             "Invalid section supplied"
         );
         accessControl[section][account].canSuspend = canSuspend;

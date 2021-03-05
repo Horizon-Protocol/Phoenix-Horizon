@@ -205,9 +205,9 @@ contract FeePool is Owned, Proxyable, LimitedSetup, MixinResolver, MixinSystemSe
     /**
      * @notice Logs an accounts issuance data per fee period
      * @param account Message.Senders account address
-     * @param debtRatio Debt percentage this account has locked after minting or burning their synth
+     * @param debtRatio Debt percentage this account has locked after minting or burning their zasset
      * @param debtEntryIndex The index in the global debt ledger. synthetixState.issuanceData(account)
-     * @dev onlyIssuer to call me on synthetix.issue() & synthetix.burn() calls to store the locked SNX
+     * @dev onlyIssuer to call me on synthetix.issue() & synthetix.burn() calls to store the locked HZN
      * per fee period so we know to allocate the correct proportions of fees and rewards per period
      */
     function appendAccountIssuanceRecord(
@@ -315,7 +315,7 @@ contract FeePool is Owned, Proxyable, LimitedSetup, MixinResolver, MixinSystemSe
 
         require(feesClaimable, "C-Ratio below penalty threshold");
 
-        require(!anyRateIsInvalid, "A hasset or HZN rate is invalid");
+        require(!anyRateIsInvalid, "A zasset or HZN rate is invalid");
 
         // Get the claimingAddress available fees and rewards
         (availableFees, availableRewards) = feesAvailable(claimingAddress);
@@ -381,7 +381,7 @@ contract FeePool is Owned, Proxyable, LimitedSetup, MixinResolver, MixinSystemSe
      * @param quantity Amount of tokens to escrow
      */
     function appendVestingEntry(address account, uint quantity) public optionalProxy_onlyOwner {
-        // Transfer SNX from messageSender to the Reward Escrow
+        // Transfer HZN from messageSender to the Reward Escrow
         IERC20(address(synthetix())).transferFrom(messageSender, address(rewardEscrow()), quantity);
 
         // Create Vesting Entry
@@ -428,11 +428,11 @@ contract FeePool is Owned, Proxyable, LimitedSetup, MixinResolver, MixinSystemSe
 
     /**
      * @notice Record the reward payment in our recentFeePeriods.
-     * @param snxAmount The amount of SNX tokens.
+     * @param hznAmount The amount of HZN tokens.
      */
-    function _recordRewardPayment(uint snxAmount) internal returns (uint) {
+    function _recordRewardPayment(uint hznAmount) internal returns (uint) {
         // Don't assign to the parameter
-        uint remainingToAllocate = snxAmount;
+        uint remainingToAllocate = hznAmount;
 
         uint rewardPaid;
 
@@ -473,32 +473,32 @@ contract FeePool is Owned, Proxyable, LimitedSetup, MixinResolver, MixinSystemSe
      */
     function _payFees(address account, uint zUSDAmount) internal notFeeAddress(account) {
         // Grab the zUSD Synth
-        ISynth sUSDSynth = issuer().synths(zUSD);
+        ISynth zUSDSynth = issuer().synths(zUSD);
 
         // NOTE: we do not control the FEE_ADDRESS so it is not possible to do an
         // ERC20.approve() transaction to allow this feePool to call ERC20.transferFrom
         // to the accounts address
 
         // Burn the source amount
-        sUSDSynth.burn(FEE_ADDRESS, zUSDAmount);
+        zUSDSynth.burn(FEE_ADDRESS, zUSDAmount);
 
         // Mint their new synths
-        sUSDSynth.issue(account, zUSDAmount);
+        zUSDSynth.issue(account, zUSDAmount);
     }
 
     /**
      * @notice Send the rewards to claiming address - will be locked in rewardEscrow.
      * @param account The address to send the fees to.
-     * @param snxAmount The amount of HZN.
+     * @param hznAmount The amount of HZN.
      */
-    function _payRewards(address account, uint snxAmount) internal notFeeAddress(account) {
+    function _payRewards(address account, uint hznAmount) internal notFeeAddress(account) {
         // Record vesting entry for claiming address and amount
-        // SNX already minted to rewardEscrow balance
-        rewardEscrow().appendVestingEntry(account, snxAmount);
+        // HZN already minted to rewardEscrow balance
+        rewardEscrow().appendVestingEntry(account, hznAmount);
     }
 
     /**
-     * @notice The total fees available in the system to be withdrawnn in zUSD
+     * @notice The total fees available in the system to be withdrawn in zUSD
      */
     function totalFeesAvailable() external view returns (uint) {
         uint totalFees = 0;
@@ -513,7 +513,7 @@ contract FeePool is Owned, Proxyable, LimitedSetup, MixinResolver, MixinSystemSe
     }
 
     /**
-     * @notice The total SNX rewards available in the system to be withdrawn
+     * @notice The total HZN rewards available in the system to be withdrawn
      */
     function totalRewardsAvailable() external view returns (uint) {
         uint totalRewards = 0;
@@ -529,7 +529,7 @@ contract FeePool is Owned, Proxyable, LimitedSetup, MixinResolver, MixinSystemSe
 
     /**
      * @notice The fees available to be withdrawn by a specific account, priced in zUSD
-     * @dev Returns two amounts, one for fees and one for SNX rewards
+     * @dev Returns two amounts, one for fees and one for HZN rewards
      */
     function feesAvailable(address account) public view returns (uint, uint) {
         // Add up the fees
@@ -796,8 +796,8 @@ contract FeePool is Owned, Proxyable, LimitedSetup, MixinResolver, MixinSystemSe
     function emitFeesClaimed(
         address account,
         uint zUSDAmount,
-        uint snxRewards
+        uint hznRewards
     ) internal {
-        proxy._emit(abi.encode(account, zUSDAmount, snxRewards), 1, FEESCLAIMED_SIG, 0, 0, 0);
+        proxy._emit(abi.encode(account, zUSDAmount, hznRewards), 1, FEESCLAIMED_SIG, 0, 0, 0);
     }
 }

@@ -62,11 +62,11 @@ const removeSynths = async ({
 	// sanity-check the synth list
 	for (const synth of synthsToRemove) {
 		if (synths.filter(({ name }) => name === synth).length < 1) {
-			console.error(red(`Hasset ${synth} not found!`));
+			console.error(red(`Zasset ${synth} not found!`));
 			process.exitCode = 1;
 			return;
 		} else if (['zUSD'].indexOf(synth) >= 0) {
-			console.error(red(`Hasset ${synth} cannot be removed`));
+			console.error(red(`Zasset ${synth} cannot be removed`));
 			process.exitCode = 1;
 			return;
 		}
@@ -121,7 +121,7 @@ const removeSynths = async ({
 
 	for (const currencyKey of synthsToRemove) {
 		const { address: synthAddress, source: synthSource } = deployment.targets[
-			`Hasset${currencyKey}`
+			`Zasset${currencyKey}`
 		];
 		const { abi: synthABI } = deployment.sources[synthSource];
 		const Synth = new web3.eth.Contract(synthABI, synthAddress);
@@ -131,7 +131,7 @@ const removeSynths = async ({
 		if (synthAddress !== currentSynthInSNX) {
 			console.error(
 				red(
-					`Hasset address in Horizon for ${currencyKey} is different from what's deployed in Horizon to the local ${DEPLOYMENT_FILENAME} of ${network} \ndeployed: ${yellow(
+					`Zasset address in Horizon for ${currencyKey} is different from what's deployed in Horizon to the local ${DEPLOYMENT_FILENAME} of ${network} \ndeployed: ${yellow(
 						currentSynthInSNX
 					)}\nlocal:    ${yellow(synthAddress)}`
 				)
@@ -145,9 +145,9 @@ const removeSynths = async ({
 		if (Number(totalSupply) > 0) {
 			console.error(
 				red(
-					`Cannot remove as Hasset${currencyKey}.totalSupply is non-zero: ${yellow(
+					`Cannot remove as Zasset${currencyKey}.totalSupply is non-zero: ${yellow(
 						totalSupply
-					)}\nThe Hasset must be purged of holders.`
+					)}\nThe Zasset must be purged of holders.`
 				)
 			);
 			process.exitCode = 1;

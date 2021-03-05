@@ -50,18 +50,18 @@ const purgeSynths = async ({
 	});
 
 	if (synthsToPurge.length < 1) {
-		console.log(gray('No hassets provided. Please use --synths-to-remove option'));
+		console.log(gray('No zassets provided. Please use --synths-to-remove option'));
 		return;
 	}
 
 	// sanity-check the synth list
 	for (const synth of synthsToPurge) {
 		if (synths.filter(({ name }) => name === synth).length < 1) {
-			console.error(red(`Hasset ${synth} not found!`));
+			console.error(red(`Zasset ${synth} not found!`));
 			process.exitCode = 1;
 			return;
-		} else if (['hUSD'].indexOf(synth) >= 0) {
-			console.error(red(`Hasset ${synth} cannot be purged`));
+		} else if (['zUSD'].indexOf(synth) >= 0) {
+			console.error(red(`Zasset ${synth} cannot be purged`));
 			process.exitCode = 1;
 			return;
 		}
@@ -114,7 +114,7 @@ const purgeSynths = async ({
 	let totalBatches = 0;
 	for (const currencyKey of synthsToPurge) {
 		const { address: synthAddress, source: synthSource } = deployment.targets[
-			`Hasset${currencyKey}`
+			`Zasset${currencyKey}`
 		];
 
 		const { abi: synthABI } = deployment.sources[synthSource];
@@ -139,7 +139,7 @@ const purgeSynths = async ({
 		if (synthAddress !== currentSynthInSNX) {
 			console.error(
 				red(
-					`Hasset address in Horizon for ${currencyKey} is different from what's deployed in Horizon to the local ${DEPLOYMENT_FILENAME} of ${network} \ndeployed: ${yellow(
+					`Zasset address in Horizon for ${currencyKey} is different from what's deployed in Horizon to the local ${DEPLOYMENT_FILENAME} of ${network} \ndeployed: ${yellow(
 						currentSynthInSNX
 					)}\nlocal:    ${yellow(synthAddress)}`
 				)
@@ -193,7 +193,7 @@ const purgeSynths = async ({
 			} else {
 				await performTransactionalStep({
 					account,
-					contract: `Hasset${currencyKey}`,
+					contract: `Zasset${currencyKey}`,
 					target: Synth,
 					write: 'purge',
 					writeArg: [entries], // explicitly pass array of args so array not splat as params

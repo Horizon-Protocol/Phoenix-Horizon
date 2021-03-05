@@ -96,15 +96,15 @@ contract EtherCollateral is Owned, Pausable, ReentrancyGuard, MixinResolver, IEt
     /* ========== ADDRESS RESOLVER CONFIGURATION ========== */
 
     bytes32 private constant CONTRACT_SYSTEMSTATUS = "SystemStatus";
-    bytes32 private constant CONTRACT_SYNTHZBNB = "HassetzBNB";
-    bytes32 private constant CONTRACT_SYNTHZUSD = "HassetzUSD";
+    bytes32 private constant CONTRACT_ZASSETZBNB = "ZassetzBNB";
+    bytes32 private constant CONTRACT_ZASSETZUSD = "ZassetzUSD";
     bytes32 private constant CONTRACT_DEPOT = "Depot";
     bytes32 private constant CONTRACT_EXRATES = "ExchangeRates";
 
     bytes32[24] private addressesToCache = [
         CONTRACT_SYSTEMSTATUS,
-        CONTRACT_SYNTHZBNB,
-        CONTRACT_SYNTHZUSD,
+        CONTRACT_ZASSETZBNB,
+        CONTRACT_ZASSETZUSD,
         CONTRACT_DEPOT,
         CONTRACT_EXRATES
     ];
@@ -360,7 +360,7 @@ contract EtherCollateral is Owned, Pausable, ReentrancyGuard, MixinResolver, IEt
         require(synthLoan.timeClosed == 0, "Loan already closed");
         require(
             IERC20(address(synthsETH())).balanceOf(msg.sender) >= synthLoan.loanAmount,
-            "You do not have the required Hasset balance to close this loan."
+            "You do not have the required Zasset balance to close this loan."
         );
 
         // Record loan as closed
@@ -444,11 +444,11 @@ contract EtherCollateral is Owned, Pausable, ReentrancyGuard, MixinResolver, IEt
     }
 
     function synthsETH() internal view returns (ISynth) {
-        return ISynth(requireAndGetAddress(CONTRACT_SYNTHZBNB, "Missing HassetzBNB address"));
+        return ISynth(requireAndGetAddress(CONTRACT_ZASSETZBNB, "Missing ZassetzBNB address"));
     }
 
     function synthsUSD() internal view returns (ISynth) {
-        return ISynth(requireAndGetAddress(CONTRACT_SYNTHZUSD, "Missing HassetzUSD address"));
+        return ISynth(requireAndGetAddress(CONTRACT_ZASSETZUSD, "Missing ZassetzUSD address"));
     }
 
     function depot() internal view returns (IDepot) {
