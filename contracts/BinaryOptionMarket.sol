@@ -69,10 +69,10 @@ contract BinaryOptionMarket is Owned, MixinResolver, IBinaryOptionMarket {
 
     bytes32 internal constant CONTRACT_SYSTEMSTATUS = "SystemStatus";
     bytes32 internal constant CONTRACT_EXRATES = "ExchangeRates";
-    bytes32 internal constant CONTRACT_SYNTHSUSD = "HassetzUSD";
+    bytes32 internal constant CONTRACT_ZASSETZUSD = "ZassetzUSD";
     bytes32 internal constant CONTRACT_FEEPOOL = "FeePool";
 
-    bytes32[24] internal addressesToCache = [CONTRACT_SYSTEMSTATUS, CONTRACT_EXRATES, CONTRACT_SYNTHSUSD, CONTRACT_FEEPOOL];
+    bytes32[24] internal addressesToCache = [CONTRACT_SYSTEMSTATUS, CONTRACT_EXRATES, CONTRACT_ZASSETZUSD, CONTRACT_FEEPOOL];
 
     /* ========== CONSTRUCTOR ========== */
 
@@ -134,8 +134,8 @@ contract BinaryOptionMarket is Owned, MixinResolver, IBinaryOptionMarket {
         return IExchangeRates(requireAndGetAddress(CONTRACT_EXRATES, "Missing ExchangeRates"));
     }
 
-    function _sUSD() internal view returns (IERC20) {
-        return IERC20(requireAndGetAddress(CONTRACT_SYNTHSUSD, "Missing HassetzUSD"));
+    function _zUSD() internal view returns (IERC20) {
+        return IERC20(requireAndGetAddress(CONTRACT_ZASSETZUSD, "Missing ZassetzUSD"));
     }
 
     function _feePool() internal view returns (IFeePool) {
@@ -430,7 +430,7 @@ contract BinaryOptionMarket is Owned, MixinResolver, IBinaryOptionMarket {
         emit Bid(side, msg.sender, value);
 
         uint _deposited = _incrementDeposited(value);
-        _sUSD().transferFrom(msg.sender, address(this), value);
+        _zUSD().transferFrom(msg.sender, address(this), value);
 
         (uint longTotalBids, uint shortTotalBids) = _totalBids();
         _updatePrices(longTotalBids, shortTotalBids, _deposited);
@@ -459,7 +459,7 @@ contract BinaryOptionMarket is Owned, MixinResolver, IBinaryOptionMarket {
         emit Refund(side, msg.sender, refundMinusFee, value.sub(refundMinusFee));
 
         uint _deposited = _decrementDeposited(refundMinusFee);
-        _sUSD().transfer(msg.sender, refundMinusFee);
+        _zUSD().transfer(msg.sender, refundMinusFee);
 
         (uint longTotalBids, uint shortTotalBids) = _totalBids();
         _updatePrices(longTotalBids, shortTotalBids, _deposited);
@@ -481,14 +481,14 @@ contract BinaryOptionMarket is Owned, MixinResolver, IBinaryOptionMarket {
         // Now remit any collected fees.
         // Since the constructor enforces that creatorFee + poolFee < 1, the balance
         // in the contract will be sufficient to cover these transfers.
-        IERC20 sUSD = _sUSD();
+        IERC20 zUSD = _zUSD();
 
         uint _deposited = deposited;
         uint poolFees = _deposited.multiplyDecimalRound(fees.poolFee);
         uint creatorFees = _deposited.multiplyDecimalRound(fees.creatorFee);
         _decrementDeposited(creatorFees.add(poolFees));
-        sUSD.transfer(_feePool().FEE_ADDRESS(), poolFees);
-        sUSD.transfer(creator, creatorFees);
+        zUSD.transfer(_feePool().FEE_ADDRESS(), poolFees);
+        zUSD.transfer(creator, creatorFees);
 
         emit MarketResolved(_result(), price, updatedAt, deposited, poolFees, creatorFees);
     }
@@ -554,7 +554,7 @@ contract BinaryOptionMarket is Owned, MixinResolver, IBinaryOptionMarket {
         emit OptionsExercised(msg.sender, payout);
         if (payout != 0) {
             _decrementDeposited(payout);
-            _sUSD().transfer(msg.sender, payout);
+            _zUSD().transfer(msg.sender, payout);
         }
         return payout;
     }
@@ -569,10 +569,10 @@ contract BinaryOptionMarket is Owned, MixinResolver, IBinaryOptionMarket {
 
         // Transfer the balance rather than the deposit value in case there are any synths left over
         // from direct transfers.
-        IERC20 sUSD = _sUSD();
-        uint balance = sUSD.balanceOf(address(this));
+        IERC20 zUSD = _zUSD();
+        uint balance = zUSD.balanceOf(address(this));
         if (balance != 0) {
-            sUSD.transfer(beneficiary, balance);
+            zUSD.transfer(beneficiary, balance);
         }
 
         // Destroy the option tokens before destroying the market itself.

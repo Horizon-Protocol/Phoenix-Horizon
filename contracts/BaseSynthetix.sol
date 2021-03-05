@@ -163,7 +163,7 @@ contract BaseSynthetix is IERC20, ExternStateToken, MixinResolver, ISynthetix {
                 tokenState.balanceOf(account)
             );
             require(value <= transferable, "Cannot transfer staked or escrowed HZN");
-            require(!anyRateIsInvalid, "A hasset or HZN rate is invalid");
+            require(!anyRateIsInvalid, "A zasset or HZN rate is invalid");
         }
         return true;
     }

@@ -130,10 +130,10 @@ contract SwapWithVirtualSynth {
         // ensure the pool can transferFrom our contract
         USDC.approve(address(incomingPool), amount);
 
-        // now invoke curve USDC to sUSD
+        // now invoke curve USDC to zUSD
         incomingPool.exchange(1, 3, amount, 0);
 
-        // now exchange my sUSD to sBTC
+        // now exchange my zUSD to zBTC
         (, IVirtualSynth vSynth) = synthetix.exchangeWithVirtual("zUSD", sUSD.balanceOf(address(this)), "zBTC", bytes32(0));
 
         // wrap this vSynth in a new token ERC20 contract

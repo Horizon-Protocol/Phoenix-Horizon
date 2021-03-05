@@ -110,7 +110,7 @@ contract Liquidations is Owned, MixinResolver, MixinSystemSettings, ILiquidation
         uint accountCollateralisationRatio = synthetix().collateralisationRatio(account);
 
         // Liquidation closed if collateral ratio less than or equal target issuance Ratio
-        // Account with no snx collateral will also not be open for liquidation (ratio is 0)
+        // Account with no HZN collateral will also not be open for liquidation (ratio is 0)
         if (accountCollateralisationRatio <= getIssuanceRatio()) {
             return false;
         }
@@ -168,7 +168,7 @@ contract Liquidations is Owned, MixinResolver, MixinSystemSettings, ILiquidation
     /* ========== MUTATIVE FUNCTIONS ========== */
 
     // totalIssuedSynths checks synths for staleness
-    // check snx rate is not stale
+    // check HZN rate is not stale
     function flagAccountForLiquidation(address account) external rateNotInvalid("HZN") {
         systemStatus().requireSystemActive();
 
@@ -204,7 +204,7 @@ contract Liquidations is Owned, MixinResolver, MixinSystemSettings, ILiquidation
 
     // Public function to allow an account to remove from liquidations
     // Checks collateral ratio is fixed - below target issuance ratio
-    // Check SNX rate is not stale
+    // Check HZN rate is not stale
     function checkAndRemoveAccountInLiquidation(address account) external rateNotInvalid("HZN") {
         systemStatus().requireSystemActive();
 
@@ -246,7 +246,7 @@ contract Liquidations is Owned, MixinResolver, MixinSystemSettings, ILiquidation
     }
 
     modifier rateNotInvalid(bytes32 currencyKey) {
-        require(!exchangeRates().rateIsInvalid(currencyKey), "Rate invalid or not a hasset");
+        require(!exchangeRates().rateIsInvalid(currencyKey), "Rate invalid or not a zasset");
         _;
     }
 

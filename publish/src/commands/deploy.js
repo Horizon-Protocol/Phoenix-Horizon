@@ -328,7 +328,7 @@ const deploy = async ({
 	}
 
 	const newSynthsToAdd = synths
-		.filter(({ name }) => !config[`Hasset${name}`])
+		.filter(({ name }) => !config[`Zasset${name}`])
 		.map(({ name }) => name);
 
 	let aggregatedPriceResults = 'N/A';
@@ -392,7 +392,7 @@ const deploy = async ({
 			(latestSolTimestamp > earliestCompiledTimestamp
 				? yellow(' ⚠⚠⚠ this is later than the last build! Is this intentional?')
 				: green(' ✅')),
-		'Add any new hassets found?': addNewSynths
+		'Add any new zassets found?': addNewSynths
 			? green('✅ YES\n\t\t\t\t') + newSynthsToAdd.join(', ')
 			: yellow('⚠ NO'),
 		'Deployer account:': account,
@@ -735,10 +735,10 @@ const deploy = async ({
 			contract: 'SystemStatus',
 			target: systemStatus,
 			read: 'accessControl',
-			readArg: [toBytes32('Hasset'), addressOf(exchanger)],
+			readArg: [toBytes32('Zasset'), addressOf(exchanger)],
 			expected: ({ canSuspend } = {}) => canSuspend,
 			write: 'updateAccessControl',
-			writeArg: [toBytes32('Hasset'), addressOf(exchanger), true, false],
+			writeArg: [toBytes32('Zasset'), addressOf(exchanger), true, false],
 		});
 	}
 
@@ -905,15 +905,15 @@ const deploy = async ({
 	}
 
 	// ----------------
-	// Hassets
+	// Zassets
 	// ----------------
-	console.log(gray(`\n------ DEPLOY Hassets ------\n`));
+	console.log(gray(`\n------ DEPLOY Zassets ------\n`));
 
 	// The list of synth to be added to the Issuer once dependencies have been set up
 	const synthsToAdd = [];
 
 	for (const { name: currencyKey, subclass, asset } of synths) {
-		console.log(gray(`\n   --- Hasset ${currencyKey} ---\n`));
+		console.log(gray(`\n   --- Zasset ${currencyKey} ---\n`));
 
 		const tokenStateForSynth = await deployer.deployContract({
 			name: `TokenState${currencyKey}`,
@@ -925,7 +925,7 @@ const deploy = async ({
 		// Legacy proxy will be around until May 30, 2020
 		// https://docs.synthetix.io/integrations/guide/#proxy-deprecation
 		// Until this time, on mainnet we will still deploy ProxyERC20sUSD and ensure that
-		// HassetzUSD.proxy is ProxyERC20zUSD, HassetzUSD.integrationProxy is ProxyzUSD
+		// ZassetzUSD.proxy is ProxyERC20zUSD, ZassetzUSD.integrationProxy is ProxyzUSD
 		const synthProxyIsLegacy = currencyKey === 'zUSD' && network === 'mainnet';
 
 		const proxyForSynth = await deployer.deployContract({
@@ -935,7 +935,7 @@ const deploy = async ({
 			force: addNewSynths,
 		});
 
-		// additionally deploy an ERC20 proxy for the hasset if it's legacy (hUSD)
+		// additionally deploy an ERC20 proxy for the zasset if it's legacy (zUSD)
 		let proxyERC20ForSynth;
 		if (currencyKey === 'zUSD') {
 			proxyERC20ForSynth = await deployer.deployContract({
@@ -948,13 +948,13 @@ const deploy = async ({
 
 		const currencyKeyInBytes = toBytes32(currencyKey);
 
-		const synthConfig = config[`Hasset${currencyKey}`] || {};
+		const synthConfig = config[`Zasset${currencyKey}`] || {};
 
 		// track the original supply if we're deploying a new synth contract for an existing synth
 		let originalTotalSupply = 0;
 		if (synthConfig.deploy) {
 			try {
-				const oldSynth = deployer.getExistingContract({ contract: `Hasset${currencyKey}` });
+				const oldSynth = deployer.getExistingContract({ contract: `Zasset${currencyKey}` });
 				originalTotalSupply = await oldSynth.methods.totalSupply().call();
 			} catch (err) {
 				if (!freshDeploy) {
@@ -973,13 +973,13 @@ const deploy = async ({
 			// future specific synths args...
 		};
 
-		// user confirm totalSupply is correct for oldHasset before deploy new Hasset
+		// user confirm totalSupply is correct for oldZasset before deploy new Zasset
 		if (synthConfig.deploy && !yes && originalTotalSupply > 0) {
 			try {
 				await confirmAction(
 					yellow(
 						`⚠⚠⚠ WARNING: Please confirm - ${network}:\n` +
-							`Hasset${currencyKey} totalSupply is ${originalTotalSupply} \n`
+							`Zasset${currencyKey} totalSupply is ${originalTotalSupply} \n`
 					) +
 						gray('-'.repeat(50)) +
 						'\nDo you want to continue? (y/n) '
@@ -992,13 +992,13 @@ const deploy = async ({
 
 		const sourceContract = subclass || 'Synth';
 		const synth = await deployer.deployContract({
-			name: `Hasset${currencyKey}`,
+			name: `Zasset${currencyKey}`,
 			source: sourceContract,
 			deps: [`TokenState${currencyKey}`, `Proxy${currencyKey}`, 'Synthetix', 'FeePool'],
 			args: [
 				proxyERC20ForSynth ? addressOf(proxyERC20ForSynth) : addressOf(proxyForSynth),
 				addressOf(tokenStateForSynth),
-				`Hasset ${currencyKey}`,
+				`Zasset ${currencyKey}`,
 				currencyKey,
 				account,
 				currencyKeyInBytes,
@@ -1032,7 +1032,7 @@ const deploy = async ({
 
 			// Migration Phrase 2: if there's a ProxyERC20sUSD then the Synth's proxy must use it
 			await runStep({
-				contract: `Hasset${currencyKey}`,
+				contract: `Zasset${currencyKey}`,
 				target: synth,
 				read: 'proxy',
 				expected: input => input === addressOf(proxyERC20ForSynth || proxyForSynth),
@@ -1081,7 +1081,7 @@ const deploy = async ({
 
 	await deployer.deployContract({
 		name: 'Depot',
-		deps: ['ProxySynthetix', 'HassetzUSD', 'FeePool'],
+		deps: ['ProxySynthetix', 'ZassetzUSD', 'FeePool'],
 		args: [account, account, addressOf(readProxyForResolver)],
 	});
 
@@ -1431,7 +1431,7 @@ const deploy = async ({
 						.call();
 
 					// and total supply, if any
-					const synth = deployer.deployedContracts[`Hasset${currencyKey}`];
+					const synth = deployer.deployedContracts[`Zasset${currencyKey}`];
 					const totalSynthSupply = await synth.methods.totalSupply().call();
 					console.log(gray(`totalSupply of ${currencyKey}: ${Number(totalSynthSupply)}`));
 
@@ -1541,9 +1541,9 @@ const deploy = async ({
 
 			// override individual currencyKey / synths exchange rates
 			const synthExchangeRateOverride = {
-				hBNB: w3utils.toWei('0.003'),
+				zBNB: w3utils.toWei('0.003'),
 				iBNB: w3utils.toWei('0.003'),
-				sBTC: w3utils.toWei('0.003'),
+				zBTC: w3utils.toWei('0.003'),
 				iBTC: w3utils.toWei('0.003'),
 			};
 

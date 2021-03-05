@@ -23,7 +23,7 @@ contract RewardEscrow is Owned, IRewardEscrow {
     IFeePool public feePool;
 
     /* Lists of (timestamp, quantity) pairs per account, sorted in ascending time order.
-     * These are the times at which each given quantity of SNX vests. */
+     * These are the times at which each given quantity of HZN vests. */
     mapping(address => uint[2][]) public vestingSchedules;
 
     /* An account's total escrowed synthetix balance to save recomputing this for fee extraction purposes. */
@@ -56,7 +56,7 @@ contract RewardEscrow is Owned, IRewardEscrow {
     /* ========== SETTERS ========== */
 
     /**
-     * @notice set the synthetix contract address as we need to transfer SNX when the user vests
+     * @notice set the synthetix contract address as we need to transfer HZN when the user vests
      */
     function setSynthetix(ISynthetix _synthetix) external onlyOwner {
         synthetix = _synthetix;
@@ -108,7 +108,7 @@ contract RewardEscrow is Owned, IRewardEscrow {
     }
 
     /**
-     * @notice Get the quantity of SNX associated with a given schedule entry.
+     * @notice Get the quantity of HZN associated with a given schedule entry.
      */
     function getVestingQuantity(address account, uint index) public view returns (uint) {
         return getVestingScheduleEntry(account, index)[QUANTITY_INDEX];
@@ -192,7 +192,7 @@ contract RewardEscrow is Owned, IRewardEscrow {
         if (scheduleLength == 0) {
             totalEscrowedAccountBalance[account] = quantity;
         } else {
-            /* Disallow adding new vested SNX earlier than the last one.
+            /* Disallow adding new vested HZN earlier than the last one.
              * Since entries are only appended, this means that no vesting date can be repeated. */
             require(
                 getVestingTime(account, scheduleLength - 1) < time,
@@ -220,7 +220,7 @@ contract RewardEscrow is Owned, IRewardEscrow {
     }
 
     /**
-     * @notice Allow a user to withdraw any SNX in their schedule that have vested.
+     * @notice Allow a user to withdraw any HZN in their schedule that have vested.
      */
     function vest() external {
         uint numEntries = _numVestingEntries(msg.sender);

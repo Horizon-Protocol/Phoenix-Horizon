@@ -57,9 +57,9 @@ contract Issuer is Owned, MixinResolver, MixinSystemSettings, IIssuer {
 
     /* ========== ENCODED NAMES ========== */
 
-    bytes32 internal constant hUSD = "zUSD";
+    bytes32 internal constant zUSD = "zUSD";
     bytes32 internal constant zBNB = "zBNB";
-    bytes32 internal constant SNX = "HZN";
+    bytes32 internal constant HZN = "HZN";
 
     // Flexible storage names
 
@@ -160,15 +160,15 @@ contract Issuer is Owned, MixinResolver, MixinSystemSettings, IIssuer {
         return getIssuanceRatio();
     }
 
-    function _availableCurrencyKeysWithOptionalSNX(bool withSNX) internal view returns (bytes32[] memory) {
-        bytes32[] memory currencyKeys = new bytes32[](availableSynths.length + (withSNX ? 1 : 0));
+    function _availableCurrencyKeysWithOptionalSNX(bool withHZN) internal view returns (bytes32[] memory) {
+        bytes32[] memory currencyKeys = new bytes32[](availableSynths.length + (withHZN ? 1 : 0));
 
         for (uint i = 0; i < availableSynths.length; i++) {
             currencyKeys[i] = synthsByAddress[address(availableSynths[i])];
         }
 
-        if (withSNX) {
-            currencyKeys[availableSynths.length] = SNX;
+        if (withHZN) {
+            currencyKeys[availableSynths.length] = HZN;
         }
 
         return currencyKeys;
@@ -196,7 +196,7 @@ contract Issuer is Owned, MixinResolver, MixinSystemSettings, IIssuer {
             anyRateIsInvalid = anyRateIsInvalid || ethRateInvalid;
         }
 
-        if (currencyKey == hUSD) {
+        if (currencyKey == zUSD) {
             return (debt, anyRateIsInvalid);
         }
 
@@ -223,7 +223,7 @@ contract Issuer is Owned, MixinResolver, MixinSystemSettings, IIssuer {
 
         // If it's zero, they haven't issued, and they have no debt.
         // Note: it's more gas intensive to put this check here rather than before _totalIssuedSynths
-        // if they have 0 SNX, but it's a necessary trade-off
+        // if they have 0 HZN, but it's a necessary trade-off
         if (initialDebtOwnership == 0) return (0, totalSystemValue, anyRateIsInvalid);
 
         // Figure out the global debt percentage delta from when they entered the system.
@@ -261,7 +261,7 @@ contract Issuer is Owned, MixinResolver, MixinSystemSettings, IIssuer {
             bool anyRateIsInvalid
         )
     {
-        (alreadyIssued, totalSystemDebt, anyRateIsInvalid) = _debtBalanceOfAndTotalDebt(_issuer, hUSD);
+        (alreadyIssued, totalSystemDebt, anyRateIsInvalid) = _debtBalanceOfAndTotalDebt(_issuer, zUSD);
         (uint issuable, bool isInvalid) = _maxIssuableSynths(_issuer);
         maxIssuable = issuable;
         anyRateIsInvalid = anyRateIsInvalid || isInvalid;
@@ -273,18 +273,18 @@ contract Issuer is Owned, MixinResolver, MixinSystemSettings, IIssuer {
         }
     }
 
-    function _snxToUSD(uint amount, uint snxRate) internal pure returns (uint) {
-        return amount.multiplyDecimalRound(snxRate);
+    function _hznToUSD(uint amount, uint hznRate) internal pure returns (uint) {
+        return amount.multiplyDecimalRound(hznRate);
     }
 
-    function _usdToSnx(uint amount, uint snxRate) internal pure returns (uint) {
-        return amount.divideDecimalRound(snxRate);
+    function _usdToHZN(uint amount, uint hznRate) internal pure returns (uint) {
+        return amount.divideDecimalRound(hznRate);
     }
 
     function _maxIssuableSynths(address _issuer) internal view returns (uint, bool) {
         // What is the value of their HZN balance in zUSD
-        (uint snxRate, bool isInvalid) = exchangeRates().rateAndInvalid(SNX);
-        uint destinationValue = _snxToUSD(_collateral(_issuer), snxRate);
+        (uint hznRate, bool isInvalid) = exchangeRates().rateAndInvalid(HZN);
+        uint destinationValue = _hznToUSD(_collateral(_issuer), hznRate);
 
         // They're allowed to issue up to issuanceRatio of that value
         return (destinationValue.multiplyDecimal(getIssuanceRatio()), isInvalid);
@@ -293,9 +293,9 @@ contract Issuer is Owned, MixinResolver, MixinSystemSettings, IIssuer {
     function _collateralisationRatio(address _issuer) internal view returns (uint, bool) {
         uint totalOwnedSynthetix = _collateral(_issuer);
 
-        (uint debtBalance, , bool anyRateIsInvalid) = _debtBalanceOfAndTotalDebt(_issuer, SNX);
+        (uint debtBalance, , bool anyRateIsInvalid) = _debtBalanceOfAndTotalDebt(_issuer, HZN);
 
-        // it's more gas intensive to put this check here if they have 0 SNX, but it complies with the interface
+        // it's more gas intensive to put this check here if they have 0 HZN, but it complies with the interface
         if (totalOwnedSynthetix == 0) return (0, anyRateIsInvalid);
 
         return (debtBalance.divideDecimalRound(totalOwnedSynthetix), anyRateIsInvalid);
@@ -393,19 +393,19 @@ contract Issuer is Owned, MixinResolver, MixinSystemSettings, IIssuer {
         view
         returns (uint transferable, bool anyRateIsInvalid)
     {
-        // How many SNX do they have, excluding escrow?
+        // How many HZN do they have, excluding escrow?
         // Note: We're excluding escrow here because we're interested in their transferable amount
-        // and escrowed SNX are not transferable.
+        // and escrowed HZN are not transferable.
 
         // How many of those will be locked by the amount they've issued?
-        // Assuming issuance ratio is 20%, then issuing 20 SNX of value would require
-        // 100 SNX to be locked in their wallet to maintain their collateralisation ratio
+        // Assuming issuance ratio is 20%, then issuing 20 HZN of value would require
+        // 100 HZN to be locked in their wallet to maintain their collateralisation ratio
         // The locked synthetix value can exceed their balance.
         uint debtBalance;
-        (debtBalance, , anyRateIsInvalid) = _debtBalanceOfAndTotalDebt(account, SNX);
+        (debtBalance, , anyRateIsInvalid) = _debtBalanceOfAndTotalDebt(account, HZN);
         uint lockedSynthetixValue = debtBalance.divideDecimalRound(getIssuanceRatio());
 
-        // If we exceed the balance, no SNX are transferable, otherwise the difference is.
+        // If we exceed the balance, no HZN are transferable, otherwise the difference is.
         if (lockedSynthetixValue >= balance) {
             transferable = 0;
         } else {
@@ -428,8 +428,8 @@ contract Issuer is Owned, MixinResolver, MixinSystemSettings, IIssuer {
 
     function _addSynth(ISynth synth) internal {
         bytes32 currencyKey = synth.currencyKey();
-        require(synths[currencyKey] == ISynth(0), "Hasset exists");
-        require(synthsByAddress[address(synth)] == bytes32(0), "Hasset address already exists");
+        require(synths[currencyKey] == ISynth(0), "Zasset exists");
+        require(synthsByAddress[address(synth)] == bytes32(0), "Zasset address already exists");
 
         availableSynths.push(synth);
         synths[currencyKey] = synth;
@@ -458,9 +458,9 @@ contract Issuer is Owned, MixinResolver, MixinSystemSettings, IIssuer {
 
     function _removeSynth(bytes32 currencyKey) internal {
         address synthToRemove = address(synths[currencyKey]);
-        require(synthToRemove != address(0), "Hasset does not exist");
-        require(IERC20(synthToRemove).totalSupply() == 0, "Hasset supply exists");
-        require(currencyKey != hUSD, "Cannot remove hasset");
+        require(synthToRemove != address(0), "Zasset does not exist");
+        require(IERC20(synthToRemove).totalSupply() == 0, "Zasset supply exists");
+        require(currencyKey != zUSD, "Cannot remove zasset");
 
         // Remove the synth from the availableSynths array.
         for (uint i = 0; i < availableSynths.length; i++) {
@@ -557,41 +557,41 @@ contract Issuer is Owned, MixinResolver, MixinSystemSettings, IIssuer {
 
     function liquidateDelinquentAccount(
         address account,
-        uint hUSDAmount,
+        uint zUSDAmount,
         address liquidator
     ) external onlySynthetix returns (uint totalRedeemed, uint amountToLiquidate) {
         // Ensure waitingPeriod and zUSD balance is settled as burning impacts the size of debt pool
-        require(!exchanger().hasWaitingPeriodOrSettlementOwing(liquidator, hUSD), "zUSD needs to be settled");
+        require(!exchanger().hasWaitingPeriodOrSettlementOwing(liquidator, zUSD), "zUSD needs to be settled");
 
         // Check account is liquidation open
         require(liquidations().isOpenForLiquidation(account), "Account not open for liquidation");
 
         // require liquidator has enough zUSD
-        require(IERC20(address(synths[hUSD])).balanceOf(liquidator) >= hUSDAmount, "Not enough zUSD");
+        require(IERC20(address(synths[zUSD])).balanceOf(liquidator) >= zUSDAmount, "Not enough zUSD");
 
         uint liquidationPenalty = liquidations().liquidationPenalty();
 
         // What is their debt in zUSD?
-        (uint debtBalance, uint totalDebtIssued, bool anyRateIsInvalid) = _debtBalanceOfAndTotalDebt(account, hUSD);
-        (uint snxRate, bool snxRateInvalid) = exchangeRates().rateAndInvalid(SNX);
+        (uint debtBalance, uint totalDebtIssued, bool anyRateIsInvalid) = _debtBalanceOfAndTotalDebt(account, zUSD);
+        (uint hznRate, bool snxRateInvalid) = exchangeRates().rateAndInvalid(HZN);
         _requireRatesNotInvalid(anyRateIsInvalid || snxRateInvalid);
 
         uint collateralForAccount = _collateral(account);
         uint amountToFixRatio = liquidations().calculateAmountToFixCollateral(
             debtBalance,
-            _snxToUSD(collateralForAccount, snxRate)
+            _hznToUSD(collateralForAccount, hznRate)
         );
 
         // Cap amount to liquidate to repair collateral ratio based on issuance ratio
-        amountToLiquidate = amountToFixRatio < hUSDAmount ? amountToFixRatio : hUSDAmount;
+        amountToLiquidate = amountToFixRatio < zUSDAmount ? amountToFixRatio : zUSDAmount;
 
-        // what's the equivalent amount of snx for the amountToLiquidate?
-        uint snxRedeemed = _usdToSnx(amountToLiquidate, snxRate);
+        // what's the equivalent amount of HZN for the amountToLiquidate?
+        uint hznRedeemed = _usdToHZN(amountToLiquidate, hznRate);
 
         // Add penalty
-        totalRedeemed = snxRedeemed.multiplyDecimal(SafeDecimalMath.unit().add(liquidationPenalty));
+        totalRedeemed = hznRedeemed.multiplyDecimal(SafeDecimalMath.unit().add(liquidationPenalty));
 
-        // if total SNX to redeem is greater than account's collateral
+        // if total HZN to redeem is greater than account's collateral
         // account is under collateralised, liquidate all collateral and reduce zUSD to burn
         // an insurance fund will be added to cover these undercollateralised positions
         if (totalRedeemed > collateralForAccount) {
@@ -599,9 +599,9 @@ contract Issuer is Owned, MixinResolver, MixinSystemSettings, IIssuer {
             totalRedeemed = collateralForAccount;
 
             // whats the equivalent zUSD to burn for all collateral less penalty
-            amountToLiquidate = _snxToUSD(
+            amountToLiquidate = _hznToUSD(
                 collateralForAccount.divideDecimal(SafeDecimalMath.unit().add(liquidationPenalty)),
-                snxRate
+                hznRate
             );
         }
 
@@ -617,7 +617,7 @@ contract Issuer is Owned, MixinResolver, MixinSystemSettings, IIssuer {
     /* ========== INTERNAL FUNCTIONS ========== */
 
     function _requireRatesNotInvalid(bool anyRateIsInvalid) internal pure {
-        require(!anyRateIsInvalid, "A hasset or HZN rate is invalid");
+        require(!anyRateIsInvalid, "A zasset or HZN rate is invalid");
     }
 
     function _requireCanIssueOnBehalf(address issueForAddress, address from) internal view {
@@ -649,12 +649,12 @@ contract Issuer is Owned, MixinResolver, MixinSystemSettings, IIssuer {
         _setLastIssueEvent(from);
 
         // Create their synths
-        synths[hUSD].issue(from, amount);
+        synths[zUSD].issue(from, amount);
 
         // Account for the issued debt in the cache
-        debtCache().updateCachedSynthDebtWithRate(hUSD, SafeDecimalMath.unit());
+        debtCache().updateCachedSynthDebtWithRate(zUSD, SafeDecimalMath.unit());
 
-        // Store their locked SNX amount to determine their fee % for the period
+        // Store their locked HZN amount to determine their fee % for the period
         _appendAccountIssuanceRecord(from);
     }
 
@@ -675,10 +675,10 @@ contract Issuer is Owned, MixinResolver, MixinSystemSettings, IIssuer {
         _removeFromDebtRegister(debtAccount, amountBurnt, existingDebt, totalDebtIssued);
 
         // synth.burn does a safe subtraction on balance (so it will revert if there are not enough synths).
-        synths[hUSD].burn(burnAccount, amountBurnt);
+        synths[zUSD].burn(burnAccount, amountBurnt);
 
         // Account for the burnt debt in the cache.
-        debtCache().updateCachedSynthDebtWithRate(hUSD, SafeDecimalMath.unit());
+        debtCache().updateCachedSynthDebtWithRate(zUSD, SafeDecimalMath.unit());
 
         // Store their debtRatio against a fee period to determine their fee/rewards % for the period
         _appendAccountIssuanceRecord(debtAccount);
@@ -696,13 +696,13 @@ contract Issuer is Owned, MixinResolver, MixinSystemSettings, IIssuer {
             // If not burning to target, then burning requires that the minimum stake time has elapsed.
             require(_canBurnSynths(from), "Minimum stake time not reached");
             // First settle anything pending into zUSD as burning or issuing impacts the size of the debt pool
-            (, uint refunded, uint numEntriesSettled) = exchanger().settle(from, hUSD);
+            (, uint refunded, uint numEntriesSettled) = exchanger().settle(from, zUSD);
             if (numEntriesSettled > 0) {
-                amount = exchanger().calculateAmountAfterSettlement(from, hUSD, amount, refunded);
+                amount = exchanger().calculateAmountAfterSettlement(from, zUSD, amount, refunded);
             }
         }
 
-        (uint existingDebt, uint totalSystemValue, bool anyRateIsInvalid) = _debtBalanceOfAndTotalDebt(from, hUSD);
+        (uint existingDebt, uint totalSystemValue, bool anyRateIsInvalid) = _debtBalanceOfAndTotalDebt(from, zUSD);
         (uint maxIssuableSynthsForAccount, bool snxRateInvalid) = _maxIssuableSynths(from);
         _requireRatesNotInvalid(anyRateIsInvalid || snxRateInvalid);
         require(existingDebt > 0, "No debt to forgive");

@@ -24,7 +24,7 @@ contract EtherCollateralsUSD is Owned, Pausable, ReentrancyGuard, MixinResolver,
     using SafeMath for uint256;
     using SafeDecimalMath for uint256;
 
-    bytes32 internal constant ETH = "BNB";
+    bytes32 internal constant BNB = "BNB";
 
     // ========== CONSTANTS ==========
     uint256 internal constant ONE_THOUSAND = 1e18 * 1000;
@@ -36,7 +36,7 @@ contract EtherCollateralsUSD is Owned, Pausable, ReentrancyGuard, MixinResolver,
     address internal constant FEE_ADDRESS = 0xfeEFEEfeefEeFeefEEFEEfEeFeefEEFeeFEEFEeF;
 
     uint256 internal constant ACCOUNT_LOAN_LIMIT_CAP = 1000;
-    bytes32 private constant hUSD = "zUSD";
+    bytes32 private constant zUSD = "zUSD";
     bytes32 public constant COLLATERAL = "BNB";
 
     // ========== SETTER STATE VARIABLES ==========
@@ -54,7 +54,7 @@ contract EtherCollateralsUSD is Owned, Pausable, ReentrancyGuard, MixinResolver,
     // Maximum amount of zUSD that can be issued by the EtherCollateral contract. Default 10MM
     uint256 public issueLimit = SafeDecimalMath.unit() * 10000000;
 
-    // Minimum amount of ETH to create loan preventing griefing and gas consumption. Min 1ETH
+    // Minimum amount of BNB to create loan preventing griefing and gas consumption. Min 1BNB
     uint256 public minLoanCollateralSize = SafeDecimalMath.unit() * 1;
 
     // Maximum number of loans an account can create
@@ -116,11 +116,11 @@ contract EtherCollateralsUSD is Owned, Pausable, ReentrancyGuard, MixinResolver,
     /* ========== ADDRESS RESOLVER CONFIGURATION ========== */
 
     bytes32 private constant CONTRACT_SYSTEMSTATUS = "SystemStatus";
-    bytes32 private constant CONTRACT_SYNTHSUSD = "HassetzUSD";
+    bytes32 private constant CONTRACT_ZASSETZUSD = "ZassetzUSD";
     bytes32 private constant CONTRACT_EXRATES = "ExchangeRates";
     bytes32 private constant CONTRACT_FEEPOOL = "FeePool";
 
-    bytes32[24] private addressesToCache = [CONTRACT_SYSTEMSTATUS, CONTRACT_SYNTHSUSD, CONTRACT_EXRATES, CONTRACT_FEEPOOL];
+    bytes32[24] private addressesToCache = [CONTRACT_SYSTEMSTATUS, CONTRACT_ZASSETZUSD, CONTRACT_EXRATES, CONTRACT_FEEPOOL];
 
     // ========== CONSTRUCTOR ==========
     constructor(address _owner, address _resolver)
@@ -227,13 +227,13 @@ contract EtherCollateralsUSD is Owned, Pausable, ReentrancyGuard, MixinResolver,
 
     function loanAmountFromCollateral(uint256 collateralAmount) public view returns (uint256) {
         // a fraction more is issued due to rounding
-        return collateralAmount.multiplyDecimal(issuanceRatio()).multiplyDecimal(exchangeRates().rateForCurrency(ETH));
+        return collateralAmount.multiplyDecimal(issuanceRatio()).multiplyDecimal(exchangeRates().rateForCurrency(BNB));
     }
 
     function collateralAmountForLoan(uint256 loanAmount) external view returns (uint256) {
         return
             loanAmount
-                .multiplyDecimal(collateralizationRatio.divideDecimalRound(exchangeRates().rateForCurrency(ETH)))
+                .multiplyDecimal(collateralizationRatio.divideDecimalRound(exchangeRates().rateForCurrency(BNB)))
                 .divideDecimalRound(ONE_HUNDRED);
     }
 
@@ -385,7 +385,7 @@ contract EtherCollateralsUSD is Owned, Pausable, ReentrancyGuard, MixinResolver,
     {
         systemStatus().requireIssuanceActive();
 
-        // Require ETH sent to be greater than minLoanCollateralSize
+        // Require BNB sent to be greater than minLoanCollateralSize
         require(
             msg.value >= minLoanCollateralSize,
             "Not enough BNB to create this loan. Please see the minLoanCollateralSize"
@@ -450,7 +450,7 @@ contract EtherCollateralsUSD is Owned, Pausable, ReentrancyGuard, MixinResolver,
         _closeLoan(msg.sender, loanID, false);
     }
 
-    // Add ETH collateral to an open loan
+    // Add BNB collateral to an open loan
     function depositCollateral(address account, uint256 loanID) external payable notPaused {
         require(msg.value > 0, "Deposit amount must be greater than 0");
 
@@ -473,7 +473,7 @@ contract EtherCollateralsUSD is Owned, Pausable, ReentrancyGuard, MixinResolver,
         emit CollateralDeposited(account, loanID, msg.value, totalCollateral);
     }
 
-    // Withdraw ETH collateral from an open loan
+    // Withdraw BNB collateral from an open loan
     function withdrawCollateral(uint256 loanID, uint256 withdrawAmount) external notPaused nonReentrant ETHRateNotInvalid {
         require(withdrawAmount > 0, "Amount to withdraw must be greater than 0");
 
@@ -497,7 +497,7 @@ contract EtherCollateralsUSD is Owned, Pausable, ReentrancyGuard, MixinResolver,
 
         require(collateralRatioAfter > liquidationRatio, "Collateral ratio below liquidation after withdraw");
 
-        // transfer ETH to msg.sender
+        // transfer BNB to msg.sender
         msg.sender.transfer(withdrawAmount);
 
         // Tell the Dapps collateral was added to loan
@@ -588,7 +588,7 @@ contract EtherCollateralsUSD is Owned, Pausable, ReentrancyGuard, MixinResolver,
         _processInterestAndLoanPayment(interestPaid, loanAmountPaid);
 
         // Collateral value to redeem
-        uint256 collateralRedeemed = exchangeRates().effectiveValue(hUSD, amountToLiquidate, COLLATERAL);
+        uint256 collateralRedeemed = exchangeRates().effectiveValue(zUSD, amountToLiquidate, COLLATERAL);
 
         // Add penalty
         uint256 totalCollateralLiquidated = collateralRedeemed.multiplyDecimal(
@@ -601,7 +601,7 @@ contract EtherCollateralsUSD is Owned, Pausable, ReentrancyGuard, MixinResolver,
         // update remaining collateral on loan
         _updateLoanCollateral(synthLoan, synthLoan.collateralAmount.sub(totalCollateralLiquidated));
 
-        // Send liquidated ETH collateral to msg.sender
+        // Send liquidated BNB collateral to msg.sender
         msg.sender.transfer(totalCollateralLiquidated);
 
         // emit loan liquidation event
@@ -696,7 +696,7 @@ contract EtherCollateralsUSD is Owned, Pausable, ReentrancyGuard, MixinResolver,
 
         require(
             IERC20(address(synthsUSD())).balanceOf(msg.sender) >= repayAmount,
-            "You do not have the required Hasset balance to close this loan."
+            "You do not have the required Zasset balance to close this loan."
         );
 
         // Record loan as closed
@@ -717,14 +717,14 @@ contract EtherCollateralsUSD is Owned, Pausable, ReentrancyGuard, MixinResolver,
 
         if (liquidation) {
             // Send liquidator redeemed collateral + 10% penalty
-            uint256 collateralRedeemed = exchangeRates().effectiveValue(hUSD, repayAmount, COLLATERAL);
+            uint256 collateralRedeemed = exchangeRates().effectiveValue(zUSD, repayAmount, COLLATERAL);
 
             // add penalty
             uint256 totalCollateralLiquidated = collateralRedeemed.multiplyDecimal(
                 SafeDecimalMath.unit().add(liquidationPenalty)
             );
 
-            // ensure remaining ETH collateral sufficient to cover collateral liquidated
+            // ensure remaining BNB collateral sufficient to cover collateral liquidated
             // will revert if the liquidated collateral + penalty is more than remaining collateral
             remainingCollateral = remainingCollateral.sub(totalCollateralLiquidated);
 
@@ -832,7 +832,7 @@ contract EtherCollateralsUSD is Owned, Pausable, ReentrancyGuard, MixinResolver,
     }
 
     function synthsUSD() internal view returns (ISynth) {
-        return ISynth(requireAndGetAddress(CONTRACT_SYNTHSUSD, "Missing HassetzUSD address"));
+        return ISynth(requireAndGetAddress(CONTRACT_ZASSETZUSD, "Missing ZassetzUSD address"));
     }
 
     function exchangeRates() internal view returns (IExchangeRates) {

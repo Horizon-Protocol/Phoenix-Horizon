@@ -109,7 +109,7 @@ contract VirtualSynth is ERC20, IVirtualSynth {
     // VIEWS
 
     function name() external view returns (string memory) {
-        return string(abi.encodePacked("Virtual Hasset ", currencyKey));
+        return string(abi.encodePacked("Virtual Zasset ", currencyKey));
     }
 
     function symbol() external view returns (string memory) {

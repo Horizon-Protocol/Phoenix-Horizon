@@ -20,12 +20,12 @@ contract Depot is Owned, Pausable, ReentrancyGuard, MixinResolver, IDepot {
     using SafeMath for uint;
     using SafeDecimalMath for uint;
 
-    bytes32 internal constant SNX = "HZN";
+    bytes32 internal constant HZN = "HZN";
     bytes32 internal constant BNB = "BNB";
 
     /* ========== STATE VARIABLES ========== */
 
-    // Address where the ether and Synths raised for selling SNX is transfered to
+    // Address where the ether and Synths raised for selling HZN is transfered to
     // Any ether raised for selling Synths gets sent back to whoever deposited the Synths,
     // and doesn't have anything to do with this address.
     address payable public fundsWallet;
@@ -34,12 +34,12 @@ contract Depot is Owned, Pausable, ReentrancyGuard, MixinResolver, IDepot {
     struct SynthDepositEntry {
         // The user that made the deposit
         address payable user;
-        // The amount (in Synths) that they deposited
+        // The amount (in Zassets) that they deposited
         uint amount;
     }
 
     /* User deposits are sold on a FIFO (First in First out) basis. When users deposit
-       synths with us, they get added this queue, which then gets fulfilled in order.
+       zassets with us, they get added this queue, which then gets fulfilled in order.
        Conceptually this fits well in an array, but then when users fill an order we
        end up copying the whole array around, so better to use an index mapping instead
        for gas performance reasons.
@@ -66,18 +66,18 @@ contract Depot is Owned, Pausable, ReentrancyGuard, MixinResolver, IDepot {
     // A cap on the amount of zUSD you can buy with BNB in 1 transaction
     uint public maxEthPurchase = 500 * SafeDecimalMath.unit();
 
-    // If a user deposits a synth amount < the minimumDepositAmount the contract will keep
+    // If a user deposits a zasset amount < the minimumDepositAmount the contract will keep
     // the total of small deposits which will not be sold on market and the sender
     // must call withdrawMyDepositedSynths() to get them back.
     mapping(address => uint) public smallDeposits;
 
     /* ========== ADDRESS RESOLVER CONFIGURATION ========== */
 
-    bytes32 private constant CONTRACT_SYNTHSUSD = "HassetzUSD";
+    bytes32 private constant CONTRACT_ZASSETZUSD = "ZassetzUSD";
     bytes32 private constant CONTRACT_EXRATES = "ExchangeRates";
     bytes32 private constant CONTRACT_SYNTHETIX = "Synthetix";
 
-    bytes32[24] private addressesToCache = [CONTRACT_SYNTHSUSD, CONTRACT_EXRATES, CONTRACT_SYNTHETIX];
+    bytes32[24] private addressesToCache = [CONTRACT_ZASSETZUSD, CONTRACT_EXRATES, CONTRACT_SYNTHETIX];
 
     /* ========== CONSTRUCTOR ========== */
 
@@ -98,7 +98,7 @@ contract Depot is Owned, Pausable, ReentrancyGuard, MixinResolver, IDepot {
 
     /**
      * @notice Set the funds wallet where BNB raised is held
-     * @param _fundsWallet The new address to forward BNB and Synths to
+     * @param _fundsWallet The new address to forward BNB and Zassets to
      */
     function setFundsWallet(address payable _fundsWallet) external onlyOwner {
         fundsWallet = _fundsWallet;
@@ -136,7 +136,7 @@ contract Depot is Owned, Pausable, ReentrancyGuard, MixinResolver, IDepot {
         rateNotInvalid(BNB)
         notPaused
         returns (
-            uint // Returns the number of Synths (zUSD) received
+            uint // Returns the number of Zassets (zUSD) received
         )
     {
         return _exchangeEtherForSynths();
@@ -173,7 +173,7 @@ contract Depot is Owned, Pausable, ReentrancyGuard, MixinResolver, IDepot {
 
                     // Transfer the BNB to the depositor. Send is used instead of transfer
                     // so a non payable contract won't block the FIFO queue on a failed
-                    // BNB payable for synths transaction. The proceeds to be sent to the
+                    // BNB payable for zassets transaction. The proceeds to be sent to the
                     // synthetix foundation funds wallet. This is to protect all depositors
                     // in the queue in this rare case that may occur.
                     ethToSend = remainingToFulfill.divideDecimal(exchangeRates().rateForCurrency(BNB));
@@ -188,8 +188,8 @@ contract Depot is Owned, Pausable, ReentrancyGuard, MixinResolver, IDepot {
                         emit ClearedDeposit(msg.sender, deposit.user, ethToSend, remainingToFulfill, i);
                     }
 
-                    // And the Synths to the recipient.
-                    // Note: Fees are calculated by the Synth contract, so when
+                    // And the Zassets to the recipient.
+                    // Note: Fees are calculated by the Zasset contract, so when
                     //       we request a specific transfer here, the fee is
                     //       automatically deducted and sent to the fee pool.
                     synthsUSD().transfer(msg.sender, remainingToFulfill);
@@ -208,7 +208,7 @@ contract Depot is Owned, Pausable, ReentrancyGuard, MixinResolver, IDepot {
 
                     // Now fulfill by transfering the BNB to the depositor. Send is used instead of transfer
                     // so a non payable contract won't block the FIFO queue on a failed
-                    // BNB payable for synths transaction. The proceeds to be sent to the
+                    // BNB payable for zassets transaction. The proceeds to be sent to the
                     // synthetix foundation funds wallet. This is to protect all depositors
                     // in the queue in this rare case that may occur.
                     ethToSend = deposit.amount.divideDecimal(exchangeRates().rateForCurrency(BNB));
@@ -223,8 +223,8 @@ contract Depot is Owned, Pausable, ReentrancyGuard, MixinResolver, IDepot {
                         emit ClearedDeposit(msg.sender, deposit.user, ethToSend, deposit.amount, i);
                     }
 
-                    // And the Synths to the recipient.
-                    // Note: Fees are calculated by the Synth contract, so when
+                    // And the Zassets to the recipient.
+                    // Note: Fees are calculated by the Zasset contract, so when
                     //       we request a specific transfer here, the fee is
                     //       automatically deducted and sent to the fee pool.
                     synthsUSD().transfer(msg.sender, deposit.amount);
@@ -266,7 +266,7 @@ contract Depot is Owned, Pausable, ReentrancyGuard, MixinResolver, IDepot {
         rateNotInvalid(BNB)
         notPaused
         returns (
-            uint // Returns the number of Synths (zUSD) received
+            uint // Returns the number of Zassets (zUSD) received
         )
     {
         require(guaranteedRate == exchangeRates().rateForCurrency(BNB), "Guaranteed rate would not be received");
@@ -275,13 +275,13 @@ contract Depot is Owned, Pausable, ReentrancyGuard, MixinResolver, IDepot {
     }
 
     function _exchangeEtherForSNX() internal returns (uint) {
-        // How many SNX are they going to be receiving?
+        // How many HZN are they going to be receiving?
         uint synthetixToSend = synthetixReceivedForEther(msg.value);
 
         // Store the BNB in our funds wallet
         fundsWallet.transfer(msg.value);
 
-        // And send them the SNX.
+        // And send them the HZN.
         synthetix().transfer(msg.sender, synthetixToSend);
 
         emit Exchange("BNB", msg.value, "HZN", synthetixToSend);
@@ -295,11 +295,11 @@ contract Depot is Owned, Pausable, ReentrancyGuard, MixinResolver, IDepot {
     function exchangeEtherForSNX()
         external
         payable
-        rateNotInvalid(SNX)
+        rateNotInvalid(HZN)
         rateNotInvalid(BNB)
         notPaused
         returns (
-            uint // Returns the number of SNX received
+            uint // Returns the number of HZN received
         )
     {
         return _exchangeEtherForSNX();
@@ -314,16 +314,16 @@ contract Depot is Owned, Pausable, ReentrancyGuard, MixinResolver, IDepot {
     function exchangeEtherForSNXAtRate(uint guaranteedEtherRate, uint guaranteedSynthetixRate)
         external
         payable
-        rateNotInvalid(SNX)
+        rateNotInvalid(HZN)
         rateNotInvalid(BNB)
         notPaused
         returns (
-            uint // Returns the number of SNX received
+            uint // Returns the number of HZN received
         )
     {
         require(guaranteedEtherRate == exchangeRates().rateForCurrency(BNB), "Guaranteed ether rate would not be received");
         require(
-            guaranteedSynthetixRate == exchangeRates().rateForCurrency(SNX),
+            guaranteedSynthetixRate == exchangeRates().rateForCurrency(HZN),
             "Guaranteed synthetix rate would not be received"
         );
 
@@ -331,7 +331,7 @@ contract Depot is Owned, Pausable, ReentrancyGuard, MixinResolver, IDepot {
     }
 
     function _exchangeSynthsForSNX(uint synthAmount) internal returns (uint) {
-        // How many SNX are they going to be receiving?
+        // How many HZN are they going to be receiving?
         uint synthetixToSend = synthetixReceivedForSynths(synthAmount);
 
         // Ok, transfer the Synths to our funds wallet.
@@ -339,7 +339,7 @@ contract Depot is Owned, Pausable, ReentrancyGuard, MixinResolver, IDepot {
         // they're sent back in from the funds wallet.
         synthsUSD().transferFrom(msg.sender, fundsWallet, synthAmount);
 
-        // And send them the SNX.
+        // And send them the HZN.
         synthetix().transfer(msg.sender, synthetixToSend);
 
         emit Exchange("zUSD", synthAmount, "HZN", synthetixToSend);
@@ -353,10 +353,10 @@ contract Depot is Owned, Pausable, ReentrancyGuard, MixinResolver, IDepot {
      */
     function exchangeSynthsForSNX(uint synthAmount)
         external
-        rateNotInvalid(SNX)
+        rateNotInvalid(HZN)
         notPaused
         returns (
-            uint // Returns the number of SNX received
+            uint // Returns the number of HZN received
         )
     {
         return _exchangeSynthsForSNX(synthAmount);
@@ -370,20 +370,20 @@ contract Depot is Owned, Pausable, ReentrancyGuard, MixinResolver, IDepot {
      */
     function exchangeSynthsForSNXAtRate(uint synthAmount, uint guaranteedRate)
         external
-        rateNotInvalid(SNX)
+        rateNotInvalid(HZN)
         notPaused
         returns (
-            uint // Returns the number of SNX received
+            uint // Returns the number of HZN received
         )
     {
-        require(guaranteedRate == exchangeRates().rateForCurrency(SNX), "Guaranteed rate would not be received");
+        require(guaranteedRate == exchangeRates().rateForCurrency(HZN), "Guaranteed rate would not be received");
 
         return _exchangeSynthsForSNX(synthAmount);
     }
 
     /**
-     * @notice Allows the owner to withdraw SNX from this contract if needed.
-     * @param amount The amount of SNX to attempt to withdraw (in 18 decimal places).
+     * @notice Allows the owner to withdraw HZN from this contract if needed.
+     * @param amount The amount of HZN to attempt to withdraw (in 18 decimal places).
      */
     function withdrawSynthetix(uint amount) external onlyOwner {
         synthetix().transfer(owner, amount);
@@ -466,17 +466,17 @@ contract Depot is Owned, Pausable, ReentrancyGuard, MixinResolver, IDepot {
     /* ========== VIEWS ========== */
 
     /**
-     * @notice Calculate how many SNX you will receive if you transfer
+     * @notice Calculate how many HZN you will receive if you transfer
      *         an amount of synths.
      * @param amount The amount of synths (in 18 decimal places) you want to ask about
      */
     function synthetixReceivedForSynths(uint amount) public view returns (uint) {
-        // And what would that be worth in SNX based on the current price?
-        return amount.divideDecimal(exchangeRates().rateForCurrency(SNX));
+        // And what would that be worth in HZN based on the current price?
+        return amount.divideDecimal(exchangeRates().rateForCurrency(HZN));
     }
 
     /**
-     * @notice Calculate how many SNX you will receive if you transfer
+     * @notice Calculate how many HZN you will receive if you transfer
      *         an amount of ether.
      * @param amount The amount of ether (in wei) you want to ask about
      */
@@ -484,7 +484,7 @@ contract Depot is Owned, Pausable, ReentrancyGuard, MixinResolver, IDepot {
         // How much is the BNB they sent us worth in zUSD (ignoring the transfer fee)?
         uint valueSentInSynths = amount.multiplyDecimal(exchangeRates().rateForCurrency(BNB));
 
-        // Now, how many SNX will that USD amount buy?
+        // Now, how many HZN will that USD amount buy?
         return synthetixReceivedForSynths(valueSentInSynths);
     }
 
@@ -501,7 +501,7 @@ contract Depot is Owned, Pausable, ReentrancyGuard, MixinResolver, IDepot {
     /* ========== INTERNAL VIEWS ========== */
 
     function synthsUSD() internal view returns (IERC20) {
-        return IERC20(requireAndGetAddress(CONTRACT_SYNTHSUSD, "Missing HassetzUSD address"));
+        return IERC20(requireAndGetAddress(CONTRACT_ZASSETZUSD, "Missing ZassetzUSD address"));
     }
 
     function synthetix() internal view returns (IERC20) {
@@ -515,7 +515,7 @@ contract Depot is Owned, Pausable, ReentrancyGuard, MixinResolver, IDepot {
     // ========== MODIFIERS ==========
 
     modifier rateNotInvalid(bytes32 currencyKey) {
-        require(!exchangeRates().rateIsInvalid(currencyKey), "Rate invalid or not a hasset");
+        require(!exchangeRates().rateIsInvalid(currencyKey), "Rate invalid or not a zasset");
         _;
     }
 

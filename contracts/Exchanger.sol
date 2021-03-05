@@ -81,7 +81,7 @@ contract Exchanger is Owned, MixinResolver, MixinSystemSettings, IExchanger {
         uint timestamp;
     }
 
-    bytes32 private constant hUSD = "zUSD";
+    bytes32 private constant zUSD = "zUSD";
 
     // SIP-65: Decentralized circuit breaker
     uint public constant CIRCUIT_BREAKER_SUSPENSION_REASON = 65;
@@ -460,8 +460,8 @@ contract Exchanger is Owned, MixinResolver, MixinSystemSettings, IExchanger {
     }
 
     function _updateSNXIssuedDebtOnExchange(bytes32[2] memory currencyKeys, uint[2] memory currencyRates) internal {
-        bool includesHUSD = currencyKeys[0] == hUSD || currencyKeys[1] == hUSD;
-        uint numKeys = includesHUSD ? 2 : 3;
+        bool includesZUSD = currencyKeys[0] == zUSD || currencyKeys[1] == zUSD;
+        uint numKeys = includesZUSD ? 2 : 3;
 
         bytes32[] memory keys = new bytes32[](numKeys);
         keys[0] = currencyKeys[0];
@@ -471,8 +471,8 @@ contract Exchanger is Owned, MixinResolver, MixinSystemSettings, IExchanger {
         rates[0] = currencyRates[0];
         rates[1] = currencyRates[1];
 
-        if (!includesHUSD) {
-            keys[2] = hUSD; // And we'll also update zUSD to account for any fees if it wasn't one of the exchanged currencies
+        if (!includesZUSD) {
+            keys[2] = zUSD; // And we'll also update zUSD to account for any fees if it wasn't one of the exchanged currencies
             rates[2] = SafeDecimalMath.unit();
         }
 
@@ -563,10 +563,10 @@ contract Exchanger is Owned, MixinResolver, MixinSystemSettings, IExchanger {
         if (fee > 0) {
             // Normalize fee to zUSD
             // Note: `fee` is being reused to avoid stack too deep errors.
-            fee = exchangeRates().effectiveValue(destinationCurrencyKey, fee, hUSD);
+            fee = exchangeRates().effectiveValue(destinationCurrencyKey, fee, zUSD);
 
             // Remit the fee in zUSDs
-            issuer().synths(hUSD).issue(feePool().FEE_ADDRESS(), fee);
+            issuer().synths(zUSD).issue(feePool().FEE_ADDRESS(), fee);
 
             // Tell the fee pool about this
             feePool().recordFeePaid(fee);
@@ -648,8 +648,8 @@ contract Exchanger is Owned, MixinResolver, MixinSystemSettings, IExchanger {
 
     function suspendSynthWithInvalidRate(bytes32 currencyKey) external {
         systemStatus().requireSystemActive();
-        require(issuer().synths(currencyKey) != ISynth(0), "No such hasset");
-        require(_isSynthRateInvalid(currencyKey, exchangeRates().rateForCurrency(currencyKey)), "Hasset price is valid");
+        require(issuer().synths(currencyKey) != ISynth(0), "No such zasset");
+        require(_isSynthRateInvalid(currencyKey, exchangeRates().rateForCurrency(currencyKey)), "Zasset price is valid");
         systemStatus().suspendSynth(currencyKey, CIRCUIT_BREAKER_SUSPENSION_REASON);
     }
 
@@ -666,7 +666,7 @@ contract Exchanger is Owned, MixinResolver, MixinSystemSettings, IExchanger {
         uint sourceAmount,
         bytes32 destinationCurrencyKey
     ) internal view {
-        require(sourceCurrencyKey != destinationCurrencyKey, "Can't be same hasset");
+        require(sourceCurrencyKey != destinationCurrencyKey, "Can't be same zasset");
         require(sourceAmount > 0, "Zero amount");
 
         bytes32[] memory synthKeys = new bytes32[](2);
@@ -932,7 +932,7 @@ contract Exchanger is Owned, MixinResolver, MixinSystemSettings, IExchanger {
         ISynthetix _synthetix = synthetix();
         require(
             msg.sender == address(_synthetix) || _synthetix.synthsByAddress(msg.sender) != bytes32(0),
-            "Exchanger: Only horizon or a hasset contract can perform this action"
+            "Exchanger: Only horizon or a zasset contract can perform this action"
         );
         _;
     }

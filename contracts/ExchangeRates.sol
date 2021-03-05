@@ -72,8 +72,6 @@ contract ExchangeRates is Owned, MixinResolver, MixinSystemSettings, IExchangeRa
 
     /* ========== ENCODED NAMES ========== */
     bytes32 private constant HZN = "HZN";
-    // TODO use SNX as HZN's price at testnet
-    bytes32 private constant SNX = "SNX";
 
     /* ========== ADDRESS RESOLVER CONFIGURATION ========== */
     bytes32 private constant CONTRACT_EXCHANGER = "Exchanger";
@@ -659,7 +657,6 @@ contract ExchangeRates is Owned, MixinResolver, MixinSystemSettings, IExchangeRa
             uint8 offset = 1;
             // pass remove prefix for HZN currencyKey
             if (currencyKey == HZN) {
-                currencyKey = SNX;
                 offset = 0;
             }
             string memory stringCurrencyKey = bytes32ToString(currencyKey, offset);
