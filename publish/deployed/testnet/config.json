@@ -136,5 +136,8 @@
 	},
 	"ZassetzBNB": {
 		"deploy": false
+	},
+	"ZassetzETH": {
+		"deploy": false
 	}
 }
