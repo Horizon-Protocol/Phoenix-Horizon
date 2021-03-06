@@ -134,8 +134,9 @@
 			},
 			"Exchanger": {
 				"address": "0x25E2DF57b72C40a42b4520Aec2cf050986Bc458F",
-				"status": "current",
-				"keccak256": "0x341ca3e9dee61d08ad031ace9d2889192b220c74ec0fbb70d3509536373723b1"
+				"status": "replaced",
+				"keccak256": "0x341ca3e9dee61d08ad031ace9d2889192b220c74ec0fbb70d3509536373723b1",
+				"replaced_in": "v1.0.1"
 			},
 			"ExchangeState": {
 				"address": "0x14d3D3Db85850D7eFEc980763f117fcC21ec56bC",
@@ -251,6 +252,21 @@
 				"address": "0x4005441c33EcBF3DE0783Cf6051d37e7E0b5dd1b",
 				"status": "current",
 				"keccak256": "0x60215e047e892dc385800dfb711391c927ccb5a010fd01cf4d6543d02e364e5f"
+			}
+		}
+	},
+	"v1.0.1": {
+		"tag": "v1.0.1",
+		"fulltag": "v1.0.1",
+		"release": "release",
+		"network": "testnet",
+		"date": "2021-03-06T11:44:11+08:00",
+		"commit": "0e594949aac7629c626cd15d621cb2c322c1f277",
+		"contracts": {
+			"Exchanger": {
+				"address": "0x905B3bc2A024e6F20FA84B58FE830A10CA256b4e",
+				"status": "current",
+				"keccak256": "0x341ca3e9dee61d08ad031ace9d2889192b220c74ec0fbb70d3509536373723b1"
 			}
 		}
 	}
