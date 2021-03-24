@@ -42,7 +42,7 @@ contract SupplySchedule is Owned, ISupplySchedule {
     // How long each inflation period is before mint can be called
     uint public constant MINT_PERIOD_DURATION = 1 weeks;
 
-    uint public constant INFLATION_START_DATE = 1551830400; // 2019-03-06T00:00:00+00:00
+    uint public constant INFLATION_START_DATE = 1672448400; // 2022-12-31T01:00:00+00:00 AMT
     uint public constant MINT_BUFFER = 1 days;
     uint8 public constant SUPPLY_DECAY_START = 40; // Week 40
     uint8 public constant SUPPLY_DECAY_END = 234; //  Supply Decay ends on Week 234 (inclusive of Week 234 for a total of 195 weeks of inflation decay)
@@ -188,6 +188,10 @@ contract SupplySchedule is Owned, ISupplySchedule {
         require(amount <= MAX_MINTER_REWARD, "Reward cannot exceed max minter reward");
         minterReward = amount;
         emit MinterRewardUpdated(minterReward);
+    }
+
+    function setStartDate(uint _date) external onlyOwner {
+        INFLATION_START_DATE = _date;
     }
 
     // ========== SETTERS ========== */

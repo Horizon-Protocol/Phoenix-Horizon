@@ -40,7 +40,7 @@ const constants = {
 
 	ZERO_ADDRESS: '0x' + '0'.repeat(40),
 
-	inflationStartTimestampInSecs: 1551830400, // 2019-03-06T00:00:00Z
+	inflationStartTimestampInSecs: 1672448400, // 2022-12-31T01:00:00+00:00 AMT
 };
 
 // The solidity defaults are managed here in the same format they will be stored, hence all
