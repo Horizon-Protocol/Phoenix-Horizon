@@ -42,7 +42,7 @@ contract SupplySchedule is Owned, ISupplySchedule {
     // How long each inflation period is before mint can be called
     uint public constant MINT_PERIOD_DURATION = 1 weeks;
 
-    uint public constant INFLATION_START_DATE = 1672448400; // 2022-12-31T01:00:00+00:00 AMT
+    uint public INFLATION_START_DATE = 1672448400; // 2022-12-31T01:00:00+00:00 AMT
     uint public constant MINT_BUFFER = 1 days;
     uint8 public constant SUPPLY_DECAY_START = 40; // Week 40
     uint8 public constant SUPPLY_DECAY_END = 234; //  Supply Decay ends on Week 234 (inclusive of Week 234 for a total of 195 weeks of inflation decay)
