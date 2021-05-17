@@ -10,7 +10,7 @@ import "./interfaces/IExchangeState.sol";
 contract ExchangeState is Owned, State, IExchangeState {
     mapping(address => mapping(bytes32 => IExchangeState.ExchangeEntry[])) public exchanges;
 
-    uint public maxEntriesInQueue = 0;
+    uint public maxEntriesInQueue = 12;
 
     constructor(address _owner, address _associatedContract) public Owned(_owner) State(_associatedContract) {}
 
