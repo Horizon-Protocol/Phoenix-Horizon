@@ -1,1 +1,10 @@
-{}
+{
+	"HZN": {
+		"asset": "HZN",
+		"feed": "0xd13D8cf00b51364590c59524A816d1eAD8D00BC9"
+	},
+	"BNB": {
+		"asset": "BNB",
+		"feed": "0x2514895c72f50D8bd4B4F9b1110F0D6bD2c97526"
+	}
+}
