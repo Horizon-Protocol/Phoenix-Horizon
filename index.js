@@ -14,10 +14,21 @@ const ovmIgnored = require('./publish/ovm-ignore.json');
 
 const networks = ['local', 'testnet', 'mainnet'];
 
-const networkToChainId = {
-	mainnet: 56,
-	testnet: 97,
+const chainIdMapping = {
+	56: {
+		network: 'mainnet',
+	},
+	97: {
+		network: 'testnet',
+	},
 };
+
+const getNetworkFromId = ({ id }) => chainIdMapping[id];
+
+const networkToChainId = Object.entries(chainIdMapping).reduce((memo, [id, { network }]) => {
+	memo[network] = id;
+	return memo;
+}, {});
 
 const constants = {
 	BUILD_FOLDER: 'build',
@@ -494,6 +505,7 @@ module.exports = {
 	getVersions,
 	networks,
 	networkToChainId,
+	getNetworkFromId,
 	toBytes32,
 	wrap,
 	ovmIgnored,
