@@ -14,10 +14,21 @@ const ovmIgnored = require('./publish/ovm-ignore.json');
 
 const networks = ['local', 'testnet', 'mainnet'];
 
-const networkToChainId = {
-	mainnet: 56,
-	testnet: 97,
+const chainIdMapping = {
+	56: {
+		network: 'mainnet',
+	},
+	97: {
+		network: 'testnet',
+	},
 };
+
+const getNetworkFromId = ({ id }) => chainIdMapping[id];
+
+const networkToChainId = Object.entries(chainIdMapping).reduce((memo, [id, { network }]) => {
+	memo[network] = id;
+	return memo;
+}, {});
 
 const constants = {
 	BUILD_FOLDER: 'build',
@@ -71,7 +82,7 @@ const defaults = {
 	DEBT_SNAPSHOT_STALE_TIME: (43800).toString(), // 12 hour heartbeat + 10 minutes mining time
 	AGGREGATOR_WARNING_FLAGS: {
 		mainnet: '0x4A5b9B4aD08616D11F3A402FF7cBEAcB732a76C6',
-		kovan: '0x6292aa9a6650ae14fbf974e5029f36f95a1848fd',
+		testnet: '0x6292aa9a6650ae14fbf974e5029f36f95a1848fd',
 	},
 	INITIAL_ISSUANCE: w3utils.toWei(`${100e6}`),
 };
@@ -342,11 +353,7 @@ const getUsers = ({ network = 'mainnet', user, useOvm = false } = {}) => {
 			marketClosure: '0xC105Ea57Eb434Fbe44690d7Dec2702e4a2FBFCf7',
 			oracle: '0xaC1ED4Fabbd5204E02950D68b6FC8c446AC95362',
 		}),
-		kovan: Object.assign({}, base),
-		rinkeby: Object.assign({}, base),
-		ropsten: Object.assign({}, base),
-		goerli: Object.assign({}, base),
-		'goerli-ovm': Object.assign({}, base),
+		testnet: Object.assign({}, base),
 		local: Object.assign({}, base, {
 			// Deterministic account #0 when using `npx buidler node`
 			owner: '0xc783df8a850f42e7F7e57013759C285caa701eB6',
@@ -494,6 +501,7 @@ module.exports = {
 	getVersions,
 	networks,
 	networkToChainId,
+	getNetworkFromId,
 	toBytes32,
 	wrap,
 	ovmIgnored,
