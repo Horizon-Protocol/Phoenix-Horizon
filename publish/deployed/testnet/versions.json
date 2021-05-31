@@ -34,8 +34,9 @@
 			},
 			"SystemSettings": {
 				"address": "0xE2bf3ea768F1A1C90260F043c6e121950DDEae50",
-				"status": "current",
-				"keccak256": "0xb824b54117e54f19cd694ffda09815b8732be9f0d90b63c8ea483405833eee0e"
+				"status": "replaced",
+				"keccak256": "0xb824b54117e54f19cd694ffda09815b8732be9f0d90b63c8ea483405833eee0e",
+				"replaced_in": "v1.0.4"
 			},
 			"SystemStatus": {
 				"address": "0x2446579e432639df4826C9A2A2eB86E47941aEED",
@@ -323,18 +324,51 @@
 		"contracts": {
 			"Synthetix": {
 				"address": "0x58B4e65553b6288382c45Ac368E544314653a15b",
-				"status": "current",
-				"keccak256": "0xd94143d4693e6a4c992e409456437efcdf7c0ebb9badbe05889f7ab1825cb752"
+				"status": "replaced",
+				"keccak256": "0xd94143d4693e6a4c992e409456437efcdf7c0ebb9badbe05889f7ab1825cb752",
+				"replaced_in": "v1.0.4"
 			},
 			"Exchanger": {
 				"address": "0x1ee74e525F28B8A17D5eF6a99AE0a051011C72a0",
+				"status": "replaced",
+				"keccak256": "0x341ca3e9dee61d08ad031ace9d2889192b220c74ec0fbb70d3509536373723b1",
+				"replaced_in": "v1.0.4"
+			},
+			"SupplySchedule": {
+				"address": "0x9B01E46Ebe81dca86f8A60E77AAE94CD8Ef45488",
+				"status": "replaced",
+				"keccak256": "0x6518d6753a6c68d1e97b62355927d9f004cc4b7cfa23f35012c8ad32d998d5bb",
+				"replaced_in": "v1.0.4"
+			}
+		}
+	},
+	"v1.0.4": {
+		"tag": "v1.0.4",
+		"fulltag": "v1.0.4",
+		"release": "v1.0.4",
+		"network": "testnet",
+		"date": "2021-05-31T10:38:16+08:00",
+		"commit": "88934819c56b6b2e85671bc81dfa5769865ad9c2",
+		"contracts": {
+			"SystemSettings": {
+				"address": "0x243F7c67E5Ac153Ba9a5957D434eCB9F41D9b124",
+				"status": "current",
+				"keccak256": "0xfd516d96494ebada3a40737ce5f26c9de7b3985bba93b08330bc0de134ffb409"
+			},
+			"Synthetix": {
+				"address": "0x948FB2dd81C8F5688f34639Dd7784B6Ea07c1225",
+				"status": "current",
+				"keccak256": "0xfa3ff14da1027d26233a7c5e5c397b108524b975f309857c603338fbe4a1a51a"
+			},
+			"Exchanger": {
+				"address": "0xB89FD31996B75f342b07884e3229582448622748",
 				"status": "current",
 				"keccak256": "0x341ca3e9dee61d08ad031ace9d2889192b220c74ec0fbb70d3509536373723b1"
 			},
 			"SupplySchedule": {
-				"address": "0x9B01E46Ebe81dca86f8A60E77AAE94CD8Ef45488",
+				"address": "0xDc1B2835748c2185aa2a2e50Db88f13E9a53a00D",
 				"status": "current",
-				"keccak256": "0x6518d6753a6c68d1e97b62355927d9f004cc4b7cfa23f35012c8ad32d998d5bb"
+				"keccak256": "0xfcb2687f0065e632ef483dae5da14c0a51fa77997510925c8c39bbb84ff0f869"
 			}
 		}
 	}
