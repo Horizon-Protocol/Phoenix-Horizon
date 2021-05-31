@@ -132,8 +132,9 @@
 			},
 			"DebtCache": {
 				"address": "0xAB1aAfF7245E683e8c03Fc1eE566f3BAd99a3A23",
-				"status": "current",
-				"keccak256": "0xa665f4f6bf06e17c94f6e3ecb20d7a7b375a2263c435f18bf416ffcc458c1fa0"
+				"status": "replaced",
+				"keccak256": "0xa665f4f6bf06e17c94f6e3ecb20d7a7b375a2263c435f18bf416ffcc458c1fa0",
+				"replaced_in": "v1.0.5"
 			},
 			"Exchanger": {
 				"address": "0x25E2DF57b72C40a42b4520Aec2cf050986Bc458F",
@@ -286,8 +287,9 @@
 		"contracts": {
 			"ExchangeRates": {
 				"address": "0xCEbdE9BFB5A53b1dBa23A7702c72b9562F16FaBa",
-				"status": "current",
-				"keccak256": "0x6dc543db079975b0956c25fcd71e15f1dcc65e18ee4f1089c701f43fb4ea879d"
+				"status": "replaced",
+				"keccak256": "0x6dc543db079975b0956c25fcd71e15f1dcc65e18ee4f1089c701f43fb4ea879d",
+				"replaced_in": "v1.0.5"
 			},
 			"Synthetix": {
 				"address": "0xb7287A3388411D06c8932070b85c633A3bA7761e",
@@ -357,8 +359,9 @@
 			},
 			"Synthetix": {
 				"address": "0x948FB2dd81C8F5688f34639Dd7784B6Ea07c1225",
-				"status": "current",
-				"keccak256": "0xfa3ff14da1027d26233a7c5e5c397b108524b975f309857c603338fbe4a1a51a"
+				"status": "replaced",
+				"keccak256": "0xfa3ff14da1027d26233a7c5e5c397b108524b975f309857c603338fbe4a1a51a",
+				"replaced_in": "v1.0.5"
 			},
 			"Exchanger": {
 				"address": "0xB89FD31996B75f342b07884e3229582448622748",
@@ -369,6 +372,31 @@
 				"address": "0xDc1B2835748c2185aa2a2e50Db88f13E9a53a00D",
 				"status": "current",
 				"keccak256": "0xfcb2687f0065e632ef483dae5da14c0a51fa77997510925c8c39bbb84ff0f869"
+			}
+		}
+	},
+	"v1.0.5": {
+		"tag": "v1.0.5",
+		"fulltag": "v1.0.5",
+		"release": "v1.0.5",
+		"network": "testnet",
+		"date": "2021-05-31T16:08:15+08:00",
+		"commit": "5f8b834a72ea9935c3ed13f3e2129dbabaadad79",
+		"contracts": {
+			"ExchangeRates": {
+				"address": "0xb078aA93d1F5600625d3f9Bbcd47572a5190882b",
+				"status": "current",
+				"keccak256": "0x6dc543db079975b0956c25fcd71e15f1dcc65e18ee4f1089c701f43fb4ea879d"
+			},
+			"Synthetix": {
+				"address": "0xFb37758e339d89f15D93C3FF913b502F2C302E23",
+				"status": "current",
+				"keccak256": "0x8a29e9668041345381ada5318f2d8ac8a1eb091802a76c9b710c84a2aa617d68"
+			},
+			"DebtCache": {
+				"address": "0xa78f97181C9912516bC00491b216a09c26482E5E",
+				"status": "current",
+				"keccak256": "0xa665f4f6bf06e17c94f6e3ecb20d7a7b375a2263c435f18bf416ffcc458c1fa0"
 			}
 		}
 	}
