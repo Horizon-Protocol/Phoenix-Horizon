@@ -138,6 +138,6 @@
 		"deploy": false
 	},
 	"ZassetzETH": {
-		"deploy": false
+		"deploy": true
 	}
 }
