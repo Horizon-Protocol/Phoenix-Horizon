@@ -65,5 +65,45 @@
 		},
 		"sources": ["Exchanger", "Synthetix"],
 		"sips": [94]
+	},
+	{
+		"name": "Adhara",
+		"version": {
+			"major": 2,
+			"minor": 34
+		},
+		"sources": ["Exchanger"],
+		"sips": [98, 99]
+	},
+	{
+		"name": "Shaula",
+		"version": {
+			"major": 2,
+			"minor": 35
+		},
+		"sources": [
+			"AddressResolver",
+			"BinaryOptionMarketFactory",
+			"BinaryOptionMarketManager",
+			"CollateralErc20",
+			"CollateralEth",
+			"CollateralManager",
+			"CollateralManagerState",
+			"CollateralStateErc20",
+			"CollateralStateEth",
+			"CollateralStateShort",
+			"CollateralShort",
+			"DebtCache",
+			"ExchangeRates",
+			"Exchanger",
+			"FeePool",
+			"Issuer",
+			"Liquidations",
+			"SystemSettings",
+			"Synthetix",
+			"TradingRewards",
+			"Synth(s|i).+"
+		],
+		"sips": [97, 100, 103]
 	}
 ]

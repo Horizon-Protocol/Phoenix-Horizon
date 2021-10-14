@@ -11,7 +11,39 @@ import "../interfaces/ISynthetix.sol";
 import "../interfaces/IAddressResolver.sol";
 import "../interfaces/IVirtualSynth.sol";
 import "../interfaces/IExchanger.sol";
-import {IERC20 as IERC20Detailed} from "../interfaces/IERC20.sol";
+
+
+interface IERC20Detailed {
+    // ERC20 Optional Views
+    function name() external view returns (string memory);
+
+    function symbol() external view returns (string memory);
+
+    function decimals() external view returns (uint8);
+
+    // Views
+    function totalSupply() external view returns (uint);
+
+    function balanceOf(address owner) external view returns (uint);
+
+    function allowance(address owner, address spender) external view returns (uint);
+
+    // Mutative functions
+    function transfer(address to, uint value) external returns (bool);
+
+    function approve(address spender, uint value) external returns (bool);
+
+    function transferFrom(
+        address from,
+        address to,
+        uint value
+    ) external returns (bool);
+
+    // Events
+    event Transfer(address indexed from, address indexed to, uint value);
+
+    event Approval(address indexed owner, address indexed spender, uint value);
+}
 
 
 interface ICurvePool {
@@ -130,11 +162,11 @@ contract SwapWithVirtualSynth {
         // ensure the pool can transferFrom our contract
         USDC.approve(address(incomingPool), amount);
 
-        // now invoke curve USDC to zUSD
+        // now invoke curve USDC to sUSD
         incomingPool.exchange(1, 3, amount, 0);
 
-        // now exchange my zUSD to zBTC
-        (, IVirtualSynth vSynth) = synthetix.exchangeWithVirtual("zUSD", sUSD.balanceOf(address(this)), "zBTC", bytes32(0));
+        // now exchange my sUSD to sBTC
+        (, IVirtualSynth vSynth) = synthetix.exchangeWithVirtual("sUSD", sUSD.balanceOf(address(this)), "sBTC", bytes32(0));
 
         // wrap this vSynth in a new token ERC20 contract
         VirtualToken vToken = new VirtualToken(vSynth, outgoingPool, WBTC);

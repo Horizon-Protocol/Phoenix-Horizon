@@ -77,15 +77,13 @@ contract Depot is Owned, Pausable, ReentrancyGuard, MixinResolver, IDepot {
     bytes32 private constant CONTRACT_EXRATES = "ExchangeRates";
     bytes32 private constant CONTRACT_SYNTHETIX = "Synthetix";
 
-    bytes32[24] private addressesToCache = [CONTRACT_ZASSETZUSD, CONTRACT_EXRATES, CONTRACT_SYNTHETIX];
-
     /* ========== CONSTRUCTOR ========== */
 
     constructor(
         address _owner,
         address payable _fundsWallet,
         address _resolver
-    ) public Owned(_owner) Pausable() MixinResolver(_resolver, addressesToCache) {
+    ) public Owned(_owner) Pausable() MixinResolver(_resolver) {
         fundsWallet = _fundsWallet;
     }
 
@@ -192,7 +190,7 @@ contract Depot is Owned, Pausable, ReentrancyGuard, MixinResolver, IDepot {
                     // Note: Fees are calculated by the Zasset contract, so when
                     //       we request a specific transfer here, the fee is
                     //       automatically deducted and sent to the fee pool.
-                    synthsUSD().transfer(msg.sender, remainingToFulfill);
+                    synthzUSD().transfer(msg.sender, remainingToFulfill);
 
                     // And we have nothing left to fulfill on this order.
                     remainingToFulfill = 0;
@@ -227,7 +225,7 @@ contract Depot is Owned, Pausable, ReentrancyGuard, MixinResolver, IDepot {
                     // Note: Fees are calculated by the Zasset contract, so when
                     //       we request a specific transfer here, the fee is
                     //       automatically deducted and sent to the fee pool.
-                    synthsUSD().transfer(msg.sender, deposit.amount);
+                    synthzUSD().transfer(msg.sender, deposit.amount);
 
                     // And subtract the order from our outstanding amount remaining
                     // for the next iteration of the loop.
@@ -337,7 +335,7 @@ contract Depot is Owned, Pausable, ReentrancyGuard, MixinResolver, IDepot {
         // Ok, transfer the Synths to our funds wallet.
         // These do not go in the deposit queue as they aren't for sale as such unless
         // they're sent back in from the funds wallet.
-        synthsUSD().transferFrom(msg.sender, fundsWallet, synthAmount);
+        synthzUSD().transferFrom(msg.sender, fundsWallet, synthAmount);
 
         // And send them the HZN.
         synthetix().transfer(msg.sender, synthetixToSend);
@@ -429,7 +427,7 @@ contract Depot is Owned, Pausable, ReentrancyGuard, MixinResolver, IDepot {
         require(synthsToSend > 0, "You have no deposits to withdraw.");
 
         // Send their deposits back to them (minus fees)
-        synthsUSD().transfer(msg.sender, synthsToSend);
+        synthzUSD().transfer(msg.sender, synthsToSend);
 
         emit SynthWithdrawal(msg.sender, synthsToSend);
     }
@@ -440,7 +438,7 @@ contract Depot is Owned, Pausable, ReentrancyGuard, MixinResolver, IDepot {
      */
     function depositSynths(uint amount) external {
         // Grab the amount of synths. Will fail if not approved first
-        synthsUSD().transferFrom(msg.sender, address(this), amount);
+        synthzUSD().transferFrom(msg.sender, address(this), amount);
 
         // A minimum deposit amount is designed to protect purchasers from over paying
         // gas for fullfilling multiple small synth deposits
@@ -464,6 +462,13 @@ contract Depot is Owned, Pausable, ReentrancyGuard, MixinResolver, IDepot {
     }
 
     /* ========== VIEWS ========== */
+
+    function resolverAddressesRequired() public view returns (bytes32[] memory addresses) {
+        addresses = new bytes32[](3);
+        addresses[0] = CONTRACT_ZASSETZUSD;
+        addresses[1] = CONTRACT_EXRATES;
+        addresses[2] = CONTRACT_SYNTHETIX;
+    }
 
     /**
      * @notice Calculate how many HZN you will receive if you transfer
@@ -500,16 +505,16 @@ contract Depot is Owned, Pausable, ReentrancyGuard, MixinResolver, IDepot {
 
     /* ========== INTERNAL VIEWS ========== */
 
-    function synthsUSD() internal view returns (IERC20) {
-        return IERC20(requireAndGetAddress(CONTRACT_ZASSETZUSD, "Missing ZassetzUSD address"));
+    function synthzUSD() internal view returns (IERC20) {
+        return IERC20(requireAndGetAddress(CONTRACT_ZASSETZUSD));
     }
 
     function synthetix() internal view returns (IERC20) {
-        return IERC20(requireAndGetAddress(CONTRACT_SYNTHETIX, "Missing Horizon address"));
+        return IERC20(requireAndGetAddress(CONTRACT_SYNTHETIX));
     }
 
     function exchangeRates() internal view returns (IExchangeRates) {
-        return IExchangeRates(requireAndGetAddress(CONTRACT_EXRATES, "Missing ExchangeRates address"));
+        return IExchangeRates(requireAndGetAddress(CONTRACT_EXRATES));
     }
 
     // ========== MODIFIERS ==========

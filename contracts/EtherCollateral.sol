@@ -101,21 +101,8 @@ contract EtherCollateral is Owned, Pausable, ReentrancyGuard, MixinResolver, IEt
     bytes32 private constant CONTRACT_DEPOT = "Depot";
     bytes32 private constant CONTRACT_EXRATES = "ExchangeRates";
 
-    bytes32[24] private addressesToCache = [
-        CONTRACT_SYSTEMSTATUS,
-        CONTRACT_ZASSETZBNB,
-        CONTRACT_ZASSETZUSD,
-        CONTRACT_DEPOT,
-        CONTRACT_EXRATES
-    ];
-
     // ========== CONSTRUCTOR ==========
-    constructor(address _owner, address _resolver)
-        public
-        Owned(_owner)
-        Pausable()
-        MixinResolver(_resolver, addressesToCache)
-    {
+    constructor(address _owner, address _resolver) public Owned(_owner) Pausable() MixinResolver(_resolver) {
         liquidationDeadline = now + 92 days; // Time before loans can be liquidated
     }
 
@@ -165,6 +152,15 @@ contract EtherCollateral is Owned, Pausable, ReentrancyGuard, MixinResolver, IEt
     }
 
     // ========== PUBLIC VIEWS ==========
+
+    function resolverAddressesRequired() public view returns (bytes32[] memory addresses) {
+        addresses = new bytes32[](5);
+        addresses[0] = CONTRACT_SYSTEMSTATUS;
+        addresses[1] = CONTRACT_ZASSETZBNB;
+        addresses[2] = CONTRACT_ZASSETZUSD;
+        addresses[3] = CONTRACT_DEPOT;
+        addresses[4] = CONTRACT_EXRATES;
+    }
 
     function getContractInfo()
         external
@@ -379,13 +375,13 @@ contract EtherCollateral is Owned, Pausable, ReentrancyGuard, MixinResolver, IEt
 
         // Fee Distribution. Purchase zUSD with BNB from Depot
         require(
-            IERC20(address(synthsUSD())).balanceOf(address(depot())) >= depot().synthsReceivedForEther(totalFeeETH),
+            IERC20(address(synthzUSD())).balanceOf(address(depot())) >= depot().synthsReceivedForEther(totalFeeETH),
             "The zUSD Depot does not have enough zUSD to buy for fees"
         );
         depot().exchangeEtherForSynths.value(totalFeeETH)();
 
         // Transfer the zUSD to distribute to HZN holders.
-        IERC20(address(synthsUSD())).transfer(FEE_ADDRESS, IERC20(address(synthsUSD())).balanceOf(address(this)));
+        IERC20(address(synthzUSD())).transfer(FEE_ADDRESS, IERC20(address(synthzUSD())).balanceOf(address(this)));
 
         // Send remainder BNB to caller
         address(msg.sender).transfer(synthLoan.collateralAmount.sub(totalFeeETH));
@@ -440,23 +436,23 @@ contract EtherCollateral is Owned, Pausable, ReentrancyGuard, MixinResolver, IEt
     /* ========== INTERNAL VIEWS ========== */
 
     function systemStatus() internal view returns (ISystemStatus) {
-        return ISystemStatus(requireAndGetAddress(CONTRACT_SYSTEMSTATUS, "Missing SystemStatus address"));
+        return ISystemStatus(requireAndGetAddress(CONTRACT_SYSTEMSTATUS));
     }
 
     function synthsETH() internal view returns (ISynth) {
-        return ISynth(requireAndGetAddress(CONTRACT_ZASSETZBNB, "Missing ZassetzBNB address"));
+        return ISynth(requireAndGetAddress(CONTRACT_ZASSETZBNB));
     }
 
-    function synthsUSD() internal view returns (ISynth) {
-        return ISynth(requireAndGetAddress(CONTRACT_ZASSETZUSD, "Missing ZassetzUSD address"));
+    function synthzUSD() internal view returns (ISynth) {
+        return ISynth(requireAndGetAddress(CONTRACT_ZASSETZUSD));
     }
 
     function depot() internal view returns (IDepot) {
-        return IDepot(requireAndGetAddress(CONTRACT_DEPOT, "Missing Depot address"));
+        return IDepot(requireAndGetAddress(CONTRACT_DEPOT));
     }
 
     function exchangeRates() internal view returns (IExchangeRates) {
-        return IExchangeRates(requireAndGetAddress(CONTRACT_EXRATES, "Missing ExchangeRates address"));
+        return IExchangeRates(requireAndGetAddress(CONTRACT_EXRATES));
     }
 
     /* ========== MODIFIERS ========== */
