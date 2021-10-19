@@ -1004,7 +1004,7 @@ const deploy = async ({
 				await confirmAction(
 					yellow(
 						`⚠⚠⚠ WARNING: Please confirm - ${network}:\n` +
-							`Synth${currencyKey} totalSupply is ${originalTotalSupply} \n`
+							`Zasset${currencyKey} totalSupply is ${originalTotalSupply} \n`
 					) +
 						gray('-'.repeat(50)) +
 						'\nDo you want to continue? (y/n) '
