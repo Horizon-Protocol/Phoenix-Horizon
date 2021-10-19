@@ -1017,7 +1017,7 @@ const deploy = async ({
 
 		const sourceContract = subclass || 'Synth';
 		const synth = await deployer.deployContract({
-			name: `Synth${currencyKey}`,
+			name: `Zasset${currencyKey}`,
 			source: sourceContract,
 			deps: [`TokenState${currencyKey}`, `Proxy${currencyKey}`, 'Synthetix', 'FeePool'],
 			args: [
