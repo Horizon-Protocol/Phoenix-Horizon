@@ -1320,7 +1320,7 @@ const deploy = async ({
 				account,
 				addressOf(collateralManager),
 				addressOf(readProxyForResolver),
-				toBytes32('sBTC'),
+				toBytes32('zBTC'),
 				(await getDeployParameter('COLLATERAL_RENBTC'))['MIN_CRATIO'],
 				(await getDeployParameter('COLLATERAL_RENBTC'))['MIN_COLLATERAL'],
 				RENBTC_ADDRESS,
