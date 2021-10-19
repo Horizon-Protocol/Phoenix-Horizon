@@ -107,7 +107,7 @@ const defaults = {
 	INITIAL_ISSUANCE: w3utils.toWei(`${100e6}`),
 	CROSS_DOMAIN_MESSAGE_GAS_LIMIT: `${3e6}`,
 	COLLATERAL_MANAGER: {
-		SYNTHS: ['sUSD', 'sBTC', 'sETH'],
+		SYNTHS: ['zUSD', 'zBTC', 'zBNB'],
 		SHORTS: [
 			{ long: 'sBTC', short: 'iBTC' },
 			{ long: 'sETH', short: 'iETH' },
