@@ -418,7 +418,7 @@ const deploy = async ({
 			(latestSolTimestamp > earliestCompiledTimestamp
 				? yellow(' ⚠⚠⚠ this is later than the last build! Is this intentional?')
 				: green(' ✅')),
-		'Add any new synths found?': addNewSynths
+		'Add any new zassets found?': addNewSynths
 			? green('✅ YES\n\t\t\t\t') + newSynthsToAdd.join(', ')
 			: yellow('⚠ NO'),
 		'Deployer account:': account,
