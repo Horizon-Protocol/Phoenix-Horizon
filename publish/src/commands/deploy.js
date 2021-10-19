@@ -1274,7 +1274,7 @@ const deploy = async ({
 				account,
 				addressOf(collateralManager),
 				addressOf(readProxyForResolver),
-				toBytes32('sETH'),
+				toBytes32('zBNB'),
 				(await getDeployParameter('COLLATERAL_ETH'))['MIN_CRATIO'],
 				(await getDeployParameter('COLLATERAL_ETH'))['MIN_COLLATERAL'],
 			],
