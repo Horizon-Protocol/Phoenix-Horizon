@@ -384,7 +384,7 @@ const deploy = async ({
 		});
 	} else if (deployerBalance < 5) {
 		console.log(
-			yellow(`⚠ WARNING: Deployer account balance could be too low: ${deployerBalance} ETH`)
+			yellow(`⚠ WARNING: Deployer account balance could be too low: ${deployerBalance} BNB`)
 		);
 	}
 
