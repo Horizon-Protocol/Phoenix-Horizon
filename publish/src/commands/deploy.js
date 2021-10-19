@@ -1614,7 +1614,7 @@ const deploy = async ({
 					.call();
 
 				// and total supply, if any
-				const synth = deployer.deployedContracts[`Synth${currencyKey}`];
+				const synth = deployer.deployedContracts[`Zasset${currencyKey}`];
 				const totalSynthSupply = await synth.methods.totalSupply().call();
 				console.log(gray(`totalSupply of ${currencyKey}: ${Number(totalSynthSupply)}`));
 
