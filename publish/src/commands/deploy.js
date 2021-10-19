@@ -970,7 +970,7 @@ const deploy = async ({
 
 		// additionally deploy an ERC20 proxy for the synth if it's legacy (sUSD)
 		let proxyERC20ForSynth;
-		if (currencyKey === 'sUSD') {
+		if (currencyKey === 'zUSD') {
 			proxyERC20ForSynth = await deployer.deployContract({
 				name: `ProxyERC20${currencyKey}`,
 				source: `ProxyERC20`,
