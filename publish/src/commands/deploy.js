@@ -1931,7 +1931,7 @@ const deploy = async ({
 			target: collateralEth,
 			read: 'areSynthsAndCurrenciesSet',
 			readArg: [
-				collateralEthSynths.map(key => toBytes32(`Synth${key}`)),
+				collateralEthSynths.map(key => toBytes32(`Zasset${key}`)),
 				collateralEthSynths.map(toBytes32),
 			],
 			expected: input => input,
