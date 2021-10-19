@@ -1964,7 +1964,7 @@ const deploy = async ({
 			expected: input => input,
 			write: 'addSynths',
 			writeArg: [
-				collateralErc20Synths.map(key => toBytes32(`Synth${key}`)),
+				collateralErc20Synths.map(key => toBytes32(`Zasset${key}`)),
 				collateralErc20Synths.map(toBytes32),
 			],
 		});
