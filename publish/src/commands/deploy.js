@@ -959,7 +959,7 @@ const deploy = async ({
 		// https://docs.synthetix.io/integrations/guide/#proxy-deprecation
 		// Until this time, on mainnet we will still deploy ProxyERC20sUSD and ensure that
 		// SynthsUSD.proxy is ProxyERC20sUSD, SynthsUSD.integrationProxy is ProxysUSD
-		const synthProxyIsLegacy = currencyKey === 'sUSD' && network === 'mainnet';
+		const synthProxyIsLegacy = currencyKey === 'zUSD' && network === 'mainnet';
 
 		const proxyForSynth = await deployer.deployContract({
 			name: `Proxy${currencyKey}`,
