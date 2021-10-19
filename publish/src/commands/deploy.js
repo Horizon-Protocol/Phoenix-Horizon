@@ -1352,7 +1352,7 @@ const deploy = async ({
 				account,
 				addressOf(collateralManager),
 				addressOf(readProxyForResolver),
-				toBytes32('sUSD'),
+				toBytes32('zUSD'),
 				(await getDeployParameter('COLLATERAL_SHORT'))['MIN_CRATIO'],
 				(await getDeployParameter('COLLATERAL_SHORT'))['MIN_COLLATERAL'],
 				addressOf(deployer.getExistingContract({ contract: 'ProxyERC20sUSD' })),
