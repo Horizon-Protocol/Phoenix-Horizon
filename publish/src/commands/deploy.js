@@ -981,7 +981,7 @@ const deploy = async ({
 
 		const currencyKeyInBytes = toBytes32(currencyKey);
 
-		const synthConfig = config[`Synth${currencyKey}`] || {};
+		const synthConfig = config[`Zasset${currencyKey}`] || {};
 
 		// track the original supply if we're deploying a new synth contract for an existing synth
 		let originalTotalSupply = 0;
