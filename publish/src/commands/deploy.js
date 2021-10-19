@@ -1023,7 +1023,7 @@ const deploy = async ({
 			args: [
 				proxyERC20ForSynth ? addressOf(proxyERC20ForSynth) : addressOf(proxyForSynth),
 				addressOf(tokenStateForSynth),
-				`Synth ${currencyKey}`,
+				`Zasset ${currencyKey}`,
 				currencyKey,
 				account,
 				currencyKeyInBytes,
