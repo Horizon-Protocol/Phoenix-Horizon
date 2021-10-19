@@ -1958,7 +1958,7 @@ const deploy = async ({
 			target: collateralErc20,
 			read: 'areSynthsAndCurrenciesSet',
 			readArg: [
-				collateralErc20Synths.map(key => toBytes32(`Synth${key}`)),
+				collateralErc20Synths.map(key => toBytes32(`Zasset${key}`)),
 				collateralErc20Synths.map(toBytes32),
 			],
 			expected: input => input,
