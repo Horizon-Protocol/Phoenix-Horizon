@@ -2049,7 +2049,7 @@ const deploy = async ({
 			target: collateralManager,
 			read: 'areShortableSynthsSet',
 			readArg: [
-				collateralManagerShorts.map(({ long }) => toBytes32(`Synth${long}`)),
+				collateralManagerShorts.map(({ long }) => toBytes32(`Zasset${long}`)),
 				collateralManagerShorts.map(({ long }) => toBytes32(long)),
 			],
 			expected: input => input,
