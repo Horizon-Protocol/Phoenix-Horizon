@@ -40,7 +40,7 @@ const DEFAULTS = {
 	methodCallGasLimit: 250e3, // 250k
 	contractDeploymentGasLimit: 6.9e6, // TODO split out into separate limits for different contracts, Proxys, Synths, Synthetix
 	debtSnapshotMaxDeviation: 0.01, // a 1 percent deviation will trigger a snapshot
-	network: 'kovan',
+	network: 'testnet',
 	buildPath: path.join(__dirname, '..', '..', '..', BUILD_FOLDER),
 };
 
