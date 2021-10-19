@@ -51,7 +51,7 @@ const constants = {
 
 	ZERO_ADDRESS: '0x' + '0'.repeat(40),
 
-	OVM_MAX_GAS_LIMIT: '8900000',
+	OVM_MAX_GAS_LIMIT: '8999999',
 
 	inflationStartTimestampInSecs: 1672448400, // 2022-12-31T01:00:00+00:00 AMT
 };
@@ -66,7 +66,13 @@ const knownAccounts = {
 			name: 'renBTCWallet',
 			address: '0x53463cd0b074E5FDafc55DcE7B1C82ADF1a43B2E',
 		},
+		{
+			name: 'loansAccount',
+			address: '0x62f7A1F94aba23eD2dD108F8D23Aa3e7d452565B',
+		},
 	],
+	rinkeby: [],
+	kovan: [],
 };
 
 // The solidity defaults are managed here in the same format they will be stored, hence all
@@ -105,14 +111,18 @@ const defaults = {
 		rinkeby: '0xEDC0C23864B041607D624E2d9a67916B6cf40F7a',
 	},
 	INITIAL_ISSUANCE: w3utils.toWei(`${100e6}`),
-	CROSS_DOMAIN_MESSAGE_GAS_LIMIT: `${3e6}`,
+	CROSS_DOMAIN_DEPOSIT_GAS_LIMIT: `${3e6}`,
+	CROSS_DOMAIN_ESCROW_GAS_LIMIT: `${8e6}`,
+	CROSS_DOMAIN_REWARD_GAS_LIMIT: `${3e6}`,
+	CROSS_DOMAIN_WITHDRAWAL_GAS_LIMIT: `${3e6}`,
+
 	COLLATERAL_MANAGER: {
 		SYNTHS: ['zUSD', 'zBTC', 'zBNB'],
 		SHORTS: [
 			{ long: 'sBTC', short: 'iBTC' },
 			{ long: 'sETH', short: 'iETH' },
 		],
-		MAX_DEBT: w3utils.toWei('100000000'),
+		MAX_DEBT: w3utils.toWei('20000000'), // 20 million zUSD
 		BASE_BORROW_RATE: Math.round((0.005 * 1e18) / 31556926).toString(), // 31556926 is CollateralManager seconds per year
 		BASE_SHORT_RATE: Math.round((0.005 * 1e18) / 31556926).toString(),
 	},
