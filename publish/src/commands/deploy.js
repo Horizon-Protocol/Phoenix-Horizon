@@ -1991,7 +1991,7 @@ const deploy = async ({
 			expected: input => input,
 			write: 'addSynths',
 			writeArg: [
-				collateralShortSynths.map(key => toBytes32(`Synth${key}`)),
+				collateralShortSynths.map(key => toBytes32(`Zasset${key}`)),
 				collateralShortSynths.map(toBytes32),
 			],
 		});
