@@ -1985,7 +1985,7 @@ const deploy = async ({
 			target: collateralShort,
 			read: 'areSynthsAndCurrenciesSet',
 			readArg: [
-				collateralShortSynths.map(key => toBytes32(`Synth${key}`)),
+				collateralShortSynths.map(key => toBytes32(`Zasset${key}`)),
 				collateralShortSynths.map(toBytes32),
 			],
 			expected: input => input,
