@@ -2031,7 +2031,7 @@ const deploy = async ({
 			target: collateralManager,
 			read: 'areSynthsAndCurrenciesSet',
 			readArg: [
-				collateralManagerSynths.map(key => toBytes32(`Synth${key}`)),
+				collateralManagerSynths.map(key => toBytes32(`Zasset${key}`)),
 				collateralManagerSynths.map(toBytes32),
 			],
 			expected: input => input,
