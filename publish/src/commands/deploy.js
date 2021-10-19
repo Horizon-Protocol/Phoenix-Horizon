@@ -1057,7 +1057,7 @@ const deploy = async ({
 
 			// Migration Phrase 2: if there's a ProxyERC20sUSD then the Synth's proxy must use it
 			await runStep({
-				contract: `Synth${currencyKey}`,
+				contract: `Zasset${currencyKey}`,
 				target: synth,
 				read: 'proxy',
 				expected: input => input === addressOf(proxyERC20ForSynth || proxyForSynth),
