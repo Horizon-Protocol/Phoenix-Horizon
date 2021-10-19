@@ -987,7 +987,7 @@ const deploy = async ({
 		let originalTotalSupply = 0;
 		if (synthConfig.deploy) {
 			try {
-				const oldSynth = deployer.getExistingContract({ contract: `Synth${currencyKey}` });
+				const oldSynth = deployer.getExistingContract({ contract: `Zasset${currencyKey}` });
 				originalTotalSupply = await oldSynth.methods.totalSupply().call();
 			} catch (err) {
 				if (!freshDeploy) {
