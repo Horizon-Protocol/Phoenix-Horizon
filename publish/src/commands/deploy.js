@@ -352,7 +352,7 @@ const deploy = async ({
 	}
 
 	const newSynthsToAdd = synths
-		.filter(({ name }) => !config[`Synth${name}`])
+		.filter(({ name }) => !config[`Zasset${name}`])
 		.map(({ name }) => name);
 
 	let aggregatedPriceResults = 'N/A';
