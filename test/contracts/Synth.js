@@ -66,6 +66,8 @@ contract('Synth', async accounts => {
 				'Exchanger', // required to exchange into sUSD when transferring to the FeePool
 				'SystemSettings',
 				'FlexibleStorage',
+				'CollateralManager',
+				'RewardEscrowV2', // required for issuer._collateral() to read collateral
 			],
 		}));
 
@@ -323,7 +325,7 @@ contract('Synth', async accounts => {
 			// Overwrite Synthetix address to the owner to allow us to invoke issue on the Synth
 			await addressResolver.importAddresses(['Issuer'].map(toBytes32), [owner], { from: owner });
 			// now have the synth resync its cache
-			await hUSDContract.setResolverAndSyncCache(addressResolver.address, { from: owner });
+			await hUSDContract.rebuildCache();
 		});
 		it('should issue successfully when called by Issuer', async () => {
 			const transaction = await hUSDContract.issue(account1, toUnit('10000'), {
@@ -479,8 +481,8 @@ contract('Synth', async accounts => {
 					from: owner,
 				});
 				// now have synthetix resync its cache
-				await synthetix.setResolverAndSyncCache(addressResolver.address, { from: owner });
-				await hUSDContract.setResolverAndSyncCache(addressResolver.address, { from: owner });
+				await synthetix.rebuildCache();
+				await hUSDContract.rebuildCache();
 			});
 			it('then transferableSynths should be the total amount', async () => {
 				assert.bnEqual(await hUSDContract.transferableSynths(owner), toUnit('1000'));

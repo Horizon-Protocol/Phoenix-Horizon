@@ -41,7 +41,6 @@ contract('EtherCollateralsUSD', async accounts => {
 	const [, owner, oracle, address1, address2, address3] = accounts;
 
 	let etherCollateral,
-		synthetix,
 		feePool,
 		exchangeRates,
 		addressResolver,
@@ -127,8 +126,7 @@ contract('EtherCollateralsUSD', async accounts => {
 	// Run once at beginning - snapshots will take care of resetting this before each test
 	before(async () => {
 		// Mock HZN, hUSD
-		[{ token: synthetix }, { token: hUSDSynth }] = await Promise.all([
-			mockToken({ accounts, name: 'Horizon', symbol: 'HZN' }),
+		[{ token: hUSDSynth }] = await Promise.all([
 			mockToken({ accounts, synth: 'hUSD', name: 'Horizon USD', symbol: 'hUSD' }),
 		]);
 
@@ -142,7 +140,6 @@ contract('EtherCollateralsUSD', async accounts => {
 			accounts,
 			mocks: {
 				HassethUSD: hUSDSynth,
-				Synthetix: synthetix,
 			},
 			contracts: [
 				'FeePool',
@@ -150,6 +147,8 @@ contract('EtherCollateralsUSD', async accounts => {
 				'ExchangeRates',
 				'SystemStatus',
 				'EtherCollateralsUSD',
+				'CollateralManager',
+				'Synthetix',
 			],
 		}));
 
@@ -174,7 +173,7 @@ contract('EtherCollateralsUSD', async accounts => {
 		});
 
 		// Sync feePool with imported mockIssuer
-		await feePool.setResolverAndSyncCache(addressResolver.address, { from: owner });
+		await feePool.rebuildCache();
 	});
 
 	addSnapshotBeforeRestoreAfterEach();

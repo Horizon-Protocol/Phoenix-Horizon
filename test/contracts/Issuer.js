@@ -27,6 +27,8 @@ const {
 } = require('../..');
 
 contract('Issuer (via Synthetix)', async accounts => {
+	const WEEK = 604800;
+
 	const [hUSD, hAUD, hEUR, HZN, hBNB, BNB] = ['hUSD', 'hAUD', 'hEUR', 'HZN', 'hBNB', 'BNB'].map(
 		toBytes32
 	);
@@ -46,7 +48,7 @@ contract('Issuer (via Synthetix)', async accounts => {
 		hEURContract,
 		hAUDContract,
 		escrow,
-		rewardEscrow,
+		rewardEscrowV2,
 		timestamp,
 		debtCache,
 		issuer,
@@ -67,7 +69,7 @@ contract('Issuer (via Synthetix)', async accounts => {
 			SystemSettings: systemSettings,
 			ExchangeRates: exchangeRates,
 			SynthetixEscrow: escrow,
-			RewardEscrow: rewardEscrow,
+			RewardEscrowV2: rewardEscrowV2,
 			HassethUSD: hUSDContract,
 			HassethBNB: hBNBContract,
 			HassethAUD: hAUDContract,
@@ -86,7 +88,7 @@ contract('Issuer (via Synthetix)', async accounts => {
 				'FeePool',
 				'FeePoolEternalStorage',
 				'AddressResolver',
-				'RewardEscrow',
+				'RewardEscrowV2',
 				'SynthetixEscrow',
 				'SystemSettings',
 				'Issuer',
@@ -94,6 +96,7 @@ contract('Issuer (via Synthetix)', async accounts => {
 				'Exchanger', // necessary for burnSynths to check settlement of hUSD
 				'DelegateApprovals', // necessary for *OnBehalf functions
 				'FlexibleStorage',
+				'CollateralManager',
 			],
 		}));
 	});
@@ -124,7 +127,7 @@ contract('Issuer (via Synthetix)', async accounts => {
 	it('ensure only known functions are mutative', () => {
 		ensureOnlyExpectedMutativeFunctions({
 			abi: issuer.abi,
-			ignoreParents: ['MixinResolver'],
+			ignoreParents: ['Owned', 'MixinResolver'],
 			expected: [
 				'addSynth',
 				'addSynths',
@@ -2084,6 +2087,16 @@ contract('Issuer (via Synthetix)', async accounts => {
 			// Check user's collaterisation ratio
 
 			describe('check collaterisation ratio', () => {
+				const duration = 52 * WEEK;
+				beforeEach(async () => {
+					// setup rewardEscrowV2 with mocked feePool address
+					await addressResolver.importAddresses([toBytes32('FeePool')], [account6], {
+						from: owner,
+					});
+
+					// update the cached addresses
+					await rewardEscrowV2.rebuildCache({ from: owner });
+				});
 				it('should return 0 if user has no synthetix when checking the collaterisation ratio', async () => {
 					const ratio = await synthetix.collateralisationRatio(account1);
 					assert.bnEqual(ratio, new web3.utils.BN(0));
@@ -2170,16 +2183,12 @@ contract('Issuer (via Synthetix)', async accounts => {
 						from: owner,
 					});
 
-					// Setup reward escrow
-					const feePoolAccount = account6;
-					await rewardEscrow.setFeePool(feePoolAccount, { from: owner });
-
 					const escrowedSynthetixs = toUnit('30000');
 					await synthetix.transfer(rewardEscrow.address, escrowedSynthetixs, {
 						from: owner,
 					});
-					await rewardEscrow.appendVestingEntry(account1, escrowedSynthetixs, {
-						from: feePoolAccount,
+					await rewardEscrowV2.appendVestingEntry(account1, escrowedSynthetixs, duration, {
+						from: account6,
 					});
 
 					// Issue
@@ -2234,10 +2243,6 @@ contract('Issuer (via Synthetix)', async accounts => {
 				});
 
 				it('should permit user to issue sUSD debt with only reward escrow as collateral (no SNX in wallet)', async () => {
-					// Setup reward escrow
-					const feePoolAccount = account6;
-					await rewardEscrow.setFeePool(feePoolAccount, { from: owner });
-
 					// ensure collateral of account1 is empty
 					let collateral = await synthetix.collateral(account1, { from: account1 });
 					assert.bnEqual(collateral, 0);
@@ -2248,7 +2253,7 @@ contract('Issuer (via Synthetix)', async accounts => {
 
 					// Append escrow amount to account1
 					const escrowedAmount = toUnit('15000');
-					await synthetix.transfer(rewardEscrow.address, escrowedAmount, {
+					await synthetix.transfer(rewardEscrowV2.address, escrowedAmount, {
 						from: owner,
 					});
 					await rewardEscrow.appendVestingEntry(account1, escrowedAmount, { from: feePoolAccount });
@@ -2295,13 +2300,13 @@ contract('Issuer (via Synthetix)', async accounts => {
 				});
 
 				it("should include escrowed reward synthetix when checking a user's collateral", async () => {
-					const feePoolAccount = account6;
 					const escrowedAmount = toUnit('15000');
-					await synthetix.transfer(rewardEscrow.address, escrowedAmount, {
+					await synthetix.transfer(rewardEscrowV2.address, escrowedAmount, {
 						from: owner,
 					});
-					await rewardEscrow.setFeePool(feePoolAccount, { from: owner });
-					await rewardEscrow.appendVestingEntry(account1, escrowedAmount, { from: feePoolAccount });
+					await rewardEscrowV2.appendVestingEntry(account1, escrowedAmount, duration, {
+						from: account6,
+					});
 					const amount = toUnit('60000');
 					await synthetix.transfer(account1, amount, { from: owner });
 					const collateral = await synthetix.collateral(account1, { from: account2 });
@@ -2335,7 +2340,7 @@ contract('Issuer (via Synthetix)', async accounts => {
 					const twelveWeeks = oneWeek * 12;
 					const now = await currentTime();
 					const escrowedSynthetixs = toUnit('30000');
-					await synthetix.transfer(escrow.address, escrowedSynthetixs, {
+					await synthetix.transfer(rewardEscrowV2.address, escrowedSynthetixs, {
 						from: owner,
 					});
 					await escrow.appendVestingEntry(
@@ -2543,7 +2548,7 @@ contract('Issuer (via Synthetix)', async accounts => {
 						);
 
 						// ensure Issuer has the latest EtherCollateral
-						await issuer.setResolverAndSyncCache(addressResolver.address, { from: owner });
+						await issuer.rebuildCache();
 
 						// Give some SNX to account1
 						await synthetix.transfer(account1, toUnit('1000'), { from: owner });
