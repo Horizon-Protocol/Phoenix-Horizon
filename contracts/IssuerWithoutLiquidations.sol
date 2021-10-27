@@ -10,7 +10,7 @@ contract IssuerWithoutLiquidations is Issuer {
 
     function liquidateDelinquentAccount(
         address account,
-        uint susdAmount,
+        uint zusdAmount,
         address liquidator
     ) external onlySynthetix returns (uint totalRedeemed, uint amountToLiquidate) {}
 }

@@ -25,8 +25,8 @@ contract('CollateralEth @ovm-skip', async accounts => {
 	const YEAR = 31556926;
 	const INTERACTION_DELAY = 300;
 
-	const sUSD = toBytes32('sUSD');
-	const sETH = toBytes32('sETH');
+	const sUSD = toBytes32('zUSD');
+	const sETH = toBytes32('zBNB');
 
 	const oneETH = toUnit(1);
 	const twoETH = toUnit(2);
@@ -93,12 +93,12 @@ contract('CollateralEth @ovm-skip', async accounts => {
 	};
 
 	const setupMultiCollateral = async () => {
-		synths = ['sUSD', 'sETH'];
+		synths = ['zUSD', 'zBNB'];
 		({
 			SystemStatus: systemStatus,
 			ExchangeRates: exchangeRates,
-			SynthsUSD: sUSDSynth,
-			SynthsETH: sETHSynth,
+			ZassetzUSD: sUSDSynth,
+			ZassetzBNB: sETHSynth,
 			FeePool: feePool,
 			AddressResolver: addressResolver,
 			Issuer: issuer,
@@ -169,14 +169,14 @@ contract('CollateralEth @ovm-skip', async accounts => {
 		await manager.addCollaterals([ceth.address], { from: owner });
 
 		await ceth.addSynths(
-			['SynthsUSD', 'SynthsETH'].map(toBytes32),
-			['sUSD', 'sETH'].map(toBytes32),
+			['ZassetzUSD', 'ZassetzBNB'].map(toBytes32),
+			['zUSD', 'zBNB'].map(toBytes32),
 			{ from: owner }
 		);
 
 		await manager.addSynths(
-			['SynthsUSD', 'SynthsETH'].map(toBytes32),
-			['sUSD', 'sETH'].map(toBytes32),
+			['ZassetzUSD', 'ZassetzBNB'].map(toBytes32),
+			['zUSD', 'zBNB'].map(toBytes32),
 			{ from: owner }
 		);
 		// rebuild the cache to add the synths we need.
@@ -192,7 +192,7 @@ contract('CollateralEth @ovm-skip', async accounts => {
 			from: oracle,
 		});
 
-		const sBTC = toBytes32('sBTC');
+		const sBTC = toBytes32('zBTC');
 
 		await exchangeRates.updateRates([sBTC], ['10000'].map(toUnit), timestamp, {
 			from: oracle,
@@ -225,8 +225,8 @@ contract('CollateralEth @ovm-skip', async accounts => {
 		assert.equal(await ceth.owner(), owner);
 		assert.equal(await ceth.resolver(), addressResolver.address);
 		assert.equal(await ceth.collateralKey(), sETH);
-		assert.equal(await ceth.synths(0), toBytes32('SynthsUSD'));
-		assert.equal(await ceth.synths(1), toBytes32('SynthsETH'));
+		assert.equal(await ceth.synths(0), toBytes32('ZassetzUSD'));
+		assert.equal(await ceth.synths(1), toBytes32('ZassetzBNB'));
 		assert.bnEqual(await ceth.minCratio(), toUnit('1.3'));
 		assert.bnEqual(await ceth.minCollateral(), toUnit('2'));
 	});
@@ -240,7 +240,7 @@ contract('CollateralEth @ovm-skip', async accounts => {
 	});
 
 	it('should access its dependencies via the address resolver', async () => {
-		assert.equal(await addressResolver.getAddress(toBytes32('SynthsUSD')), sUSDSynth.address);
+		assert.equal(await addressResolver.getAddress(toBytes32('ZassetzUSD')), sUSDSynth.address);
 		assert.equal(await addressResolver.getAddress(toBytes32('FeePool')), feePool.address);
 		assert.equal(
 			await addressResolver.getAddress(toBytes32('ExchangeRates')),
@@ -329,7 +329,7 @@ contract('CollateralEth @ovm-skip', async accounts => {
 			assert.bnClose(sUSDAmount, toUnit('200'), '100');
 
 			// $260 worth of eth should allow $200 (0.02) of sBTC to be issued.
-			const sBTCAmount = await ceth.maxLoan(toUnit('2.6'), toBytes32('sBTC'));
+			const sBTCAmount = await ceth.maxLoan(toUnit('2.6'), toBytes32('zBTC'));
 
 			assert.bnEqual(sBTCAmount, toUnit('0.02'));
 		});

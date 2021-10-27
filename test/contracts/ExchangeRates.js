@@ -55,7 +55,7 @@ contract('Exchange Rates', async accounts => {
 		'hJPY',
 		'hXTZ',
 		'hBNB',
-		'hUSD',
+		'zUSD',
 		'hEUR',
 		'hAUD',
 		'fastGasPrice',
@@ -109,7 +109,6 @@ contract('Exchange Rates', async accounts => {
 				'freezeRate',
 				'removeAggregator',
 				'removeInversePricing',
-				'setBandProtocolOracle', // new oracle
 				'setInversePricing',
 				'setOracle',
 				'updateRates',
@@ -332,7 +331,7 @@ contract('Exchange Rates', async accounts => {
 				instance.updateRates([hUSD], [web3.utils.toWei('1.0', 'ether')], timeSent, {
 					from: oracle,
 				}),
-				"Rate of hUSD cannot be updated, it's always UNIT"
+				"Rate of zUSD cannot be updated, it's always UNIT"
 			);
 		});
 
@@ -466,41 +465,6 @@ contract('Exchange Rates', async accounts => {
 			assert.eventEqual(txn, 'OracleUpdated', {
 				newOracle: accountOne,
 			});
-		});
-	});
-
-	// new oracle BandProtocolOracleUpdated
-	// TODO link oracle test-case
-	describe('setBandProtocolOracle()', () => {
-		it("only the owner should be able to change the bandProtocolOracle's address", async () => {
-			await onlyGivenAddressCanInvoke({
-				fnc: instance.setBandProtocolOracle,
-				args: [bandProtocolOracle],
-				address: owner,
-				accounts,
-				skipPassCheck: true,
-			});
-
-			await instance.setBandProtocolOracle(accountOne, { from: owner });
-
-			assert.equal(await instance.bandProtocolOracle.call(), accountOne);
-			assert.notEqual(await instance.bandProtocolOracle.call(), bandProtocolOracle);
-		});
-
-		it('should emit event on successful bandProtocolOracle address update', async () => {
-			// Ensure bandProtocolOracle is set to bandProtocolOracle address originally
-			await instance.setBandProtocolOracle(bandProtocolOracle, { from: owner });
-			assert.equal(await instance.bandProtocolOracle.call(), bandProtocolOracle);
-
-			const txn = await instance.setBandProtocolOracle(accountOne, { from: owner });
-			assert.eventEqual(txn, 'BandProtocolOracleUpdated', {
-				newBandProtocolOracle: accountOne,
-			});
-		});
-
-		it('remove bandProtocolOracle address', async () => {
-			await instance.setBandProtocolOracle(ZERO_ADDRESS, { from: owner });
-			assert.equal(await instance.bandProtocolOracle.call(), ZERO_ADDRESS);
 		});
 	});
 

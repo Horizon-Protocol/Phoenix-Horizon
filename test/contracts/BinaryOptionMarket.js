@@ -59,7 +59,7 @@ contract('BinaryOptionMarket @gas-skip @ovm-skip', accounts => {
 	const initialCreatorFee = toUnit(0.002);
 	const initialRefundFee = toUnit(0.02);
 	const totalInitialFee = initialPoolFee.add(initialCreatorFee);
-	const hAUDKey = toBytes32('hAUD');
+	const hAUDKey = toBytes32('zAUD');
 
 	let creationTime;
 
@@ -128,10 +128,10 @@ contract('BinaryOptionMarket @gas-skip @ovm-skip', accounts => {
 			AddressResolver: addressResolver,
 			ExchangeRates: exchangeRates,
 			FeePool: feePool,
-			HassethUSD: hUSDSynth,
+			ZassetzUSD: hUSDSynth,
 		} = await setupAllContracts({
 			accounts,
-			synths: ['hUSD'],
+			synths: ['zUSD'],
 			contracts: [
 				'BinaryOptionMarketManager',
 				'AddressResolver',

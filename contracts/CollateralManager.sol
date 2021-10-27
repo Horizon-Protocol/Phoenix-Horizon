@@ -59,7 +59,7 @@ contract CollateralManager is ICollateralManager, Owned, Pausable, MixinResolver
     // The factor that will scale the utilisation ratio.
     uint public utilisationMultiplier = 1e18;
 
-    // The maximum amount of debt in zUSD that can be issued by non snx collateral.
+    // The maximum amount of debt in zUSD that can be issued by non hzn collateral.
     uint public maxDebt;
 
     // The base interest rate applied to all borrows.
@@ -204,17 +204,17 @@ contract CollateralManager is ICollateralManager, Owned, Pausable, MixinResolver
     }
 
     function getBorrowRate() external view returns (uint borrowRate, bool anyRateIsInvalid) {
-        // get the snx backed debt.
-        uint snxDebt = _issuer().totalIssuedSynths(zUSD, true);
+        // get the hzn backed debt.
+        uint hznDebt = _issuer().totalIssuedSynths(zUSD, true);
 
-        // now get the non snx backed debt.
-        (uint nonSnxDebt, bool ratesInvalid) = totalLong();
+        // now get the non hzn backed debt.
+        (uint nonHznDebt, bool ratesInvalid) = totalLong();
 
         // the total.
-        uint totalDebt = snxDebt.add(nonSnxDebt);
+        uint totalDebt = hznDebt.add(nonHznDebt);
 
         // now work out the utilisation ratio, and divide through to get a per second value.
-        uint utilisation = nonSnxDebt.divideDecimal(totalDebt).divideDecimal(SECONDS_IN_A_YEAR);
+        uint utilisation = nonHznDebt.divideDecimal(totalDebt).divideDecimal(SECONDS_IN_A_YEAR);
 
         // scale it by the utilisation multiplier.
         uint scaledUtilisation = utilisation.multiplyDecimal(utilisationMultiplier);
@@ -345,7 +345,7 @@ contract CollateralManager is ICollateralManager, Owned, Pausable, MixinResolver
                 bytes32 synthName = synthNamesInResolver[i];
                 _synths.add(synthName);
                 synthsByKey[synthKeys[i]] = synthName;
-                emit SynthAdded(synthName);
+                emit ZassetAdded(synthName);
             }
         }
     }
@@ -378,7 +378,7 @@ contract CollateralManager is ICollateralManager, Owned, Pausable, MixinResolver
                 _synths.remove(synths[i]);
                 delete synthsByKey[synthKeys[i]];
 
-                emit SynthRemoved(synths[i]);
+                emit ZassetRemoved(synths[i]);
             }
         }
     }
@@ -404,7 +404,7 @@ contract CollateralManager is ICollateralManager, Owned, Pausable, MixinResolver
                 // store the mapping to the iSynth so we can get its total supply for the borrow rate.
                 synthToInverseSynth[synth] = iSynth;
 
-                emit ShortableSynthAdded(synth);
+                emit ShortableZassetAdded(synth);
 
                 // now the associated synth key to the CollateralManagerState
                 state.addShortCurrency(synthKeys[i]);
@@ -456,7 +456,7 @@ contract CollateralManager is ICollateralManager, Owned, Pausable, MixinResolver
                 // remove the inverse mapping.
                 delete synthToInverseSynth[synths[i]];
 
-                emit ShortableSynthRemoved(synths[i]);
+                emit ShortableZassetRemoved(synths[i]);
             }
         }
     }
@@ -505,9 +505,9 @@ contract CollateralManager is ICollateralManager, Owned, Pausable, MixinResolver
     event CollateralAdded(address collateral);
     event CollateralRemoved(address collateral);
 
-    event SynthAdded(bytes32 synth);
-    event SynthRemoved(bytes32 synth);
+    event ZassetAdded(bytes32 synth);
+    event ZassetRemoved(bytes32 synth);
 
-    event ShortableSynthAdded(bytes32 synth);
-    event ShortableSynthRemoved(bytes32 synth);
+    event ShortableZassetAdded(bytes32 synth);
+    event ShortableZassetRemoved(bytes32 synth);
 }

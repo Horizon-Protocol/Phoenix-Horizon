@@ -40,7 +40,7 @@ contract('FeePool', async accounts => {
 	const updateRatesWithDefaults = async () => {
 		const timestamp = await currentTime();
 
-		await exchangeRates.updateRates([hAUD, HZN], ['0.5', '0.1'].map(toUnit), timestamp, {
+		await exchangeRates.updateRates([zAUD, HZN], ['0.5', '0.1'].map(toUnit), timestamp, {
 			from: oracle,
 		});
 		await debtCache.takeDebtSnapshot();
@@ -64,7 +64,7 @@ contract('FeePool', async accounts => {
 	};
 
 	// CURRENCIES
-	const [hUSD, hAUD, HZN] = ['hUSD', 'hAUD', 'HZN'].map(toBytes32);
+	const [zUSD, zAUD, HZN] = ['zUSD', 'zAUD', 'HZN'].map(toBytes32);
 
 	let feePool,
 		debtCache,
@@ -76,12 +76,12 @@ contract('FeePool', async accounts => {
 		exchangeRates,
 		feePoolState,
 		delegateApprovals,
-		hUSDContract,
+		zUSDContract,
 		addressResolver,
 		synths;
 
 	before(async () => {
-		synths = ['hUSD', 'hAUD'];
+		synths = ['zUSD', 'zAUD'];
 		({
 			AddressResolver: addressResolver,
 			DelegateApprovals: delegateApprovals,
@@ -92,7 +92,7 @@ contract('FeePool', async accounts => {
 			ProxyFeePool: feePoolProxy,
 			Synthetix: synthetix,
 			SystemSettings: systemSettings,
-			HassethUSD: hUSDContract,
+			ZassetzUSD: zUSDContract,
 			SystemStatus: systemStatus,
 		} = await setupAllContracts({
 			accounts,
@@ -126,7 +126,7 @@ contract('FeePool', async accounts => {
 
 		// set a 0.3% default exchange fee rate                                                                                 │        { contract: 'ExchangeState' },
 		const exchangeFeeRate = toUnit('0.003');
-		const synthKeys = [hAUD, hUSD];
+		const synthKeys = [zAUD, zUSD];
 		await setExchangeFeeRateForSynths({
 			owner,
 			systemSettings,
@@ -228,7 +228,7 @@ contract('FeePool', async accounts => {
 
 			// Generate a fee.
 			const exchange = toUnit('10000');
-			await synthetix.exchange(hUSD, exchange, hAUD, { from: owner });
+			await synthetix.exchange(zUSD, exchange, zAUD, { from: owner });
 
 			await closeFeePeriod();
 
@@ -299,7 +299,7 @@ contract('FeePool', async accounts => {
 			await synthetix.issueSynths(amount.mul(web3.utils.toBN('2')), { from: account1 });
 
 			// Generate a fee.
-			await synthetix.exchange(hUSD, amount, hAUD, { from: owner });
+			await synthetix.exchange(zUSD, amount, zAUD, { from: owner });
 
 			// Should be no fees available yet because the period is still pending.
 			assert.bnEqual(await feePool.totalFeesAvailable(), 0);
@@ -325,7 +325,7 @@ contract('FeePool', async accounts => {
 			await synthetix.issueSynths(amount2, { from: account1 });
 
 			// Generate a fee.
-			await synthetix.exchange(hUSD, amount1, hAUD, { from: owner });
+			await synthetix.exchange(zUSD, amount1, zAUD, { from: owner });
 
 			// Should be no fees available yet because the period is still pending.
 			assert.bnEqual(await feePool.totalFeesAvailable(), 0);
@@ -340,7 +340,7 @@ contract('FeePool', async accounts => {
 			const fee2 = amount2.sub(amountReceivedFromExchange(amount2));
 
 			// Generate a fee.
-			await synthetix.exchange(hUSD, amount2, hAUD, { from: account1 });
+			await synthetix.exchange(zUSD, amount2, zAUD, { from: account1 });
 
 			// Should be only the previous fees available because the period is still pending.
 			assert.bnEqual(await feePool.totalFeesAvailable(), fee1);
@@ -368,7 +368,7 @@ contract('FeePool', async accounts => {
 			await closeFeePeriod();
 
 			// Generate a fee.
-			await synthetix.exchange(hUSD, amount, hAUD, { from: owner });
+			await synthetix.exchange(zUSD, amount, zAUD, { from: owner });
 
 			// Should be no fees available yet because the period is still pending.
 			let feesAvailable;
@@ -420,7 +420,7 @@ contract('FeePool', async accounts => {
 			await closeFeePeriod();
 
 			// Generate a fee.
-			await synthetix.exchange(hUSD, amount, hAUD, { from: owner });
+			await synthetix.exchange(zUSD, amount, zAUD, { from: owner });
 
 			let feesAvailable;
 			// Should be no fees available yet because the period is still pending.
@@ -651,12 +651,12 @@ contract('FeePool', async accounts => {
 				await closeFeePeriod();
 
 				// Do a single transfer of all our synths to generate a fee.
-				await hUSDContract.transfer(account1, toUnit('10000'), {
+				await zUSDContract.transfer(account1, toUnit('10000'), {
 					from: owner,
 				});
 
 				// Assert that the correct fee is in the fee pool.
-				const fee = await hUSDContract.balanceOf(FEE_ADDRESS);
+				const fee = await zUSDContract.balanceOf(FEE_ADDRESS);
 				const pendingFees = await feePool.feesByPeriod(owner);
 				assert.bnEqual(web3.utils.toBN(pendingFees[0][0]), fee);
 			});
@@ -672,12 +672,12 @@ contract('FeePool', async accounts => {
 				await closeFeePeriod();
 
 				// Do a single transfer of all our synths to generate a fee.
-				await hUSDContract.transfer(account1, toUnit('10000'), {
+				await zUSDContract.transfer(account1, toUnit('10000'), {
 					from: owner,
 				});
 
 				// Assert that the correct fee is in the fee pool.
-				const fee = await hUSDContract.balanceOf(FEE_ADDRESS);
+				const fee = await zUSDContract.balanceOf(FEE_ADDRESS);
 				const pendingFees = await feePool.feesByPeriod(owner);
 
 				assert.bnEqual(pendingFees[0][0], fee);
@@ -713,10 +713,10 @@ contract('FeePool', async accounts => {
 
 				// Now create the first fee
 				await synthetix.issueSynths(toUnit('10000'), { from: owner });
-				await hUSDContract.transfer(account1, toUnit('10000'), {
+				await zUSDContract.transfer(account1, toUnit('10000'), {
 					from: owner,
 				});
-				const fee = await hUSDContract.balanceOf(FEE_ADDRESS);
+				const fee = await zUSDContract.balanceOf(FEE_ADDRESS);
 
 				// And walk it forward one fee period.
 				await closeFeePeriod();
@@ -779,7 +779,7 @@ contract('FeePool', async accounts => {
 				beforeEach(async () => {
 					// ensure claimFees() can succeed by default (generate fees and close period)
 					await synthetix.issueSynths(toUnit('10000'), { from: owner });
-					await synthetix.exchange(hUSD, toUnit('10'), hAUD, { from: owner });
+					await synthetix.exchange(zUSD, toUnit('10'), zAUD, { from: owner });
 					await closeFeePeriod();
 				});
 				['System', 'Issuance'].forEach(section => {
@@ -800,7 +800,7 @@ contract('FeePool', async accounts => {
 						});
 					});
 				});
-				['HZN', 'hAUD', ['HZN', 'hAUD'], 'none'].forEach(type => {
+				['HZN', 'zAUD', ['HZN', 'zAUD'], 'none'].forEach(type => {
 					describe(`when ${type} is stale`, () => {
 						beforeEach(async () => {
 							await fastForward(
@@ -810,7 +810,7 @@ contract('FeePool', async accounts => {
 							// set all rates minus those to ignore
 							const ratesToUpdate = ['HZN']
 								.concat(synths)
-								.filter(key => key !== 'hUSD' && ![].concat(type).includes(key));
+								.filter(key => key !== 'zUSD' && ![].concat(type).includes(key));
 
 							const timestamp = await currentTime();
 
@@ -833,7 +833,7 @@ contract('FeePool', async accounts => {
 							it('reverts on claimFees', async () => {
 								await assert.revert(
 									feePool.claimFees({ from: owner }),
-									'A hasset or HZN rate is invalid'
+									'A zasset or HZN rate is invalid'
 								);
 							});
 						}
@@ -841,7 +841,7 @@ contract('FeePool', async accounts => {
 				});
 			});
 
-			it('should allow a user to claim their fees in hUSD @gasprofile', async () => {
+			it('should allow a user to claim their fees in zUSD @gasprofile', async () => {
 				const length = (await feePool.FEE_PERIOD_LENGTH()).toNumber();
 
 				// Issue 10,000 sUSD for two different accounts.
@@ -857,25 +857,25 @@ contract('FeePool', async accounts => {
 					const exchange1 = toUnit(((i + 1) * 10).toString());
 					const exchange2 = toUnit(((i + 1) * 15).toString());
 
-					await synthetix.exchange(hUSD, exchange1, hAUD, { from: owner });
-					await synthetix.exchange(hUSD, exchange2, hAUD, { from: account1 });
+					await synthetix.exchange(zUSD, exchange1, zAUD, { from: owner });
+					await synthetix.exchange(zUSD, exchange2, zAUD, { from: account1 });
 
 					await closeFeePeriod();
 				}
 
 				// Assert that we have correct values in the fee pool
 				const feesAvailableUSD = await feePool.feesAvailable(owner);
-				const oldsUSDBalance = await hUSDContract.balanceOf(owner);
+				const oldsUSDBalance = await zUSDContract.balanceOf(owner);
 
 				// Now we should be able to claim them.
 				const claimFeesTx = await feePool.claimFees({ from: owner });
 
 				assert.eventEqual(claimFeesTx, 'FeesClaimed', {
-					hUSDAmount: feesAvailableUSD[0],
-					snxRewards: feesAvailableUSD[1],
+					zUSDAmount: feesAvailableUSD[0],
+					hznRewards: feesAvailableUSD[1],
 				});
 
-				const newUSDBalance = await hUSDContract.balanceOf(owner);
+				const newUSDBalance = await zUSDContract.balanceOf(owner);
 				// We should have our fees
 				assert.bnEqual(newUSDBalance, oldsUSDBalance.add(feesAvailableUSD[0]));
 			});
@@ -893,7 +893,7 @@ contract('FeePool', async accounts => {
 
 				const exchange1 = toUnit((10).toString());
 
-				await synthetix.exchange(hUSD, exchange1, hAUD, { from: owner });
+				await synthetix.exchange(zUSD, exchange1, zAUD, { from: owner });
 
 				totalFees = totalFees.add(exchange1.sub(amountReceivedFromExchange(exchange1)));
 
@@ -904,20 +904,20 @@ contract('FeePool', async accounts => {
 				const feesAvailable = await feePool.feesAvailable(owner);
 				assert.bnClose(feesAvailable[0], totalFees, '8');
 
-				const oldSynthBalance = await hUSDContract.balanceOf(owner);
+				const oldSynthBalance = await zUSDContract.balanceOf(owner);
 
 				// Now we should be able to claim them.
 				await feePool.claimFees({ from: owner });
 
 				// We should have our fees
-				assert.bnEqual(await hUSDContract.balanceOf(owner), oldSynthBalance.add(feesAvailable[0]));
+				assert.bnEqual(await zUSDContract.balanceOf(owner), oldSynthBalance.add(feesAvailable[0]));
 
 				// FeePeriod 2 - account 1 joins and mints 50% of the debt
 				totalFees = web3.utils.toBN('0');
 				await synthetix.issueSynths(toUnit('10000'), { from: account1 });
 
 				// Generate fees
-				await synthetix.exchange(hUSD, exchange1, hAUD, { from: owner });
+				await synthetix.exchange(zUSD, exchange1, zAUD, { from: owner });
 				totalFees = totalFees.add(exchange1.sub(amountReceivedFromExchange(exchange1)));
 
 				await closeFeePeriod();
@@ -954,8 +954,8 @@ contract('FeePool', async accounts => {
 					const exchange1 = toUnit(((i + 1) * 10).toString());
 					const exchange2 = toUnit(((i + 1) * 15).toString());
 
-					await synthetix.exchange(hUSD, exchange1, hAUD, { from: owner });
-					await synthetix.exchange(hUSD, exchange2, hAUD, { from: account1 });
+					await synthetix.exchange(zUSD, exchange1, zAUD, { from: owner });
+					await synthetix.exchange(zUSD, exchange2, zAUD, { from: account1 });
 
 					totalFees = totalFees.add(exchange1.sub(amountReceivedFromExchange(exchange1)));
 					totalFees = totalFees.add(exchange2.sub(amountReceivedFromExchange(exchange2)));
@@ -987,13 +987,13 @@ contract('FeePool', async accounts => {
 				// owner has half the debt so entitled to half the fees
 				assert.bnClose(feesAvailable[0], half(totalFees), '19');
 
-				const oldSynthBalance = await hUSDContract.balanceOf(owner);
+				const oldSynthBalance = await zUSDContract.balanceOf(owner);
 
 				// Now we should be able to claim them.
 				await feePool.claimFees({ from: owner });
 
 				// We should have our fees
-				assert.bnEqual(await hUSDContract.balanceOf(owner), oldSynthBalance.add(feesAvailable[0]));
+				assert.bnEqual(await zUSDContract.balanceOf(owner), oldSynthBalance.add(feesAvailable[0]));
 			});
 
 			it('should revert when a user tries to double claim their fees', async () => {
@@ -1006,10 +1006,10 @@ contract('FeePool', async accounts => {
 
 				// Do a single exchange of all our synths to generate a fee.
 				const exchange1 = toUnit(100);
-				await synthetix.exchange(hUSD, exchange1, hAUD, { from: owner });
+				await synthetix.exchange(zUSD, exchange1, zAUD, { from: owner });
 
 				// Assert that the correct fee is in the fee pool.
-				const fee = await hUSDContract.balanceOf(FEE_ADDRESS);
+				const fee = await zUSDContract.balanceOf(FEE_ADDRESS);
 				const pendingFees = await feePool.feesByPeriod(owner);
 
 				assert.bnEqual(pendingFees[0][0], fee);
@@ -1144,12 +1144,12 @@ contract('FeePool', async accounts => {
 				});
 
 				await synthetix.issueMaxSynths({ from: account1 });
-				const amount = await hUSDContract.balanceOf(account1);
+				const amount = await zUSDContract.balanceOf(account1);
 				await synthetix.issueSynths(amount, { from: owner });
 				await closeFeePeriod();
 
 				// Do a transfer to generate fees
-				await synthetix.exchange(hUSD, amount, hAUD, { from: owner });
+				await synthetix.exchange(zUSD, amount, zAUD, { from: owner });
 				const fee = amount.sub(amountReceivedFromExchange(amount));
 
 				// We should have zero fees available because the period is still open.
@@ -1187,12 +1187,12 @@ contract('FeePool', async accounts => {
 				});
 
 				await synthetix.issueMaxSynths({ from: account1 });
-				const amount = await hUSDContract.balanceOf(account1);
+				const amount = await zUSDContract.balanceOf(account1);
 				await synthetix.issueSynths(amount, { from: owner });
 				await closeFeePeriod();
 
 				// Do a transfer to generate fees
-				await synthetix.exchange(hUSD, amount, hAUD, { from: owner });
+				await synthetix.exchange(zUSD, amount, zAUD, { from: owner });
 				const fee = amount.sub(amountReceivedFromExchange(amount));
 
 				// We should have zero fees available because the period is still open.
@@ -1264,7 +1264,7 @@ contract('FeePool', async accounts => {
 				const exchange1 = toUnit((10).toString());
 
 				// generate fee
-				await synthetix.exchange(hUSD, exchange1, hAUD, { from: account1 });
+				await synthetix.exchange(zUSD, exchange1, zAUD, { from: account1 });
 
 				await closeFeePeriod();
 			}
@@ -1299,7 +1299,7 @@ contract('FeePool', async accounts => {
 						});
 					});
 				});
-				['HZN', 'hAUD', ['HZN', 'hAUD'], 'none'].forEach(type => {
+				['HZN', 'zAUD', ['HZN', 'zAUD'], 'none'].forEach(type => {
 					describe(`when ${type} is stale`, () => {
 						beforeEach(async () => {
 							await fastForward(
@@ -1309,7 +1309,7 @@ contract('FeePool', async accounts => {
 							// set all rates minus those to ignore
 							const ratesToUpdate = ['HZN']
 								.concat(synths)
-								.filter(key => key !== 'hUSD' && ![].concat(type).includes(key));
+								.filter(key => key !== 'zUSD' && ![].concat(type).includes(key));
 
 							const timestamp = await currentTime();
 
@@ -1332,7 +1332,7 @@ contract('FeePool', async accounts => {
 							it('reverts on claimFees', async () => {
 								await assert.revert(
 									feePool.claimOnBehalf(authoriser, { from: delegate }),
-									'A hasset or HZN rate is invalid'
+									'A zasset or HZN rate is invalid'
 								);
 							});
 						}
@@ -1357,14 +1357,14 @@ contract('FeePool', async accounts => {
 				const feesAvailable = await feePool.feesAvailable(account1);
 
 				// old balance of account1 (authoriser)
-				const oldSynthBalance = await hUSDContract.balanceOf(account1);
+				const oldSynthBalance = await zUSDContract.balanceOf(account1);
 
 				// Now we should be able to claim them on behalf of account1.
 				await feePool.claimOnBehalf(account1, { from: account2 });
 
 				// We should have our fees for account1
 				assert.bnEqual(
-					await hUSDContract.balanceOf(account1),
+					await zUSDContract.balanceOf(account1),
 					oldSynthBalance.add(feesAvailable[0])
 				);
 			});
@@ -1409,7 +1409,7 @@ contract('FeePool', async accounts => {
 					await synthetix.issueSynths(toUnit('1000'), { from: owner });
 					await synthetix.issueSynths(toUnit('1000'), { from: account1 });
 
-					await synthetix.exchange(hUSD, exchange1, hAUD, { from: owner });
+					await synthetix.exchange(zUSD, exchange1, zAUD, { from: owner });
 
 					totalFees = totalFees.add(exchange1.sub(amountReceivedFromExchange(exchange1)));
 
@@ -1421,14 +1421,14 @@ contract('FeePool', async accounts => {
 				const feesAvailable = await feePool.feesAvailable(account1);
 				assert.bnClose(feesAvailable[0], totalFees.div(web3.utils.toBN('2')), '8');
 
-				const oldSynthBalance = await hUSDContract.balanceOf(account1);
+				const oldSynthBalance = await zUSDContract.balanceOf(account1);
 
 				// Now we should be able to claim them.
 				await feePool.claimFees({ from: account1 });
 
 				// We should have our fees
 				assert.bnEqual(
-					await hUSDContract.balanceOf(account1),
+					await zUSDContract.balanceOf(account1),
 					oldSynthBalance.add(feesAvailable[0])
 				);
 			});

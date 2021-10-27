@@ -49,7 +49,7 @@ contract('Depot @ovm-skip', async accounts => {
 	before(async () => {
 		// Mock hUSD as Depot only needs its ERC20 methods (System Pause will not work for suspending hUSD transfers)
 		[{ token: synth }] = await Promise.all([
-			mockToken({ accounts, synth: 'hUSD', name: 'Horizon USD', symbol: 'hUSD' }),
+			mockToken({ accounts, synth: 'zUSD', name: 'Horizon USD', symbol: 'zUSD' }),
 		]);
 
 		({
@@ -62,7 +62,7 @@ contract('Depot @ovm-skip', async accounts => {
 			accounts,
 			mocks: {
 				// mocks necessary for address resolver imports
-				HassethUSD: synth,
+				ZassetzUSD: synth,
 			},
 			contracts: [
 				'Depot',
@@ -357,7 +357,7 @@ contract('Depot @ovm-skip', async accounts => {
 					from: address1,
 					value: 10,
 				}),
-				'Rate invalid or not a hasset'
+				'Rate invalid or not a zasset'
 			);
 			const depotSynthBalanceCurrent = await synth.balanceOf(depot.address);
 			assert.bnEqual(depotSynthBalanceCurrent, depotSynthBalanceBefore);
@@ -516,7 +516,7 @@ contract('Depot @ovm-skip', async accounts => {
 				assert.eventEqual(exchangeEvent, 'Exchange', {
 					fromCurrency: 'BNB',
 					fromAmount: ethToSend,
-					toCurrency: 'hUSD',
+					toCurrency: 'zUSD',
 					toAmount: synthsToDeposit,
 				});
 
@@ -586,7 +586,7 @@ contract('Depot @ovm-skip', async accounts => {
 				assert.eventEqual(exchangeEvent, 'Exchange', {
 					fromCurrency: 'BNB',
 					fromAmount: ethToSend,
-					toCurrency: 'hUSD',
+					toCurrency: 'zUSD',
 					toAmount: synthsToDeposit.div(web3.utils.toBN('2')),
 				});
 
@@ -643,7 +643,7 @@ contract('Depot @ovm-skip', async accounts => {
 				assert.eventEqual(exchangeEvent, 'Exchange', {
 					fromCurrency: 'BNB',
 					fromAmount: ethToSend,
-					toCurrency: 'hUSD',
+					toCurrency: 'zUSD',
 					toAmount: synthsAmount,
 				});
 
@@ -702,7 +702,7 @@ contract('Depot @ovm-skip', async accounts => {
 				assert.eventEqual(exchangeEvent, 'Exchange', {
 					fromCurrency: 'BNB',
 					fromAmount: ethToSend,
-					toCurrency: 'hUSD',
+					toCurrency: 'zUSD',
 					toAmount: synthsToDeposit,
 				});
 
@@ -755,7 +755,7 @@ contract('Depot @ovm-skip', async accounts => {
 					assert.eventEqual(exchangeEvent, 'Exchange', {
 						fromCurrency: 'BNB',
 						fromAmount: ethToSend,
-						toCurrency: 'hUSD',
+						toCurrency: 'zUSD',
 						toAmount: synthsToPurchase,
 					});
 				});
@@ -869,7 +869,7 @@ contract('Depot @ovm-skip', async accounts => {
 					const exchangeEvent = txn.logs.find(log => log.event === 'Exchange');
 
 					assert.eventEqual(exchangeEvent, 'Exchange', {
-						fromCurrency: 'hUSD',
+						fromCurrency: 'zUSD',
 						fromAmount: synthsToSend,
 						toCurrency: 'HZN',
 						toAmount: snxToPurchase,
@@ -1230,7 +1230,7 @@ contract('Depot @ovm-skip', async accounts => {
 			const exchangeEvent = txn.logs.find(log => log.event === 'Exchange');
 
 			assert.eventEqual(exchangeEvent, 'Exchange', {
-				fromCurrency: 'hUSD',
+				fromCurrency: 'zUSD',
 				fromAmount: synthsToSend,
 				toCurrency: 'HZN',
 				toAmount: purchaseValueInSynthetix,

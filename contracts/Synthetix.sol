@@ -204,7 +204,7 @@ contract Synthetix is BaseSynthetix {
         return _transferByProxy(account, messageSender, totalRedeemed);
     }
 
-    /* Once off function for SIP-60 to migrate SNX balances in the RewardEscrow contract
+    /* Once off function for SIP-60 to migrate HZN balances in the RewardEscrow contract
      * To the new RewardEscrowV2 contract
      */
     function migrateEscrowBalanceToRewardEscrowV2() external onlyOwner {

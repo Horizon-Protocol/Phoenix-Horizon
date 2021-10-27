@@ -70,18 +70,18 @@ module.exports = {
 	async updateRatesWithDefaults({ exchangeRates, oracle, debtCache }) {
 		const timestamp = await currentTime();
 
-		const [SNX, sAUD, sEUR, sBTC, iBTC, hBNB, BNB] = [
+		const [HZN, zAUD, zEUR, zBTC, iBTC, zBNB, BNB] = [
 			'HZN',
-			'hAUD',
-			'hEUR',
-			'hBTC',
+			'zAUD',
+			'zEUR',
+			'zBTC',
 			'iBTC',
-			'hBNB',
+			'zBNB',
 			'BNB',
 		].map(toBytes32);
 
 		await exchangeRates.updateRates(
-			[SNX, sAUD, sEUR, sBTC, iBTC, hBNB, BNB],
+			[HZN, zAUD, zEUR, zBTC, iBTC, zBNB, BNB],
 			['0.1', '0.5', '1.25', '5000', '4000', '172', '172'].map(toUnit),
 			timestamp,
 			{

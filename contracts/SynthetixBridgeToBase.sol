@@ -101,7 +101,7 @@ contract SynthetixBridgeToBase is Owned, MixinSystemSettings, ISynthetixBridgeTo
         VestingEntries.VestingEntry[] calldata vestingEntries
     ) external onlyOptimismBridge {
         IRewardEscrowV2 rewardEscrow = rewardEscrowV2();
-        // First, mint the escrowed SNX that are being migrated
+        // First, mint the escrowed HZN that are being migrated
         synthetix().mintSecondary(address(rewardEscrow), escrowedAmount);
         rewardEscrow.importVestingEntries(account, escrowedAmount, vestingEntries);
         emit ImportedVestingEntries(account, escrowedAmount, vestingEntries);

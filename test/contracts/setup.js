@@ -154,7 +154,6 @@ const setupContract = async ({
 		],
 		SynthetixState: [owner, ZERO_ADDRESS],
 		SupplySchedule: [owner, 0, 0],
-
 		Proxy: [owner],
 		ProxyERC20: [owner],
 		Depot: [owner, fundsWallet, tryGetAddressOf('AddressResolver')],
@@ -193,6 +192,7 @@ const setupContract = async ({
 			tryGetAddressOf('RewardEscrowV2'),
 			tryGetAddressOf('ProxyFeePool'),
 		],
+		RewardEscrow: [owner, tryGetAddressOf('Synthetix'), tryGetAddressOf('FeePool')],
 		BaseRewardEscrowV2: [owner, tryGetAddressOf('AddressResolver')],
 		RewardEscrowV2: [owner, tryGetAddressOf('AddressResolver')],
 		ImportableRewardEscrowV2: [owner, tryGetAddressOf('AddressResolver')],
@@ -206,10 +206,10 @@ const setupContract = async ({
 		Synth: [
 			tryGetAddressOf('ProxyERC20Synth'),
 			tryGetAddressOf('TokenStateSynth'),
-			tryGetProperty({ property: 'name', otherwise: 'Horizon hUSD' }),
-			tryGetProperty({ property: 'symbol', otherwise: 'hUSD' }),
+			tryGetProperty({ property: 'name', otherwise: 'Zasset zUSD' }),
+			tryGetProperty({ property: 'symbol', otherwise: 'zUSD' }),
 			owner,
-			tryGetProperty({ property: 'currencyKey', otherwise: toBytes32('hUSD') }),
+			tryGetProperty({ property: 'currencyKey', otherwise: toBytes32('zUSD') }),
 			tryGetProperty({ property: 'totalSupply', otherwise: '0' }),
 			tryGetAddressOf('AddressResolver'),
 		],
@@ -469,7 +469,7 @@ const setupContract = async ({
 				cache['ExchangeState'].setAssociatedContract(instance.address, { from: owner }),
 
 				cache['SystemStatus'].updateAccessControl(
-					toBytes32('Hasset'),
+					toBytes32('Zasset'),
 					instance.address,
 					true,
 					false,
@@ -859,24 +859,24 @@ const setupAllContracts = async ({
 		});
 	}
 
-	// HASSETS
+	// ZASSETS
 
 	const synthsToAdd = [];
 
-	// now setup each hasset and its deps
+	// now setup each synth and its deps
 	for (const synth of synths) {
 		const { token, proxy, tokenState } = await mockToken({
 			accounts,
 			synth,
 			supply: 0, // add synths with 0 supply initially
 			skipInitialAllocation: true,
-			name: `Hasset ${synth}`,
+			name: `Zasset ${synth}`,
 			symbol: synth,
 		});
 
 		returnObj[`ProxyERC20${synth}`] = proxy;
 		returnObj[`TokenState${synth}`] = tokenState;
-		returnObj[`Hasset${synth}`] = token;
+		returnObj[`Zasset${synth}`] = token;
 
 		// We'll defer adding the tokens into the Issuer as it must
 		// be synchronised with the FlexibleStorage address first.
@@ -888,6 +888,7 @@ const setupAllContracts = async ({
 		if (process.env.DEBUG) {
 			log(`Importing into AddressResolver:\n\t - ${Object.keys(returnObj).join('\n\t - ')}`);
 		}
+
 		await returnObj['AddressResolver'].importAddresses(
 			Object.keys(returnObj).map(toBytes32),
 			Object.values(returnObj).map(entry =>

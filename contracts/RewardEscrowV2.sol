@@ -13,7 +13,7 @@ import "./interfaces/ISystemStatus.sol";
 contract RewardEscrowV2 is BaseRewardEscrowV2 {
     mapping(address => uint256) public totalBalancePendingMigration;
 
-    uint public migrateEntriesThresholdAmount = SafeDecimalMath.unit() * 1000; // Default 1000 SNX
+    uint public migrateEntriesThresholdAmount = SafeDecimalMath.unit() * 1000; // Default 1000 HZN
 
     /* ========== ADDRESS RESOLVER CONFIGURATION ========== */
 
@@ -68,7 +68,7 @@ contract RewardEscrowV2 is BaseRewardEscrowV2 {
         require(totalBalancePendingMigration[addressToMigrate] > 0, "No escrow migration pending");
         require(totalEscrowedAccountBalance[addressToMigrate] > 0, "Address escrow balance is 0");
 
-        /* Add a vestable entry for addresses with totalBalancePendingMigration <= migrateEntriesThreshold amount of SNX */
+        /* Add a vestable entry for addresses with totalBalancePendingMigration <= migrateEntriesThreshold amount of HZN */
         if (totalBalancePendingMigration[addressToMigrate] <= migrateEntriesThresholdAmount) {
             _importVestingEntry(
                 addressToMigrate,
@@ -213,7 +213,7 @@ contract RewardEscrowV2 is BaseRewardEscrowV2 {
 
         /**
          *  update account total escrow balances for migration
-         *  transfer the escrowed SNX being migrated to the L2 deposit contract
+         *  transfer the escrowed HZN being migrated to the L2 deposit contract
          */
         if (escrowedAccountBalance > 0) {
             _reduceAccountEscrowBalances(account, escrowedAccountBalance);

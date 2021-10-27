@@ -29,9 +29,9 @@ contract('CollateralErc20 @ovm-skip', async accounts => {
 	const YEAR = 31536000;
 	const INTERACTION_DELAY = 300;
 
-	const sUSD = toBytes32('sUSD');
-	const sETH = toBytes32('sETH');
-	const sBTC = toBytes32('sBTC');
+	const sUSD = toBytes32('zUSD');
+	const sETH = toBytes32('zBNB');
+	const sBTC = toBytes32('zBTC');
 
 	const oneRenBTC = web3.utils.toBN('100000000');
 	const twoRenBTC = web3.utils.toBN('200000000');
@@ -93,7 +93,7 @@ contract('CollateralErc20 @ovm-skip', async accounts => {
 			from: oracle,
 		});
 
-		const sBTC = toBytes32('sBTC');
+		const sBTC = toBytes32('zBTC');
 
 		await exchangeRates.updateRates([sBTC], ['10000'].map(toUnit), timestamp, {
 			from: oracle,
@@ -124,12 +124,12 @@ contract('CollateralErc20 @ovm-skip', async accounts => {
 	};
 
 	const setupMultiCollateral = async () => {
-		synths = ['sUSD', 'sBTC'];
+		synths = ['zUSD', 'zBTC'];
 		({
 			SystemStatus: systemStatus,
 			ExchangeRates: exchangeRates,
-			SynthsUSD: sUSDSynth,
-			SynthsBTC: sBTCSynth,
+			ZassetzUSD: sUSDSynth,
+			ZassetzBTC: sBTCSynth,
 			FeePool: feePool,
 			AddressResolver: addressResolver,
 			Issuer: issuer,
@@ -225,14 +225,14 @@ contract('CollateralErc20 @ovm-skip', async accounts => {
 		await manager.addCollaterals([cerc20.address], { from: owner });
 
 		await cerc20.addSynths(
-			['SynthsUSD', 'SynthsBTC'].map(toBytes32),
-			['sUSD', 'sBTC'].map(toBytes32),
+			['ZassetzUSD', 'ZassetzBTC'].map(toBytes32),
+			['zUSD', 'zBTC'].map(toBytes32),
 			{ from: owner }
 		);
 
 		await manager.addSynths(
-			['SynthsUSD', 'SynthsBTC'].map(toBytes32),
-			['sUSD', 'sBTC'].map(toBytes32),
+			['ZassetzUSD', 'ZassetzBTC'].map(toBytes32),
+			['zUSD', 'zBTC'].map(toBytes32),
 			{ from: owner }
 		);
 		// rebuild the cache to add the synths we need.
@@ -263,8 +263,8 @@ contract('CollateralErc20 @ovm-skip', async accounts => {
 		assert.equal(await cerc20.owner(), owner);
 		assert.equal(await cerc20.resolver(), addressResolver.address);
 		assert.equal(await cerc20.collateralKey(), sBTC);
-		assert.equal(await cerc20.synths(0), toBytes32('SynthsUSD'));
-		assert.equal(await cerc20.synths(1), toBytes32('SynthsBTC'));
+		assert.equal(await cerc20.synths(0), toBytes32('ZassetzUSD'));
+		assert.equal(await cerc20.synths(1), toBytes32('ZassetzBTC'));
 		assert.bnEqual(await cerc20.minCratio(), toUnit(1.5));
 		assert.bnEqual(await cerc20.minCollateral(), toUnit(0.1));
 		assert.equal(await cerc20.underlyingContract(), renBTC.address);
@@ -280,7 +280,7 @@ contract('CollateralErc20 @ovm-skip', async accounts => {
 	});
 
 	it('should access its dependencies via the address resolver', async () => {
-		assert.equal(await addressResolver.getAddress(toBytes32('SynthsUSD')), sUSDSynth.address);
+		assert.equal(await addressResolver.getAddress(toBytes32('ZassetzUSD')), sUSDSynth.address);
 		assert.equal(await addressResolver.getAddress(toBytes32('FeePool')), feePool.address);
 		assert.equal(
 			await addressResolver.getAddress(toBytes32('ExchangeRates')),

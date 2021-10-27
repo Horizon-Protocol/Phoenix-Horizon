@@ -446,7 +446,7 @@ contract Issuer is Owned, MixinSystemSettings, IIssuer {
         synths[currencyKey] = synth;
         synthsByAddress[address(synth)] = currencyKey;
 
-        emit SynthAdded(currencyKey, address(synth));
+        emit ZassetAdded(currencyKey, address(synth));
     }
 
     function addSynth(ISynth synth) external onlyOwner {
@@ -494,7 +494,7 @@ contract Issuer is Owned, MixinSystemSettings, IIssuer {
         delete synthsByAddress[synthToRemove];
         delete synths[currencyKey];
 
-        emit SynthRemoved(currencyKey, synthToRemove);
+        emit ZassetRemoved(currencyKey, synthToRemove);
     }
 
     function removeSynth(bytes32 currencyKey) external onlyOwner {
@@ -843,6 +843,6 @@ contract Issuer is Owned, MixinSystemSettings, IIssuer {
 
     /* ========== EVENTS ========== */
 
-    event SynthAdded(bytes32 currencyKey, address synth);
-    event SynthRemoved(bytes32 currencyKey, address synth);
+    event ZassetAdded(bytes32 currencyKey, address synth);
+    event ZassetRemoved(bytes32 currencyKey, address synth);
 }

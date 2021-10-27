@@ -47,7 +47,7 @@ contract('BinaryOptionMarketManager @gas-skip @ovm-skip', accounts => {
 
 	let manager, factory, systemStatus, exchangeRates, addressResolver, hUSDSynth, oracle;
 
-	const hAUDKey = toBytes32('hAUD');
+	const hAUDKey = toBytes32('zAUD');
 	const iAUDKey = toBytes32('iAUD');
 
 	const Side = {
@@ -77,10 +77,10 @@ contract('BinaryOptionMarketManager @gas-skip @ovm-skip', accounts => {
 			SystemStatus: systemStatus,
 			AddressResolver: addressResolver,
 			ExchangeRates: exchangeRates,
-			HassethUSD: hUSDSynth,
+			ZassetzUSD: hUSDSynth,
 		} = await setupAllContracts({
 			accounts,
-			synths: ['hUSD'],
+			synths: ['zUSD'],
 			contracts: [
 				'SystemStatus',
 				'BinaryOptionMarketManager',
@@ -459,7 +459,7 @@ contract('BinaryOptionMarketManager @gas-skip @ovm-skip', accounts => {
 		it('Cannot create markets for invalid keys.', async () => {
 			const now = await currentTime();
 
-			const HUSDKey = toBytes32('hUSD');
+			const HUSDKey = toBytes32('zUSD');
 			const nonRate = toBytes32('nonExistent');
 
 			await assert.revert(

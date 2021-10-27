@@ -951,7 +951,7 @@ const deploy = async ({
 
 		// Legacy proxy will be around until May 30, 2020
 		// https://docs.synthetix.io/integrations/guide/#proxy-deprecation
-		// Until this time, on mainnet we will still deploy ProxyERC20sUSD and ensure that
+		// Until this time, on mainnet we will still deploy ProxyERC20zUSD and ensure that
 		// SynthsUSD.proxy is ProxyERC20sUSD, SynthsUSD.integrationProxy is ProxysUSD
 		const synthProxyIsLegacy = currencyKey === 'zUSD' && network === 'mainnet';
 
@@ -962,7 +962,7 @@ const deploy = async ({
 			force: addNewSynths,
 		});
 
-		// additionally deploy an ERC20 proxy for the synth if it's legacy (sUSD)
+		// additionally deploy an ERC20 proxy for the synth if it's legacy (zUSD)
 		let proxyERC20ForSynth;
 		if (currencyKey === 'zUSD') {
 			proxyERC20ForSynth = await deployer.deployContract({

@@ -194,21 +194,21 @@ contract('AddressResolver', accounts => {
 			});
 		});
 		describe('when a Synthetix is created with a few added synths', () => {
-			let sETHContract;
-			let sUSDContract;
+			let zETHContract;
+			let zUSDContract;
 			beforeEach(async () => {
-				({ HassethBNB: sETHContract, HassethUSD: sUSDContract } = await setupAllContracts({
+				({ ZassetzBNB: zETHContract, ZassetzUSD: zUSDContract } = await setupAllContracts({
 					accounts,
 					existing: {
 						AddressResolver: resolver,
 					},
-					synths: ['hUSD', 'hBNB', 'hEUR', 'hAUD'],
+					synths: ['zUSD', 'zBNB', 'zEUR', 'zAUD'],
 					contracts: ['Synthetix'],
 				}));
 			});
 			it('when getSynth() is invoked with these synth keys, they are returned correctly', async () => {
-				assert.equal(await resolver.getSynth(toBytes32('hUSD')), sUSDContract.address);
-				assert.equal(await resolver.getSynth(toBytes32('hBNB')), sETHContract.address);
+				assert.equal(await resolver.getSynth(toBytes32('zUSD')), zUSDContract.address);
+				assert.equal(await resolver.getSynth(toBytes32('zBNB')), zETHContract.address);
 			});
 		});
 	});

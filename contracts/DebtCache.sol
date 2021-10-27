@@ -136,7 +136,7 @@ contract DebtCache is Owned, MixinSystemSettings, IDebtCache {
                 uint collateralIssued = collateralManager().long(key);
 
                 // this is an edge case --
-                // if a synth other than zUSD is only issued by non SNX collateral
+                // if a synth other than zUSD is only issued by non HZN collateral
                 // the long value will exceed the supply if there was a minting fee,
                 // so we check explicitly and 0 it out to prevent
                 // a safesub overflow.

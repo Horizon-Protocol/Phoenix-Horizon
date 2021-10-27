@@ -309,7 +309,7 @@ contract Collateral is ICollateralLoan, Owned, MixinSystemSettings {
         // 5. Cap the number of loans so that the array doesn't get too big.
         require(state.getNumLoans(msg.sender) < maxLoansPerAccount, "Max loans exceeded");
 
-        // 6. Check we haven't hit the debt cap for non snx collateral.
+        // 6. Check we haven't hit the debt cap for non hzn collateral.
         (bool canIssue, bool anyRateIsInvalid) = _manager().exceedsDebtLimit(amount, currency);
 
         require(canIssue && !anyRateIsInvalid, "Debt limit or invalid rate");

@@ -29,7 +29,7 @@ contract('EtherCollateral @ovm-skip', async accounts => {
 
 	const TEST_TIMEOUT = 160e3;
 
-	const [hBNB, BNB, HZN] = ['hBNB', 'BNB', 'HZN'].map(toBytes32);
+	const [hBNB, BNB, HZN] = ['zBNB', 'BNB', 'HZN'].map(toBytes32);
 
 	const ISSUACE_RATIO = toUnit('0.8');
 	const ZERO_BN = toUnit('0');
@@ -135,8 +135,8 @@ contract('EtherCollateral @ovm-skip', async accounts => {
 		// Mock HZN, hUSD and hBNB
 		[{ token: horizon }, { token: hUSDHasset }, { token: hETHHasset }] = await Promise.all([
 			mockToken({ accounts, name: 'Horizon', symbol: 'HZN' }),
-			mockToken({ accounts, synth: 'hUSD', name: 'Horizon USD', symbol: 'hUSD' }),
-			mockToken({ accounts, synth: 'hBNB', name: 'Horizon BNB', symbol: 'hBNB' }),
+			mockToken({ accounts, synth: 'zUSD', name: 'Horizon USD', symbol: 'zUSD' }),
+			mockToken({ accounts, synth: 'zBNB', name: 'Horizon BNB', symbol: 'zBNB' }),
 		]);
 
 		({
@@ -149,8 +149,8 @@ contract('EtherCollateral @ovm-skip', async accounts => {
 		} = await setupAllContracts({
 			accounts,
 			mocks: {
-				HassethUSD: hUSDHasset,
-				HassethBNB: hETHHasset,
+				ZassetzUSD: hUSDHasset,
+				ZassetzBNB: hETHHasset,
 				Synthetix: horizon,
 			},
 			contracts: [
@@ -203,8 +203,8 @@ contract('EtherCollateral @ovm-skip', async accounts => {
 		});
 
 		it('should access its dependencies via the address resolver', async () => {
-			assert.equal(await addressResolver.getAddress(toBytes32('HassethBNB')), hETHHasset.address);
-			assert.equal(await addressResolver.getAddress(toBytes32('HassethUSD')), hUSDHasset.address);
+			assert.equal(await addressResolver.getAddress(toBytes32('ZassetzBNB')), hETHHasset.address);
+			assert.equal(await addressResolver.getAddress(toBytes32('ZassetzUSD')), hUSDHasset.address);
 			assert.equal(await addressResolver.getAddress(toBytes32('Depot')), depot.address);
 		});
 
@@ -451,7 +451,7 @@ contract('EtherCollateral @ovm-skip', async accounts => {
 				it('then calling openLoan() reverts', async () => {
 					await assert.revert(
 						etherCollateral.openLoan({ value: toUnit('1'), from: address1 }),
-						'Blocked as hBNB rate is invalid'
+						'Blocked as zBNB rate is invalid'
 					);
 				});
 				describe('when hBNB gets a rate', () => {
@@ -1130,7 +1130,7 @@ contract('EtherCollateral @ovm-skip', async accounts => {
 								etherCollateral.closeLoan(loanID, {
 									from: address1,
 								}),
-								'Blocked as hBNB rate is invalid'
+								'Blocked as zBNB rate is invalid'
 							);
 						});
 						describe('when hBNB gets a rate', () => {
@@ -1295,7 +1295,7 @@ contract('EtherCollateral @ovm-skip', async accounts => {
 						etherCollateral.closeLoan(openLoanID, {
 							from: address1,
 						}),
-						'The hUSD Depot does not have enough hUSD to buy for fees'
+						'The zUSD Depot does not have enough zUSD to buy for fees'
 					);
 				});
 			});
@@ -1330,7 +1330,7 @@ contract('EtherCollateral @ovm-skip', async accounts => {
 		it('when bob attempts to liquidate alices loan and he has no hBNB then it reverts', async () => {
 			await assert.revert(
 				etherCollateral.liquidateUnclosedLoan(alice, loanID, { from: bob }),
-				'You do not have the required Hasset balance to close this loan.'
+				'You do not have the required Zasset balance to close this loan.'
 			);
 		});
 		it('when alice create a loan then it reverts', async () => {
@@ -1475,7 +1475,7 @@ contract('EtherCollateral @ovm-skip', async accounts => {
 								etherCollateral.liquidateUnclosedLoan(alice, loanID, {
 									from: bob,
 								}),
-								'Blocked as hBNB rate is invalid'
+								'Blocked as zBNB rate is invalid'
 							);
 						});
 						describe('when hBNB gets a rate', () => {
