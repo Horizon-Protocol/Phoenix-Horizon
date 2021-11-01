@@ -19,8 +19,6 @@ contract('SynthetixBridgeToBase (unit tests)', accounts => {
 				'completeEscrowMigration',
 				'completeRewardDeposit',
 				'initiateWithdrawal',
-				'mintSecondaryFromDeposit',
-				'mintSecondaryFromDepositForRewards',
 			],
 		});
 	});
@@ -46,7 +44,6 @@ contract('SynthetixBridgeToBase (unit tests)', accounts => {
 
 			mintableSynthetix = await smockit(artifacts.require('MintableSynthetix').abi);
 			flexibleStorage = await smockit(artifacts.require('FlexibleStorage').abi);
-
 			// now add to address resolver
 			resolver = await artifacts.require('AddressResolver').new(owner);
 			await resolver.importAddresses(
@@ -147,7 +144,7 @@ contract('SynthetixBridgeToBase (unit tests)', accounts => {
 				describe('failure modes', () => {
 					it('does not work when user has less trasferable snx than the withdrawal amount', async () => {
 						mintableSynthetix.smocked.transferableSynthetix.will.return.with(() => '0');
-						await assert.revert(instance.initiateWithdrawal('1'), 'Not enough transferable SNX');
+						await assert.revert(instance.initiateWithdrawal('1'), 'Not enough transferable HZN');
 					});
 				});
 

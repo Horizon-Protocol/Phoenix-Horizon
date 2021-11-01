@@ -192,6 +192,7 @@ contract('SynthetixBridgeToOptimism (unit tests)', accounts => {
 					[1, 2, 3],
 					[4, 5, 6],
 				];
+
 				describe('failure modes', () => {
 					it('does not work when the contract has been deactivated', async () => {
 						await instance.migrateBridge(randomAddress, { from: owner });

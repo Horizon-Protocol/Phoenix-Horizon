@@ -608,14 +608,14 @@ contract('SystemSettings', async accounts => {
 
 	describe('setExchangeFeeRateForSynths()', () => {
 		describe('Given synth exchange fee rates to set', async () => {
-			const [hUSD, hBNB, hAUD, hBTC] = ['hUSD', 'hBNB', 'hAUD', 'hBTC'].map(toBytes32);
+			const [zUSD, zETH, zAUD, zBTC] = ['zUSD', 'zETH', 'zAUD', 'zBTC'].map(toBytes32);
 			const fxBIPS = toUnit('0.01');
 			const cryptoBIPS = toUnit('0.03');
 
 			it('when a non owner calls then revert', async () => {
 				await onlyGivenAddressCanInvoke({
 					fnc: systemSettings.setExchangeFeeRateForSynths,
-					args: [[hUSD], [toUnit('0.1')]],
+					args: [[zUSD], [toUnit('0.1')]],
 					accounts,
 					address: owner,
 					reason: 'Only the contract owner may perform this action',
@@ -623,7 +623,7 @@ contract('SystemSettings', async accounts => {
 			});
 			it('when input array lengths dont match then revert ', async () => {
 				await assert.revert(
-					systemSettings.setExchangeFeeRateForSynths([hUSD, hAUD], [toUnit('0.1')], {
+					systemSettings.setExchangeFeeRateForSynths([zUSD, zAUD], [toUnit('0.1')], {
 						from: owner,
 					}),
 					'Array lengths dont match'
@@ -631,7 +631,7 @@ contract('SystemSettings', async accounts => {
 			});
 			it('when owner sets an exchange fee rate larger than MAX_EXCHANGE_FEE_RATE then revert', async () => {
 				await assert.revert(
-					systemSettings.setExchangeFeeRateForSynths([hUSD], [toUnit('11')], {
+					systemSettings.setExchangeFeeRateForSynths([zUSD], [toUnit('11')], {
 						from: owner,
 					}),
 					'MAX_EXCHANGE_FEE_RATE exceeded'
@@ -640,47 +640,47 @@ contract('SystemSettings', async accounts => {
 
 			describe('Given new synth exchange fee rates to store', async () => {
 				it('when 1 exchange rate then store it to be readable', async () => {
-					await systemSettings.setExchangeFeeRateForSynths([hUSD], [fxBIPS], {
+					await systemSettings.setExchangeFeeRateForSynths([zUSD], [fxBIPS], {
 						from: owner,
 					});
-					let sUSDRate = await systemSettings.exchangeFeeRate(hUSD);
-					assert.bnEqual(sUSDRate, fxBIPS);
+					let zUSDRate = await systemSettings.exchangeFeeRate(zUSD);
+					assert.bnEqual(zUSDRate, fxBIPS);
 
-					sUSDRate = await systemSettings.exchangeFeeRate(hUSD);
-					assert.bnEqual(sUSDRate, fxBIPS);
+					zUSDRate = await systemSettings.exchangeFeeRate(zUSD);
+					assert.bnEqual(zUSDRate, fxBIPS);
 				});
 				it('when 1 exchange rate then emits update event', async () => {
-					const transaction = await systemSettings.setExchangeFeeRateForSynths([hUSD], [fxBIPS], {
+					const transaction = await systemSettings.setExchangeFeeRateForSynths([zUSD], [fxBIPS], {
 						from: owner,
 					});
 					assert.eventEqual(transaction, 'ExchangeFeeUpdated', {
-						synthKey: hUSD,
+						synthKey: zUSD,
 						newExchangeFeeRate: fxBIPS,
 					});
 				});
 				it('when multiple exchange rates then store them to be readable', async () => {
 					// Store multiple rates
 					await systemSettings.setExchangeFeeRateForSynths(
-						[hUSD, hAUD, hBTC, hBNB],
+						[zUSD, zAUD, zBTC, zETH],
 						[fxBIPS, fxBIPS, cryptoBIPS, cryptoBIPS],
 						{
 							from: owner,
 						}
 					);
 					// Read all rates
-					const sAUDRate = await systemSettings.exchangeFeeRate(hAUD);
-					assert.bnEqual(sAUDRate, fxBIPS);
-					const sUSDRate = await systemSettings.exchangeFeeRate(hUSD);
-					assert.bnEqual(sUSDRate, fxBIPS);
-					const sBTCRate = await systemSettings.exchangeFeeRate(hBTC);
-					assert.bnEqual(sBTCRate, cryptoBIPS);
-					const sETHRate = await systemSettings.exchangeFeeRate(hBNB);
-					assert.bnEqual(sETHRate, cryptoBIPS);
+					const zAUDRate = await systemSettings.exchangeFeeRate(zAUD);
+					assert.bnEqual(zAUDRate, fxBIPS);
+					const zUSDRate = await systemSettings.exchangeFeeRate(zUSD);
+					assert.bnEqual(zUSDRate, fxBIPS);
+					const zBTCRate = await systemSettings.exchangeFeeRate(zBTC);
+					assert.bnEqual(zBTCRate, cryptoBIPS);
+					const zETHRate = await systemSettings.exchangeFeeRate(zETH);
+					assert.bnEqual(zETHRate, cryptoBIPS);
 				});
 				it('when multiple exchange rates then each update event is emitted', async () => {
 					// Update multiple rates
 					const transaction = await systemSettings.setExchangeFeeRateForSynths(
-						[hUSD, hAUD, hBTC, hBNB],
+						[zUSD, zAUD, zBTC, zETH],
 						[fxBIPS, fxBIPS, cryptoBIPS, cryptoBIPS],
 						{
 							from: owner,
@@ -691,22 +691,22 @@ contract('SystemSettings', async accounts => {
 						transaction,
 						'ExchangeFeeUpdated',
 						{
-							synthKey: hUSD,
+							synthKey: zUSD,
 							newExchangeFeeRate: fxBIPS,
 						},
 						'ExchangeFeeUpdated',
 						{
-							synthKey: hAUD,
+							synthKey: zAUD,
 							newExchangeFeeRate: fxBIPS,
 						},
 						'ExchangeFeeUpdated',
 						{
-							synthKey: hBTC,
+							synthKey: zBTC,
 							newExchangeFeeRate: cryptoBIPS,
 						},
 						'ExchangeFeeUpdated',
 						{
-							synthKey: hBNB,
+							synthKey: zETH,
 							newExchangeFeeRate: cryptoBIPS,
 						}
 					);
