@@ -820,8 +820,8 @@ contract Exchanger is Owned, MixinSystemSettings, IExchanger {
 
         // Is this a swing trade? long to short or short to long skipping zUSD.
         if (
-            (sourceCurrencyKey[0] == 0x73 && destinationCurrencyKey[0] == 0x69) ||
-            (sourceCurrencyKey[0] == 0x69 && destinationCurrencyKey[0] == 0x73)
+            (sourceCurrencyKey[0] == 0x7a && destinationCurrencyKey[0] == 0x69) ||
+            (sourceCurrencyKey[0] == 0x69 && destinationCurrencyKey[0] == 0x7a)
         ) {
             // Double the exchange fee
             exchangeFeeRate = exchangeFeeRate.mul(2);

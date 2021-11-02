@@ -54,7 +54,7 @@ contract('SupplySchedule', async accounts => {
 		ensureOnlyExpectedMutativeFunctions({
 			abi: supplySchedule.abi,
 			ignoreParents: ['Owned'],
-			expected: ['recordMintEvent', 'setMinterReward', 'setSynthetixProxy'],
+			expected: ['recordMintEvent', 'setMinterReward', 'setStartDate', 'setSynthetixProxy'],
 		});
 	});
 
@@ -477,7 +477,7 @@ contract('SupplySchedule', async accounts => {
 				let instance, lastMintEvent;
 				beforeEach(async () => {
 					// constructor(address _owner, uint _lastMintEvent, uint _currentWeek) //
-					lastMintEvent = 1575552876; // Thursday, 5 December 2019 13:34:36
+					lastMintEvent = 1672448400; // Thursday, 5 December 2019 13:34:36
 					const weekCounter = 39; // latest week
 					instance = await setupContract({
 						accounts,

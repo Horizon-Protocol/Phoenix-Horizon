@@ -23,7 +23,7 @@ const MockExchanger = artifacts.require('MockExchanger');
 const FlexibleStorage = artifacts.require('FlexibleStorage');
 
 contract('Liquidations', accounts => {
-	const [hUSD, HZN] = ['hUSD', 'HZN'].map(toBytes32);
+	const [hUSD, HZN] = ['zUSD', 'HZN'].map(toBytes32);
 	const [deployerAccount, owner, oracle, account1, alice, bob, carol, david] = accounts;
 	const week = 3600 * 24 * 7;
 	const hUSD100 = toUnit('100');
@@ -48,7 +48,7 @@ contract('Liquidations', accounts => {
 			AddressResolver: addressResolver,
 			ExchangeRates: exchangeRates,
 			Liquidations: liquidations,
-			HassethUSD: hUSDContract,
+			ZassetzUSD: hUSDContract,
 			Synthetix: synthetix,
 			SynthetixState: synthetixState,
 			SystemSettings: systemSettings,
@@ -58,7 +58,7 @@ contract('Liquidations', accounts => {
 			Issuer: issuer,
 		} = await setupAllContracts({
 			accounts,
-			synths: ['hUSD'],
+			synths: ['zUSD'],
 			contracts: [
 				'AddressResolver',
 				'ExchangeRates',
@@ -164,13 +164,13 @@ contract('Liquidations', accounts => {
 				it('when flagAccountForLiquidation() is invoked, it reverts for rate stale', async () => {
 					await assert.revert(
 						liquidations.flagAccountForLiquidation(alice, { from: owner }),
-						'Rate invalid or not a hasset'
+						'Rate invalid or not a zasset'
 					);
 				});
 				it('when checkAndRemoveAccountInLiquidation() is invoked, it reverts for rate stale', async () => {
 					await assert.revert(
 						liquidations.checkAndRemoveAccountInLiquidation(alice, { from: owner }),
-						'Rate invalid or not a hasset'
+						'Rate invalid or not a zasset'
 					);
 				});
 			});
@@ -337,7 +337,7 @@ contract('Liquidations', accounts => {
 
 					await assert.revert(
 						synthetix.liquidateDelinquentAccount(alice, hUSD100, { from: bob }),
-						'hUSD needs to be settled'
+						'zUSD needs to be settled'
 					);
 				});
 				it('when a liquidator has hasWaitingPeriod from hasWaitingPeriodOrSettlementOwing then revert', async () => {
@@ -346,7 +346,7 @@ contract('Liquidations', accounts => {
 					await exchanger.setNumEntries(1);
 					await assert.revert(
 						synthetix.liquidateDelinquentAccount(alice, hUSD100, { from: bob }),
-						'hUSD needs to be settled'
+						'zUSD needs to be settled'
 					);
 				});
 				it('when an account is not isOpenForLiquidation then revert', async () => {
@@ -675,7 +675,7 @@ contract('Liquidations', accounts => {
 
 								await assert.revert(
 									synthetix.liquidateDelinquentAccount(alice, hUSD100, { from: carol }),
-									'Not enough hUSD'
+									'Not enough zUSD'
 								);
 							});
 							describe('when Bobs liquidates alice for 100 sUSD but only has 99 sUSD then revert', async () => {
@@ -694,7 +694,7 @@ contract('Liquidations', accounts => {
 								it('it should revert', async () => {
 									await assert.revert(
 										synthetix.liquidateDelinquentAccount(alice, hUSD100, { from: bob }),
-										'Not enough hUSD'
+										'Not enough zUSD'
 									);
 								});
 							});
@@ -1105,7 +1105,7 @@ contract('Liquidations', accounts => {
 					it('then liquidate reverts', async () => {
 						await assert.revert(
 							synthetix.liquidateDelinquentAccount(david, hUSD100, { from: bob }),
-							'A hasset or HZN rate is invalid'
+							'A zasset or HZN rate is invalid'
 						);
 					});
 				});

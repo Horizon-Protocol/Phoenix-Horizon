@@ -48,13 +48,13 @@ contract('Rewards Integration Tests', async accounts => {
 
 	// CURRENCIES
 	const [hUSD, hAUD, hEUR, hBTC, HZN, iBTC, hBNB, BNB] = [
-		'hUSD',
-		'hAUD',
-		'hEUR',
-		'hBTC',
+		'zUSD',
+		'zAUD',
+		'zEUR',
+		'zBTC',
 		'HZN',
 		'iBTC',
-		'hBNB',
+		'zBNB',
 		'BNB',
 	].map(toBytes32);
 
@@ -156,11 +156,11 @@ contract('Rewards Integration Tests', async accounts => {
 			RewardEscrowV2: rewardEscrow,
 			SupplySchedule: supplySchedule,
 			Synthetix: synthetix,
-			HassethUSD: hUSDContract,
+			ZassetzUSD: hUSDContract,
 			SystemSettings: systemSettings,
 		} = await setupAllContracts({
 			accounts,
-			synths: ['hUSD', 'hAUD', 'hEUR', 'hBTC', 'iBTC', 'hBNB'],
+			synths: ['zUSD', 'zAUD', 'zEUR', 'zBTC', 'iBTC', 'zBNB'],
 			contracts: [
 				'AddressResolver',
 				'Exchanger', // necessary for burnSynths to check settlement of sUSD
@@ -983,8 +983,8 @@ contract('Rewards Integration Tests', async accounts => {
 			// Now we should be able to claim them.
 			const claimFeesTx = await feePool.claimFees({ from: account2 });
 			assert.eventEqual(claimFeesTx, 'FeesClaimed', {
-				hUSDAmount: feesAvailableUSD[0],
-				snxRewards: feesAvailableUSD[1],
+				zUSDAmount: feesAvailableUSD[0],
+				hznRewards: feesAvailableUSD[1],
 			});
 
 			const newUSDBalance = await hUSDContract.balanceOf(account2);
@@ -1016,8 +1016,8 @@ contract('Rewards Integration Tests', async accounts => {
 			// however only   721,053.846153846153846153 Claimable after rounding to 18 decimals
 			const transaction = await feePool.claimFees({ from: account1 });
 			assert.eventEqual(transaction, 'FeesClaimed', {
-				hUSDAmount: feesAvailableUSDAcc1[0].sub(toUnit('0.000000000000000001')),
-				snxRewards: feesAvailableUSDAcc1[1].sub(toUnit('0.000000000000000001')),
+				zUSDAmount: feesAvailableUSDAcc1[0].sub(toUnit('0.000000000000000001')),
+				hznRewards: feesAvailableUSDAcc1[1].sub(toUnit('0.000000000000000001')),
 			});
 		});
 	});

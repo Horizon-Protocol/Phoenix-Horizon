@@ -21,7 +21,7 @@ const { setupAllContracts, setupContract } = require('./setup');
 contract('MultiCollateralSynth @gas-skip @ovm-skip', accounts => {
 	const [deployerAccount, owner, oracle, , account1] = accounts;
 
-	const sETH = toBytes32('sETH');
+	const sETH = toBytes32('zBNB');
 
 	let issuer,
 		resolver,
@@ -69,19 +69,19 @@ contract('MultiCollateralSynth @gas-skip @ovm-skip', accounts => {
 			from: oracle,
 		});
 
-		const sBTC = toBytes32('sBTC');
+		const zBTC = toBytes32('zBTC');
 
-		await exchangeRates.updateRates([sBTC], ['10000'].map(toUnit), timestamp, {
+		await exchangeRates.updateRates([zBTC], ['10000'].map(toUnit), timestamp, {
 			from: oracle,
 		});
 	};
 
 	before(async () => {
-		synths = ['sUSD'];
+		synths = ['zUSD'];
 		({
 			AddressResolver: resolver,
 			Issuer: issuer,
-			SynthsUSD: sUSDSynth,
+			ZassetzUSD: sUSDSynth,
 			ExchangeRates: exchangeRates,
 			DebtCache: debtCache,
 			FeePool: feePool,
@@ -123,7 +123,7 @@ contract('MultiCollateralSynth @gas-skip @ovm-skip', accounts => {
 			owner: owner,
 			manager: manager.address,
 			resolver: resolver.address,
-			collatKey: toBytes32('sETH'),
+			collatKey: toBytes32('zBNB'),
 			minColat: toUnit(1.5),
 			minSize: toUnit(1),
 		});
@@ -197,7 +197,7 @@ contract('MultiCollateralSynth @gas-skip @ovm-skip', accounts => {
 	describe('when a MultiCollateral synth is added and connected to Synthetix', () => {
 		beforeEach(async () => {
 			const { synth, tokenState, proxy } = await deploySynth({
-				currencyKey: 'sXYZ',
+				currencyKey: 'zXYZ',
 			});
 			await tokenState.setAssociatedContract(synth.address, { from: owner });
 			await proxy.setTarget(synth.address, { from: owner });
@@ -246,7 +246,7 @@ contract('MultiCollateralSynth @gas-skip @ovm-skip', accounts => {
 			beforeEach(async () => {
 				const timestamp = await currentTime();
 
-				await exchangeRates.updateRates([toBytes32('sXYZ')], [toUnit(5)], timestamp, {
+				await exchangeRates.updateRates([toBytes32('zXYZ')], [toUnit(5)], timestamp, {
 					from: oracle,
 				});
 			});
@@ -257,7 +257,7 @@ contract('MultiCollateralSynth @gas-skip @ovm-skip', accounts => {
 					const totalSupplyBefore = await this.synth.totalSupply();
 					const balanceOfBefore = await this.synth.balanceOf(accountToIssue);
 
-					await ceth.open(issueAmount, toBytes32('sXYZ'), { value: toUnit(2), from: account1 });
+					await ceth.open(issueAmount, toBytes32('zXYZ'), { value: toUnit(2), from: account1 });
 
 					assert.bnEqual(await this.synth.totalSupply(), totalSupplyBefore.add(issueAmount));
 					assert.bnEqual(
@@ -272,7 +272,7 @@ contract('MultiCollateralSynth @gas-skip @ovm-skip', accounts => {
 					const balanceOfBefore = await this.synth.balanceOf(account1);
 					const amount = toUnit('5');
 
-					const tx = await ceth.open(amount, toBytes32('sXYZ'), {
+					const tx = await ceth.open(amount, toBytes32('zXYZ'), {
 						value: toUnit(2),
 						from: account1,
 					});

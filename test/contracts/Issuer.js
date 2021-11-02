@@ -29,7 +29,7 @@ const {
 contract('Issuer (via Synthetix)', async accounts => {
 	const WEEK = 604800;
 
-	const [zUSD, zAUD, zEUR, SNX, zETH, ETH] = ['zUSD', 'zAUD', 'zEUR', 'HZN', 'zETH', 'ETH'].map(
+	const [zUSD, zAUD, zEUR, SNX, zETH, ETH] = ['zUSD', 'zAUD', 'zEUR', 'HZN', 'zBNB', 'ETH'].map(
 		toBytes32
 	);
 	const synthKeys = [zUSD, zAUD, zEUR, zETH, SNX];
@@ -44,7 +44,7 @@ contract('Issuer (via Synthetix)', async accounts => {
 		exchangeRates,
 		feePool,
 		zUSDContract,
-		zETHContract,
+		zBNBContract,
 		zEURContract,
 		zAUDContract,
 		escrow,
@@ -61,7 +61,7 @@ contract('Issuer (via Synthetix)', async accounts => {
 	// run this once before all tests to prepare our environment, snapshots on beforeEach will take
 	// care of resetting to this state
 	before(async () => {
-		synths = ['zUSD', 'zAUD', 'zEUR', 'zETH'];
+		synths = ['zUSD', 'zAUD', 'zEUR', 'zBNB'];
 		({
 			Synthetix: synthetix,
 			SynthetixState: synthetixState,
@@ -71,7 +71,7 @@ contract('Issuer (via Synthetix)', async accounts => {
 			SynthetixEscrow: escrow,
 			RewardEscrowV2: rewardEscrowV2,
 			ZassetzUSD: zUSDContract,
-			ZassetzETH: zETHContract,
+			ZassetzBNB: zBNBContract,
 			ZassetzAUD: zAUDContract,
 			ZassetzEUR: zEURContract,
 			FeePool: feePool,
@@ -352,7 +352,7 @@ contract('Issuer (via Synthetix)', async accounts => {
 
 							await zEURContract.issue(account3, toUnit('80')); // 100 zUSD worth
 
-							await zETHContract.issue(account1, toUnit('1')); // 100 zUSD worth
+							await zBNBContract.issue(account1, toUnit('1')); // 100 zUSD worth
 
 							// and since we are are bypassing the usual issuance flow here, we must cache the debt snapshot
 							assert.bnEqual(await synthetix.totalIssuedSynths(zUSD), toUnit('0'));
@@ -661,7 +661,7 @@ contract('Issuer (via Synthetix)', async accounts => {
 					it('should be able to query multiple synth addresses', async () => {
 						const synthAddresses = await issuer.getSynths([currencyKey, zETH, zUSD]);
 						assert.equal(synthAddresses[0], synth.address);
-						assert.equal(synthAddresses[1], zETHContract.address);
+						assert.equal(synthAddresses[1], zBNBContract.address);
 						assert.equal(synthAddresses[2], zUSDContract.address);
 						assert.equal(synthAddresses.length, 3);
 					});
@@ -2568,7 +2568,7 @@ contract('Issuer (via Synthetix)', async accounts => {
 
 						// issue zETH
 						const amountToIssue = toUnit('10');
-						await zETHContract.issue(account1, amountToIssue, { from: owner });
+						await zBNBContract.issue(account1, amountToIssue, { from: owner });
 						// openLoan of same amount on Ether Collateral
 						await etherCollateral.openLoan(amountToIssue, { from: owner });
 						// totalSupply of synths should exclude Ether Collateral issued synths
@@ -2591,7 +2591,7 @@ contract('Issuer (via Synthetix)', async accounts => {
 
 						// issue zETH to mimic loan
 						const amountToIssue = toUnit('10');
-						await zETHContract.issue(account1, amountToIssue, { from: owner });
+						await zBNBContract.issue(account1, amountToIssue, { from: owner });
 						await etherCollateral.openLoan(amountToIssue, { from: owner });
 
 						// After account1 owns 100% of zUSD debt.

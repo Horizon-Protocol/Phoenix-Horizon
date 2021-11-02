@@ -26,9 +26,9 @@ contract('ShortingRewards', accounts => {
 		account2,
 	] = accounts;
 
-	const sUSD = toBytes32('sUSD');
-	const sETH = toBytes32('sETH');
-	const sBTC = toBytes32('sBTC');
+	const sUSD = toBytes32('zUSD');
+	const sETH = toBytes32('zBNB');
+	const sBTC = toBytes32('zBTC');
 
 	// Synthetix is the rewardsToken
 	let rewardsToken,
@@ -66,7 +66,7 @@ contract('ShortingRewards', accounts => {
 			from: oracle,
 		});
 
-		const sBTC = toBytes32('sBTC');
+		const sBTC = toBytes32('zBTC');
 
 		await exchangeRates.updateRates([sBTC], ['10000'].map(toUnit), timestamp, {
 			from: oracle,
@@ -115,12 +115,12 @@ contract('ShortingRewards', accounts => {
 	addSnapshotBeforeRestoreAfterEach();
 
 	before(async () => {
-		synths = ['sUSD', 'sBTC', 'sETH', 'iBTC', 'iETH'];
+		synths = ['zUSD', 'zBTC', 'zBNB', 'iBTC', 'iBNB'];
 		({
 			ExchangeRates: exchangeRates,
-			SynthsUSD: sUSDSynth,
-			SynthsBTC: sBTCSynth,
-			SynthsETH: sETHSynth,
+			ZassetzUSD: sUSDSynth,
+			ZassetzBTC: sBTCSynth,
+			ZassetzBNB: sETHSynth,
 			FeePool: feePool,
 			AddressResolver: addressResolver,
 			Issuer: issuer,
@@ -194,17 +194,17 @@ contract('ShortingRewards', accounts => {
 		await manager.addCollaterals([short.address], { from: owner });
 
 		await short.addSynths(
-			['SynthsBTC', 'SynthsETH'].map(toBytes32),
-			['sBTC', 'sETH'].map(toBytes32),
+			['ZassetzBTC', 'ZassetzBNB'].map(toBytes32),
+			['zBTC', 'zBNB'].map(toBytes32),
 			{ from: owner }
 		);
 
 		await manager.addShortableSynths(
 			[
-				[toBytes32('SynthsBTC'), toBytes32('SynthiBTC')],
-				[toBytes32('SynthsETH'), toBytes32('SynthiETH')],
+				[toBytes32('ZassetzBTC'), toBytes32('ZassetiBTC')],
+				[toBytes32('ZassetzBNB'), toBytes32('ZassetiBNB')],
 			],
-			['sBTC', 'sETH'].map(toBytes32),
+			['zBTC', 'zBNB'].map(toBytes32),
 			{
 				from: owner,
 			}
@@ -221,7 +221,7 @@ contract('ShortingRewards', accounts => {
 				rewardsDistribution.address,
 				rewardsToken.address,
 				short.address,
-				toBytes32('SynthsBTC'),
+				toBytes32('ZassetzBTC'),
 			],
 		});
 
@@ -280,7 +280,7 @@ contract('ShortingRewards', accounts => {
 		});
 
 		it('should staking token on constructor', async () => {
-			assert.equal(await shortingRewards.synth(), toBytes32('SynthsBTC'));
+			assert.equal(await shortingRewards.synth(), toBytes32('ZassetzBTC'));
 		});
 
 		it('should set owner on constructor', async () => {

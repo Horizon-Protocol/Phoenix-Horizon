@@ -37,7 +37,7 @@ contract('ExchangerWithVirtualSynth (unit tests)', async accounts => {
 		describe('exchanging', () => {
 			describe('exchangeWithVirtual', () => {
 				describe('failure modes', () => {
-					const args = [owner, toBytes32('hUSD'), '100', toBytes32('hBNB'), owner, toBytes32()];
+					const args = [owner, toBytes32('zUSD'), '100', toBytes32('zBNB'), owner, toBytes32()];
 
 					behaviors.whenInstantiated({ owner }, () => {
 						// as we aren't calling as Synthetix, we need to mock the check for synths
@@ -47,7 +47,7 @@ contract('ExchangerWithVirtualSynth (unit tests)', async accounts => {
 									fnc: this.instance.exchangeWithVirtual,
 									args,
 									accounts: accounts.filter(a => a !== this.mocks.Synthetix.address),
-									reason: 'Exchanger: Only horizon or a hasset contract can perform this action',
+									reason: 'Exchanger: Only horizon or a zasset contract can perform this action',
 									// address: this.mocks.Synthetix.address (doesnt work as this reverts due to lack of mocking setup)
 								});
 							});
@@ -75,9 +75,9 @@ contract('ExchangerWithVirtualSynth (unit tests)', async accounts => {
 																await assert.revert(
 																	this.instance.exchangeWithVirtual(
 																		owner,
-																		toBytes32('hUSD'),
+																		toBytes32('zUSD'),
 																		'0',
-																		toBytes32('hBNB'),
+																		toBytes32('zBNB'),
 																		owner,
 																		toBytes32(),
 																		{ from: this.mocks.Synthetix.address }
@@ -89,14 +89,14 @@ contract('ExchangerWithVirtualSynth (unit tests)', async accounts => {
 																await assert.revert(
 																	this.instance.exchangeWithVirtual(
 																		owner,
-																		toBytes32('hUSD'),
+																		toBytes32('zUSD'),
 																		'100',
 																		toBytes32('iBNB'),
 																		owner,
 																		toBytes32(),
 																		{ from: this.mocks.Synthetix.address }
 																	),
-																	'Cannot virtualize this hasset'
+																	'Cannot virtualize this zasset'
 																);
 															});
 														});
@@ -127,9 +127,9 @@ contract('ExchangerWithVirtualSynth (unit tests)', async accounts => {
 														beforeEach(async () => {
 															txn = await this.instance.exchangeWithVirtual(
 																owner,
-																toBytes32('hUSD'),
+																toBytes32('zUSD'),
 																amount,
-																toBytes32('hBNB'),
+																toBytes32('zBNB'),
 																owner,
 																toBytes32(),
 																{ from: this.mocks.Synthetix.address }
@@ -138,7 +138,7 @@ contract('ExchangerWithVirtualSynth (unit tests)', async accounts => {
 														it('emits a VirtualSynthCreated event with the correct underlying synth and amount', async () => {
 															assert.eventEqual(txn, 'VirtualSynthCreated', {
 																synth: this.mocks.synth.smocked.proxy.will.returnValue,
-																currencyKey: toBytes32('hBNB'),
+																currencyKey: toBytes32('zBNB'),
 																amount,
 																recipient: owner,
 															});
