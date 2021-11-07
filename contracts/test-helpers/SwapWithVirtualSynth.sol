@@ -119,7 +119,7 @@ contract VirtualToken is ERC20 {
         // allow the pool to spend my synths
         synth.approve(address(pool), balanceAfterSettlement);
 
-        // now exchange all my synths (sBTC) for WBTC
+        // now exchange all my synths (zBTC) for WBTC
         pool.exchange(2, 1, balanceAfterSettlement, 0);
     }
 
@@ -147,7 +147,7 @@ contract VirtualToken is ERC20 {
 
 contract SwapWithVirtualSynth {
     ICurvePool public incomingPool = ICurvePool(0xA5407eAE9Ba41422680e2e00537571bcC53efBfD); // Curve: zUSD v2 Swap
-    ICurvePool public outgoingPool = ICurvePool(0x7fC77b5c7614E1533320Ea6DDc2Eb61fa00A9714); // Curve: sBTC Swap
+    ICurvePool public outgoingPool = ICurvePool(0x7fC77b5c7614E1533320Ea6DDc2Eb61fa00A9714); // Curve: zBTC Swap
 
     ISynthetix public synthetix = ISynthetix(0xC011a73ee8576Fb46F5E1c5751cA3B9Fe0af2a6F);
 
@@ -165,8 +165,8 @@ contract SwapWithVirtualSynth {
         // now invoke curve USDC to zUSD
         incomingPool.exchange(1, 3, amount, 0);
 
-        // now exchange my zUSD to sBTC
-        (, IVirtualSynth vSynth) = synthetix.exchangeWithVirtual("zUSD", zUSD.balanceOf(address(this)), "sBTC", bytes32(0));
+        // now exchange my zUSD to zBTC
+        (, IVirtualSynth vSynth) = synthetix.exchangeWithVirtual("zUSD", zUSD.balanceOf(address(this)), "zBTC", bytes32(0));
 
         // wrap this vSynth in a new token ERC20 contract
         VirtualToken vToken = new VirtualToken(vSynth, outgoingPool, WBTC);
