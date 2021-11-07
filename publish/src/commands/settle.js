@@ -13,7 +13,7 @@ const { ensureNetwork, loadConnections, stringify } = require('../util');
 const fromBlockMap = {
 	// these were from when ExchangeState was first deployed (SIP-37)
 	testnet: 4573446,
-	mainnet: 10772929,
+	mainnet: 11590207, // system exchanged after SCCP-68 implemented
 };
 
 const pathToLocal = name => path.join(__dirname, `${name}.json`);
@@ -41,7 +41,7 @@ const settle = async ({
 }) => {
 	ensureNetwork(network);
 
-	const { getTarget, getSource } = wrap({ network, fs, path });
+	const { getTarget, getSource, getVersions } = wrap({ network, fs, path });
 
 	console.log(gray('Using network:', yellow(network)));
 
@@ -90,19 +90,27 @@ const settle = async ({
 
 	const { number: currentBlock } = await web3.eth.getBlock('latest');
 
-	const getContract = ({ label, source }) =>
-		new web3.eth.Contract(
-			getSource({ contract: source }).abi,
-			getTarget({ contract: label }).address
-		);
+	const versions = getVersions({ byContract: true });
+
+	const getContract = ({ label, source = label, blockNumber }) => {
+		let { address } = getTarget({ contract: label });
+
+		if (blockNumber) {
+			// look for the right contract based off the block
+			for (const entry of versions[source].sort((a, b) => (a.block > b.block ? 1 : -1))) {
+				if (entry.block < blockNumber) {
+					address = entry.address;
+				}
+			}
+		}
+		// console.log(`For ${label} using ${address}`);
+		return new web3.eth.Contract(getSource({ contract: source }).abi, address);
+	};
 
 	const Synthetix = getContract({
 		label: 'ProxyERC20',
 		source: 'Synthetix',
 	});
-
-	const Exchanger = getContract({ label: 'Exchanger', source: 'Exchanger' });
-	const ExchangeRates = getContract({ label: 'ExchangeRates', source: 'ExchangeRates' });
 
 	const fetchAllEvents = ({ pageSize = 10e3, startingBlock = fromBlock, target }) => {
 		const innerFnc = async () => {
@@ -151,13 +159,45 @@ const settle = async ({
 		if (cache[account + toCurrencyKey]) continue;
 		cache[account + toCurrencyKey] = true;
 
-		if (synth && !new RegExp(synth).test(web3.utils.hexToUtf8(toCurrencyKey))) continue;
+		// get the current exchanger and state
+		const Exchanger = getContract({ label: 'Exchanger' });
+		const ExchangeState = getContract({ label: 'ExchangeState' });
 
+		// but get the historical exchange rates (for showing historical debt)
+		const ExchangeRates = getContract({ label: 'ExchangeRates', blockNumber });
+
+		// check for current settlement owing
 		const { reclaimAmount, rebateAmount, numEntries } = await Exchanger.methods
 			.settlementOwing(account, toCurrencyKey)
 			.call();
 
 		if (+numEntries > 0) {
+			// Fetch all entries within the settlement
+			const results = [];
+			let earliestTimestamp = Infinity;
+			const fromSynths = [];
+			for (let i = 0; i < numEntries; i++) {
+				const { src, amount, timestamp } = await ExchangeState.methods
+					.getEntryAt(account, toCurrencyKey, i)
+					.call();
+
+				results.push(
+					`${web3.utils.hexToUtf8(src)} - ${web3.utils.fromWei(amount)} at ${new Date(
+						timestamp * 1000
+					).toString()}`
+				);
+
+				fromSynths.push(src);
+				earliestTimestamp = Math.min(timestamp, earliestTimestamp);
+			}
+			const isSynthTheDest = new RegExp(synth).test(web3.utils.hexToUtf8(toCurrencyKey));
+			const isSynthOneSrcEntry = !!fromSynths.find(src => web3.utils.hexToUtf8(src) === synth);
+
+			// skip when filtered by synth if not the destination and not any of the sources
+			if (synth && !isSynthTheDest && !isSynthOneSrcEntry) {
+				continue;
+			}
+
 			process.stdout.write(
 				gray(
 					'Block',
@@ -165,11 +205,22 @@ const settle = async ({
 					'processing',
 					yellow(account),
 					'into',
-					yellow(web3.utils.hexToAscii(toCurrencyKey))
+					yellow(web3.utils.hexToAscii(toCurrencyKey)),
+					'with',
+					yellow(numEntries),
+					'entries'
 				)
 			);
 
 			const wasReclaimOrRebate = reclaimAmount > 0 || rebateAmount > 0;
+			let skipIfWillFail = false;
+
+			const secsLeft = await Exchanger.methods
+				.maxSecsLeftInWaitingPeriod(account, toCurrencyKey)
+				.call();
+
+			skipIfWillFail = +secsLeft > 0;
+
 			if (showDebt) {
 				const valueInUSD = wasReclaimOrRebate
 					? web3.utils.fromWei(
@@ -197,6 +248,24 @@ const settle = async ({
 						'Settling...'
 					)
 				);
+				// see if user has enough funds to settle
+				if (reclaimAmount > 0) {
+					const synth = await Synthetix.methods.synths(toCurrencyKey).call();
+
+					const Synth = new web3.eth.Contract(getSource({ contract: 'Synth' }).abi, synth);
+
+					const balance = await Synth.methods.balanceOf(account).call();
+
+					console.log(
+						gray('Warning: user does not have enough balance to be reclaimed'),
+						gray('User has'),
+						yellow(web3.utils.fromWei(balance.toString())),
+						gray('needs'),
+						yellow(web3.utils.fromWei(reclaimAmount.toString())),
+						+reclaimAmount > +balance ? red('not enough!') : green('sufficient')
+					);
+					skipIfWillFail = skipIfWillFail || +reclaimAmount > +balance;
+				}
 			} else {
 				console.log(
 					gray(
@@ -213,31 +282,29 @@ const settle = async ({
 				);
 			}
 
+			console.log(gray(`Comprised of`), yellow(results.join(',')));
+
 			if (dryRun) {
 				console.log(green(`[DRY RUN] > Invoke settle()`));
+			} else if (skipIfWillFail) {
+				console.log(green(`Skipping - will fail`));
+				// } else if (earliestTimestamp > new Date().getTime() / 1000 - 3600 * 24 * 2) {
+				// 	console.log(green(`Skipping - too recent`));
 			} else {
 				console.log(green(`Invoking settle()`));
 
-				// do not await, just emit using the nonce
-				Exchanger.methods
-					.settle(account, toCurrencyKey)
-					.send({
+				try {
+					const { transactionHash } = await Exchanger.methods.settle(account, toCurrencyKey).send({
 						from: user.address,
-						gas: Math.max(gas * numEntries, 500e3),
+						gas: Math.max(gas * numEntries, 650e3),
 						gasPrice,
 						nonce: nonce++,
-					})
-					.then(({ transactionHash }) =>
-						console.log(gray(`${etherscanLinkPrefix}/tx/${transactionHash}`))
-					)
-					.catch(err => {
-						console.error(
-							red('Error settling'),
-							yellow(account),
-							yellow(web3.utils.hexToAscii(toCurrencyKey)),
-							gray(`${etherscanLinkPrefix}/tx/${err.receipt.transactionHash}`)
-						);
 					});
+
+					console.log(gray(`${etherscanLinkPrefix}/tx/${transactionHash}`));
+				} catch (err) {
+					console.log(red('Could not transact:', err));
+				}
 			}
 		} else if (process.env.DEBUG) {
 			console.log(
@@ -271,7 +338,7 @@ module.exports = {
 				'Perform the deployment on a forked chain running on localhost (see fork command).',
 				false
 			)
-			.option('-l, --gas-limit <value>', 'Gas limit', parseInt, 180e3)
+			.option('-l, --gas-limit <value>', 'Gas limit', parseInt, 350e3)
 			.option('-n, --network <value>', 'The network to run off.', x => x.toLowerCase(), 'kovan')
 			.option(
 				'-r, --dry-run',

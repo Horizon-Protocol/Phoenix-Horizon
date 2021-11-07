@@ -4,7 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const { assert, addSnapshotBeforeRestoreAfter } = require('../contracts/common');
 const { toUnit, fromUnit } = require('../utils')();
-const { wrap, toBytes32 } = require('../..');
+const { knownAccounts, wrap, toBytes32 } = require('../..');
 const {
 	detectNetworkName,
 	connectContracts,
@@ -15,10 +15,12 @@ const {
 	skipWaitingPeriod,
 	skipStakeTime,
 	writeSetting,
+	avoidStaleRates,
 	simulateExchangeRates,
 	takeDebtSnapshot,
 	mockOptimismBridge,
 	implementsVirtualSynths,
+	resumeSystem,
 } = require('./utils');
 
 const gasFromReceipt = ({ receipt }) =>
@@ -32,7 +34,7 @@ contract('Synthetix (prod tests)', accounts => {
 	let network, deploymentPath;
 
 	let Synthetix, SynthetixState, ReadProxyAddressResolver;
-	let HassethUSD, HassethBNB;
+	let SynthsUSD, SynthsETH;
 
 	before('prepare', async () => {
 		network = await detectNetworkName();
@@ -42,17 +44,20 @@ contract('Synthetix (prod tests)', accounts => {
 
 		owner = getUsers({ network, user: 'owner' }).address;
 
+		await avoidStaleRates({ network, deploymentPath });
+		await takeDebtSnapshot({ network, deploymentPath });
+		await resumeSystem({ owner, network, deploymentPath });
+
 		if (config.patchFreshDeployment) {
 			await simulateExchangeRates({ network, deploymentPath });
-			await takeDebtSnapshot({ network, deploymentPath });
 			await mockOptimismBridge({ network, deploymentPath });
 		}
 
 		({
 			Synthetix,
 			SynthetixState,
-			HassethUSD,
-			HassethBNB,
+			SynthsUSD,
+			SynthsETH,
 			ReadProxyAddressResolver,
 		} = await connectContracts({
 			network,
@@ -60,8 +65,8 @@ contract('Synthetix (prod tests)', accounts => {
 			requests: [
 				{ contractName: 'Synthetix' },
 				{ contractName: 'SynthetixState' },
-				{ contractName: 'ProxyERC20hUSD', abiName: 'Synth', alias: 'HassethUSD' },
-				{ contractName: 'ProxyhBNB', abiName: 'Synth', alias: 'HassethBNB' },
+				{ contractName: 'ProxyERC20sUSD', abiName: 'Synth', alias: 'SynthsUSD' },
+				{ contractName: 'ProxysETH', abiName: 'Synth', alias: 'SynthsETH' },
 				{ contractName: 'ReadProxyAddressResolver' },
 				{ contractName: 'ProxyERC20', abiName: 'Synthetix' },
 			],
@@ -88,126 +93,141 @@ contract('Synthetix (prod tests)', accounts => {
 			deploymentPath,
 		});
 	});
-
-	describe('misc state', () => {
-		it('has the expected resolver set', async () => {
-			assert.equal(await Synthetix.resolver(), ReadProxyAddressResolver.address);
-		});
-
-		it('has the expected owner set', async () => {
-			assert.equal(await Synthetix.owner(), owner);
-		});
-
-		it('does not report any rate to be stale or invalid', async () => {
-			assert.isFalse(await Synthetix.anySynthOrSNXRateIsInvalid());
-		});
-
-		it('reports matching totalIssuedSynths and debtLedger', async () => {
-			const totalIssuedSynths = await Synthetix.totalIssuedSynths(toBytes32('hUSD'));
-			const debtLedgerLength = await SynthetixState.debtLedgerLength();
-
-			assert.isFalse(debtLedgerLength > 0 && totalIssuedSynths === 0);
-		});
-	});
-
-	describe('erc20 functionality', () => {
-		addSnapshotBeforeRestoreAfter();
-
-		it('can transfer HZN', async () => {
-			const user1BalanceBefore = await Synthetix.balanceOf(user1);
-			const user2BalanceBefore = await Synthetix.balanceOf(user2);
-
-			const amount = toUnit('10');
-			await Synthetix.transfer(user2, amount, {
-				from: user1,
+	describe('core infrastructure', () => {
+		describe('misc state', () => {
+			it('has the expected resolver set', async () => {
+				assert.equal(await Synthetix.resolver(), ReadProxyAddressResolver.address);
 			});
 
-			const user1BalanceAfter = await Synthetix.balanceOf(user1);
-			const user2BalanceAfter = await Synthetix.balanceOf(user2);
+			it('does not report any rate to be stale or invalid', async () => {
+				assert.isFalse(await Synthetix.anySynthOrSNXRateIsInvalid());
+			});
 
-			assert.bnEqual(user1BalanceAfter, user1BalanceBefore.sub(amount));
-			assert.bnEqual(user2BalanceAfter, user2BalanceBefore.add(amount));
-		});
-	});
+			it('reports matching totalIssuedSynths and debtLedger', async () => {
+				const totalIssuedSynths = await Synthetix.totalIssuedSynths(toBytes32('sUSD'));
+				const debtLedgerLength = await SynthetixState.debtLedgerLength();
 
-	describe('minting', () => {
-		addSnapshotBeforeRestoreAfter();
-
-		before(async () => {
-			await writeSetting({
-				setting: 'setMinimumStakeTime',
-				value: '60',
-				owner,
-				network,
-				deploymentPath,
+				assert.isFalse(debtLedgerLength > 0 && totalIssuedSynths === 0);
 			});
 		});
 
-		it('can issue hUSD', async () => {
-			const user1BalanceBefore = await HassethUSD.balanceOf(user1);
+		describe('erc20 functionality', () => {
+			addSnapshotBeforeRestoreAfter();
 
-			const amount = toUnit('10');
-			await Synthetix.issueSynths(amount, {
-				from: user1,
+			it('can transfer SNX', async () => {
+				const user1BalanceBefore = await Synthetix.balanceOf(user1);
+				const user2BalanceBefore = await Synthetix.balanceOf(user2);
+
+				const amount = toUnit('10');
+				const txn = await Synthetix.transfer(user2, amount, {
+					from: user1,
+				});
+
+				const receipt = await web3.eth.getTransactionReceipt(txn.tx);
+				console.log('Gas on transfer', gasFromReceipt({ receipt }));
+
+				const user1BalanceAfter = await Synthetix.balanceOf(user1);
+				const user2BalanceAfter = await Synthetix.balanceOf(user2);
+
+				assert.bnEqual(user1BalanceAfter, user1BalanceBefore.sub(amount));
+				assert.bnEqual(user2BalanceAfter, user2BalanceBefore.add(amount));
 			});
-
-			const user1BalanceAfter = await HassethUSD.balanceOf(user1);
-
-			assert.bnEqual(user1BalanceAfter, user1BalanceBefore.add(amount));
 		});
 
-		it('can burn hUSD', async () => {
-			await skipStakeTime({ network, deploymentPath });
+		describe('minting', () => {
+			addSnapshotBeforeRestoreAfter();
 
-			const user1BalanceBefore = await HassethUSD.balanceOf(user1);
-
-			await Synthetix.burnSynths(user1BalanceBefore, {
-				from: user1,
+			before(async () => {
+				await writeSetting({
+					setting: 'setMinimumStakeTime',
+					value: '60',
+					network,
+					deploymentPath,
+				});
 			});
 
-			const user1BalanceAfter = await HassethUSD.balanceOf(user1);
+			it('can issue sUSD', async () => {
+				const user1BalanceBefore = await SynthsUSD.balanceOf(user1);
 
-			assert.bnLt(user1BalanceAfter, user1BalanceBefore);
+				const amount = toUnit('10');
+				const txn = await Synthetix.issueSynths(amount, {
+					from: user1,
+				});
+				const receipt = await web3.eth.getTransactionReceipt(txn.tx);
+				console.log('Gas on issue', gasFromReceipt({ receipt }));
+
+				const user1BalanceAfter = await SynthsUSD.balanceOf(user1);
+
+				assert.bnEqual(user1BalanceAfter, user1BalanceBefore.add(amount));
+			});
+
+			it('can burn sUSD', async () => {
+				await skipStakeTime({ network, deploymentPath });
+
+				const user1BalanceBefore = await SynthsUSD.balanceOf(user1);
+
+				const txn = await Synthetix.burnSynths(user1BalanceBefore, {
+					from: user1,
+				});
+
+				const receipt = await web3.eth.getTransactionReceipt(txn.tx);
+				console.log('Gas on burn', gasFromReceipt({ receipt }));
+
+				const user1BalanceAfter = await SynthsUSD.balanceOf(user1);
+
+				assert.bnLt(user1BalanceAfter, user1BalanceBefore);
+			});
 		});
-	});
 
-	describe('exchanging', () => {
-		addSnapshotBeforeRestoreAfter();
+		describe('exchanging', () => {
+			before('skip if there is no exchanging implementation', async function() {
+				if (config.useOvm) {
+					this.skip();
+				}
+			});
+			addSnapshotBeforeRestoreAfter();
 
-		it('can exchange hUSD to hBNB', async () => {
-			await skipWaitingPeriod({ network, deploymentPath });
+			it('can exchange sUSD to sETH', async () => {
+				await skipWaitingPeriod({ network, deploymentPath });
 
-			const user1BalanceBeforesUSD = await HassethUSD.balanceOf(user1);
-			const user1BalanceBeforesETH = await HassethBNB.balanceOf(user1);
+				const user1BalanceBeforesUSD = await SynthsUSD.balanceOf(user1);
+				const user1BalanceBeforesETH = await SynthsETH.balanceOf(user1);
 
-			const amount = toUnit('10');
-			await Synthetix.exchange(toBytes32('hUSD'), amount, toBytes32('hBNB'), {
-				from: user1,
+				const amount = toUnit('10');
+				const txn = await Synthetix.exchange(toBytes32('sUSD'), amount, toBytes32('sETH'), {
+					from: user1,
+				});
+
+				const receipt = await web3.eth.getTransactionReceipt(txn.tx);
+				console.log('Gas on exchange', gasFromReceipt({ receipt }));
+
+				const user1BalanceAftersUSD = await SynthsUSD.balanceOf(user1);
+				const user1BalanceAftersETH = await SynthsETH.balanceOf(user1);
+
+				assert.bnLt(user1BalanceAftersUSD, user1BalanceBeforesUSD);
+				assert.bnGt(user1BalanceAftersETH, user1BalanceBeforesETH);
 			});
 
-			const user1BalanceAftersUSD = await HassethUSD.balanceOf(user1);
-			const user1BalanceAftersETH = await HassethBNB.balanceOf(user1);
+			it('can exchange sETH to sUSD', async () => {
+				await skipWaitingPeriod({ network, deploymentPath });
 
-			assert.bnLt(user1BalanceAftersUSD, user1BalanceBeforesUSD);
-			assert.bnGt(user1BalanceAftersETH, user1BalanceBeforesETH);
-		});
+				const user1BalanceBeforesUSD = await SynthsUSD.balanceOf(user1);
+				const user1BalanceBeforesETH = await SynthsETH.balanceOf(user1);
 
-		it('can exchange hBNB to hUSD', async () => {
-			await skipWaitingPeriod({ network, deploymentPath });
+				const amount = toUnit('1');
+				const txn = await Synthetix.exchange(toBytes32('sETH'), amount, toBytes32('sUSD'), {
+					from: user1,
+				});
 
-			const user1BalanceBeforesUSD = await HassethUSD.balanceOf(user1);
-			const user1BalanceBeforesETH = await HassethBNB.balanceOf(user1);
+				const receipt = await web3.eth.getTransactionReceipt(txn.tx);
+				console.log('Gas on exchange', gasFromReceipt({ receipt }));
 
-			const amount = toUnit('1');
-			await Synthetix.exchange(toBytes32('hBNB'), amount, toBytes32('hUSD'), {
-				from: user1,
+				const user1BalanceAftersUSD = await SynthsUSD.balanceOf(user1);
+				const user1BalanceAftersETH = await SynthsETH.balanceOf(user1);
+
+				assert.bnLt(user1BalanceAftersETH, user1BalanceBeforesETH);
+				assert.bnGt(user1BalanceAftersUSD, user1BalanceBeforesUSD);
 			});
-
-			const user1BalanceAftersUSD = await HassethUSD.balanceOf(user1);
-			const user1BalanceAftersETH = await HassethBNB.balanceOf(user1);
-
-			assert.bnLt(user1BalanceAftersETH, user1BalanceBeforesETH);
-			assert.bnGt(user1BalanceAftersUSD, user1BalanceBeforesUSD);
 		});
 	});
 
@@ -222,14 +242,12 @@ contract('Synthetix (prod tests)', accounts => {
 			return web3.eth.abi.decodeLog(vscEntry.inputs, log.data, log.topics.slice(1));
 		};
 
-		before('skip if there is no vSynth implementation', async function() {
+		before(async function() {
 			const virtualSynths = await implementsVirtualSynths({ network, deploymentPath });
 			if (config.useOvm || !virtualSynths) {
 				this.skip();
 			}
-		});
 
-		before(async () => {
 			await skipWaitingPeriod({ network, deploymentPath });
 
 			Exchanger = await connectContract({
@@ -239,23 +257,23 @@ contract('Synthetix (prod tests)', accounts => {
 			});
 
 			// // clear out any pending settlements
-			await Exchanger.settle(user1, toBytes32('hBNB'), { from: user1 });
-			await Exchanger.settle(user1, toBytes32('hBTC'), { from: user1 });
+			await Exchanger.settle(user1, toBytes32('sETH'), { from: user1 });
+			await Exchanger.settle(user1, toBytes32('sBTC'), { from: user1 });
 		});
 
-		describe('when user exchanges hUSD into hBNB using a Virtualsynths', () => {
+		describe('when user exchanges sUSD into sETH using a Virtualynths', () => {
 			const amount = toUnit('100');
 			let txn;
 			let receipt;
 			let userBalanceOfsETHBefore;
 
 			before(async () => {
-				userBalanceOfsETHBefore = await HassethBNB.balanceOf(user1);
+				userBalanceOfsETHBefore = await SynthsETH.balanceOf(user1);
 
 				txn = await Synthetix.exchangeWithVirtual(
-					toBytes32('hUSD'),
+					toBytes32('sUSD'),
 					amount,
-					toBytes32('hBNB'),
+					toBytes32('sETH'),
 					toBytes32(),
 					{
 						from: user1,
@@ -273,13 +291,13 @@ contract('Synthetix (prod tests)', accounts => {
 
 				const trimUtf8EscapeChars = input => web3.utils.hexToAscii(web3.utils.utf8ToHex(input));
 
-				assert.equal(trimUtf8EscapeChars(await vSynth.name()), 'Virtual Hasset hBNB');
-				assert.equal(trimUtf8EscapeChars(await vSynth.symbol()), 'vhBNB');
+				assert.equal(trimUtf8EscapeChars(await vSynth.name()), 'Virtual Synth sETH');
+				assert.equal(trimUtf8EscapeChars(await vSynth.symbol()), 'vsETH');
 
 				assert.ok((await vSynth.totalSupply()).toString() > 0);
 				assert.ok((await vSynth.balanceOf(user1)).toString() > 0);
 
-				assert.ok(await HassethBNB.balanceOf(vSynth.address), '0');
+				assert.ok(await SynthsETH.balanceOf(vSynth.address), '0');
 
 				assert.ok((await vSynth.secsLeftInWaitingPeriod()) > 0);
 				assert.notOk(await vSynth.readyToSettle());
@@ -287,19 +305,19 @@ contract('Synthetix (prod tests)', accounts => {
 			});
 
 			it('and the vSynth has a single settlement entry', async () => {
-				const { numEntries } = await Exchanger.settlementOwing(vSynth.address, toBytes32('hBNB'));
+				const { numEntries } = await Exchanger.settlementOwing(vSynth.address, toBytes32('sETH'));
 
 				assert.equal(numEntries.toString(), '1');
 			});
 
 			it('and the user has no settlement entries', async () => {
-				const { numEntries } = await Exchanger.settlementOwing(user1, toBytes32('hBNB'));
+				const { numEntries } = await Exchanger.settlementOwing(user1, toBytes32('sETH'));
 
 				assert.equal(numEntries.toString(), '0');
 			});
 
-			it('and the user has no more hBNB after the exchange', async () => {
-				assert.bnEqual(await HassethBNB.balanceOf(user1), userBalanceOfsETHBefore);
+			it('and the user has no more sETH after the exchanage', async () => {
+				assert.bnEqual(await SynthsETH.balanceOf(user1), userBalanceOfsETHBefore);
 			});
 
 			describe('when the waiting period expires', () => {
@@ -317,18 +335,18 @@ contract('Synthetix (prod tests)', accounts => {
 
 						console.log('Gas on vSynth settlement', gasFromReceipt({ receipt }));
 					});
-					it('user has more hBNB balance', async () => {
-						assert.bnGt(await HassethBNB.balanceOf(user1), userBalanceOfsETHBefore);
+					it('user has more sETH balance', async () => {
+						assert.bnGt(await SynthsETH.balanceOf(user1), userBalanceOfsETHBefore);
 					});
 					it('and the user has no settlement entries', async () => {
-						const { numEntries } = await Exchanger.settlementOwing(user1, toBytes32('hBNB'));
+						const { numEntries } = await Exchanger.settlementOwing(user1, toBytes32('sETH'));
 
 						assert.equal(numEntries.toString(), '0');
 					});
 					it('and the vSynth has no settlement entries', async () => {
 						const { numEntries } = await Exchanger.settlementOwing(
 							vSynth.address,
-							toBytes32('hBNB')
+							toBytes32('sETH')
 						);
 
 						assert.equal(numEntries.toString(), '0');
@@ -346,7 +364,7 @@ contract('Synthetix (prod tests)', accounts => {
 		});
 
 		describe('with virtual tokens and a custom swap contract', () => {
-			const usdcHolder = '0xbe0eb53f46cd790cd13851d5eff43d12404d33e8';
+			const usdcHolder = knownAccounts['mainnet'].find(a => a.name === 'binance').address;
 			const usdc = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48';
 			const wbtc = '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599';
 
@@ -394,9 +412,9 @@ contract('Synthetix (prod tests)', accounts => {
 
 				const SynthsBTC = await connectContract({
 					network,
-					contractName: 'ProxyhBTC',
+					contractName: 'ProxysBTC',
 					abiName: 'Synth',
-					alias: 'HassethBTC',
+					alias: 'SynthsBTC',
 				});
 
 				vSynth = await artifacts.require('VirtualSynth').at(decoded.vSynth);

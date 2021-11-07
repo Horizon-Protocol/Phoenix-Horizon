@@ -11,7 +11,39 @@ import "../interfaces/ISynthetix.sol";
 import "../interfaces/IAddressResolver.sol";
 import "../interfaces/IVirtualSynth.sol";
 import "../interfaces/IExchanger.sol";
-import {IERC20 as IERC20Detailed} from "../interfaces/IERC20.sol";
+
+
+interface IERC20Detailed {
+    // ERC20 Optional Views
+    function name() external view returns (string memory);
+
+    function symbol() external view returns (string memory);
+
+    function decimals() external view returns (uint8);
+
+    // Views
+    function totalSupply() external view returns (uint);
+
+    function balanceOf(address owner) external view returns (uint);
+
+    function allowance(address owner, address spender) external view returns (uint);
+
+    // Mutative functions
+    function transfer(address to, uint value) external returns (bool);
+
+    function approve(address spender, uint value) external returns (bool);
+
+    function transferFrom(
+        address from,
+        address to,
+        uint value
+    ) external returns (bool);
+
+    // Events
+    event Transfer(address indexed from, address indexed to, uint value);
+
+    event Approval(address indexed owner, address indexed spender, uint value);
+}
 
 
 interface ICurvePool {
@@ -87,7 +119,7 @@ contract VirtualToken is ERC20 {
         // allow the pool to spend my synths
         synth.approve(address(pool), balanceAfterSettlement);
 
-        // now exchange all my synths (sBTC) for WBTC
+        // now exchange all my synths (zBTC) for WBTC
         pool.exchange(2, 1, balanceAfterSettlement, 0);
     }
 
@@ -114,12 +146,12 @@ contract VirtualToken is ERC20 {
 
 
 contract SwapWithVirtualSynth {
-    ICurvePool public incomingPool = ICurvePool(0xA5407eAE9Ba41422680e2e00537571bcC53efBfD); // Curve: sUSD v2 Swap
-    ICurvePool public outgoingPool = ICurvePool(0x7fC77b5c7614E1533320Ea6DDc2Eb61fa00A9714); // Curve: sBTC Swap
+    ICurvePool public incomingPool = ICurvePool(0xA5407eAE9Ba41422680e2e00537571bcC53efBfD); // Curve: zUSD v2 Swap
+    ICurvePool public outgoingPool = ICurvePool(0x7fC77b5c7614E1533320Ea6DDc2Eb61fa00A9714); // Curve: zBTC Swap
 
     ISynthetix public synthetix = ISynthetix(0xC011a73ee8576Fb46F5E1c5751cA3B9Fe0af2a6F);
 
-    IERC20Detailed public sUSD = IERC20Detailed(0x57Ab1ec28D129707052df4dF418D58a2D46d5f51);
+    IERC20Detailed public zUSD = IERC20Detailed(0x57Ab1ec28D129707052df4dF418D58a2D46d5f51);
     IERC20Detailed public USDC = IERC20Detailed(0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48);
     IERC20Detailed public WBTC = IERC20Detailed(0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599);
 
@@ -134,7 +166,7 @@ contract SwapWithVirtualSynth {
         incomingPool.exchange(1, 3, amount, 0);
 
         // now exchange my zUSD to zBTC
-        (, IVirtualSynth vSynth) = synthetix.exchangeWithVirtual("zUSD", sUSD.balanceOf(address(this)), "zBTC", bytes32(0));
+        (, IVirtualSynth vSynth) = synthetix.exchangeWithVirtual("zUSD", zUSD.balanceOf(address(this)), "zBTC", bytes32(0));
 
         // wrap this vSynth in a new token ERC20 contract
         VirtualToken vToken = new VirtualToken(vSynth, outgoingPool, WBTC);

@@ -12,7 +12,7 @@ contract('BinaryOptionMarketData @gas-skip @ovm-skip', accounts => {
 	before(async () => {
 		const { AddressResolver: addressResolver } = await setupAllContracts({
 			accounts,
-			synths: ['hUSD'],
+			synths: ['zUSD'],
 			contracts: [
 				'BinaryOptionMarketManager',
 				'AddressResolver',
@@ -29,8 +29,9 @@ contract('BinaryOptionMarketData @gas-skip @ovm-skip', accounts => {
 			args: [
 				accounts[0], // manager
 				accounts[1], // creator
+				addressResolver.address,
 				[toUnit(2), toUnit(0.05)], // Capital requirement, skew limit
-				toBytes32('hAUD'), // oracle key
+				toBytes32('zAUD'), // oracle key
 				toUnit(1), // strike price
 				true,
 				[setupTime + 100, setupTime + 200, setupTime + 300], // bidding end, maturity, expiry
@@ -38,7 +39,7 @@ contract('BinaryOptionMarketData @gas-skip @ovm-skip', accounts => {
 				[toUnit(0.01), toUnit(0.02), toUnit(0.03)], // pool, creator, refund fees
 			],
 		});
-		await market.setResolverAndSyncCache(addressResolver.address);
+		await market.rebuildCache();
 
 		dataContract = await setupContract({
 			accounts,

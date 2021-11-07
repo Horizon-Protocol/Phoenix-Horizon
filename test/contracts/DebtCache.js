@@ -25,7 +25,7 @@ const {
 } = require('../..');
 
 contract('DebtCache', async accounts => {
-	const [hUSD, hAUD, hEUR, HZN, hETH] = ['hUSD', 'hAUD', 'hEUR', 'HZN', 'hBNB'].map(toBytes32);
+	const [hUSD, hAUD, hEUR, HZN, hETH] = ['zUSD', 'zAUD', 'zEUR', 'HZN', 'zBNB'].map(toBytes32);
 	const synthKeys = [hUSD, hAUD, hEUR, hETH, HZN];
 
 	const [, owner, oracle, account1, account2] = accounts;
@@ -35,10 +35,10 @@ contract('DebtCache', async accounts => {
 		systemSettings,
 		exchangeRates,
 		feePool,
-		hUSDContract,
-		hBNBContract,
-		hEURContract,
-		hAUDContract,
+		zUSDContract,
+		zBNBContract,
+		zEURContract,
+		zAUDContract,
 		timestamp,
 		debtCache,
 		issuer,
@@ -49,16 +49,16 @@ contract('DebtCache', async accounts => {
 	// run this once before all tests to prepare our environment, snapshots on beforeEach will take
 	// care of resetting to this state
 	before(async () => {
-		synths = ['hUSD', 'hAUD', 'hEUR', 'hBNB'];
+		synths = ['zUSD', 'zAUD', 'zEUR', 'zBNB'];
 		({
 			Synthetix: synthetix,
 			SystemStatus: systemStatus,
 			SystemSettings: systemSettings,
 			ExchangeRates: exchangeRates,
-			HassethUSD: hUSDContract,
-			HassethBNB: hBNBContract,
-			HassethAUD: hAUDContract,
-			HassethEUR: hEURContract,
+			ZassetzUSD: zUSDContract,
+			ZassetzBNB: zBNBContract,
+			ZassetzAUD: zAUDContract,
+			ZassetzEUR: zEURContract,
 			FeePool: feePool,
 			DebtCache: debtCache,
 			Issuer: issuer,
@@ -81,6 +81,8 @@ contract('DebtCache', async accounts => {
 				'Exchanger', // necessary for burnSynths to check settlement of hUSD
 				'DelegateApprovals', // necessary for *OnBehalf functions
 				'FlexibleStorage',
+				'CollateralManager',
+				'RewardEscrowV2', // necessary for issuer._collateral()
 			],
 		}));
 	});
@@ -111,7 +113,7 @@ contract('DebtCache', async accounts => {
 	it('ensure only known functions are mutative', () => {
 		ensureOnlyExpectedMutativeFunctions({
 			abi: debtCache.abi,
-			ignoreParents: ['MixinResolver'],
+			ignoreParents: ['Owned', 'MixinResolver'],
 			expected: [
 				'takeDebtSnapshot',
 				'purgeCachedSynthDebt',
@@ -186,10 +188,10 @@ contract('DebtCache', async accounts => {
 			await debtCache.takeDebtSnapshot();
 
 			// Issue 1000 hUSD worth of tokens to a user
-			await hUSDContract.issue(account1, toUnit(100));
-			await hAUDContract.issue(account1, toUnit(100));
-			await hEURContract.issue(account1, toUnit(100));
-			await hBNBContract.issue(account1, toUnit(2));
+			await zUSDContract.issue(account1, toUnit(100));
+			await zAUDContract.issue(account1, toUnit(100));
+			await zEURContract.issue(account1, toUnit(100));
+			await zBNBContract.issue(account1, toUnit(2));
 		});
 
 		describe('Current issued debt', () => {
@@ -352,7 +354,7 @@ contract('DebtCache', async accounts => {
 				await addressResolver.importAddresses([debtCacheName], [newDebtCache.address], {
 					from: owner,
 				});
-				await newDebtCache.setResolverAndSyncCache(addressResolver.address, { from: owner });
+				await newDebtCache.rebuildCache();
 
 				assert.bnEqual(await newDebtCache.cachedDebt(), toUnit('0'));
 				assert.bnEqual(await newDebtCache.cachedSynthDebt(hUSD), toUnit('0'));
@@ -366,7 +368,7 @@ contract('DebtCache', async accounts => {
 				assert.isTrue(info.isStale);
 				assert.isTrue(await newDebtCache.cacheStale());
 
-				await issuer.setResolverAndSyncCache(addressResolver.address, { from: owner });
+				await issuer.rebuildCache();
 				assert.isTrue((await issuer.collateralisationRatioAndAnyRatesInvalid(account1))[1]);
 			});
 
@@ -389,20 +391,20 @@ contract('DebtCache', async accounts => {
 
 				await assert.revert(
 					synthetix.issueSynths(toUnit('10'), { from: account1 }),
-					'A hasset or HZN rate is invalid'
+					'A zasset or HZN rate is invalid'
 				);
 
 				await assert.revert(
 					synthetix.burnSynths(toUnit('1'), { from: account1 }),
-					'A hasset or HZN rate is invalid'
+					'A zasset or HZN rate is invalid'
 				);
 
-				await assert.revert(feePool.claimFees(), 'A hasset or HZN rate is invalid');
+				await assert.revert(feePool.claimFees(), 'A zasset or HZN rate is invalid');
 
 				// Can't transfer SNX if issued debt
 				await assert.revert(
 					synthetix.transfer(owner, toUnit('1'), { from: account1 }),
-					'A hasset or HZN rate is invalid'
+					'A zasset or HZN rate is invalid'
 				);
 
 				// But can transfer if not
@@ -586,7 +588,7 @@ contract('DebtCache', async accounts => {
 					{ from: owner }
 				);
 
-				await hEURContract.issue(account1, toUnit(20));
+				await zEURContract.issue(account1, toUnit(20));
 				await debtCache.takeDebtSnapshot();
 				const issued = (await debtCache.cacheInfo())[0];
 
@@ -606,7 +608,7 @@ contract('DebtCache', async accounts => {
 					from: owner,
 				});
 
-				await hEURContract.issue(account1, toUnit(20));
+				await zEURContract.issue(account1, toUnit(20));
 				await debtCache.takeDebtSnapshot();
 				const issued = (await debtCache.cacheInfo())[0];
 
@@ -631,7 +633,7 @@ contract('DebtCache', async accounts => {
 				await systemSettings.setExchangeFeeRateForSynths([hAUD, hEUR], [toUnit(0), toUnit(0)], {
 					from: owner,
 				});
-				await hAUDContract.issue(account1, toUnit(100));
+				await zAUDContract.issue(account1, toUnit(100));
 				await debtCache.takeDebtSnapshot();
 
 				await synthetix.exchange(hAUD, toUnit(50), hEUR, { from: account1 });
@@ -668,7 +670,7 @@ contract('DebtCache', async accounts => {
 				await debtCache.takeDebtSnapshot();
 				const issued = (await debtCache.cacheInfo())[0];
 				const hEURValue = (await debtCache.cachedSynthDebts([hEUR]))[0];
-				await hEURContract.setTotalSupply(toUnit(0));
+				await zEURContract.setTotalSupply(toUnit(0));
 				const tx = await issuer.removeSynth(hEUR, { from: owner });
 				const result = (await debtCache.cachedSynthDebts([hEUR]))[0];
 				const newIssued = (await debtCache.cacheInfo())[0];
@@ -689,7 +691,7 @@ contract('DebtCache', async accounts => {
 			});
 
 			it('Synth snapshots cannot be purged while the synth exists', async () => {
-				await assert.revert(debtCache.purgeCachedSynthDebt(hAUD, { from: owner }), 'Hasset exists');
+				await assert.revert(debtCache.purgeCachedSynthDebt(hAUD, { from: owner }), 'Zasset exists');
 			});
 
 			it('Synth snapshots can be purged without updating the snapshot', async () => {
@@ -703,7 +705,7 @@ contract('DebtCache', async accounts => {
 				await addressResolver.importAddresses([debtCacheName], [newDebtCache.address], {
 					from: owner,
 				});
-				await newDebtCache.setResolverAndSyncCache(addressResolver.address, { from: owner });
+				await newDebtCache.rebuildCache();
 
 				await newDebtCache.takeDebtSnapshot();
 				const issued = (await newDebtCache.cacheInfo())[0];
@@ -723,7 +725,7 @@ contract('DebtCache', async accounts => {
 			});
 
 			it('Removing a synth invalidates the debt cache', async () => {
-				await hEURContract.setTotalSupply(toUnit('0'));
+				await zEURContract.setTotalSupply(toUnit('0'));
 				assert.isFalse((await debtCache.cacheInfo())[2]);
 				const tx = await issuer.removeSynth(hEUR, { from: owner });
 				assert.isTrue((await debtCache.cacheInfo())[2]);
@@ -804,8 +806,8 @@ contract('DebtCache', async accounts => {
 			});
 
 			it('Removing multiple synths invalidates the debt cache', async () => {
-				await hAUDContract.setTotalSupply(toUnit('0'));
-				await hEURContract.setTotalSupply(toUnit('0'));
+				await zAUDContract.setTotalSupply(toUnit('0'));
+				await zEURContract.setTotalSupply(toUnit('0'));
 
 				assert.isFalse((await debtCache.cacheInfo())[2]);
 				const tx = await issuer.removeSynths([hEUR, hAUD], { from: owner });
@@ -829,8 +831,8 @@ contract('DebtCache', async accounts => {
 				const issued = (await debtCache.cacheInfo())[0];
 				const hEURValue = (await debtCache.cachedSynthDebts([hEUR]))[0];
 				const hAUDValue = (await debtCache.cachedSynthDebts([hAUD]))[0];
-				await hEURContract.setTotalSupply(toUnit(0));
-				await hAUDContract.setTotalSupply(toUnit(0));
+				await zEURContract.setTotalSupply(toUnit(0));
+				await zAUDContract.setTotalSupply(toUnit(0));
 				const tx = await issuer.removeSynths([hEUR, hAUD], { from: owner });
 				const result = await debtCache.cachedSynthDebts([hEUR, hAUD]);
 				const newIssued = (await debtCache.cacheInfo())[0];
@@ -862,7 +864,7 @@ contract('DebtCache', async accounts => {
 				await addressResolver.importAddresses([issuerName], [account1], {
 					from: owner,
 				});
-				await debtCache.setResolverAndSyncCache(addressResolver.address, { from: owner });
+				await debtCache.rebuildCache();
 			});
 
 			describe('when the debt cache is valid', () => {
@@ -957,10 +959,11 @@ contract('DebtCache', async accounts => {
 					}
 				);
 
+				// rebuild the caches of those addresses not just added to the adress resolver
 				await Promise.all([
-					issuer.setResolverAndSyncCache(addressResolver.address, { from: owner }),
-					exchanger.setResolverAndSyncCache(addressResolver.address, { from: owner }),
-					realtimeDebtCache.setResolverAndSyncCache(addressResolver.address, { from: owner }),
+					issuer.rebuildCache(),
+					exchanger.rebuildCache(),
+					realtimeDebtCache.rebuildCache(),
 				]);
 			});
 
@@ -1166,7 +1169,7 @@ contract('DebtCache', async accounts => {
 						{ from: owner }
 					);
 
-					await hEURContract.issue(account1, toUnit(20));
+					await zEURContract.issue(account1, toUnit(20));
 					const issued = (await realtimeDebtCache.cacheInfo())[0];
 
 					const debts = await realtimeDebtCache.cachedSynthDebts([hUSD, hAUD, hEUR]);
@@ -1185,7 +1188,7 @@ contract('DebtCache', async accounts => {
 						from: owner,
 					});
 
-					await hEURContract.issue(account1, toUnit(20));
+					await zEURContract.issue(account1, toUnit(20));
 					const issued = (await realtimeDebtCache.cacheInfo())[0];
 
 					const debts = await realtimeDebtCache.cachedSynthDebts([hAUD, hEUR]);
@@ -1214,7 +1217,7 @@ contract('DebtCache', async accounts => {
 					await systemSettings.setExchangeFeeRateForSynths([hAUD, hEUR], [toUnit(0), toUnit(0)], {
 						from: owner,
 					});
-					await hAUDContract.issue(account1, toUnit(100));
+					await zAUDContract.issue(account1, toUnit(100));
 
 					await synthetix.exchange(hAUD, toUnit(50), hEUR, { from: account1 });
 

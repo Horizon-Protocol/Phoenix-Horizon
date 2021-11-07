@@ -70,18 +70,18 @@ module.exports = {
 	async updateRatesWithDefaults({ exchangeRates, oracle, debtCache }) {
 		const timestamp = await currentTime();
 
-		const [SNX, sAUD, sEUR, sBTC, iBTC, hBNB, BNB] = [
+		const [HZN, zAUD, zEUR, zBTC, iBTC, zBNB, BNB] = [
 			'HZN',
-			'hAUD',
-			'hEUR',
-			'hBTC',
+			'zAUD',
+			'zEUR',
+			'zBTC',
 			'iBTC',
-			'hBNB',
+			'zBNB',
 			'BNB',
 		].map(toBytes32);
 
 		await exchangeRates.updateRates(
-			[SNX, sAUD, sEUR, sBTC, iBTC, hBNB, BNB],
+			[HZN, zAUD, zEUR, zBTC, iBTC, zBNB, BNB],
 			['0.1', '0.5', '1.25', '5000', '4000', '172', '172'].map(toUnit),
 			timestamp,
 			{
@@ -119,7 +119,7 @@ module.exports = {
 			from: owner,
 		});
 		// now have the synth resync its cache
-		await synthContract.setResolverAndSyncCache(addressResolver.address, { from: owner });
+		await synthContract.rebuildCache();
 
 		await synthContract.issue(user, amount, {
 			from: owner,
@@ -129,7 +129,7 @@ module.exports = {
 		await addressResolver.importAddresses(['Issuer'].map(toBytes32), [issuer.address], {
 			from: owner,
 		});
-		await synthContract.setResolverAndSyncCache(addressResolver.address, { from: owner });
+		await synthContract.rebuildCache();
 	},
 
 	async setExchangeWaitingPeriod({ owner, systemSettings, secs }) {
@@ -264,5 +264,9 @@ module.exports = {
 		resolver.smocked.getAddress.will.return.with(returnMockFromResolver);
 
 		return { mocks, resolver };
+	},
+
+	getEventByName({ tx, name }) {
+		return tx.logs.find(({ event }) => event === name);
 	},
 };

@@ -23,7 +23,7 @@ const {
 const { setupAllContracts } = require('./setup');
 
 contract('PurgeableSynth', accounts => {
-	const [hUSD, HZN, hAUD, iBNB] = ['hUSD', 'SNX', 'hAUD', 'iBNB'].map(toBytes32);
+	const [hUSD, HZN, hAUD, iBNB] = ['zUSD', 'HZN', 'zAUD', 'iBNB'].map(toBytes32);
 	const synthKeys = [hUSD, hAUD, iBNB];
 	const [deployerAccount, owner, oracle, , account1, account2] = accounts;
 
@@ -53,15 +53,15 @@ contract('PurgeableSynth', accounts => {
 			AddressResolver: addressResolver,
 			ExchangeRates: exchangeRates,
 			Exchanger: exchanger,
-			HassethUSD: hUSDContract,
-			HassethAUD: hAUDContract,
+			ZassetzUSD: hUSDContract,
+			ZassetzAUD: hAUDContract,
 			SystemStatus: systemStatus,
 			SystemSettings: systemSettings,
 			DebtCache: debtCache,
 			Issuer: issuer,
 		} = await setupAllContracts({
 			accounts,
-			synths: ['hUSD', 'hAUD'],
+			synths: ['zUSD', 'zAUD'],
 			contracts: [
 				'ExchangeRates',
 				'Exchanger',
@@ -72,6 +72,7 @@ contract('PurgeableSynth', accounts => {
 				'Synthetix',
 				'SystemStatus',
 				'SystemSettings',
+				'CollateralManager',
 			],
 		}));
 
@@ -139,12 +140,10 @@ contract('PurgeableSynth', accounts => {
 		});
 
 		it('ensure the list of resolver addresses are as expected', async () => {
-			const actual = await iETHContract.getResolverAddressesRequired();
+			const actual = await iETHContract.resolverAddressesRequired();
 			assert.deepEqual(
 				actual,
-				['SystemStatus', 'Exchanger', 'Issuer', 'FeePool', 'ExchangeRates']
-					.concat(new Array(18).fill(''))
-					.map(toBytes32)
+				['SystemStatus', 'Exchanger', 'Issuer', 'FeePool', 'ExchangeRates'].map(toBytes32)
 			);
 		});
 
@@ -446,7 +445,7 @@ contract('PurgeableSynth', accounts => {
 						describe('when a Purgeable synth is added to replace the existing sAUD', () => {
 							beforeEach(async () => {
 								const { synth } = await deploySynth({
-									currencyKey: 'hAUD',
+									currencyKey: 'zAUD',
 									proxy: this.oldProxy,
 									tokenState: this.oldTokenState,
 								});
@@ -455,9 +454,7 @@ contract('PurgeableSynth', accounts => {
 							describe('and it is added to Synthetix', () => {
 								beforeEach(async () => {
 									await issuer.addSynth(this.replacement.address, { from: owner });
-									await this.replacement.setResolverAndSyncCache(addressResolver.address, {
-										from: owner,
-									});
+									await this.replacement.rebuildCache();
 								});
 
 								describe('and the old sAUD TokenState and Proxy is connected to the replacement synth', () => {

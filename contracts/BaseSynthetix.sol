@@ -13,7 +13,6 @@ import "./interfaces/ISynthetixState.sol";
 import "./interfaces/ISystemStatus.sol";
 import "./interfaces/IExchanger.sol";
 import "./interfaces/IIssuer.sol";
-import "./SupplySchedule.sol";
 import "./interfaces/IRewardsDistribution.sol";
 import "./interfaces/IVirtualSynth.sol";
 
@@ -27,23 +26,12 @@ contract BaseSynthetix is IERC20, ExternStateToken, MixinResolver, ISynthetix {
     uint8 public constant DECIMALS = 18;
     bytes32 public constant zUSD = "zUSD";
 
-    /* ========== ADDRESS RESOLVER CONFIGURATION ========== */
-
+    // ========== ADDRESS RESOLVER CONFIGURATION ==========
     bytes32 private constant CONTRACT_SYNTHETIXSTATE = "SynthetixState";
     bytes32 private constant CONTRACT_SYSTEMSTATUS = "SystemStatus";
     bytes32 private constant CONTRACT_EXCHANGER = "Exchanger";
     bytes32 private constant CONTRACT_ISSUER = "Issuer";
-    bytes32 private constant CONTRACT_SUPPLYSCHEDULE = "SupplySchedule";
     bytes32 private constant CONTRACT_REWARDSDISTRIBUTION = "RewardsDistribution";
-
-    bytes32[24] private addressesToCache = [
-        CONTRACT_SYSTEMSTATUS,
-        CONTRACT_EXCHANGER,
-        CONTRACT_ISSUER,
-        CONTRACT_SUPPLYSCHEDULE,
-        CONTRACT_REWARDSDISTRIBUTION,
-        CONTRACT_SYNTHETIXSTATE
-    ];
 
     // ========== CONSTRUCTOR ==========
 
@@ -56,34 +44,39 @@ contract BaseSynthetix is IERC20, ExternStateToken, MixinResolver, ISynthetix {
     )
         public
         ExternStateToken(_proxy, _tokenState, TOKEN_NAME, TOKEN_SYMBOL, _totalSupply, DECIMALS, _owner)
-        MixinResolver(_resolver, addressesToCache)
+        MixinResolver(_resolver)
     {}
 
-    /* ========== VIEWS ========== */
+    // ========== VIEWS ==========
+
+    // Note: use public visibility so that it can be invoked in a subclass
+    function resolverAddressesRequired() public view returns (bytes32[] memory addresses) {
+        addresses = new bytes32[](5);
+        addresses[0] = CONTRACT_SYNTHETIXSTATE;
+        addresses[1] = CONTRACT_SYSTEMSTATUS;
+        addresses[2] = CONTRACT_EXCHANGER;
+        addresses[3] = CONTRACT_ISSUER;
+        addresses[4] = CONTRACT_REWARDSDISTRIBUTION;
+    }
 
     function synthetixState() internal view returns (ISynthetixState) {
-        return ISynthetixState(requireAndGetAddress(CONTRACT_SYNTHETIXSTATE, "Missing HorizonState address"));
+        return ISynthetixState(requireAndGetAddress(CONTRACT_SYNTHETIXSTATE));
     }
 
     function systemStatus() internal view returns (ISystemStatus) {
-        return ISystemStatus(requireAndGetAddress(CONTRACT_SYSTEMSTATUS, "Missing SystemStatus address"));
+        return ISystemStatus(requireAndGetAddress(CONTRACT_SYSTEMSTATUS));
     }
 
     function exchanger() internal view returns (IExchanger) {
-        return IExchanger(requireAndGetAddress(CONTRACT_EXCHANGER, "Missing Exchanger address"));
+        return IExchanger(requireAndGetAddress(CONTRACT_EXCHANGER));
     }
 
     function issuer() internal view returns (IIssuer) {
-        return IIssuer(requireAndGetAddress(CONTRACT_ISSUER, "Missing Issuer address"));
-    }
-
-    function supplySchedule() internal view returns (SupplySchedule) {
-        return SupplySchedule(requireAndGetAddress(CONTRACT_SUPPLYSCHEDULE, "Missing SupplySchedule address"));
+        return IIssuer(requireAndGetAddress(CONTRACT_ISSUER));
     }
 
     function rewardsDistribution() internal view returns (IRewardsDistribution) {
-        return
-            IRewardsDistribution(requireAndGetAddress(CONTRACT_REWARDSDISTRIBUTION, "Missing RewardsDistribution address"));
+        return IRewardsDistribution(requireAndGetAddress(CONTRACT_REWARDSDISTRIBUTION));
     }
 
     function debtBalanceOf(address account, bytes32 currencyKey) external view returns (uint) {
@@ -309,24 +302,21 @@ contract BaseSynthetix is IERC20, ExternStateToken, MixinResolver, ISynthetix {
 
     // ========== MODIFIERS ==========
 
-    modifier onlyExchanger() {
-        require(msg.sender == address(exchanger()), "Only Exchanger can invoke this");
+    modifier systemActive() {
+        _systemActive();
         _;
     }
 
-    modifier systemActive() {
+    function _systemActive() private {
         systemStatus().requireSystemActive();
-        _;
     }
 
     modifier issuanceActive() {
-        systemStatus().requireIssuanceActive();
+        _issuanceActive();
         _;
     }
 
-    modifier exchangeActive(bytes32 src, bytes32 dest) {
-        systemStatus().requireExchangeActive();
-        systemStatus().requireSynthsActive(src, dest);
-        _;
+    function _issuanceActive() private {
+        systemStatus().requireIssuanceActive();
     }
 }

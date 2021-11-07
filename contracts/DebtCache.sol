@@ -17,10 +17,11 @@ import "./interfaces/ISystemStatus.sol";
 import "./interfaces/IEtherCollateral.sol";
 import "./interfaces/IEtherCollateralsUSD.sol";
 import "./interfaces/IERC20.sol";
+import "./interfaces/ICollateralManager.sol";
 
 
 // https://docs.synthetix.io/contracts/source/contracts/debtcache
-contract DebtCache is Owned, MixinResolver, MixinSystemSettings, IDebtCache {
+contract DebtCache is Owned, MixinSystemSettings, IDebtCache {
     using SafeMath for uint;
     using SafeDecimalMath for uint;
 
@@ -42,48 +43,51 @@ contract DebtCache is Owned, MixinResolver, MixinSystemSettings, IDebtCache {
     bytes32 private constant CONTRACT_SYSTEMSTATUS = "SystemStatus";
     bytes32 private constant CONTRACT_ETHERCOLLATERAL = "EtherCollateral";
     bytes32 private constant CONTRACT_ETHERCOLLATERAL_SUSD = "EtherCollateralsUSD";
+    bytes32 private constant CONTRACT_COLLATERALMANAGER = "CollateralManager";
 
-    bytes32[24] private addressesToCache = [
-        CONTRACT_ISSUER,
-        CONTRACT_EXCHANGER,
-        CONTRACT_EXRATES,
-        CONTRACT_SYSTEMSTATUS,
-        CONTRACT_ETHERCOLLATERAL,
-        CONTRACT_ETHERCOLLATERAL_SUSD
-    ];
-
-    constructor(address _owner, address _resolver)
-        public
-        Owned(_owner)
-        MixinResolver(_resolver, addressesToCache)
-        MixinSystemSettings()
-    {}
+    constructor(address _owner, address _resolver) public Owned(_owner) MixinSystemSettings(_resolver) {}
 
     /* ========== VIEWS ========== */
 
+    function resolverAddressesRequired() public view returns (bytes32[] memory addresses) {
+        bytes32[] memory existingAddresses = MixinSystemSettings.resolverAddressesRequired();
+        bytes32[] memory newAddresses = new bytes32[](7);
+        newAddresses[0] = CONTRACT_ISSUER;
+        newAddresses[1] = CONTRACT_EXCHANGER;
+        newAddresses[2] = CONTRACT_EXRATES;
+        newAddresses[3] = CONTRACT_SYSTEMSTATUS;
+        newAddresses[4] = CONTRACT_ETHERCOLLATERAL;
+        newAddresses[5] = CONTRACT_ETHERCOLLATERAL_SUSD;
+        newAddresses[6] = CONTRACT_COLLATERALMANAGER;
+        addresses = combineArrays(existingAddresses, newAddresses);
+    }
+
     function issuer() internal view returns (IIssuer) {
-        return IIssuer(requireAndGetAddress(CONTRACT_ISSUER, "Missing Issuer address"));
+        return IIssuer(requireAndGetAddress(CONTRACT_ISSUER));
     }
 
     function exchanger() internal view returns (IExchanger) {
-        return IExchanger(requireAndGetAddress(CONTRACT_EXCHANGER, "Missing Exchanger address"));
+        return IExchanger(requireAndGetAddress(CONTRACT_EXCHANGER));
     }
 
     function exchangeRates() internal view returns (IExchangeRates) {
-        return IExchangeRates(requireAndGetAddress(CONTRACT_EXRATES, "Missing ExchangeRates address"));
+        return IExchangeRates(requireAndGetAddress(CONTRACT_EXRATES));
     }
 
     function systemStatus() internal view returns (ISystemStatus) {
-        return ISystemStatus(requireAndGetAddress(CONTRACT_SYSTEMSTATUS, "Missing SystemStatus address"));
+        return ISystemStatus(requireAndGetAddress(CONTRACT_SYSTEMSTATUS));
     }
 
     function etherCollateral() internal view returns (IEtherCollateral) {
-        return IEtherCollateral(requireAndGetAddress(CONTRACT_ETHERCOLLATERAL, "Missing EtherCollateral address"));
+        return IEtherCollateral(requireAndGetAddress(CONTRACT_ETHERCOLLATERAL));
     }
 
     function etherCollateralsUSD() internal view returns (IEtherCollateralsUSD) {
-        return
-            IEtherCollateralsUSD(requireAndGetAddress(CONTRACT_ETHERCOLLATERAL_SUSD, "Missing EtherCollateralsUSD address"));
+        return IEtherCollateralsUSD(requireAndGetAddress(CONTRACT_ETHERCOLLATERAL_SUSD));
+    }
+
+    function collateralManager() internal view returns (ICollateralManager) {
+        return ICollateralManager(requireAndGetAddress(CONTRACT_COLLATERALMANAGER));
     }
 
     function debtSnapshotStaleTime() external view returns (uint) {
@@ -128,9 +132,25 @@ contract DebtCache is Owned, MixinResolver, MixinSystemSettings, IDebtCache {
             require(synthAddress != address(0), "Zasset does not exist");
             uint supply = IERC20(synthAddress).totalSupply();
 
-            bool iszUSD = key == zUSD;
-            if (iszUSD || key == zBNB) {
-                IEtherCollateral etherCollateralContract = iszUSD
+            if (collateralManager().isSynthManaged(key)) {
+                uint collateralIssued = collateralManager().long(key);
+
+                // this is an edge case --
+                // if a synth other than zUSD is only issued by non HZN collateral
+                // the long value will exceed the supply if there was a minting fee,
+                // so we check explicitly and 0 it out to prevent
+                // a safesub overflow.
+
+                if (collateralIssued > supply) {
+                    supply = 0;
+                } else {
+                    supply = supply.sub(collateralIssued);
+                }
+            }
+
+            bool isZUSD = key == zUSD;
+            if (isZUSD || key == zBNB) {
+                IEtherCollateral etherCollateralContract = isZUSD
                     ? IEtherCollateral(address(etherCollateralsUSD()))
                     : etherCollateral();
                 uint etherCollateralSupply = etherCollateralContract.totalIssuedSynths();
@@ -179,6 +199,14 @@ contract DebtCache is Owned, MixinResolver, MixinSystemSettings, IDebtCache {
         for (uint i; i < numValues; i++) {
             total = total.add(values[i]);
         }
+
+        // subtract the USD value of all shorts.
+        (uint susdValue, bool shortInvalid) = collateralManager().totalShort();
+
+        total = total.sub(susdValue);
+
+        isInvalid = isInvalid || shortInvalid;
+
         return (total, isInvalid);
     }
 
@@ -212,6 +240,9 @@ contract DebtCache is Owned, MixinResolver, MixinSystemSettings, IDebtCache {
         bytes32[] memory currencyKeys = issuer().availableCurrencyKeys();
         (uint[] memory values, bool isInvalid) = _currentSynthDebts(currencyKeys);
 
+        // Subtract the USD value of all shorts.
+        (uint shortValue, ) = collateralManager().totalShort();
+
         uint numValues = values.length;
         uint snxCollateralDebt;
         for (uint i; i < numValues; i++) {
@@ -219,7 +250,7 @@ contract DebtCache is Owned, MixinResolver, MixinSystemSettings, IDebtCache {
             snxCollateralDebt = snxCollateralDebt.add(value);
             _cachedSynthDebt[currencyKeys[i]] = value;
         }
-        _cachedDebt = snxCollateralDebt;
+        _cachedDebt = snxCollateralDebt.sub(shortValue);
         _cacheTimestamp = block.timestamp;
         emit DebtCacheUpdated(snxCollateralDebt);
         emit DebtCacheSnapshotTaken(block.timestamp);

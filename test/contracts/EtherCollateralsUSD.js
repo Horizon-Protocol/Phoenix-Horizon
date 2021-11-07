@@ -41,7 +41,6 @@ contract('EtherCollateralsUSD', async accounts => {
 	const [, owner, oracle, address1, address2, address3] = accounts;
 
 	let etherCollateral,
-		synthetix,
 		feePool,
 		exchangeRates,
 		addressResolver,
@@ -127,9 +126,8 @@ contract('EtherCollateralsUSD', async accounts => {
 	// Run once at beginning - snapshots will take care of resetting this before each test
 	before(async () => {
 		// Mock HZN, hUSD
-		[{ token: synthetix }, { token: hUSDSynth }] = await Promise.all([
-			mockToken({ accounts, name: 'Horizon', symbol: 'HZN' }),
-			mockToken({ accounts, synth: 'hUSD', name: 'Horizon USD', symbol: 'hUSD' }),
+		[{ token: hUSDSynth }] = await Promise.all([
+			mockToken({ accounts, synth: 'zUSD', name: 'Horizon USD', symbol: 'zUSD' }),
 		]);
 
 		({
@@ -141,8 +139,7 @@ contract('EtherCollateralsUSD', async accounts => {
 		} = await setupAllContracts({
 			accounts,
 			mocks: {
-				HassethUSD: hUSDSynth,
-				Synthetix: synthetix,
+				ZassetzUSD: hUSDSynth,
 			},
 			contracts: [
 				'FeePool',
@@ -150,6 +147,8 @@ contract('EtherCollateralsUSD', async accounts => {
 				'ExchangeRates',
 				'SystemStatus',
 				'EtherCollateralsUSD',
+				'CollateralManager',
+				'Synthetix',
 			],
 		}));
 
@@ -174,7 +173,7 @@ contract('EtherCollateralsUSD', async accounts => {
 		});
 
 		// Sync feePool with imported mockIssuer
-		await feePool.setResolverAndSyncCache(addressResolver.address, { from: owner });
+		await feePool.rebuildCache();
 	});
 
 	addSnapshotBeforeRestoreAfterEach();
@@ -218,7 +217,7 @@ contract('EtherCollateralsUSD', async accounts => {
 		});
 
 		it('should access its dependencies via the address resolver', async () => {
-			assert.equal(await addressResolver.getAddress(toBytes32('HassethUSD')), hUSDSynth.address);
+			assert.equal(await addressResolver.getAddress(toBytes32('ZassetzUSD')), hUSDSynth.address);
 			assert.equal(await addressResolver.getAddress(toBytes32('FeePool')), feePool.address);
 			assert.equal(
 				await addressResolver.getAddress(toBytes32('ExchangeRates')),
@@ -1408,7 +1407,7 @@ contract('EtherCollateralsUSD', async accounts => {
 		it('when bob attempts to liquidate alices loan and he has no hUSD then it reverts', async () => {
 			await assert.revert(
 				etherCollateral.liquidateUnclosedLoan(alice, loanID, { from: bob }),
-				'You do not have the required Hasset balance to close this loan.'
+				'You do not have the required Zasset balance to close this loan.'
 			);
 		});
 		it('when alice create a loan then it reverts', async () => {
@@ -1723,7 +1722,7 @@ contract('EtherCollateralsUSD', async accounts => {
 			hUSDSynth.transfer(bob, await hUSDSynth.balanceOf(alice), { from: alice });
 			await assert.revert(
 				etherCollateral.repayLoan(alice, loanID, openLoanAmount, { from: alice }),
-				'Not enough hUSD balance'
+				'Not enough zUSD balance'
 			);
 		});
 

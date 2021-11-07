@@ -11,7 +11,7 @@ import "./SafeDecimalMath.sol";
 
 
 // https://docs.synthetix.io/contracts/source/contracts/systemsettings
-contract SystemSettings is Owned, MixinResolver, MixinSystemSettings, ISystemSettings {
+contract SystemSettings is Owned, MixinSystemSettings, ISystemSettings {
     using SafeMath for uint;
     using SafeDecimalMath for uint;
 
@@ -39,14 +39,10 @@ contract SystemSettings is Owned, MixinResolver, MixinSystemSettings, ISystemSet
     // Minimum Stake time may not exceed 1 weeks.
     uint public constant MAX_MINIMUM_STAKE_TIME = 1 weeks;
 
-    bytes32[24] private addressesToCache = [bytes32(0)];
+    uint public constant MAX_CROSS_DOMAIN_GAS_LIMIT = 8e6;
+    uint public constant MIN_CROSS_DOMAIN_GAS_LIMIT = 3e6;
 
-    constructor(address _owner, address _resolver)
-        public
-        Owned(_owner)
-        MixinResolver(_resolver, addressesToCache)
-        MixinSystemSettings()
-    {}
+    constructor(address _owner, address _resolver) public Owned(_owner) MixinSystemSettings(_resolver) {}
 
     // ========== VIEWS ==========
 
@@ -129,7 +125,28 @@ contract SystemSettings is Owned, MixinResolver, MixinSystemSettings, ISystemSet
         return getTradingRewardsEnabled();
     }
 
+    function crossDomainMessageGasLimit(CrossDomainMessageGasLimits gasLimitType) external view returns (uint) {
+        return getCrossDomainMessageGasLimit(gasLimitType);
+    }
+
     // ========== RESTRICTED ==========
+
+    function setCrossDomainMessageGasLimit(CrossDomainMessageGasLimits _gasLimitType, uint _crossDomainMessageGasLimit)
+        external
+        onlyOwner
+    {
+        require(
+            _crossDomainMessageGasLimit >= MIN_CROSS_DOMAIN_GAS_LIMIT &&
+                _crossDomainMessageGasLimit <= MAX_CROSS_DOMAIN_GAS_LIMIT,
+            "Out of range xDomain gasLimit"
+        );
+        flexibleStorage().setUIntValue(
+            SETTING_CONTRACT_NAME,
+            _getGasLimitSetting(_gasLimitType),
+            _crossDomainMessageGasLimit
+        );
+        emit CrossDomainMessageGasLimitChanged(_gasLimitType, _crossDomainMessageGasLimit);
+    }
 
     function setTradingRewardsEnabled(bool _tradingRewardsEnabled) external onlyOwner {
         flexibleStorage().setBoolValue(SETTING_CONTRACT_NAME, SETTING_TRADING_REWARDS_ENABLED, _tradingRewardsEnabled);
@@ -250,6 +267,7 @@ contract SystemSettings is Owned, MixinResolver, MixinSystemSettings, ISystemSet
     }
 
     // ========== EVENTS ==========
+    event CrossDomainMessageGasLimitChanged(CrossDomainMessageGasLimits gasLimitType, uint newLimit);
     event TradingRewardsEnabled(bool enabled);
     event WaitingPeriodSecsUpdated(uint waitingPeriodSecs);
     event PriceDeviationThresholdUpdated(uint threshold);

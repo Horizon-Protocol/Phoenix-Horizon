@@ -14,6 +14,8 @@ const {
 	simulateExchangeRates,
 	takeDebtSnapshot,
 	mockOptimismBridge,
+	avoidStaleRates,
+	resumeSystem,
 } = require('./utils');
 const { toBytes32 } = require('../..');
 
@@ -34,9 +36,12 @@ contract('ExchangeRates (prod tests)', accounts => {
 
 		deploymentPath = config.deploymentPath || getPathToNetwork(network);
 
+		await avoidStaleRates({ network, deploymentPath });
+		await takeDebtSnapshot({ network, deploymentPath });
+		await resumeSystem({ owner, network, deploymentPath });
+
 		if (config.patchFreshDeployment) {
 			await simulateExchangeRates({ network, deploymentPath });
-			await takeDebtSnapshot({ network, deploymentPath });
 			await mockOptimismBridge({ network, deploymentPath });
 		}
 
@@ -78,15 +83,15 @@ contract('ExchangeRates (prod tests)', accounts => {
 		it('has the expected resolver set', async () => {
 			assert.equal(await ExchangeRates.resolver(), ReadProxyAddressResolver.address);
 		});
-
-		it('has the expected owner set', async () => {
-			assert.equal(await ExchangeRates.owner(), owner);
-		});
 	});
 
 	describe('when an exchange is made', () => {
 		let waitingPeriod;
-		before(async () => {
+		before(async function() {
+			if (config.useOvm) {
+				this.skip();
+			}
+
 			await exchangeSynths({
 				network,
 				deploymentPath,
@@ -97,6 +102,7 @@ contract('ExchangeRates (prod tests)', accounts => {
 			});
 			waitingPeriod = Number(await SystemSettings.waitingPeriodSecs());
 		});
+
 		it('should settle', async () => {
 			await fastForward(waitingPeriod);
 			await Exchanger.settle(user, toBytes32('hBNB'), { from: user });

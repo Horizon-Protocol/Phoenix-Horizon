@@ -2,6 +2,8 @@
 
 const { artifacts, contract } = require('@nomiclabs/buidler');
 
+const { smockit } = require('@eth-optimism/smock');
+
 const { assert } = require('./common');
 
 const {
@@ -55,6 +57,23 @@ contract('AddressResolver', accounts => {
 					['first', 'second', 'third'].map(toBytes32),
 					[account1, account2, account3],
 					{ from: owner }
+				);
+			});
+			it('then it can verify the imported set of addresses', async () => {
+				assert.equal(
+					await resolver.areAddressesImported(['first', 'second', 'third'].map(toBytes32), [
+						account1,
+						account2,
+						account3,
+					]),
+					true
+				);
+				assert.equal(
+					await resolver.areAddressesImported(
+						['first', 'second', 'third'].map(toBytes32),
+						[account1, account3, account2] // Reversed
+					),
+					false
 				);
 			});
 			it('then each can be looked up in turn', async () => {
@@ -124,6 +143,32 @@ contract('AddressResolver', accounts => {
 		});
 	});
 
+	describe('rebuildCaches()', () => {
+		describe('when some MixinResolver contracts exist', () => {
+			let MixinResolver1;
+
+			beforeEach('smock some MixinResolver contracts', async () => {
+				MixinResolver1 = await smockit(artifacts.require('TestableMixinResolver').abi);
+			});
+
+			describe('when some of these contracts are imported and caches are rebuilt', () => {
+				beforeEach('import contracts and rebuild caches', async () => {
+					await resolver.importAddresses(
+						['Example_1', 'Example_2', 'Example_3'].map(toBytes32),
+						[MixinResolver1.address, MixinResolver1.address, MixinResolver1.address],
+						{ from: owner }
+					);
+
+					await resolver.rebuildCaches([MixinResolver1.address, MixinResolver1.address]);
+				});
+
+				it('shows that rebuildCache() was called on imported addresses', async () => {
+					assert.equal(MixinResolver1.smocked.rebuildCache.calls.length, 2);
+				});
+			});
+		});
+	});
+
 	describe('getSynth()', () => {
 		describe('when a mock for Issuer is added', () => {
 			let mock;
@@ -149,21 +194,21 @@ contract('AddressResolver', accounts => {
 			});
 		});
 		describe('when a Synthetix is created with a few added synths', () => {
-			let sETHContract;
-			let sUSDContract;
+			let zETHContract;
+			let zUSDContract;
 			beforeEach(async () => {
-				({ HassethBNB: sETHContract, HassethUSD: sUSDContract } = await setupAllContracts({
+				({ ZassetzBNB: zETHContract, ZassetzUSD: zUSDContract } = await setupAllContracts({
 					accounts,
 					existing: {
 						AddressResolver: resolver,
 					},
-					synths: ['hUSD', 'hBNB', 'hEUR', 'hAUD'],
+					synths: ['zUSD', 'zBNB', 'zEUR', 'zAUD'],
 					contracts: ['Synthetix'],
 				}));
 			});
 			it('when getSynth() is invoked with these synth keys, they are returned correctly', async () => {
-				assert.equal(await resolver.getSynth(toBytes32('hUSD')), sUSDContract.address);
-				assert.equal(await resolver.getSynth(toBytes32('hBNB')), sETHContract.address);
+				assert.equal(await resolver.getSynth(toBytes32('zUSD')), zUSDContract.address);
+				assert.equal(await resolver.getSynth(toBytes32('zBNB')), zETHContract.address);
 			});
 		});
 	});
