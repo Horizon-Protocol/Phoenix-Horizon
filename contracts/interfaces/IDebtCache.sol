@@ -1,9 +1,6 @@
 pragma solidity >=0.4.24;
 
-import "../interfaces/ISynth.sol";
 
-
-// https://docs.synthetix.io/contracts/source/interfaces/idebtcache
 interface IDebtCache {
     // Views
 
@@ -20,9 +17,15 @@ interface IDebtCache {
     function currentSynthDebts(bytes32[] calldata currencyKeys)
         external
         view
-        returns (uint[] memory debtValues, bool anyRateIsInvalid);
+        returns (
+            uint[] memory debtValues,
+            uint excludedDebt,
+            bool anyRateIsInvalid
+        );
 
     function cachedSynthDebts(bytes32[] calldata currencyKeys) external view returns (uint[] memory debtValues);
+
+    function totalNonSnxBackedDebt() external view returns (uint excludedDebt, bool isInvalid);
 
     function currentDebt() external view returns (uint debt, bool anyRateIsInvalid);
 
@@ -38,7 +41,15 @@ interface IDebtCache {
 
     // Mutative functions
 
-    function takeDebtSnapshot() external;
-
     function updateCachedSynthDebts(bytes32[] calldata currencyKeys) external;
+
+    function updateCachedSynthDebtWithRate(bytes32 currencyKey, uint currencyRate) external;
+
+    function updateCachedSynthDebtsWithRates(bytes32[] calldata currencyKeys, uint[] calldata currencyRates) external;
+
+    function updateDebtCacheValidity(bool currentlyInvalid) external;
+
+    function purgeCachedSynthDebt(bytes32 currencyKey) external;
+
+    function takeDebtSnapshot() external;
 }
