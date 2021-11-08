@@ -1,9 +1,7 @@
 'use strict';
 
-const { artifacts, contract } = require('@nomiclabs/buidler');
-
+const { artifacts, contract } = require('hardhat');
 const { smockit } = require('@eth-optimism/smock');
-
 const { assert } = require('./common');
 
 const {
@@ -189,7 +187,7 @@ contract('AddressResolver', accounts => {
 			});
 
 			it('when getSynth() is invoked', async () => {
-				const synth = await resolver.getSynth(toBytes32('hUSD'));
+				const synth = await resolver.getSynth(toBytes32('zUSD'));
 				assert.equal(synth, account4);
 			});
 		});
@@ -197,18 +195,18 @@ contract('AddressResolver', accounts => {
 			let zETHContract;
 			let zUSDContract;
 			beforeEach(async () => {
-				({ ZassetzBNB: zETHContract, ZassetzUSD: zUSDContract } = await setupAllContracts({
+				({ ZassetzETH: zETHContract, ZassetzUSD: zUSDContract } = await setupAllContracts({
 					accounts,
 					existing: {
 						AddressResolver: resolver,
 					},
-					synths: ['zUSD', 'zBNB', 'zEUR', 'zAUD'],
+					synths: ['zUSD', 'zETH', 'zEUR', 'zAUD'],
 					contracts: ['Synthetix'],
 				}));
 			});
 			it('when getSynth() is invoked with these synth keys, they are returned correctly', async () => {
 				assert.equal(await resolver.getSynth(toBytes32('zUSD')), zUSDContract.address);
-				assert.equal(await resolver.getSynth(toBytes32('zBNB')), zETHContract.address);
+				assert.equal(await resolver.getSynth(toBytes32('zETH')), zETHContract.address);
 			});
 		});
 	});
