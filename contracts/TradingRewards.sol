@@ -6,7 +6,6 @@ import "./MixinResolver.sol";
 import "./Owned.sol";
 
 // External dependencies.
-import "openzeppelin-solidity-2.3.0/contracts/token/ERC20/ERC20Detailed.sol";
 import "openzeppelin-solidity-2.3.0/contracts/token/ERC20/SafeERC20.sol";
 import "openzeppelin-solidity-2.3.0/contracts/utils/ReentrancyGuard.sol";
 
@@ -16,7 +15,6 @@ import "./SafeDecimalMath.sol";
 // Internal references.
 import "./interfaces/ITradingRewards.sol";
 import "./interfaces/IExchanger.sol";
-
 
 // https://docs.synthetix.io/contracts/source/contracts/tradingrewards
 contract TradingRewards is ITradingRewards, ReentrancyGuard, Owned, Pausable, MixinResolver {

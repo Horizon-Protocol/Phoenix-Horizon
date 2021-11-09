@@ -9,7 +9,6 @@ import "./SafeDecimalMath.sol";
 // Internal References
 import "./interfaces/IExchangeRates.sol";
 
-
 // https://docs.synthetix.io/contracts/source/contracts/purgeablesynth
 contract PurgeableSynth is Synth {
     using SafeDecimalMath for uint;
@@ -63,7 +62,7 @@ contract PurgeableSynth is Synth {
             uint amountHeld = tokenState.balanceOf(holder);
 
             if (amountHeld > 0) {
-                exchanger().exchange(holder, currencyKey, amountHeld, "zUSD", holder);
+                exchanger().exchange(holder, holder, currencyKey, amountHeld, "zUSD", holder, false, address(0), bytes32(0));
                 emitPurged(holder, amountHeld);
             }
         }

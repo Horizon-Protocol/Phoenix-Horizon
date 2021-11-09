@@ -24,14 +24,15 @@ import "./interfaces/ISynthetixState.sol";
 import "./interfaces/IRewardEscrowV2.sol";
 import "./interfaces/IDelegateApprovals.sol";
 import "./interfaces/IRewardsDistribution.sol";
-import "./interfaces/IEtherCollateralsUSD.sol";
 import "./interfaces/ICollateralManager.sol";
-
+import "./interfaces/IEtherWrapper.sol";
 
 // https://docs.synthetix.io/contracts/source/contracts/feepool
 contract FeePool is Owned, Proxyable, LimitedSetup, MixinSystemSettings, IFeePool {
     using SafeMath for uint;
     using SafeDecimalMath for uint;
+
+    bytes32 public constant CONTRACT_NAME = "FeePool";
 
     // Where fees are pooled in zUSD.
     address public constant FEE_ADDRESS = 0xfeEFEEfeefEeFeefEEFEEfEeFeefEEFeeFEEFEeF;
@@ -71,9 +72,9 @@ contract FeePool is Owned, Proxyable, LimitedSetup, MixinSystemSettings, IFeePoo
     bytes32 private constant CONTRACT_SYNTHETIXSTATE = "SynthetixState";
     bytes32 private constant CONTRACT_REWARDESCROW_V2 = "RewardEscrowV2";
     bytes32 private constant CONTRACT_DELEGATEAPPROVALS = "DelegateApprovals";
-    bytes32 private constant CONTRACT_ETH_COLLATERAL_SUSD = "EtherCollateralsUSD";
     bytes32 private constant CONTRACT_COLLATERALMANAGER = "CollateralManager";
     bytes32 private constant CONTRACT_REWARDSDISTRIBUTION = "RewardsDistribution";
+    bytes32 private constant CONTRACT_ETHER_WRAPPER = "EtherWrapper";
 
     /* ========== ETERNAL STORAGE CONSTANTS ========== */
 
@@ -102,9 +103,9 @@ contract FeePool is Owned, Proxyable, LimitedSetup, MixinSystemSettings, IFeePoo
         newAddresses[6] = CONTRACT_SYNTHETIXSTATE;
         newAddresses[7] = CONTRACT_REWARDESCROW_V2;
         newAddresses[8] = CONTRACT_DELEGATEAPPROVALS;
-        newAddresses[9] = CONTRACT_ETH_COLLATERAL_SUSD;
-        newAddresses[10] = CONTRACT_REWARDSDISTRIBUTION;
-        newAddresses[11] = CONTRACT_COLLATERALMANAGER;
+        newAddresses[9] = CONTRACT_REWARDSDISTRIBUTION;
+        newAddresses[10] = CONTRACT_COLLATERALMANAGER;
+        newAddresses[11] = CONTRACT_ETHER_WRAPPER;
         addresses = combineArrays(existingAddresses, newAddresses);
     }
 
@@ -126,10 +127,6 @@ contract FeePool is Owned, Proxyable, LimitedSetup, MixinSystemSettings, IFeePoo
 
     function exchanger() internal view returns (IExchanger) {
         return IExchanger(requireAndGetAddress(CONTRACT_EXCHANGER));
-    }
-
-    function etherCollateralsUSD() internal view returns (IEtherCollateralsUSD) {
-        return IEtherCollateralsUSD(requireAndGetAddress(CONTRACT_ETH_COLLATERAL_SUSD));
     }
 
     function collateralManager() internal view returns (ICollateralManager) {
@@ -154,6 +151,10 @@ contract FeePool is Owned, Proxyable, LimitedSetup, MixinSystemSettings, IFeePoo
 
     function rewardsDistribution() internal view returns (IRewardsDistribution) {
         return IRewardsDistribution(requireAndGetAddress(CONTRACT_REWARDSDISTRIBUTION));
+    }
+
+    function etherWrapper() internal view returns (IEtherWrapper) {
+        return IEtherWrapper(requireAndGetAddress(CONTRACT_ETHER_WRAPPER));
     }
 
     function issuanceRatio() external view returns (uint) {
@@ -211,7 +212,7 @@ contract FeePool is Owned, Proxyable, LimitedSetup, MixinSystemSettings, IFeePoo
         address account,
         uint debtRatio,
         uint debtEntryIndex
-    ) external onlyIssuer {
+    ) external onlyIssuerAndSynthetixState {
         feePoolState().appendAccountIssuanceRecord(
             account,
             debtRatio,
@@ -247,6 +248,8 @@ contract FeePool is Owned, Proxyable, LimitedSetup, MixinSystemSettings, IFeePoo
     function closeCurrentFeePeriod() external issuanceActive {
         require(getFeePeriodDuration() > 0, "Fee Period Duration not set");
         require(_recentFeePeriodsStorage(0).startTime <= (now - getFeePeriodDuration()), "Too early to close fee period");
+
+        etherWrapper().distributeFees();
 
         // Note:  when FEE_PERIOD_LENGTH = 2, periodClosing is the current period & periodToRollover is the last open claimable period
         FeePeriod storage periodClosing = _recentFeePeriodsStorage(FEE_PERIOD_LENGTH - 2);
@@ -424,9 +427,8 @@ contract FeePool is Owned, Proxyable, LimitedSetup, MixinSystemSettings, IFeePoo
         // until we've exhausted the amount.
         // The condition checks for overflow because we're going to 0 with an unsigned int.
         for (uint i = FEE_PERIOD_LENGTH - 1; i < FEE_PERIOD_LENGTH; i--) {
-            uint toDistribute = _recentFeePeriodsStorage(i).rewardsToDistribute.sub(
-                _recentFeePeriodsStorage(i).rewardsClaimed
-            );
+            uint toDistribute =
+                _recentFeePeriodsStorage(i).rewardsToDistribute.sub(_recentFeePeriodsStorage(i).rewardsClaimed);
 
             if (toDistribute > 0) {
                 // Take the smaller of the amount left to claim in the period and the amount we need to allocate
@@ -649,9 +651,8 @@ contract FeePool is Owned, Proxyable, LimitedSetup, MixinSystemSettings, IFeePoo
         // This is a high precision integer.
         uint feesFromPeriod = _recentFeePeriodsStorage(period).feesToDistribute.multiplyDecimal(debtOwnershipForPeriod);
 
-        uint rewardsFromPeriod = _recentFeePeriodsStorage(period).rewardsToDistribute.multiplyDecimal(
-            debtOwnershipForPeriod
-        );
+        uint rewardsFromPeriod =
+            _recentFeePeriodsStorage(period).rewardsToDistribute.multiplyDecimal(debtOwnershipForPeriod);
 
         return (feesFromPeriod.preciseDecimalToDecimal(), rewardsFromPeriod.preciseDecimalToDecimal());
     }
@@ -664,10 +665,11 @@ contract FeePool is Owned, Proxyable, LimitedSetup, MixinSystemSettings, IFeePoo
         // Figure out their global debt percentage delta at end of fee Period.
         // This is a high precision integer.
         ISynthetixState _synthetixState = synthetixState();
-        uint feePeriodDebtOwnership = _synthetixState
-            .debtLedger(closingDebtIndex)
-            .divideDecimalRoundPrecise(_synthetixState.debtLedger(debtEntryIndex))
-            .multiplyDecimalRoundPrecise(ownershipPercentage);
+        uint feePeriodDebtOwnership =
+            _synthetixState
+                .debtLedger(closingDebtIndex)
+                .divideDecimalRoundPrecise(_synthetixState.debtLedger(debtEntryIndex))
+                .multiplyDecimalRoundPrecise(ownershipPercentage);
 
         return feePeriodDebtOwnership;
     }
@@ -721,15 +723,16 @@ contract FeePool is Owned, Proxyable, LimitedSetup, MixinSystemSettings, IFeePoo
     modifier onlyInternalContracts {
         bool isExchanger = msg.sender == address(exchanger());
         bool isSynth = issuer().synthsByAddress(msg.sender) != bytes32(0);
-        bool isEtherCollateralsUSD = msg.sender == address(etherCollateralsUSD());
         bool isCollateral = collateralManager().hasCollateral(msg.sender);
-
-        require(isExchanger || isSynth || isEtherCollateralsUSD || isCollateral, "Only Internal Contracts");
+        bool isEtherWrapper = msg.sender == address(etherWrapper());
+        require(isExchanger || isSynth || isCollateral || isEtherWrapper, "Only Internal Contracts");
         _;
     }
 
-    modifier onlyIssuer {
-        require(msg.sender == address(issuer()), "FeePool: Only Issuer Authorised");
+    modifier onlyIssuerAndSynthetixState {
+        bool isIssuer = msg.sender == address(issuer());
+        bool isSynthetixState = msg.sender == address(synthetixState());
+        require(isIssuer || isSynthetixState, "Issuer and SynthetixState only");
         _;
     }
 
@@ -751,9 +754,8 @@ contract FeePool is Owned, Proxyable, LimitedSetup, MixinSystemSettings, IFeePoo
         uint debtEntryIndex,
         uint feePeriodStartingDebtIndex
     );
-    bytes32 private constant ISSUANCEDEBTRATIOENTRY_SIG = keccak256(
-        "IssuanceDebtRatioEntry(address,uint256,uint256,uint256)"
-    );
+    bytes32 private constant ISSUANCEDEBTRATIOENTRY_SIG =
+        keccak256("IssuanceDebtRatioEntry(address,uint256,uint256,uint256)");
 
     function emitIssuanceDebtRatioEntry(
         address account,

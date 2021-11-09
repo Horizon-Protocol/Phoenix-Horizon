@@ -11,6 +11,7 @@ import "./SafeDecimalMath.sol";
 
 // Internal references
 import "./interfaces/ISystemStatus.sol";
+import "./interfaces/IERC20.sol";
 import "./interfaces/IExchangeState.sol";
 import "./interfaces/IExchangeRates.sol";
 import "./interfaces/ISynthetix.sol";
@@ -18,21 +19,16 @@ import "./interfaces/IFeePool.sol";
 import "./interfaces/IDelegateApprovals.sol";
 import "./interfaces/IIssuer.sol";
 import "./interfaces/ITradingRewards.sol";
-import "./interfaces/IDebtCache.sol";
 import "./interfaces/IVirtualSynth.sol";
 import "./Proxyable.sol";
-
-// Note: use OZ's IERC20 here as using ours will complain about conflicting names
-// during the build (VirtualSynth has IERC20 from the OZ ERC20 implementation)
-import "openzeppelin-solidity-2.3.0/contracts/token/ERC20/IERC20.sol";
-
 
 // Used to have strongly-typed access to internal mutative functions in Synthetix
 interface ISynthetixInternal {
     function emitExchangeTracking(
         bytes32 trackingCode,
         bytes32 toCurrencyKey,
-        uint256 toAmount
+        uint256 toAmount,
+        uint256 fee
     ) external;
 
     function emitSynthExchange(
@@ -57,13 +53,11 @@ interface ISynthetixInternal {
     ) external;
 }
 
-
 interface IExchangerInternalDebtCache {
     function updateCachedSynthDebtsWithRates(bytes32[] calldata currencyKeys, uint[] calldata currencyRates) external;
 
     function updateCachedSynthDebts(bytes32[] calldata currencyKeys) external;
 }
-
 
 // https://docs.synthetix.io/contracts/source/contracts/exchanger
 contract Exchanger is Owned, MixinSystemSettings, IExchanger {
@@ -80,6 +74,8 @@ contract Exchanger is Owned, MixinSystemSettings, IExchanger {
         uint destRoundIdAtPeriodEnd;
         uint timestamp;
     }
+
+    bytes32 public constant CONTRACT_NAME = "Exchanger";
 
     bytes32 private constant zUSD = "zUSD";
 
@@ -209,13 +205,14 @@ contract Exchanger is Owned, MixinSystemSettings, IExchanger {
             (uint srcRoundIdAtPeriodEnd, uint destRoundIdAtPeriodEnd) = getRoundIdsAtPeriodEnd(exchangeEntry);
 
             // given these round ids, determine what effective value they should have received
-            uint destinationAmount = exchangeRates().effectiveValueAtRound(
-                exchangeEntry.src,
-                exchangeEntry.amount,
-                exchangeEntry.dest,
-                srcRoundIdAtPeriodEnd,
-                destRoundIdAtPeriodEnd
-            );
+            uint destinationAmount =
+                exchangeRates().effectiveValueAtRound(
+                    exchangeEntry.src,
+                    exchangeEntry.amount,
+                    exchangeEntry.dest,
+                    srcRoundIdAtPeriodEnd,
+                    destRoundIdAtPeriodEnd
+                );
 
             // and deduct the fee from this amount using the exchangeFeeRate from storage
             uint amountShouldHaveReceived = _getAmountReceivedForExchange(destinationAmount, exchangeEntry.exchangeFeeRate);
@@ -318,133 +315,41 @@ contract Exchanger is Owned, MixinSystemSettings, IExchanger {
 
     /* ========== MUTATIVE FUNCTIONS ========== */
     function exchange(
-        address from,
-        bytes32 sourceCurrencyKey,
-        uint sourceAmount,
-        bytes32 destinationCurrencyKey,
-        address destinationAddress
-    ) external onlySynthetixorSynth returns (uint amountReceived) {
-        uint fee;
-        (amountReceived, fee, ) = _exchange(
-            from,
-            sourceCurrencyKey,
-            sourceAmount,
-            destinationCurrencyKey,
-            destinationAddress,
-            false
-        );
-
-        _processTradingRewards(fee, destinationAddress);
-    }
-
-    function exchangeOnBehalf(
-        address exchangeForAddress,
-        address from,
-        bytes32 sourceCurrencyKey,
-        uint sourceAmount,
-        bytes32 destinationCurrencyKey
-    ) external onlySynthetixorSynth returns (uint amountReceived) {
-        require(delegateApprovals().canExchangeFor(exchangeForAddress, from), "Not approved to act on behalf");
-
-        uint fee;
-        (amountReceived, fee, ) = _exchange(
-            exchangeForAddress,
-            sourceCurrencyKey,
-            sourceAmount,
-            destinationCurrencyKey,
-            exchangeForAddress,
-            false
-        );
-
-        _processTradingRewards(fee, exchangeForAddress);
-    }
-
-    function exchangeWithTracking(
-        address from,
-        bytes32 sourceCurrencyKey,
-        uint sourceAmount,
-        bytes32 destinationCurrencyKey,
-        address destinationAddress,
-        address originator,
-        bytes32 trackingCode
-    ) external onlySynthetixorSynth returns (uint amountReceived) {
-        uint fee;
-        (amountReceived, fee, ) = _exchange(
-            from,
-            sourceCurrencyKey,
-            sourceAmount,
-            destinationCurrencyKey,
-            destinationAddress,
-            false
-        );
-
-        _processTradingRewards(fee, originator);
-
-        _emitTrackingEvent(trackingCode, destinationCurrencyKey, amountReceived);
-    }
-
-    function exchangeOnBehalfWithTracking(
         address exchangeForAddress,
         address from,
         bytes32 sourceCurrencyKey,
         uint sourceAmount,
         bytes32 destinationCurrencyKey,
-        address originator,
-        bytes32 trackingCode
-    ) external onlySynthetixorSynth returns (uint amountReceived) {
-        require(delegateApprovals().canExchangeFor(exchangeForAddress, from), "Not approved to act on behalf");
-
-        uint fee;
-        (amountReceived, fee, ) = _exchange(
-            exchangeForAddress,
-            sourceCurrencyKey,
-            sourceAmount,
-            destinationCurrencyKey,
-            exchangeForAddress,
-            false
-        );
-
-        _processTradingRewards(fee, originator);
-
-        _emitTrackingEvent(trackingCode, destinationCurrencyKey, amountReceived);
-    }
-
-    function exchangeWithVirtual(
-        address from,
-        bytes32 sourceCurrencyKey,
-        uint sourceAmount,
-        bytes32 destinationCurrencyKey,
         address destinationAddress,
+        bool virtualSynth,
+        address rewardAddress,
         bytes32 trackingCode
     ) external onlySynthetixorSynth returns (uint amountReceived, IVirtualSynth vSynth) {
         uint fee;
+        if (from != exchangeForAddress) {
+            require(delegateApprovals().canExchangeFor(exchangeForAddress, from), "Not approved to act on behalf");
+        }
+
         (amountReceived, fee, vSynth) = _exchange(
-            from,
+            exchangeForAddress,
             sourceCurrencyKey,
             sourceAmount,
             destinationCurrencyKey,
             destinationAddress,
-            true
+            virtualSynth
         );
 
-        _processTradingRewards(fee, destinationAddress);
+        if (fee > 0 && rewardAddress != address(0) && getTradingRewardsEnabled()) {
+            tradingRewards().recordExchangeFeeForAccount(fee, rewardAddress);
+        }
 
         if (trackingCode != bytes32(0)) {
-            _emitTrackingEvent(trackingCode, destinationCurrencyKey, amountReceived);
-        }
-    }
-
-    function _emitTrackingEvent(
-        bytes32 trackingCode,
-        bytes32 toCurrencyKey,
-        uint256 toAmount
-    ) internal {
-        ISynthetixInternal(address(synthetix())).emitExchangeTracking(trackingCode, toCurrencyKey, toAmount);
-    }
-
-    function _processTradingRewards(uint fee, address originator) internal {
-        if (fee > 0 && originator != address(0) && getTradingRewardsEnabled()) {
-            tradingRewards().recordExchangeFeeForAccount(fee, originator);
+            ISynthetixInternal(address(synthetix())).emitExchangeTracking(
+                trackingCode,
+                destinationCurrencyKey,
+                amountReceived,
+                fee
+            );
         }
     }
 
@@ -458,8 +363,8 @@ contract Exchanger is Owned, MixinSystemSettings, IExchanger {
     }
 
     function _updateSNXIssuedDebtOnExchange(bytes32[2] memory currencyKeys, uint[2] memory currencyRates) internal {
-        bool includesZUSD = currencyKeys[0] == zUSD || currencyKeys[1] == zUSD;
-        uint numKeys = includesZUSD ? 2 : 3;
+        bool includesSUSD = currencyKeys[0] == zUSD || currencyKeys[1] == zUSD;
+        uint numKeys = includesSUSD ? 2 : 3;
 
         bytes32[] memory keys = new bytes32[](numKeys);
         keys[0] = currencyKeys[0];
@@ -469,7 +374,7 @@ contract Exchanger is Owned, MixinSystemSettings, IExchanger {
         rates[0] = currencyRates[0];
         rates[1] = currencyRates[1];
 
-        if (!includesZUSD) {
+        if (!includesSUSD) {
             keys[2] = zUSD; // And we'll also update zUSD to account for any fees if it wasn't one of the exchanged currencies
             rates[2] = SafeDecimalMath.unit();
         }
@@ -587,15 +492,18 @@ contract Exchanger is Owned, MixinSystemSettings, IExchanger {
             destinationAddress
         );
 
-        // persist the exchange information for the dest key
-        appendExchange(
-            destinationAddress,
-            sourceCurrencyKey,
-            sourceAmountAfterSettlement,
-            destinationCurrencyKey,
-            amountReceived,
-            exchangeFeeRate
-        );
+        // iff the waiting period is gt 0
+        if (getWaitingPeriodSecs() > 0) {
+            // persist the exchange information for the dest key
+            appendExchange(
+                destinationAddress,
+                sourceCurrencyKey,
+                sourceAmountAfterSettlement,
+                destinationCurrencyKey,
+                amountReceived,
+                exchangeFeeRate
+            );
+        }
     }
 
     function _convert(
@@ -646,8 +554,8 @@ contract Exchanger is Owned, MixinSystemSettings, IExchanger {
 
     function suspendSynthWithInvalidRate(bytes32 currencyKey) external {
         systemStatus().requireSystemActive();
-        require(issuer().synths(currencyKey) != ISynth(0), "No such zasset");
-        require(_isSynthRateInvalid(currencyKey, exchangeRates().rateForCurrency(currencyKey)), "Zasset price is valid");
+        require(issuer().synths(currencyKey) != ISynth(0), "No such synth");
+        require(_isSynthRateInvalid(currencyKey, exchangeRates().rateForCurrency(currencyKey)), "Synth price is valid");
         systemStatus().suspendSynth(currencyKey, CIRCUIT_BREAKER_SUSPENSION_REASON);
     }
 
@@ -657,6 +565,17 @@ contract Exchanger is Owned, MixinSystemSettings, IExchanger {
         lastExchangeRate[currencyKey] = rate;
     }
 
+    // SIP-139
+    function resetLastExchangeRate(bytes32[] calldata currencyKeys) external onlyOwner {
+        (uint[] memory rates, bool anyRateInvalid) = exchangeRates().ratesAndInvalidForCurrencies(currencyKeys);
+
+        require(!anyRateInvalid, "Rates for given synths not valid");
+
+        for (uint i = 0; i < currencyKeys.length; i++) {
+            lastExchangeRate[currencyKeys[i]] = rates[i];
+        }
+    }
+
     /* ========== INTERNAL FUNCTIONS ========== */
 
     function _ensureCanExchange(
@@ -664,7 +583,7 @@ contract Exchanger is Owned, MixinSystemSettings, IExchanger {
         uint sourceAmount,
         bytes32 destinationCurrencyKey
     ) internal view {
-        require(sourceCurrencyKey != destinationCurrencyKey, "Can't be same zasset");
+        require(sourceCurrencyKey != destinationCurrencyKey, "Can't be same synth");
         require(sourceAmount > 0, "Zero amount");
 
         bytes32[] memory synthKeys = new bytes32[](2);
@@ -727,12 +646,8 @@ contract Exchanger is Owned, MixinSystemSettings, IExchanger {
     {
         require(maxSecsLeftInWaitingPeriod(from, currencyKey) == 0, "Cannot settle during waiting period");
 
-        (
-            uint reclaimAmount,
-            uint rebateAmount,
-            uint entries,
-            ExchangeEntrySettlement[] memory settlements
-        ) = _settlementOwing(from, currencyKey);
+        (uint reclaimAmount, uint rebateAmount, uint entries, ExchangeEntrySettlement[] memory settlements) =
+            _settlementOwing(from, currencyKey);
 
         if (reclaimAmount > rebateAmount) {
             reclaimed = reclaimAmount.sub(rebateAmount);
@@ -742,7 +657,9 @@ contract Exchanger is Owned, MixinSystemSettings, IExchanger {
             refund(from, currencyKey, refunded);
         }
 
-        if (updateCache) {
+        // by checking a reclaim or refund we also check that the currency key is still a valid synth,
+        // as the deviation check will return 0 if the synth has been removed.
+        if (updateCache && (reclaimed > 0 || refunded > 0)) {
             bytes32[] memory key = new bytes32[](1);
             key[0] = currencyKey;
             debtCache().updateCachedSynthDebts(key);
@@ -820,8 +737,8 @@ contract Exchanger is Owned, MixinSystemSettings, IExchanger {
 
         // Is this a swing trade? long to short or short to long skipping zUSD.
         if (
-            (sourceCurrencyKey[0] == 0x7a && destinationCurrencyKey[0] == 0x69) ||
-            (sourceCurrencyKey[0] == 0x69 && destinationCurrencyKey[0] == 0x7a)
+            (sourceCurrencyKey[0] == 0x73 && destinationCurrencyKey[0] == 0x69) ||
+            (sourceCurrencyKey[0] == 0x69 && destinationCurrencyKey[0] == 0x73)
         ) {
             // Double the exchange fee
             exchangeFeeRate = exchangeFeeRate.mul(2);
@@ -947,7 +864,7 @@ contract Exchanger is Owned, MixinSystemSettings, IExchanger {
         ISynthetix _synthetix = synthetix();
         require(
             msg.sender == address(_synthetix) || _synthetix.synthsByAddress(msg.sender) != bytes32(0),
-            "Exchanger: Only horizon or a zasset contract can perform this action"
+            "Exchanger: Only synthetix or a synth contract can perform this action"
         );
         _;
     }
