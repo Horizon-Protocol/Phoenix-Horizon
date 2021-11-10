@@ -1,17 +1,25 @@
 'use strict';
 
-const { artifacts, contract } = require('@nomiclabs/buidler');
+const { artifacts, contract, web3 } = require('hardhat');
 
 const { assert } = require('./common');
 
-const { onlyGivenAddressCanInvoke, ensureOnlyExpectedMutativeFunctions } = require('./helpers');
+const {
+	ensureOnlyExpectedMutativeFunctions,
+	getEventByName,
+	buildMinimalProxyCode,
+} = require('./helpers');
 
 const { toBytes32 } = require('../..');
 
-const ExchangerWithVirtualSynth = artifacts.require('ExchangerWithVirtualSynth');
+let ExchangerWithVirtualSynth;
 
 contract('ExchangerWithVirtualSynth (unit tests)', async accounts => {
 	const [, owner] = accounts;
+
+	before(async () => {
+		ExchangerWithVirtualSynth = artifacts.require('ExchangerWithVirtualSynth');
+	});
 
 	it('ensure only known functions are mutative', () => {
 		ensureOnlyExpectedMutativeFunctions({
@@ -19,10 +27,7 @@ contract('ExchangerWithVirtualSynth (unit tests)', async accounts => {
 			ignoreParents: ['Owned', 'MixinResolver'],
 			expected: [
 				'exchange',
-				'exchangeOnBehalf',
-				'exchangeOnBehalfWithTracking',
-				'exchangeWithTracking',
-				'exchangeWithVirtual',
+				'resetLastExchangeRate',
 				'settle',
 				'suspendSynthWithInvalidRate',
 				'setLastExchangeRateForSynth',
@@ -30,38 +35,15 @@ contract('ExchangerWithVirtualSynth (unit tests)', async accounts => {
 		});
 	});
 
-	describe('when a contract is instantiated @cov-skip', () => {
+	describe('when a contract is instantiated', () => {
 		// ensure all of the behaviors are bound to "this" for sharing test state
 		const behaviors = require('./ExchangerWithVirtualSynth.behaviors').call(this, { accounts });
 
 		describe('exchanging', () => {
-			describe('exchangeWithVirtual', () => {
+			describe('exchange with virtual synths', () => {
 				describe('failure modes', () => {
-					const args = [owner, toBytes32('zUSD'), '100', toBytes32('zBNB'), owner, toBytes32()];
-
 					behaviors.whenInstantiated({ owner }, () => {
-						// as we aren't calling as Synthetix, we need to mock the check for synths
-						behaviors.whenMockedToAllowChecks(() => {
-							it('it reverts when called by regular accounts', async () => {
-								await onlyGivenAddressCanInvoke({
-									fnc: this.instance.exchangeWithVirtual,
-									args,
-									accounts: accounts.filter(a => a !== this.mocks.Synthetix.address),
-									reason: 'Exchanger: Only horizon or a zasset contract can perform this action',
-									// address: this.mocks.Synthetix.address (doesnt work as this reverts due to lack of mocking setup)
-								});
-							});
-						});
-
 						behaviors.whenMockedWithExchangeRatesValidity({ valid: false }, () => {
-							it('it reverts when either rate is invalid', async () => {
-								await assert.revert(
-									this.instance.exchangeWithVirtual(
-										...args.concat({ from: this.mocks.Synthetix.address })
-									),
-									'Src/dest rate invalid or not found'
-								);
-							});
 							behaviors.whenMockedWithExchangeRatesValidity({ valid: true }, () => {
 								behaviors.whenMockedWithNoPriorExchangesToSettle(() => {
 									behaviors.whenMockedWithUintSystemSetting(
@@ -69,15 +51,18 @@ contract('ExchangerWithVirtualSynth (unit tests)', async accounts => {
 										() => {
 											behaviors.whenMockedEffectiveRateAsEqual(() => {
 												behaviors.whenMockedLastNRates(() => {
-													behaviors.whenMockedASynthToIssueAmdBurn(() => {
+													behaviors.whenMockedASynthToIssueAndBurn(() => {
 														behaviors.whenMockedExchangeStatePersistance(() => {
 															it('it reverts trying to create a virtual synth with no supply', async () => {
 																await assert.revert(
-																	this.instance.exchangeWithVirtual(
+																	this.instance.exchange(
 																		owner,
-																		toBytes32('zUSD'),
+																		owner,
+																		toBytes32('sUSD'),
 																		'0',
-																		toBytes32('zBNB'),
+																		toBytes32('sETH'),
+																		owner,
+																		true,
 																		owner,
 																		toBytes32(),
 																		{ from: this.mocks.Synthetix.address }
@@ -87,16 +72,19 @@ contract('ExchangerWithVirtualSynth (unit tests)', async accounts => {
 															});
 															it('it reverts trying to virtualize into an inverse synth', async () => {
 																await assert.revert(
-																	this.instance.exchangeWithVirtual(
+																	this.instance.exchange(
 																		owner,
-																		toBytes32('zUSD'),
+																		owner,
+																		toBytes32('sUSD'),
 																		'100',
-																		toBytes32('iBNB'),
+																		toBytes32('iETH'),
+																		owner,
+																		true,
 																		owner,
 																		toBytes32(),
 																		{ from: this.mocks.Synthetix.address }
 																	),
-																	'Cannot virtualize this zasset'
+																	'Cannot virtualize this synth'
 																);
 															});
 														});
@@ -119,17 +107,20 @@ contract('ExchangerWithVirtualSynth (unit tests)', async accounts => {
 								() => {
 									behaviors.whenMockedEffectiveRateAsEqual(() => {
 										behaviors.whenMockedLastNRates(() => {
-											behaviors.whenMockedASynthToIssueAmdBurn(() => {
+											behaviors.whenMockedASynthToIssueAndBurn(() => {
 												behaviors.whenMockedExchangeStatePersistance(() => {
 													describe('when invoked', () => {
 														let txn;
 														const amount = '101';
 														beforeEach(async () => {
-															txn = await this.instance.exchangeWithVirtual(
+															txn = await this.instance.exchange(
 																owner,
-																toBytes32('zUSD'),
+																owner,
+																toBytes32('sUSD'),
 																amount,
-																toBytes32('zBNB'),
+																toBytes32('sETH'),
+																owner,
+																true,
 																owner,
 																toBytes32(),
 																{ from: this.mocks.Synthetix.address }
@@ -138,18 +129,19 @@ contract('ExchangerWithVirtualSynth (unit tests)', async accounts => {
 														it('emits a VirtualSynthCreated event with the correct underlying synth and amount', async () => {
 															assert.eventEqual(txn, 'VirtualSynthCreated', {
 																synth: this.mocks.synth.smocked.proxy.will.returnValue,
-																currencyKey: toBytes32('zBNB'),
+																currencyKey: toBytes32('sETH'),
 																amount,
 																recipient: owner,
 															});
 														});
-														describe('when interrogating the Virtual Synths construction params', () => {
+														describe('when interrogating the Virtual Synths', () => {
 															let vSynth;
 															beforeEach(async () => {
-																const { vSynth: vSynthAddress } = txn.logs.find(
-																	({ event }) => event === 'VirtualSynthCreated'
-																).args;
-																vSynth = await artifacts.require('VirtualSynth').at(vSynthAddress);
+																const VirtualSynth = artifacts.require('VirtualSynth');
+																vSynth = await VirtualSynth.at(
+																	getEventByName({ tx: txn, name: 'VirtualSynthCreated' }).args
+																		.vSynth
+																);
 															});
 															it('the vSynth has the correct synth', async () => {
 																assert.equal(
@@ -170,6 +162,13 @@ contract('ExchangerWithVirtualSynth (unit tests)', async accounts => {
 																	vSynth.address
 																);
 																assert.equal(this.mocks.synth.smocked.issue.calls[0][1], amount);
+															});
+															it('the vSynth is an ERC-1167 minimal proxy instead of a full Virtual Synth', async () => {
+																const vSynthCode = await web3.eth.getCode(vSynth.address);
+																assert.equal(
+																	vSynthCode,
+																	buildMinimalProxyCode(this.mocks.VirtualSynthMastercopy.address)
+																);
 															});
 														});
 													});

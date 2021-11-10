@@ -1,4 +1,4 @@
-const { contract, web3 } = require('@nomiclabs/buidler');
+const { contract, web3 } = require('hardhat');
 const { toBN } = web3.utils;
 const { assert, addSnapshotBeforeRestoreAfter } = require('./common');
 const { setupAllContracts } = require('./setup');
@@ -88,6 +88,7 @@ contract('TradingRewards', accounts => {
 					'AddressResolver',
 					'ExchangeRates',
 					'SystemSettings',
+					'CollateralManager',
 				],
 			}));
 		});
@@ -277,7 +278,7 @@ contract('TradingRewards', accounts => {
 			describe('when executing an exchange with tracking', () => {
 				addSnapshotBeforeRestoreAfter();
 
-				describe('when a valid originator address is passed', () => {
+				describe('when a valid reward address is passed', () => {
 					before('execute exchange with tracking', async () => {
 						const exchangeTx = await synthetix.exchangeWithTracking(
 							zUSD,
@@ -302,13 +303,13 @@ contract('TradingRewards', accounts => {
 					});
 				});
 
-				describe('when no valid originator address is passed', () => {
+				describe('when no valid reward address is passed', () => {
 					before('execute exchange with tracking', async () => {
 						const exchangeTx = await synthetix.exchangeWithTracking(
 							zUSD,
 							toUnit('100'),
 							zETH,
-							zeroAddress, // No originator = 0x0
+							zeroAddress, // No reward address = 0x0
 							toBytes32('1INCH'),
 							{
 								from: account1,

@@ -1,6 +1,6 @@
 'use strict';
 
-const { contract, web3 } = require('@nomiclabs/buidler');
+const { contract, web3 } = require('hardhat');
 
 const { assert } = require('./common');
 
@@ -15,10 +15,12 @@ const {
 	constants: { ZERO_ADDRESS },
 } = require('../../');
 const BN = require('bn.js');
+const { toBN } = require('web3-utils');
 
 contract('SystemSettings', async accounts => {
 	const [, owner] = accounts;
-	const oneWeek = web3.utils.toBN(7 * 24 * 60 * 60);
+	const oneWeek = toBN(7 * 24 * 60 * 60);
+	const ONE = toBN('1');
 
 	let systemSettings;
 
@@ -49,6 +51,9 @@ contract('SystemSettings', async accounts => {
 				'setTradingRewardsEnabled',
 				'setDebtSnapshotStaleTime',
 				'setCrossDomainMessageGasLimit',
+				'setEtherWrapperMaxETH',
+				'setEtherWrapperMintFeeRate',
+				'setEtherWrapperBurnFeeRate',
 			],
 		});
 	});
@@ -608,14 +613,14 @@ contract('SystemSettings', async accounts => {
 
 	describe('setExchangeFeeRateForSynths()', () => {
 		describe('Given synth exchange fee rates to set', async () => {
-			const [zUSD, zETH, zAUD, zBTC] = ['zUSD', 'zETH', 'zAUD', 'zBTC'].map(toBytes32);
+			const [sUSD, sETH, sAUD, sBTC] = ['sUSD', 'sETH', 'sAUD', 'sBTC'].map(toBytes32);
 			const fxBIPS = toUnit('0.01');
 			const cryptoBIPS = toUnit('0.03');
 
 			it('when a non owner calls then revert', async () => {
 				await onlyGivenAddressCanInvoke({
 					fnc: systemSettings.setExchangeFeeRateForSynths,
-					args: [[zUSD], [toUnit('0.1')]],
+					args: [[sUSD], [toUnit('0.1')]],
 					accounts,
 					address: owner,
 					reason: 'Only the contract owner may perform this action',
@@ -623,7 +628,7 @@ contract('SystemSettings', async accounts => {
 			});
 			it('when input array lengths dont match then revert ', async () => {
 				await assert.revert(
-					systemSettings.setExchangeFeeRateForSynths([zUSD, zAUD], [toUnit('0.1')], {
+					systemSettings.setExchangeFeeRateForSynths([sUSD, sAUD], [toUnit('0.1')], {
 						from: owner,
 					}),
 					'Array lengths dont match'
@@ -631,7 +636,7 @@ contract('SystemSettings', async accounts => {
 			});
 			it('when owner sets an exchange fee rate larger than MAX_EXCHANGE_FEE_RATE then revert', async () => {
 				await assert.revert(
-					systemSettings.setExchangeFeeRateForSynths([zUSD], [toUnit('11')], {
+					systemSettings.setExchangeFeeRateForSynths([sUSD], [toUnit('11')], {
 						from: owner,
 					}),
 					'MAX_EXCHANGE_FEE_RATE exceeded'
@@ -640,47 +645,47 @@ contract('SystemSettings', async accounts => {
 
 			describe('Given new synth exchange fee rates to store', async () => {
 				it('when 1 exchange rate then store it to be readable', async () => {
-					await systemSettings.setExchangeFeeRateForSynths([zUSD], [fxBIPS], {
+					await systemSettings.setExchangeFeeRateForSynths([sUSD], [fxBIPS], {
 						from: owner,
 					});
-					let zUSDRate = await systemSettings.exchangeFeeRate(zUSD);
-					assert.bnEqual(zUSDRate, fxBIPS);
+					let sUSDRate = await systemSettings.exchangeFeeRate(sUSD);
+					assert.bnEqual(sUSDRate, fxBIPS);
 
-					zUSDRate = await systemSettings.exchangeFeeRate(zUSD);
-					assert.bnEqual(zUSDRate, fxBIPS);
+					sUSDRate = await systemSettings.exchangeFeeRate(sUSD);
+					assert.bnEqual(sUSDRate, fxBIPS);
 				});
 				it('when 1 exchange rate then emits update event', async () => {
-					const transaction = await systemSettings.setExchangeFeeRateForSynths([zUSD], [fxBIPS], {
+					const transaction = await systemSettings.setExchangeFeeRateForSynths([sUSD], [fxBIPS], {
 						from: owner,
 					});
 					assert.eventEqual(transaction, 'ExchangeFeeUpdated', {
-						synthKey: zUSD,
+						synthKey: sUSD,
 						newExchangeFeeRate: fxBIPS,
 					});
 				});
 				it('when multiple exchange rates then store them to be readable', async () => {
 					// Store multiple rates
 					await systemSettings.setExchangeFeeRateForSynths(
-						[zUSD, zAUD, zBTC, zETH],
+						[sUSD, sAUD, sBTC, sETH],
 						[fxBIPS, fxBIPS, cryptoBIPS, cryptoBIPS],
 						{
 							from: owner,
 						}
 					);
 					// Read all rates
-					const zAUDRate = await systemSettings.exchangeFeeRate(zAUD);
-					assert.bnEqual(zAUDRate, fxBIPS);
-					const zUSDRate = await systemSettings.exchangeFeeRate(zUSD);
-					assert.bnEqual(zUSDRate, fxBIPS);
-					const zBTCRate = await systemSettings.exchangeFeeRate(zBTC);
-					assert.bnEqual(zBTCRate, cryptoBIPS);
-					const zETHRate = await systemSettings.exchangeFeeRate(zETH);
-					assert.bnEqual(zETHRate, cryptoBIPS);
+					const sAUDRate = await systemSettings.exchangeFeeRate(sAUD);
+					assert.bnEqual(sAUDRate, fxBIPS);
+					const sUSDRate = await systemSettings.exchangeFeeRate(sUSD);
+					assert.bnEqual(sUSDRate, fxBIPS);
+					const sBTCRate = await systemSettings.exchangeFeeRate(sBTC);
+					assert.bnEqual(sBTCRate, cryptoBIPS);
+					const sETHRate = await systemSettings.exchangeFeeRate(sETH);
+					assert.bnEqual(sETHRate, cryptoBIPS);
 				});
 				it('when multiple exchange rates then each update event is emitted', async () => {
 					// Update multiple rates
 					const transaction = await systemSettings.setExchangeFeeRateForSynths(
-						[zUSD, zAUD, zBTC, zETH],
+						[sUSD, sAUD, sBTC, sETH],
 						[fxBIPS, fxBIPS, cryptoBIPS, cryptoBIPS],
 						{
 							from: owner,
@@ -691,22 +696,22 @@ contract('SystemSettings', async accounts => {
 						transaction,
 						'ExchangeFeeUpdated',
 						{
-							synthKey: zUSD,
+							synthKey: sUSD,
 							newExchangeFeeRate: fxBIPS,
 						},
 						'ExchangeFeeUpdated',
 						{
-							synthKey: zAUD,
+							synthKey: sAUD,
 							newExchangeFeeRate: fxBIPS,
 						},
 						'ExchangeFeeUpdated',
 						{
-							synthKey: zBTC,
+							synthKey: sBTC,
 							newExchangeFeeRate: cryptoBIPS,
 						},
 						'ExchangeFeeUpdated',
 						{
-							synthKey: zETH,
+							synthKey: sETH,
 							newExchangeFeeRate: cryptoBIPS,
 						}
 					);
@@ -775,6 +780,103 @@ contract('SystemSettings', async accounts => {
 
 			it('and emits an AggregatorWarningFlagsUpdated event', async () => {
 				assert.eventEqual(txn, 'AggregatorWarningFlagsUpdated', [owner]);
+			});
+		});
+	});
+
+	describe('setEtherWrapperMaxETH()', () => {
+		it('can only be invoked by owner', async () => {
+			await onlyGivenAddressCanInvoke({
+				fnc: systemSettings.setEtherWrapperMaxETH,
+				args: [owner],
+				address: owner,
+				accounts,
+				reason: 'Only the contract owner may perform this action',
+			});
+		});
+
+		describe('when successfully invoked', () => {
+			let txn;
+			const newValue = toUnit('6000');
+			beforeEach(async () => {
+				txn = await systemSettings.setEtherWrapperMaxETH(newValue, { from: owner });
+			});
+			it('then it changes the value as expected', async () => {
+				assert.bnEqual(await systemSettings.etherWrapperMaxETH(), newValue);
+			});
+
+			it('and emits an EtherWrapperMaxETHUpdated event', async () => {
+				assert.eventEqual(txn, 'EtherWrapperMaxETHUpdated', [newValue]);
+			});
+		});
+	});
+
+	describe('setEtherWrapperMintFeeRate()', () => {
+		it('can only be invoked by owner', async () => {
+			await onlyGivenAddressCanInvoke({
+				fnc: systemSettings.setEtherWrapperMintFeeRate,
+				args: [1],
+				address: owner,
+				accounts,
+				reason: 'Only the contract owner may perform this action',
+			});
+		});
+
+		it('should revert if the rate exceeds MAX_ETHER_WRAPPER_MINT_FEE_RATE', async () => {
+			const newValue = (await systemSettings.MAX_ETHER_WRAPPER_MINT_FEE_RATE()).add(ONE);
+			await assert.revert(
+				systemSettings.setEtherWrapperMintFeeRate(newValue, { from: owner }),
+				'rate > MAX_ETHER_WRAPPER_MINT_FEE_RATE'
+			);
+		});
+
+		describe('when successfully invoked', () => {
+			let txn;
+			const newValue = toUnit('0.06');
+			beforeEach(async () => {
+				txn = await systemSettings.setEtherWrapperMintFeeRate(newValue, { from: owner });
+			});
+			it('then it changes the value as expected', async () => {
+				assert.bnEqual(await systemSettings.etherWrapperMintFeeRate(), newValue);
+			});
+
+			it('and emits an EtherWrapperMintFeeRateUpdated event', async () => {
+				assert.eventEqual(txn, 'EtherWrapperMintFeeRateUpdated', [newValue]);
+			});
+		});
+	});
+
+	describe('setEtherWrapperBurnFeeRate()', () => {
+		it('can only be invoked by owner', async () => {
+			await onlyGivenAddressCanInvoke({
+				fnc: systemSettings.setEtherWrapperBurnFeeRate,
+				args: [1],
+				address: owner,
+				accounts,
+				reason: 'Only the contract owner may perform this action',
+			});
+		});
+
+		it('should revert if the rate exceeds MAX_ETHER_WRAPPER_BURN_FEE_RATE', async () => {
+			const newValue = (await systemSettings.MAX_ETHER_WRAPPER_BURN_FEE_RATE()).add(ONE);
+			await assert.revert(
+				systemSettings.setEtherWrapperBurnFeeRate(newValue, { from: owner }),
+				'rate > MAX_ETHER_WRAPPER_BURN_FEE_RATE'
+			);
+		});
+
+		describe('when successfully invoked', () => {
+			let txn;
+			const newValue = toUnit('0.06');
+			beforeEach(async () => {
+				txn = await systemSettings.setEtherWrapperBurnFeeRate(newValue, { from: owner });
+			});
+			it('then it changes the value as expected', async () => {
+				assert.bnEqual(await systemSettings.etherWrapperBurnFeeRate(), newValue);
+			});
+
+			it('and emits an EtherWrapperBurnFeeRateUpdated event', async () => {
+				assert.eventEqual(txn, 'EtherWrapperBurnFeeRateUpdated', [newValue]);
 			});
 		});
 	});
