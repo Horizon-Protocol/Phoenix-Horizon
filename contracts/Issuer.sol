@@ -17,18 +17,17 @@ import "./interfaces/ISynthetixState.sol";
 import "./interfaces/IExchanger.sol";
 import "./interfaces/IDelegateApprovals.sol";
 import "./interfaces/IExchangeRates.sol";
-import "./interfaces/IEtherCollateral.sol";
-import "./interfaces/IEtherCollateralsUSD.sol";
 import "./interfaces/IHasBalance.sol";
 import "./interfaces/IERC20.sol";
 import "./interfaces/ILiquidations.sol";
 import "./interfaces/ICollateralManager.sol";
-import "./interfaces/IDebtCache.sol";
+import "./interfaces/IRewardEscrowV2.sol";
+import "./interfaces/ISynthRedeemer.sol";
+import "./Proxyable.sol";
 
 
-interface IRewardEscrowV2 {
-    // Views
-    function balanceOf(address account) external view returns (uint);
+interface IProxy {
+    function target() external view returns (address);
 }
 
 
@@ -38,6 +37,8 @@ interface IIssuerInternalDebtCache {
     function updateCachedSynthDebtsWithRates(bytes32[] calldata currencyKeys, uint[] calldata currencyRates) external;
 
     function updateDebtCacheValidity(bool currentlyInvalid) external;
+
+    function totalNonSnxBackedDebt() external view returns (uint excludedDebt, bool isInvalid);
 
     function cacheInfo()
         external
@@ -56,6 +57,8 @@ contract Issuer is Owned, MixinSystemSettings, IIssuer {
     using SafeMath for uint;
     using SafeDecimalMath for uint;
 
+    bytes32 public constant CONTRACT_NAME = "Issuer";
+
     // Available Synths which can be used with the system
     ISynth[] public availableSynths;
     mapping(bytes32 => ISynth) public synths;
@@ -69,7 +72,6 @@ contract Issuer is Owned, MixinSystemSettings, IIssuer {
 
     // Flexible storage names
 
-    bytes32 public constant CONTRACT_NAME = "Issuer";
     bytes32 internal constant LAST_ISSUE_EVENT = "lastIssueEvent";
 
     /* ========== ADDRESS RESOLVER CONFIGURATION ========== */
@@ -80,33 +82,31 @@ contract Issuer is Owned, MixinSystemSettings, IIssuer {
     bytes32 private constant CONTRACT_SYNTHETIXSTATE = "SynthetixState";
     bytes32 private constant CONTRACT_FEEPOOL = "FeePool";
     bytes32 private constant CONTRACT_DELEGATEAPPROVALS = "DelegateApprovals";
-    bytes32 private constant CONTRACT_ETHERCOLLATERAL = "EtherCollateral";
-    bytes32 private constant CONTRACT_ETHERCOLLATERAL_SUSD = "EtherCollateralsUSD";
     bytes32 private constant CONTRACT_COLLATERALMANAGER = "CollateralManager";
     bytes32 private constant CONTRACT_REWARDESCROW_V2 = "RewardEscrowV2";
     bytes32 private constant CONTRACT_SYNTHETIXESCROW = "SynthetixEscrow";
     bytes32 private constant CONTRACT_LIQUIDATIONS = "Liquidations";
     bytes32 private constant CONTRACT_DEBTCACHE = "DebtCache";
+    bytes32 private constant CONTRACT_SYNTHREDEEMER = "SynthRedeemer";
 
     constructor(address _owner, address _resolver) public Owned(_owner) MixinSystemSettings(_resolver) {}
 
     /* ========== VIEWS ========== */
     function resolverAddressesRequired() public view returns (bytes32[] memory addresses) {
         bytes32[] memory existingAddresses = MixinSystemSettings.resolverAddressesRequired();
-        bytes32[] memory newAddresses = new bytes32[](13);
+        bytes32[] memory newAddresses = new bytes32[](12);
         newAddresses[0] = CONTRACT_SYNTHETIX;
         newAddresses[1] = CONTRACT_EXCHANGER;
         newAddresses[2] = CONTRACT_EXRATES;
         newAddresses[3] = CONTRACT_SYNTHETIXSTATE;
         newAddresses[4] = CONTRACT_FEEPOOL;
         newAddresses[5] = CONTRACT_DELEGATEAPPROVALS;
-        newAddresses[6] = CONTRACT_ETHERCOLLATERAL;
-        newAddresses[7] = CONTRACT_ETHERCOLLATERAL_SUSD;
-        newAddresses[8] = CONTRACT_REWARDESCROW_V2;
-        newAddresses[9] = CONTRACT_SYNTHETIXESCROW;
-        newAddresses[10] = CONTRACT_LIQUIDATIONS;
-        newAddresses[11] = CONTRACT_DEBTCACHE;
-        newAddresses[12] = CONTRACT_COLLATERALMANAGER;
+        newAddresses[6] = CONTRACT_REWARDESCROW_V2;
+        newAddresses[7] = CONTRACT_SYNTHETIXESCROW;
+        newAddresses[8] = CONTRACT_LIQUIDATIONS;
+        newAddresses[9] = CONTRACT_DEBTCACHE;
+        newAddresses[10] = CONTRACT_COLLATERALMANAGER;
+        newAddresses[11] = CONTRACT_SYNTHREDEEMER;
         return combineArrays(existingAddresses, newAddresses);
     }
 
@@ -138,14 +138,6 @@ contract Issuer is Owned, MixinSystemSettings, IIssuer {
         return IDelegateApprovals(requireAndGetAddress(CONTRACT_DELEGATEAPPROVALS));
     }
 
-    function etherCollateral() internal view returns (IEtherCollateral) {
-        return IEtherCollateral(requireAndGetAddress(CONTRACT_ETHERCOLLATERAL));
-    }
-
-    function etherCollateralsUSD() internal view returns (IEtherCollateralsUSD) {
-        return IEtherCollateralsUSD(requireAndGetAddress(CONTRACT_ETHERCOLLATERAL_SUSD));
-    }
-
     function collateralManager() internal view returns (ICollateralManager) {
         return ICollateralManager(requireAndGetAddress(CONTRACT_COLLATERALMANAGER));
     }
@@ -160,6 +152,10 @@ contract Issuer is Owned, MixinSystemSettings, IIssuer {
 
     function debtCache() internal view returns (IIssuerInternalDebtCache) {
         return IIssuerInternalDebtCache(requireAndGetAddress(CONTRACT_DEBTCACHE));
+    }
+
+    function synthRedeemer() internal view returns (ISynthRedeemer) {
+        return ISynthRedeemer(requireAndGetAddress(CONTRACT_SYNTHREDEEMER));
     }
 
     function issuanceRatio() external view returns (uint) {
@@ -180,6 +176,8 @@ contract Issuer is Owned, MixinSystemSettings, IIssuer {
         return currencyKeys;
     }
 
+    // Returns the total value of the debt pool in currency specified by `currencyKey`.
+    // To return only the HZN-backed debt, set `excludeCollateral` to true.
     function _totalIssuedSynths(bytes32 currencyKey, bool excludeCollateral)
         internal
         view
@@ -192,19 +190,9 @@ contract Issuer is Owned, MixinSystemSettings, IIssuer {
 
         // Add total issued synths from non hzn collateral back into the total if not excluded
         if (!excludeCollateral) {
-            // Get the zUSD equivalent amount of all the MC issued synths.
-            (uint nonSnxDebt, bool invalid) = collateralManager().totalLong();
+            (uint nonSnxDebt, bool invalid) = debtCache().totalNonSnxBackedDebt();
             debt = debt.add(nonSnxDebt);
             anyRateIsInvalid = anyRateIsInvalid || invalid;
-
-            // Now add the ether collateral stuff as we are still supporting it.
-            debt = debt.add(etherCollateralsUSD().totalIssuedSynths());
-
-            // Add ether collateral zBNB
-            (uint ethRate, bool ethRateInvalid) = exRates.rateAndInvalid(zBNB);
-            uint ethIssuedDebt = etherCollateral().totalIssuedSynths().multiplyDecimalRound(ethRate);
-            debt = debt.add(ethIssuedDebt);
-            anyRateIsInvalid = anyRateIsInvalid || ethRateInvalid;
         }
 
         if (currencyKey == zUSD) {
@@ -234,7 +222,7 @@ contract Issuer is Owned, MixinSystemSettings, IIssuer {
 
         // If it's zero, they haven't issued, and they have no debt.
         // Note: it's more gas intensive to put this check here rather than before _totalIssuedSynths
-        // if they have 0 HZN, but it's a necessary trade-off
+        // if they have 0 SNX, but it's a necessary trade-off
         if (initialDebtOwnership == 0) return (0, totalSystemValue, anyRateIsInvalid);
 
         // Figure out the global debt percentage delta from when they entered the system.
@@ -284,18 +272,18 @@ contract Issuer is Owned, MixinSystemSettings, IIssuer {
         }
     }
 
-    function _hznToUSD(uint amount, uint hznRate) internal pure returns (uint) {
-        return amount.multiplyDecimalRound(hznRate);
+    function _snxToUSD(uint amount, uint snxRate) internal pure returns (uint) {
+        return amount.multiplyDecimalRound(snxRate);
     }
 
-    function _usdToHZN(uint amount, uint hznRate) internal pure returns (uint) {
-        return amount.divideDecimalRound(hznRate);
+    function _usdToSnx(uint amount, uint snxRate) internal pure returns (uint) {
+        return amount.divideDecimalRound(snxRate);
     }
 
     function _maxIssuableSynths(address _issuer) internal view returns (uint, bool) {
         // What is the value of their HZN balance in zUSD
-        (uint hznRate, bool isInvalid) = exchangeRates().rateAndInvalid(HZN);
-        uint destinationValue = _hznToUSD(_collateral(_issuer), hznRate);
+        (uint snxRate, bool isInvalid) = exchangeRates().rateAndInvalid(HZN);
+        uint destinationValue = _snxToUSD(_collateral(_issuer), snxRate);
 
         // They're allowed to issue up to issuanceRatio of that value
         return (destinationValue.multiplyDecimal(getIssuanceRatio()), isInvalid);
@@ -306,7 +294,7 @@ contract Issuer is Owned, MixinSystemSettings, IIssuer {
 
         (uint debtBalance, , bool anyRateIsInvalid) = _debtBalanceOfAndTotalDebt(_issuer, HZN);
 
-        // it's more gas intensive to put this check here if they have 0 HZN, but it complies with the interface
+        // it's more gas intensive to put this check here if they have 0 SNX, but it complies with the interface
         if (totalOwnedSynthetix == 0) return (0, anyRateIsInvalid);
 
         return (debtBalance.divideDecimalRound(totalOwnedSynthetix), anyRateIsInvalid);
@@ -346,8 +334,8 @@ contract Issuer is Owned, MixinSystemSettings, IIssuer {
         (, anyRateInvalid) = exchangeRates().ratesAndInvalidForCurrencies(_availableCurrencyKeysWithOptionalSNX(true));
     }
 
-    function totalIssuedSynths(bytes32 currencyKey, bool excludeEtherCollateral) external view returns (uint totalIssued) {
-        (totalIssued, ) = _totalIssuedSynths(currencyKey, excludeEtherCollateral);
+    function totalIssuedSynths(bytes32 currencyKey, bool excludeOtherCollateral) external view returns (uint totalIssued) {
+        (totalIssued, ) = _totalIssuedSynths(currencyKey, excludeOtherCollateral);
     }
 
     function lastIssueEvent(address account) external view returns (uint) {
@@ -439,14 +427,14 @@ contract Issuer is Owned, MixinSystemSettings, IIssuer {
 
     function _addSynth(ISynth synth) internal {
         bytes32 currencyKey = synth.currencyKey();
-        require(synths[currencyKey] == ISynth(0), "Zasset exists");
-        require(synthsByAddress[address(synth)] == bytes32(0), "Zasset address already exists");
+        require(synths[currencyKey] == ISynth(0), "Synth exists");
+        require(synthsByAddress[address(synth)] == bytes32(0), "Synth address already exists");
 
         availableSynths.push(synth);
         synths[currencyKey] = synth;
         synthsByAddress[address(synth)] = currencyKey;
 
-        emit ZassetAdded(currencyKey, address(synth));
+        emit SynthAdded(currencyKey, address(synth));
     }
 
     function addSynth(ISynth synth) external onlyOwner {
@@ -469,9 +457,24 @@ contract Issuer is Owned, MixinSystemSettings, IIssuer {
 
     function _removeSynth(bytes32 currencyKey) internal {
         address synthToRemove = address(synths[currencyKey]);
-        require(synthToRemove != address(0), "Zasset does not exist");
-        require(IERC20(synthToRemove).totalSupply() == 0, "Zasset supply exists");
-        require(currencyKey != zUSD, "Cannot remove zasset");
+        require(synthToRemove != address(0), "Synth does not exist");
+        require(currencyKey != zUSD, "Cannot remove synth");
+
+        uint synthSupply = IERC20(synthToRemove).totalSupply();
+
+        if (synthSupply > 0) {
+            (uint amountOfzUSD, uint rateToRedeem, ) = exchangeRates().effectiveValueAndRates(
+                currencyKey,
+                synthSupply,
+                "zUSD"
+            );
+            require(rateToRedeem > 0, "Cannot remove synth to redeem without rate");
+            ISynthRedeemer _synthRedeemer = synthRedeemer();
+            synths[zUSD].issue(address(_synthRedeemer), amountOfzUSD);
+            // ensure the debt cache is aware of the new zUSD issued
+            debtCache().updateCachedSynthDebtWithRate(zUSD, SafeDecimalMath.unit());
+            _synthRedeemer.deprecate(IERC20(address(Proxyable(address(synthToRemove)).proxy())), rateToRedeem);
+        }
 
         // Remove the synth from the availableSynths array.
         for (uint i = 0; i < availableSynths.length; i++) {
@@ -494,7 +497,7 @@ contract Issuer is Owned, MixinSystemSettings, IIssuer {
         delete synthsByAddress[synthToRemove];
         delete synths[currencyKey];
 
-        emit ZassetRemoved(currencyKey, synthToRemove);
+        emit SynthRemoved(currencyKey, synthToRemove);
     }
 
     function removeSynth(bytes32 currencyKey) external onlyOwner {
@@ -566,6 +569,14 @@ contract Issuer is Owned, MixinSystemSettings, IIssuer {
         _voluntaryBurnSynths(burnForAddress, 0, true);
     }
 
+    function burnForRedemption(
+        address deprecatedSynthProxy,
+        address account,
+        uint balance
+    ) external onlySynthRedeemer {
+        ISynth(IProxy(deprecatedSynthProxy).target()).burn(account, balance);
+    }
+
     function liquidateDelinquentAccount(
         address account,
         uint zUSDAmount,
@@ -584,35 +595,34 @@ contract Issuer is Owned, MixinSystemSettings, IIssuer {
 
         // What is their debt in zUSD?
         (uint debtBalance, uint totalDebtIssued, bool anyRateIsInvalid) = _debtBalanceOfAndTotalDebt(account, zUSD);
-        (uint hznRate, bool snxRateInvalid) = exchangeRates().rateAndInvalid(HZN);
+        (uint snxRate, bool snxRateInvalid) = exchangeRates().rateAndInvalid(HZN);
         _requireRatesNotInvalid(anyRateIsInvalid || snxRateInvalid);
 
         uint collateralForAccount = _collateral(account);
         uint amountToFixRatio = liquidations().calculateAmountToFixCollateral(
             debtBalance,
-            _hznToUSD(collateralForAccount, hznRate)
+            _snxToUSD(collateralForAccount, snxRate)
         );
 
         // Cap amount to liquidate to repair collateral ratio based on issuance ratio
         amountToLiquidate = amountToFixRatio < zUSDAmount ? amountToFixRatio : zUSDAmount;
 
-        // what's the equivalent amount of HZN for the amountToLiquidate?
-        uint hznRedeemed = _usdToHZN(amountToLiquidate, hznRate);
+        // what's the equivalent amount of snx for the amountToLiquidate?
+        uint snxRedeemed = _usdToSnx(amountToLiquidate, snxRate);
 
         // Add penalty
-        totalRedeemed = hznRedeemed.multiplyDecimal(SafeDecimalMath.unit().add(liquidationPenalty));
+        totalRedeemed = snxRedeemed.multiplyDecimal(SafeDecimalMath.unit().add(liquidationPenalty));
 
         // if total HZN to redeem is greater than account's collateral
         // account is under collateralised, liquidate all collateral and reduce zUSD to burn
-        // an insurance fund will be added to cover these undercollateralised positions
         if (totalRedeemed > collateralForAccount) {
-            // set totalRedeemed to all collateral
+            // set totalRedeemed to all transferable collateral
             totalRedeemed = collateralForAccount;
 
             // whats the equivalent zUSD to burn for all collateral less penalty
-            amountToLiquidate = _hznToUSD(
+            amountToLiquidate = _snxToUSD(
                 collateralForAccount.divideDecimal(SafeDecimalMath.unit().add(liquidationPenalty)),
-                hznRate
+                snxRate
             );
         }
 
@@ -629,7 +639,7 @@ contract Issuer is Owned, MixinSystemSettings, IIssuer {
     /* ========== INTERNAL FUNCTIONS ========== */
 
     function _requireRatesNotInvalid(bool anyRateIsInvalid) internal pure {
-        require(!anyRateIsInvalid, "A zasset or HZN rate is invalid");
+        require(!anyRateIsInvalid, "A synth or HZN rate is invalid");
     }
 
     function _requireCanIssueOnBehalf(address issueForAddress, address from) internal view {
@@ -841,8 +851,17 @@ contract Issuer is Owned, MixinSystemSettings, IIssuer {
         _;
     }
 
+    function _onlySynthRedeemer() internal view {
+        require(msg.sender == address(synthRedeemer()), "Issuer: Only the SynthRedeemer contract can perform this action");
+    }
+
+    modifier onlySynthRedeemer() {
+        _onlySynthRedeemer();
+        _;
+    }
+
     /* ========== EVENTS ========== */
 
-    event ZassetAdded(bytes32 currencyKey, address synth);
-    event ZassetRemoved(bytes32 currencyKey, address synth);
+    event SynthAdded(bytes32 currencyKey, address synth);
+    event SynthRemoved(bytes32 currencyKey, address synth);
 }

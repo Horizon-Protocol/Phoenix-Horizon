@@ -1,6 +1,6 @@
 'use strict';
 
-const { artifacts, contract } = require('@nomiclabs/buidler');
+const { artifacts, contract } = require('hardhat');
 
 const { assert, addSnapshotBeforeRestoreAfterEach } = require('./common');
 
@@ -15,16 +15,14 @@ const {
 	constants: { ZERO_ADDRESS },
 } = require('../..');
 
-const CollateralManager = artifacts.require(`CollateralManager`);
-const CollateralState = artifacts.require(`CollateralState`);
-const CollateralManagerState = artifacts.require('CollateralManagerState');
+let CollateralState;
 
-contract('CollateralManager @ovm-skip', async accounts => {
+contract('CollateralManager', async accounts => {
 	const [deployerAccount, owner, oracle, , account1] = accounts;
 
-	const sETH = toBytes32('zBNB');
-	const sUSD = toBytes32('zUSD');
-	const sBTC = toBytes32('zBTC');
+	const sETH = toBytes32('sETH');
+	const sUSD = toBytes32('sUSD');
+	const sBTC = toBytes32('sBTC');
 
 	const INTERACTION_DELAY = 300;
 
@@ -112,7 +110,7 @@ contract('CollateralManager @ovm-skip', async accounts => {
 			from: oracle,
 		});
 
-		const sBTC = toBytes32('zBTC');
+		const sBTC = toBytes32('sBTC');
 
 		await exchangeRates.updateRates([sBTC], ['10000'].map(toUnit), timestamp, {
 			from: oracle,
@@ -125,16 +123,18 @@ contract('CollateralManager @ovm-skip', async accounts => {
 	};
 
 	const setupManager = async () => {
-		synths = ['zUSD', 'zBTC', 'zBNB', 'iBTC', 'iBNB'];
+		synths = ['sUSD', 'sBTC', 'sETH', 'iBTC', 'iETH'];
 		({
 			ExchangeRates: exchangeRates,
-			ZassetzUSD: sUSDSynth,
-			ZassetzBNB: sETHSynth,
-			ZassetzBTC: sBTCSynth,
+			SynthsUSD: sUSDSynth,
+			SynthsETH: sETHSynth,
+			SynthsBTC: sBTCSynth,
 			FeePool: feePool,
 			AddressResolver: addressResolver,
 			Issuer: issuer,
 			DebtCache: debtCache,
+			CollateralManager: manager,
+			CollateralManagerState: managerState,
 		} = await setupAllContracts({
 			accounts,
 			synths,
@@ -147,25 +147,12 @@ contract('CollateralManager @ovm-skip', async accounts => {
 				'Issuer',
 				'DebtCache',
 				'Exchanger',
+				'CollateralManager',
+				'CollateralManagerState',
 			],
 		}));
 
-		managerState = await CollateralManagerState.new(owner, ZERO_ADDRESS, { from: deployerAccount });
-
 		maxDebt = toUnit(50000000);
-
-		manager = await CollateralManager.new(
-			managerState.address,
-			owner,
-			addressResolver.address,
-			maxDebt,
-			// 5% / 31536000 (seconds in common year)
-			1585489599,
-			0,
-			{
-				from: deployerAccount,
-			}
-		);
 
 		await managerState.setAssociatedContract(manager.address, { from: owner });
 
@@ -269,24 +256,24 @@ contract('CollateralManager @ovm-skip', async accounts => {
 		await manager.addCollaterals([ceth.address, cerc20.address, short.address], { from: owner });
 
 		await ceth.addSynths(
-			['ZassetzUSD', 'ZassetzBNB'].map(toBytes32),
-			['zUSD', 'zBNB'].map(toBytes32),
+			['SynthsUSD', 'SynthsETH'].map(toBytes32),
+			['sUSD', 'sETH'].map(toBytes32),
 			{ from: owner }
 		);
 		await cerc20.addSynths(
-			['ZassetzUSD', 'ZassetzBTC'].map(toBytes32),
-			['zUSD', 'zBTC'].map(toBytes32),
+			['SynthsUSD', 'SynthsBTC'].map(toBytes32),
+			['sUSD', 'sBTC'].map(toBytes32),
 			{ from: owner }
 		);
 		await short.addSynths(
-			['ZassetzBTC', 'ZassetzBNB'].map(toBytes32),
-			['zBTC', 'zBNB'].map(toBytes32),
+			['SynthsBTC', 'SynthsETH'].map(toBytes32),
+			['sBTC', 'sETH'].map(toBytes32),
 			{ from: owner }
 		);
 
 		await manager.addSynths(
-			[toBytes32('ZassetzUSD'), toBytes32('ZassetzBTC'), toBytes32('ZassetzBNB')],
-			[toBytes32('zUSD'), toBytes32('zBTC'), toBytes32('zBNB')],
+			[toBytes32('SynthsUSD'), toBytes32('SynthsBTC'), toBytes32('SynthsETH')],
+			[toBytes32('sUSD'), toBytes32('sBTC'), toBytes32('sETH')],
 			{
 				from: owner,
 			}
@@ -294,10 +281,10 @@ contract('CollateralManager @ovm-skip', async accounts => {
 
 		await manager.addShortableSynths(
 			[
-				[toBytes32('ZassetzBTC'), toBytes32('ZassetiBTC')],
-				[toBytes32('ZassetzBNB'), toBytes32('ZassetiBNB')],
+				[toBytes32('SynthsBTC'), toBytes32('SynthiBTC')],
+				[toBytes32('SynthsETH'), toBytes32('SynthiETH')],
 			],
-			['zBTC', 'zBNB'].map(toBytes32),
+			['sBTC', 'sETH'].map(toBytes32),
 			{
 				from: owner,
 			}
@@ -306,8 +293,8 @@ contract('CollateralManager @ovm-skip', async accounts => {
 		// check synths are set and currencyKeys set
 		assert.isTrue(
 			await manager.areSynthsAndCurrenciesSet(
-				['ZassetzUSD', 'ZassetzBTC', 'ZassetzBNB'].map(toBytes32),
-				['zUSD', 'zBTC', 'zBNB'].map(toBytes32)
+				['SynthsUSD', 'SynthsBTC', 'SynthsETH'].map(toBytes32),
+				['sUSD', 'sBTC', 'sETH'].map(toBytes32)
 			)
 		);
 
@@ -316,6 +303,8 @@ contract('CollateralManager @ovm-skip', async accounts => {
 	};
 
 	before(async () => {
+		CollateralState = artifacts.require(`CollateralState`);
+
 		await setupManager();
 	});
 
@@ -364,7 +353,7 @@ contract('CollateralManager @ovm-skip', async accounts => {
 	});
 
 	it('should access its dependencies via the address resolver', async () => {
-		assert.equal(await addressResolver.getAddress(toBytes32('ZassetzUSD')), sUSDSynth.address);
+		assert.equal(await addressResolver.getAddress(toBytes32('SynthsUSD')), sUSDSynth.address);
 		assert.equal(await addressResolver.getAddress(toBytes32('FeePool')), feePool.address);
 		assert.equal(
 			await addressResolver.getAddress(toBytes32('ExchangeRates')),
@@ -382,11 +371,11 @@ contract('CollateralManager @ovm-skip', async accounts => {
 	describe('default values for totalLong and totalShort', async () => {
 		it('totalLong should be 0', async () => {
 			const long = await manager.totalLong();
-			assert.bnEqual(long.zusdValue, toUnit('0'));
+			assert.bnEqual(long.susdValue, toUnit('0'));
 		});
 		it('totalShort should be 0', async () => {
 			const short = await manager.totalShort();
-			assert.bnEqual(short.zusdValue, toUnit('0'));
+			assert.bnEqual(short.susdValue, toUnit('0'));
 		});
 	});
 
@@ -433,14 +422,14 @@ contract('CollateralManager @ovm-skip', async accounts => {
 
 		it('should get the total long balance in sUSD correctly', async () => {
 			const total = await manager.totalLong();
-			const debt = total.zusdValue;
+			const debt = total.susdValue;
 
 			assert.bnEqual(debt, toUnit(400));
 		});
 
 		it('should get the total short balance in sUSD correctly', async () => {
 			const total = await manager.totalShort();
-			const debt = total.zusdValue;
+			const debt = total.susdValue;
 
 			assert.bnEqual(debt, toUnit(100));
 		});
@@ -449,11 +438,11 @@ contract('CollateralManager @ovm-skip', async accounts => {
 			await fastForward(await exchangeRates.rateStalePeriod());
 
 			const long = await manager.totalLong();
-			const debt = long.zusdValue;
+			const debt = long.susdValue;
 			const invalid = long.anyRateIsInvalid;
 
 			const short = await manager.totalShort();
-			const shortDebt = short.zusdValue;
+			const shortDebt = short.susdValue;
 			const shortInvalid = short.anyRateIsInvalid;
 
 			assert.bnEqual(debt, toUnit(400));
@@ -476,7 +465,7 @@ contract('CollateralManager @ovm-skip', async accounts => {
 			await ceth.close(id, { from: account1 });
 
 			const total = await manager.totalLong();
-			const debt = total.zusdValue;
+			const debt = total.susdValue;
 
 			assert.bnEqual(debt, toUnit(300));
 		});

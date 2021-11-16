@@ -87,7 +87,7 @@ contract BaseSynthetix is IERC20, ExternStateToken, MixinResolver, ISynthetix {
         return issuer().totalIssuedSynths(currencyKey, false);
     }
 
-    function totalIssuedSynthsExcludeEtherCollateral(bytes32 currencyKey) external view returns (uint) {
+    function totalIssuedSynthsExcludeOtherCollateral(bytes32 currencyKey) external view returns (uint) {
         return issuer().totalIssuedSynths(currencyKey, true);
     }
 
@@ -163,6 +163,96 @@ contract BaseSynthetix is IERC20, ExternStateToken, MixinResolver, ISynthetix {
 
     // ========== MUTATIVE FUNCTIONS ==========
 
+    function exchange(
+        bytes32 sourceCurrencyKey,
+        uint sourceAmount,
+        bytes32 destinationCurrencyKey
+    ) external exchangeActive(sourceCurrencyKey, destinationCurrencyKey) optionalProxy returns (uint amountReceived) {
+        (amountReceived, ) = exchanger().exchange(
+            messageSender,
+            messageSender,
+            sourceCurrencyKey,
+            sourceAmount,
+            destinationCurrencyKey,
+            messageSender,
+            false,
+            messageSender,
+            bytes32(0)
+        );
+    }
+
+    function exchangeOnBehalf(
+        address exchangeForAddress,
+        bytes32 sourceCurrencyKey,
+        uint sourceAmount,
+        bytes32 destinationCurrencyKey
+    ) external exchangeActive(sourceCurrencyKey, destinationCurrencyKey) optionalProxy returns (uint amountReceived) {
+        (amountReceived, ) = exchanger().exchange(
+            exchangeForAddress,
+            messageSender,
+            sourceCurrencyKey,
+            sourceAmount,
+            destinationCurrencyKey,
+            exchangeForAddress,
+            false,
+            exchangeForAddress,
+            bytes32(0)
+        );
+    }
+
+    function settle(bytes32 currencyKey)
+        external
+        optionalProxy
+        returns (
+            uint reclaimed,
+            uint refunded,
+            uint numEntriesSettled
+        )
+    {
+        return exchanger().settle(messageSender, currencyKey);
+    }
+
+    function exchangeWithTracking(
+        bytes32 sourceCurrencyKey,
+        uint sourceAmount,
+        bytes32 destinationCurrencyKey,
+        address rewardAddress,
+        bytes32 trackingCode
+    ) external exchangeActive(sourceCurrencyKey, destinationCurrencyKey) optionalProxy returns (uint amountReceived) {
+        (amountReceived, ) = exchanger().exchange(
+            messageSender,
+            messageSender,
+            sourceCurrencyKey,
+            sourceAmount,
+            destinationCurrencyKey,
+            messageSender,
+            false,
+            rewardAddress,
+            trackingCode
+        );
+    }
+
+    function exchangeOnBehalfWithTracking(
+        address exchangeForAddress,
+        bytes32 sourceCurrencyKey,
+        uint sourceAmount,
+        bytes32 destinationCurrencyKey,
+        address rewardAddress,
+        bytes32 trackingCode
+    ) external exchangeActive(sourceCurrencyKey, destinationCurrencyKey) optionalProxy returns (uint amountReceived) {
+        (amountReceived, ) = exchanger().exchange(
+            exchangeForAddress,
+            messageSender,
+            sourceCurrencyKey,
+            sourceAmount,
+            destinationCurrencyKey,
+            exchangeForAddress,
+            false,
+            rewardAddress,
+            trackingCode
+        );
+    }
+
     function transfer(address to, uint value) external optionalProxy systemActive returns (bool) {
         // Ensure they're not trying to exceed their locked amount -- only if they have debt.
         _canTransfer(messageSender, value);
@@ -218,41 +308,13 @@ contract BaseSynthetix is IERC20, ExternStateToken, MixinResolver, ISynthetix {
         return issuer().burnSynthsToTargetOnBehalf(burnForAddress, messageSender);
     }
 
-    function exchange(
-        bytes32,
-        uint,
-        bytes32
-    ) external returns (uint) {
-        _notImplemented();
-    }
-
-    function exchangeOnBehalf(
-        address,
-        bytes32,
-        uint,
-        bytes32
-    ) external returns (uint) {
-        _notImplemented();
-    }
-
-    function exchangeWithTracking(
+    function exchangeWithTrackingForInitiator(
         bytes32,
         uint,
         bytes32,
         address,
         bytes32
-    ) external returns (uint) {
-        _notImplemented();
-    }
-
-    function exchangeOnBehalfWithTracking(
-        address,
-        bytes32,
-        uint,
-        bytes32,
-        address,
-        bytes32
-    ) external returns (uint) {
+    ) external returns (uint amountReceived) {
         _notImplemented();
     }
 
@@ -262,17 +324,6 @@ contract BaseSynthetix is IERC20, ExternStateToken, MixinResolver, ISynthetix {
         bytes32,
         bytes32
     ) external returns (uint, IVirtualSynth) {
-        _notImplemented();
-    }
-
-    function settle(bytes32)
-        external
-        returns (
-            uint,
-            uint,
-            uint
-        )
-    {
         _notImplemented();
     }
 
@@ -318,5 +369,88 @@ contract BaseSynthetix is IERC20, ExternStateToken, MixinResolver, ISynthetix {
 
     function _issuanceActive() private {
         systemStatus().requireIssuanceActive();
+    }
+
+    modifier exchangeActive(bytes32 src, bytes32 dest) {
+        _exchangeActive(src, dest);
+        _;
+    }
+
+    function _exchangeActive(bytes32 src, bytes32 dest) private {
+        systemStatus().requireExchangeBetweenSynthsAllowed(src, dest);
+    }
+
+    modifier onlyExchanger() {
+        _onlyExchanger();
+        _;
+    }
+
+    function _onlyExchanger() private {
+        require(msg.sender == address(exchanger()), "Only Exchanger can invoke this");
+    }
+
+    // ========== EVENTS ==========
+    event SynthExchange(
+        address indexed account,
+        bytes32 fromCurrencyKey,
+        uint256 fromAmount,
+        bytes32 toCurrencyKey,
+        uint256 toAmount,
+        address toAddress
+    );
+    bytes32 internal constant SYNTHEXCHANGE_SIG = keccak256(
+        "SynthExchange(address,bytes32,uint256,bytes32,uint256,address)"
+    );
+
+    function emitSynthExchange(
+        address account,
+        bytes32 fromCurrencyKey,
+        uint256 fromAmount,
+        bytes32 toCurrencyKey,
+        uint256 toAmount,
+        address toAddress
+    ) external onlyExchanger {
+        proxy._emit(
+            abi.encode(fromCurrencyKey, fromAmount, toCurrencyKey, toAmount, toAddress),
+            2,
+            SYNTHEXCHANGE_SIG,
+            addressToBytes32(account),
+            0,
+            0
+        );
+    }
+
+    event ExchangeTracking(bytes32 indexed trackingCode, bytes32 toCurrencyKey, uint256 toAmount, uint256 fee);
+    bytes32 internal constant EXCHANGE_TRACKING_SIG = keccak256("ExchangeTracking(bytes32,bytes32,uint256,uint256)");
+
+    function emitExchangeTracking(
+        bytes32 trackingCode,
+        bytes32 toCurrencyKey,
+        uint256 toAmount,
+        uint256 fee
+    ) external onlyExchanger {
+        proxy._emit(abi.encode(toCurrencyKey, toAmount, fee), 2, EXCHANGE_TRACKING_SIG, trackingCode, 0, 0);
+    }
+
+    event ExchangeReclaim(address indexed account, bytes32 currencyKey, uint amount);
+    bytes32 internal constant EXCHANGERECLAIM_SIG = keccak256("ExchangeReclaim(address,bytes32,uint256)");
+
+    function emitExchangeReclaim(
+        address account,
+        bytes32 currencyKey,
+        uint256 amount
+    ) external onlyExchanger {
+        proxy._emit(abi.encode(currencyKey, amount), 2, EXCHANGERECLAIM_SIG, addressToBytes32(account), 0, 0);
+    }
+
+    event ExchangeRebate(address indexed account, bytes32 currencyKey, uint amount);
+    bytes32 internal constant EXCHANGEREBATE_SIG = keccak256("ExchangeRebate(address,bytes32,uint256)");
+
+    function emitExchangeRebate(
+        address account,
+        bytes32 currencyKey,
+        uint256 amount
+    ) external onlyExchanger {
+        proxy._emit(abi.encode(currencyKey, amount), 2, EXCHANGEREBATE_SIG, addressToBytes32(account), 0, 0);
     }
 }
