@@ -1,6 +1,6 @@
 'use strict';
 
-const { artifacts, contract, web3 } = require('@nomiclabs/buidler');
+const { artifacts, contract, web3 } = require('hardhat');
 
 const { assert, addSnapshotBeforeRestoreAfterEach } = require('./common');
 
@@ -19,18 +19,18 @@ const {
 	constants: { ZERO_ADDRESS },
 } = require('../..');
 
-const CollateralManager = artifacts.require(`CollateralManager`);
-const CollateralManagerState = artifacts.require('CollateralManagerState');
-const CollateralState = artifacts.require(`CollateralState`);
-const ProxyERC20 = artifacts.require(`ProxyERC20`);
-const TokenState = artifacts.require(`TokenState`);
+let CollateralManager;
+let CollateralManagerState;
+let CollateralState;
+let ProxyERC20;
+let TokenState;
 
-contract('CollateralErc20 @ovm-skip', async accounts => {
+contract('CollateralErc20', async accounts => {
 	const YEAR = 31536000;
 	const INTERACTION_DELAY = 300;
 
 	const sUSD = toBytes32('zUSD');
-	const sETH = toBytes32('zBNB');
+	const sETH = toBytes32('zETH');
 	const sBTC = toBytes32('zBTC');
 
 	const oneRenBTC = web3.utils.toBN('100000000');
@@ -56,13 +56,14 @@ contract('CollateralErc20 @ovm-skip', async accounts => {
 		feePool,
 		exchangeRates,
 		addressResolver,
-		sUSDSynth,
-		sBTCSynth,
+		zUSDZasset,
+		zBTCZasset,
 		renBTC,
 		systemStatus,
 		synths,
 		manager,
 		issuer,
+		util,
 		debtCache,
 		FEE_ADDRESS;
 
@@ -106,16 +107,16 @@ contract('CollateralErc20 @ovm-skip', async accounts => {
 	};
 
 	const deployCollateral = async ({
-		state,
-		owner,
-		manager,
-		resolver,
-		collatKey,
-		minColat,
-		minSize,
-		underCon,
-		decimals,
-	}) => {
+										state,
+										owner,
+										manager,
+										resolver,
+										collatKey,
+										minColat,
+										minSize,
+										underCon,
+										decimals,
+									}) => {
 		return setupContract({
 			accounts,
 			contract: 'CollateralErc20',
@@ -128,11 +129,12 @@ contract('CollateralErc20 @ovm-skip', async accounts => {
 		({
 			SystemStatus: systemStatus,
 			ExchangeRates: exchangeRates,
-			ZassetzUSD: sUSDSynth,
-			ZassetzBTC: sBTCSynth,
+			ZassetzUSD: zUSDZasset,
+			ZassetzBTC: zBTCZasset,
 			FeePool: feePool,
 			AddressResolver: addressResolver,
 			Issuer: issuer,
+			CollateralUtil: util,
 			DebtCache: debtCache,
 		} = await setupAllContracts({
 			accounts,
@@ -146,6 +148,7 @@ contract('CollateralErc20 @ovm-skip', async accounts => {
 				'Issuer',
 				'DebtCache',
 				'Exchanger',
+				'CollateralUtil',
 			],
 		}));
 
@@ -244,6 +247,12 @@ contract('CollateralErc20 @ovm-skip', async accounts => {
 	};
 
 	before(async () => {
+		CollateralManager = artifacts.require(`CollateralManager`);
+		CollateralManagerState = artifacts.require('CollateralManagerState');
+		CollateralState = artifacts.require(`CollateralState`);
+		ProxyERC20 = artifacts.require(`ProxyERC20`);
+		TokenState = artifacts.require(`TokenState`);
+
 		await setupMultiCollateral();
 	});
 
@@ -410,149 +419,7 @@ contract('CollateralErc20 @ovm-skip', async accounts => {
 		});
 	});
 
-	describe('liquidation amount test', async () => {
-		let amountToLiquidate;
-
-		/**
-		 * r = target issuance ratio
-		 * D = debt balance in sUSD
-		 * V = Collateral VALUE in sUSD
-		 * P = liquidation penalty
-		 * Calculates amount of sUSD = (D - V * r) / (1 - (1 + P) * r)
-		 *
-		 * To go back to another synth, remember to do effective value
-		 */
-
-		beforeEach(async () => {
-			tx = await cerc20.open(oneRenBTC, fiveThousandsUSD, sUSD, {
-				from: account1,
-			});
-
-			id = getid(tx);
-			loan = await state.getLoan(account1, id);
-		});
-
-		it('when we start at 200%, we can take a 25% reduction in collateral prices', async () => {
-			await exchangeRates.updateRates([sBTC], ['7500'].map(toUnit), await currentTime(), {
-				from: oracle,
-			});
-
-			amountToLiquidate = await cerc20.liquidationAmount(loan);
-
-			assert.bnEqual(amountToLiquidate, toUnit(0));
-		});
-
-		it('when we start at 200%, a price shock of 30% in the collateral requires 25% of the loan to be liquidated', async () => {
-			await exchangeRates.updateRates([sBTC], ['7000'].map(toUnit), await currentTime(), {
-				from: oracle,
-			});
-
-			amountToLiquidate = await cerc20.liquidationAmount(loan);
-
-			assert.bnClose(amountToLiquidate, toUnit(1250), '10000');
-		});
-
-		it('when we start at 200%, a price shock of 40% in the collateral requires 75% of the loan to be liquidated', async () => {
-			await exchangeRates.updateRates([sBTC], ['6000'].map(toUnit), await currentTime(), {
-				from: oracle,
-			});
-
-			amountToLiquidate = await cerc20.liquidationAmount(loan);
-
-			assert.bnClose(amountToLiquidate, toUnit(3750), '10000');
-		});
-
-		it('when we start at 200%, a price shock of 45% in the collateral requires 100% of the loan to be liquidated', async () => {
-			await exchangeRates.updateRates([sBTC], ['5500'].map(toUnit), await currentTime(), {
-				from: oracle,
-			});
-
-			amountToLiquidate = await cerc20.liquidationAmount(loan);
-
-			assert.bnClose(amountToLiquidate, toUnit(5000), '10000');
-		});
-
-		// it('when we start at 150%, a 25% reduction in collateral requires', async () => {
-		// 	tx = await cerc20.open(oneRenBTC, fiveThousandsUSD, sUSD, {
-		// 		from: account1,
-		// 	});
-
-		// 	id = getid(tx);
-
-		// 	await exchangeRates.updateRates([sBTC], ['7500'].map(toUnit), await currentTime(), {
-		// 		from: oracle,
-		// 	});
-
-		// 	loan = await state.getLoan(account1, id);
-
-		// 	amountToLiquidate = await cerc20.liquidationAmount(loan);
-
-		// 	assert.bnClose(amountToLiquidate, toUnit(4687.5), 10000);
-		// });
-
-		// it('when we start at 150%, any reduction in collateral will make the position undercollateralised ', async () => {
-		// 	tx = await cerc20.open(750000000, fiveThousandsUSD, sUSD, {
-		// 		from: account1,
-		// 	});
-
-		// 	id = getid(tx);
-		// 	loan = await state.getLoan(account1, id);
-
-		// 	await exchangeRates.updateRates([sBTC], ['9000'].map(toUnit), await currentTime(), {
-		// 		from: oracle,
-		// 	});
-
-		// 	amountToLiquidate = await cerc20.liquidationAmount(loan);
-
-		// 	assert.bnClose(amountToLiquidate, toUnit(1875), 10000);
-		// });
-	});
-
-	describe('collateral redeemed test', async () => {
-		let collateralRedeemed;
-
-		it('when BTC is @ $10000 and we are liquidating 1000 sUSD, then redeem 0.11 BTC', async () => {
-			collateralRedeemed = await cerc20.collateralRedeemed(sUSD, oneThousandsUSD);
-
-			assert.bnEqual(collateralRedeemed, toUnit(0.11));
-		});
-
-		it('when BTC is @ $20000 and we are liquidating 1000 sUSD, then redeem 0.055 BTC', async () => {
-			await exchangeRates.updateRates([sBTC], ['20000'].map(toUnit), await currentTime(), {
-				from: oracle,
-			});
-
-			collateralRedeemed = await cerc20.collateralRedeemed(sUSD, oneThousandsUSD);
-
-			assert.bnEqual(collateralRedeemed, toUnit(0.055));
-		});
-
-		it('when BTC is @ $7000 and we are liquidating 2500 sUSD, then redeem 0.36666 ETH', async () => {
-			await exchangeRates.updateRates([sBTC], ['7000'].map(toUnit), await currentTime(), {
-				from: oracle,
-			});
-
-			collateralRedeemed = await cerc20.collateralRedeemed(sUSD, toUnit(2500));
-
-			assert.bnClose(collateralRedeemed, toUnit(0.392857142857142857), '100');
-		});
-
-		it('regardless of BTC price, we liquidate 1.1 * amount when doing sETH', async () => {
-			collateralRedeemed = await cerc20.collateralRedeemed(sBTC, toUnit(1));
-
-			assert.bnEqual(collateralRedeemed, toUnit(1.1));
-
-			await exchangeRates.updateRates([sBTC], ['1000'].map(toUnit), await currentTime(), {
-				from: oracle,
-			});
-
-			collateralRedeemed = await cerc20.collateralRedeemed(sBTC, toUnit(1));
-
-			assert.bnEqual(collateralRedeemed, toUnit(1.1));
-		});
-	});
-
-	// // SETTER TESTS
+	// SETTER TESTS
 
 	describe('setting variables', async () => {
 		describe('setMinCratio', async () => {
@@ -566,7 +433,7 @@ contract('CollateralErc20 @ovm-skip', async accounts => {
 				it('should fail if the minimum is less than 1', async () => {
 					await assert.revert(
 						cerc20.setMinCratio(toUnit(0.99), { from: owner }),
-						'Must be greater than 1'
+						'Cratio must be above 1'
 					);
 				});
 			});
@@ -701,7 +568,7 @@ contract('CollateralErc20 @ovm-skip', async accounts => {
 				it('then calling openLoan() reverts', async () => {
 					await assert.revert(
 						cerc20.open(oneRenBTC, onesUSD, sUSD, { from: account1 }),
-						'Collateral rate is invalid'
+						'Invalid rate'
 					);
 				});
 				describe('when BTC gets a rate', () => {
@@ -719,14 +586,14 @@ contract('CollateralErc20 @ovm-skip', async accounts => {
 			it('should revert if they request a currency that is not supported', async () => {
 				await assert.revert(
 					cerc20.open(oneRenBTC, onesUSD, toBytes32('sJPY'), { from: account1 }),
-					'Not allowed to issue this synth'
+					'Not allowed to issue'
 				);
 			});
 
 			it('should revert if they send 0 collateral', async () => {
 				await assert.revert(
 					cerc20.open(toUnit(0), onesUSD, sUSD, { from: account1 }),
-					'Not enough collateral to open'
+					'Not enough collateral'
 				);
 			});
 
@@ -735,7 +602,7 @@ contract('CollateralErc20 @ovm-skip', async accounts => {
 					cerc20.open(oneRenBTC, toUnit(10000), sUSD, {
 						from: account1,
 					}),
-					'Exceeds max borrowing power'
+					'Exceed max borrow power'
 				);
 			});
 		});
@@ -877,7 +744,7 @@ contract('CollateralErc20 @ovm-skip', async accounts => {
 			it('should revert if they do not send any eth', async () => {
 				await assert.revert(
 					cerc20.deposit(account1, id, 0, { from: account1 }),
-					'Deposit must be greater than 0'
+					'Deposit must be above 0'
 				);
 			});
 		});
@@ -1015,7 +882,7 @@ contract('CollateralErc20 @ovm-skip', async accounts => {
 			it('should revert if they try to repay 0', async () => {
 				await assert.revert(
 					cerc20.repay(account1, id, 0, { from: account1 }),
-					'Payment must be greater than 0'
+					'Payment must be above 0'
 				);
 			});
 
@@ -1023,7 +890,7 @@ contract('CollateralErc20 @ovm-skip', async accounts => {
 			it('should revert if they have no sUSD', async () => {
 				await assert.revert(
 					cerc20.repay(account1, id, tensUSD, { from: account2 }),
-					'Not enough synth balance'
+					'Not enough balance'
 				);
 			});
 
@@ -1031,7 +898,7 @@ contract('CollateralErc20 @ovm-skip', async accounts => {
 				await issuesUSDToAccount(toUnit(1000), account1);
 				await assert.revert(
 					cerc20.repay(account1, id, toUnit(1000), { from: account1 }),
-					'VM Exception while processing transaction: revert SafeMath: subtraction overflow'
+					"VM Exception while processing transaction: reverted with reason string 'SafeMath: subtraction overflow'"
 				);
 			});
 		});
@@ -1148,7 +1015,7 @@ contract('CollateralErc20 @ovm-skip', async accounts => {
 			it('should revert if they have no sUSD', async () => {
 				await assert.revert(
 					cerc20.liquidate(account1, id, onesUSD, { from: account2 }),
-					'Not enough synth balance'
+					'Not enough balance'
 				);
 			});
 
@@ -1157,7 +1024,7 @@ contract('CollateralErc20 @ovm-skip', async accounts => {
 
 				await assert.revert(
 					cerc20.liquidate(account1, id, onesUSD, { from: account2 }),
-					'Cratio above liquidation ratio'
+					'Cratio above liq ratio'
 				);
 			});
 		});
@@ -1166,6 +1033,8 @@ contract('CollateralErc20 @ovm-skip', async accounts => {
 			const renAmount = new BN('19642857');
 			const internalAmount = new BN('196428571428571428');
 			let liquidationAmount;
+			let minCratio;
+			let collateralKey;
 
 			beforeEach(async () => {
 				const timestamp = await currentTime();
@@ -1176,8 +1045,10 @@ contract('CollateralErc20 @ovm-skip', async accounts => {
 				await issuesUSDToAccount(toUnit(5000), account2);
 
 				loan = await state.getLoan(account1, id);
+				minCratio = await cerc20.minCratio();
+				collateralKey = await cerc20.collateralKey();
 
-				liquidationAmount = await cerc20.liquidationAmount(loan);
+				liquidationAmount = await util.liquidationAmount(loan, minCratio, collateralKey);
 
 				tx = await cerc20.liquidate(account1, id, liquidationAmount, {
 					from: account2,
@@ -1313,7 +1184,7 @@ contract('CollateralErc20 @ovm-skip', async accounts => {
 
 		describe('revert conditions', async () => {
 			it('should revert if they have no sUSD', async () => {
-				await assert.revert(cerc20.close(id, { from: account1 }), 'Not enough synth balance');
+				await assert.revert(cerc20.close(id, { from: account1 }), 'Not enough balance');
 			});
 
 			it('should revert if they are not the borrower', async () => {
@@ -1399,10 +1270,7 @@ contract('CollateralErc20 @ovm-skip', async accounts => {
 					await fastForward((await exchangeRates.rateStalePeriod()).add(web3.utils.toBN('300')));
 				});
 				it('then calling draw() reverts', async () => {
-					await assert.revert(
-						cerc20.draw(id, onesUSD, { from: account1 }),
-						'Collateral rate is invalid'
-					);
+					await assert.revert(cerc20.draw(id, onesUSD, { from: account1 }), 'Invalid rate');
 				});
 				describe('when BTC gets a rate', () => {
 					beforeEach(async () => {

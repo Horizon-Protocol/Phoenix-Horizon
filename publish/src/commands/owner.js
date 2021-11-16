@@ -1,9 +1,8 @@
 'use strict';
 
+const ethers = require('ethers');
 const fs = require('fs');
 const { gray, yellow, red, cyan, bgYellow, black } = require('chalk');
-const w3utils = require('web3-utils');
-const Web3 = require('web3');
 
 const {
 	getUsers,
@@ -25,7 +24,9 @@ const {
 	getSafeNonce,
 	getSafeTransactions,
 	checkExistingPendingTx,
-	createAndSaveApprovalTransaction,
+	getNewTransactionHash,
+	saveTransactionToApi,
+	getSafeSignature,
 } = require('../safe-utils');
 
 const DEFAULTS = {
@@ -41,9 +42,14 @@ const owner = async ({
 	gasLimit = DEFAULTS.gasLimit,
 	privateKey,
 	yes,
+	useOvm,
+	useFork,
+	providerUrl,
+	throwOnNotNominatedOwner = false,
+	isContract,
 }) => {
 	ensureNetwork(network);
-	deploymentPath = deploymentPath || getDeploymentPathForNetwork({ network });
+	deploymentPath = deploymentPath || getDeploymentPathForNetwork({ network, useOvm });
 	ensureDeploymentPath(deploymentPath);
 
 	function logTx(tx) {
@@ -51,10 +57,10 @@ const owner = async ({
 	}
 
 	if (!newOwner) {
-		newOwner = getUsers({ network, user: 'owner' }).address;
+		newOwner = getUsers({ network, useOvm, user: 'owner' }).address;
 	}
 
-	if (!w3utils.isAddress(newOwner)) {
+	if (!ethers.utils.isAddress(newOwner)) {
 		console.error(red('Invalid new owner to nominate. Please check the option and try again.'));
 		process.exit(1);
 	} else {
@@ -66,18 +72,26 @@ const owner = async ({
 		network,
 	});
 
-	const { providerUrl, privateKey: envPrivateKey } = loadConnections({
+	const { providerUrl: envProviderUrl, privateKey: envPrivateKey } = loadConnections({
 		network,
+		useFork,
 	});
 
-	if (!privateKey) {
+	if (!providerUrl) {
+		if (!envProviderUrl) {
+			throw new Error('Missing .env key of PROVIDER_URL. Please add and retry.');
+		}
+
+		providerUrl = envProviderUrl;
+	}
+
+	// if not specified, or in a local network, override the private key passed as a CLI option, with the one specified in .env
+	if (network !== 'local' && !privateKey && !useFork) {
 		privateKey = envPrivateKey;
 	}
 
-	const web3 = new Web3(new Web3.providers.HttpProvider(providerUrl));
+	const provider = new ethers.providers.JsonRpcProvider(providerUrl);
 
-	const code = await web3.eth.getCode(newOwner);
-	const isContract = code !== '0x';
 	if (!isContract && !yes) {
 		try {
 			await confirmAction(
@@ -91,13 +105,22 @@ const owner = async ({
 		}
 	}
 
-	web3.eth.accounts.wallet.add(privateKey);
-	const account = web3.eth.accounts.wallet[0].address;
-	console.log(gray(`Using account with public key ${account}`));
+	let wallet;
+	if (!privateKey) {
+		const account = getUsers({ network, user: 'owner' }).address; // protocolDAO
+		wallet = provider.getSigner(account);
+		wallet.address = await wallet.getAddress();
+	} else {
+		wallet = new ethers.Wallet(privateKey, provider);
+	}
 
-	if (!isContract && account.toLowerCase() !== newOwner.toLowerCase()) {
+	const signerAddress = wallet.address;
+
+	console.log(gray(`Using account with public key ${signerAddress}`));
+
+	if (!isContract && wallet.address.toLowerCase() !== newOwner.toLowerCase()) {
 		throw new Error(
-			`New owner is ${newOwner} and signer is ${account}. The signer needs to be the new owner in order to be able to claim ownership and/or execute owner actions.`
+			`New owner is ${newOwner} and signer is ${wallet.address}. The signer needs to be the new owner in order to be able to claim ownership and/or execute owner actions.`
 		);
 	}
 
@@ -108,7 +131,7 @@ const owner = async ({
 	let currentSafeNonce;
 	if (isContract) {
 		// new owner should be gnosis safe proxy address
-		protocolDaoContract = getSafeInstance(web3, newOwner);
+		protocolDaoContract = getSafeInstance({ provider, safeAddress: newOwner });
 
 		// get protocolDAO nonce
 		currentSafeNonce = await getSafeNonce(protocolDaoContract);
@@ -118,9 +141,7 @@ const owner = async ({
 			process.exit();
 		}
 
-		console.log(
-			yellow(`Using Protocol DAO Safe contract at ${protocolDaoContract.options.address}`)
-		);
+		console.log(yellow(`Using Protocol DAO Safe contract at ${protocolDaoContract.address}`));
 	}
 
 	const confirmOrEnd = async message => {
@@ -131,7 +152,9 @@ const owner = async ({
 				await confirmAction(
 					message +
 						cyan(
-							'\nPlease type "y" to stage transaction, or enter "n" to cancel and resume this later? (y/n) '
+							`\nPlease type "y" to ${
+								isContract ? 'stage' : 'submit'
+							} transaction, or enter "n" to cancel and resume this later? (y/n) `
 						)
 				);
 			}
@@ -146,7 +169,7 @@ const owner = async ({
 		// Load staged transactions
 		stagedTransactions = await getSafeTransactions({
 			network,
-			safeAddress: protocolDaoContract.options.address,
+			safeAddress: protocolDaoContract.address,
 		});
 	}
 
@@ -173,32 +196,52 @@ const owner = async ({
 		await confirmOrEnd(yellow('Confirm: ') + `Stage ${bgYellow(black(key))} to (${target})`);
 
 		try {
-			let newNonce;
 			if (isContract) {
-				newNonce = await createAndSaveApprovalTransaction({
+				const { txHash, newNonce } = await getNewTransactionHash({
 					safeContract: protocolDaoContract,
 					data,
 					to: target,
-					sender: account,
-					gasLimit,
-					gasPrice,
+					sender: wallet.address,
 					network,
 					lastNonce,
 				});
-			} else {
-				const tx = await web3.eth.sendTransaction({
-					from: account,
-					to: target,
-					gasPrice,
-					gas: gasLimit,
-					data,
+
+				// sign txHash to get signature
+				const sig = await getSafeSignature({
+					privateKey,
+					providerUrl,
+					contractTxHash: txHash,
 				});
 
-				logTx(tx);
-			}
+				// save transaction and signature to Gnosis Safe API
+				await saveTransactionToApi({
+					safeContract: protocolDaoContract,
+					network,
+					data,
+					nonce: newNonce,
+					to: target,
+					sender: wallet.address,
+					transactionHash: txHash,
+					signature: sig,
+				});
 
-			// track lastNonce submitted
-			lastNonce = newNonce;
+				// track lastNonce submitted
+				lastNonce = newNonce;
+			} else {
+				const params = {
+					to: target,
+					gasPrice: ethers.utils.parseUnits(gasPrice, 'gwei'),
+					data,
+				};
+				if (gasLimit) {
+					params.gasLimit = ethers.BigNumber.from(gasLimit);
+				}
+
+				const tx = await wallet.sendTransaction(params);
+				const receipt = await tx.wait();
+
+				logTx(receipt);
+			}
 
 			entry.complete = true;
 			fs.writeFileSync(ownerActionsFile, stringify(ownerActions));
@@ -211,28 +254,35 @@ const owner = async ({
 	}
 
 	console.log(gray('Looking for contracts whose ownership we should accept'));
+	const warnings = [];
 	for (const contract of Object.keys(config)) {
-		const { address, source } = deployment.targets[contract];
-		const { abi } = deployment.sources[source];
-		const deployedContract = new web3.eth.Contract(abi, address);
-
-		// ignore contracts that don't support Owned
-		if (!deployedContract.methods.owner) {
+		if (!deployment.targets[contract]) {
+			const msg = yellow(`WARNING: contract ${contract} not found in deployment file`);
+			console.log(msg);
+			warnings.push(msg);
 			continue;
 		}
-		const currentOwner = (await deployedContract.methods.owner().call()).toLowerCase();
-		const nominatedOwner = (await deployedContract.methods.nominatedOwner().call()).toLowerCase();
+		const { address, source } = deployment.targets[contract];
+		const { abi } = deployment.sources[source];
+		const deployedContract = new ethers.Contract(address, abi, provider);
+
+		// ignore contracts that don't support Owned
+		if (!deployedContract.functions.owner) {
+			continue;
+		}
+		const currentOwner = (await deployedContract.owner()).toLowerCase();
+		const nominatedOwner = (await deployedContract.nominatedOwner()).toLowerCase();
 
 		if (currentOwner === newOwner) {
 			console.log(gray(`${newOwner} is already the owner of ${contract}`));
 		} else if (nominatedOwner === newOwner) {
-			const encodedData = deployedContract.methods.acceptOwnership().encodeABI();
+			const encodedData = deployedContract.interface.encodeFunctionData('acceptOwnership', []);
 
 			if (isContract) {
 				// Check if similar one already staged and pending
 				const existingTx = checkExistingPendingTx({
 					stagedTransactions,
-					target: deployedContract.options.address,
+					target: address,
 					encodedData,
 					currentSafeNonce,
 				});
@@ -241,36 +291,57 @@ const owner = async ({
 			}
 
 			// continue if no pending tx found
-			await confirmOrEnd(yellow(`Confirm: Stage ${contract}.acceptOwnership() via protocolDAO?`));
+			await confirmOrEnd(yellow(`Confirm: ${contract}.acceptOwnership()?`));
 
 			if (isContract) console.log(yellow(`Attempting action protocolDaoContract.approveHash()`));
 			else console.log(yellow(`Calling acceptOwnership() on ${contract}...`));
 
 			try {
-				if (isContract) {
-					const newNonce = await createAndSaveApprovalTransaction({
+				if (isContract && !useFork) {
+					const { txHash, newNonce } = await getNewTransactionHash({
 						safeContract: protocolDaoContract,
 						data: encodedData,
-						to: deployedContract.options.address,
-						sender: account,
-						gasLimit,
-						gasPrice,
+						to: address,
+						sender: wallet.address,
 						network,
 						lastNonce,
+					});
+
+					// sign txHash to get signature
+					const sig = await getSafeSignature({
+						privateKey,
+						providerUrl,
+						contractTxHash: txHash,
+					});
+
+					// save transaction and signature to Gnosis Safe API
+					await saveTransactionToApi({
+						safeContract: protocolDaoContract,
+						network,
+						data: encodedData,
+						nonce: newNonce,
+						to: address,
+						sender: wallet.address,
+						transactionHash: txHash,
+						signature: sig,
 					});
 
 					// track lastNonce submitted
 					lastNonce = newNonce;
 				} else {
-					const tx = await web3.eth.sendTransaction({
-						from: account,
-						to: deployedContract.options.address,
-						gasPrice,
-						gas: gasLimit,
+					const params = {
+						to: address,
+						gasPrice: ethers.utils.parseUnits(gasPrice, 'gwei'),
 						data: encodedData,
-					});
+					};
+					if (gasLimit) {
+						params.gasLimit = ethers.BigNumber.from(gasLimit);
+					}
 
-					logTx(tx);
+					const tx = await wallet.sendTransaction(params);
+					const receipt = await tx.wait();
+
+					logTx(receipt);
 				}
 			} catch (err) {
 				console.log(
@@ -279,12 +350,19 @@ const owner = async ({
 				return;
 			}
 		} else {
-			console.log(
-				cyan(
-					`Cannot acceptOwnership on ${contract} as nominatedOwner: ${nominatedOwner} isn't the newOwner ${newOwner} you specified. Have you run the nominate command yet?`
-				)
-			);
+			const msg = `Cannot acceptOwnership on ${contract} as nominatedOwner: ${nominatedOwner} isn't the newOwner ${newOwner} you specified. Have you run the nominate command yet?`;
+			if (throwOnNotNominatedOwner && contract !== 'DappMaintenance') {
+				throw Error(msg);
+			} else {
+				console.log(cyan(msg));
+			}
 		}
+	}
+	if (warnings.length) {
+		console.log(yellow('\nThere were some issues nominating owner\n'));
+		console.log(yellow('---'));
+		warnings.forEach(warning => console.log(warning));
+		console.log(yellow('---'));
 	}
 };
 
@@ -299,13 +377,29 @@ module.exports = {
 				`Path to a folder that has your input configuration file ${CONFIG_FILENAME} and where your ${DEPLOYMENT_FILENAME} files will go`
 			)
 			.option(
+				'-k, --use-fork',
+				'Perform the deployment on a forked chain running on localhost (see fork command).',
+				false
+			)
+			.option(
 				'-o, --new-owner <value>',
 				'The address of protocolDAO proxy contract as owner (please include the 0x prefix)'
 			)
+			.option(
+				'-k, --use-fork',
+				'Perform the deployment on a forked chain running on localhost (see fork command).',
+				false
+			)
+			.option('--is-contract', 'Wether the new owner is a contract wallet or an EOA', false)
 			.option('-v, --private-key [value]', 'The private key of wallet to stage with.')
 			.option('-g, --gas-price <value>', 'Gas price in GWEI', DEFAULTS.gasPrice)
 			.option('-l, --gas-limit <value>', 'Gas limit', parseInt, DEFAULTS.gasLimit)
 			.option('-n, --network <value>', 'The network to run off.', x => x.toLowerCase(), 'kovan')
 			.option('-y, --yes', 'Dont prompt, just reply yes.')
+			.option('-z, --use-ovm', 'Target deployment for the OVM (Optimism).')
+			.option(
+				'-p, --provider-url <value>',
+				'Ethereum network provider URL. If default, will use PROVIDER_URL found in the .env file.'
+			)
 			.action(owner),
 };
