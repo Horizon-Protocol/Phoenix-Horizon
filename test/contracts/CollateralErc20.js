@@ -29,9 +29,9 @@ contract('CollateralErc20', async accounts => {
 	const YEAR = 31536000;
 	const INTERACTION_DELAY = 300;
 
-	const sUSD = toBytes32('sUSD');
-	const sETH = toBytes32('sETH');
-	const sBTC = toBytes32('sBTC');
+	const sUSD = toBytes32('zUSD');
+	const sETH = toBytes32('zETH');
+	const sBTC = toBytes32('zBTC');
 
 	const oneRenBTC = web3.utils.toBN('100000000');
 	const twoRenBTC = web3.utils.toBN('200000000');
@@ -56,8 +56,8 @@ contract('CollateralErc20', async accounts => {
 		feePool,
 		exchangeRates,
 		addressResolver,
-		sUSDSynth,
-		sBTCSynth,
+		zUSDZasset,
+		zBTCZasset,
 		renBTC,
 		systemStatus,
 		synths,
@@ -107,16 +107,16 @@ contract('CollateralErc20', async accounts => {
 	};
 
 	const deployCollateral = async ({
-		state,
-		owner,
-		manager,
-		resolver,
-		collatKey,
-		minColat,
-		minSize,
-		underCon,
-		decimals,
-	}) => {
+										state,
+										owner,
+										manager,
+										resolver,
+										collatKey,
+										minColat,
+										minSize,
+										underCon,
+										decimals,
+									}) => {
 		return setupContract({
 			accounts,
 			contract: 'CollateralErc20',
@@ -129,8 +129,8 @@ contract('CollateralErc20', async accounts => {
 		({
 			SystemStatus: systemStatus,
 			ExchangeRates: exchangeRates,
-			SynthsUSD: sUSDSynth,
-			SynthsBTC: sBTCSynth,
+			ZassetzUSD: zUSDZasset,
+			ZassetzBTC: zBTCZasset,
 			FeePool: feePool,
 			AddressResolver: addressResolver,
 			Issuer: issuer,

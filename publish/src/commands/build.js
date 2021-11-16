@@ -27,15 +27,16 @@ const overrides = require('../contract-overrides');
 
 const build = async ({
 	buildPath = DEFAULTS.buildPath,
+	cleanBuild,
+	migrations,
 	optimizerRuns = DEFAULTS.optimizerRuns,
+	showSize,
+	showWarnings,
 	skipUnchanged,
 	testHelpers,
-	showWarnings,
-	showContractSize,
 	useOvm,
-	cleanBuild,
 } = {}) => {
-	console.log(gray(`Starting build${useOvm ? ' using OVM' : ''}...`));
+	console.log(gray(`Starting build${useOvm ? ' using OVM' : ''} at path ${buildPath}...`));
 
 	if (cleanBuild && fs.existsSync(buildPath)) {
 		fs.rmdirSync(buildPath, { recursive: true });
@@ -52,7 +53,9 @@ const build = async ({
 	const libraries = findSolFiles({ sourcePath: 'node_modules' });
 	const contracts = findSolFiles({
 		sourcePath: CONTRACTS_FOLDER,
-		ignore: [].concat(!testHelpers ? /^test-helpers\// : []),
+		ignore: []
+			.concat(!migrations ? /^migrations\// : [])
+			.concat(!testHelpers ? /^test-helpers\// : []),
 	});
 
 	if (useOvm) {
@@ -202,7 +205,7 @@ const build = async ({
 	// We're built!
 	console.log(green('Build succeeded'));
 
-	if (showContractSize) {
+	if (showSize) {
 		const contractToObjectMap = allCompiledFilePaths
 			.filter(file => fs.existsSync(file))
 			.reduce((memo, file) => {
@@ -227,12 +230,13 @@ module.exports = {
 				'-k, --skip-unchanged',
 				'Skip any contracts that seem as though they have not changed (infers from flattened file and does not strictly check bytecode. ⚠⚠⚠ DO NOT USE FOR PRODUCTION BUILDS.'
 			)
+			.option('-m, --migrations', 'Also compile the migrations')
 			.option(
 				'-o, --optimizer-runs <value>',
 				'Number of runs for the optimizer by default',
 				DEFAULTS.optimizerRuns
 			)
-			.option('-s, --show-contract-size', 'Show contract sizes')
+			.option('-s, --show-size', 'Show contract sizes')
 			.option('-t, --test-helpers', 'Also compile the test-helpers')
 			.option('-w, --show-warnings', 'Show warnings')
 			.option('-z, --use-ovm', 'Use Optimism OVM-compatible compiler')
