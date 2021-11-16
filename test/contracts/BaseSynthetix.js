@@ -423,6 +423,117 @@ contract('BaseSynthetix', async accounts => {
 		});
 	});
 
+	describe('Exchanger calls', () => {
+		let smockExchanger;
+		beforeEach(async () => {
+			smockExchanger = await smockit(artifacts.require('Exchanger').abi);
+			smockExchanger.smocked.exchange.will.return.with(() => ['1', ZERO_ADDRESS]);
+			smockExchanger.smocked.settle.will.return.with(() => ['1', '2', '3']);
+			await addressResolver.importAddresses(
+				['Exchanger'].map(toBytes32),
+				[smockExchanger.address],
+				{ from: owner }
+			);
+			await baseSynthetix.rebuildCache();
+		});
+
+		const amount1 = '10';
+		const currencyKey1 = sAUD;
+		const currencyKey2 = sEUR;
+		const msgSender = owner;
+		const trackingCode = toBytes32('1inch');
+
+		it('exchangeOnBehalf is called with the right arguments ', async () => {
+			await baseSynthetix.exchangeOnBehalf(account1, currencyKey1, amount1, currencyKey2, {
+				from: msgSender,
+			});
+			assert.equal(smockExchanger.smocked.exchange.calls[0][0], account1);
+			assert.equal(smockExchanger.smocked.exchange.calls[0][1], msgSender);
+			assert.equal(smockExchanger.smocked.exchange.calls[0][2], currencyKey1);
+			assert.equal(smockExchanger.smocked.exchange.calls[0][3].toString(), amount1);
+			assert.equal(smockExchanger.smocked.exchange.calls[0][4], currencyKey2);
+			assert.equal(smockExchanger.smocked.exchange.calls[0][5], account1);
+			assert.equal(smockExchanger.smocked.exchange.calls[0][6], false);
+			assert.equal(smockExchanger.smocked.exchange.calls[0][7], account1);
+			assert.equal(smockExchanger.smocked.exchange.calls[0][8], toBytes32(''));
+		});
+
+		it('exchangeWithTracking is called with the right arguments ', async () => {
+			await baseSynthetix.exchangeWithTracking(
+				currencyKey1,
+				amount1,
+				currencyKey2,
+				account2,
+				trackingCode,
+				{ from: msgSender }
+			);
+			assert.equal(smockExchanger.smocked.exchange.calls[0][0], msgSender);
+			assert.equal(smockExchanger.smocked.exchange.calls[0][1], msgSender);
+			assert.equal(smockExchanger.smocked.exchange.calls[0][2], currencyKey1);
+			assert.equal(smockExchanger.smocked.exchange.calls[0][3].toString(), amount1);
+			assert.equal(smockExchanger.smocked.exchange.calls[0][4], currencyKey2);
+			assert.equal(smockExchanger.smocked.exchange.calls[0][5], msgSender);
+			assert.equal(smockExchanger.smocked.exchange.calls[0][6], false);
+			assert.equal(smockExchanger.smocked.exchange.calls[0][7], account2);
+			assert.equal(smockExchanger.smocked.exchange.calls[0][8], trackingCode);
+		});
+
+		it('exchangeOnBehalfWithTracking is called with the right arguments ', async () => {
+			await baseSynthetix.exchangeOnBehalfWithTracking(
+				account1,
+				currencyKey1,
+				amount1,
+				currencyKey2,
+				account2,
+				trackingCode,
+				{ from: owner }
+			);
+			assert.equal(smockExchanger.smocked.exchange.calls[0][0], account1);
+			assert.equal(smockExchanger.smocked.exchange.calls[0][1], msgSender);
+			assert.equal(smockExchanger.smocked.exchange.calls[0][2], currencyKey1);
+			assert.equal(smockExchanger.smocked.exchange.calls[0][3].toString(), amount1);
+			assert.equal(smockExchanger.smocked.exchange.calls[0][4], currencyKey2);
+			assert.equal(smockExchanger.smocked.exchange.calls[0][5], account1);
+
+			assert.equal(smockExchanger.smocked.exchange.calls[0][6], false);
+			assert.equal(smockExchanger.smocked.exchange.calls[0][7], account2);
+			assert.equal(smockExchanger.smocked.exchange.calls[0][8], trackingCode);
+		});
+
+		it('settle is called with the right arguments ', async () => {
+			await baseSynthetix.settle(currencyKey1, {
+				from: owner,
+			});
+			assert.equal(smockExchanger.smocked.settle.calls[0][0], msgSender);
+			assert.equal(smockExchanger.smocked.settle.calls[0][1].toString(), currencyKey1);
+		});
+	});
+
+	describe('isWaitingPeriod()', () => {
+		it('returns false by default', async () => {
+			assert.isFalse(await baseSynthetix.isWaitingPeriod(sETH));
+		});
+		describe('when a user has exchanged into sETH', () => {
+			beforeEach(async () => {
+				await updateRatesWithDefaults({ exchangeRates, oracle, debtCache });
+
+				await baseSynthetix.issueSynths(toUnit('100'), { from: owner });
+				await baseSynthetix.exchange(sUSD, toUnit('10'), sETH, { from: owner });
+			});
+			it('then waiting period is true', async () => {
+				assert.isTrue(await baseSynthetix.isWaitingPeriod(sETH));
+			});
+			describe('when the waiting period expires', () => {
+				beforeEach(async () => {
+					await fastForward(await systemSettings.waitingPeriodSecs());
+				});
+				it('returns false by default', async () => {
+					assert.isFalse(await baseSynthetix.isWaitingPeriod(sETH));
+				});
+			});
+		});
+	});
+
 	describe('anySynthOrHZNRateIsInvalid()', () => {
 		it('should have stale rates initially', async () => {
 			assert.equal(await baseSynthetix.anySynthOrSNXRateIsInvalid(), true);
@@ -551,7 +662,7 @@ contract('BaseSynthetix', async accounts => {
 			// Try to transfer 0.000000000000000001 SNX
 			await assert.revert(
 				baseSynthetix.transfer(account1, '1', { from: owner }),
-				'Cannot transfer staked or escrowed HZN'
+				'Cannot transfer staked or escrowed SNX'
 			);
 		});
 
@@ -613,7 +724,7 @@ contract('BaseSynthetix', async accounts => {
 				baseSynthetix.transferFrom(owner, account2, '1', {
 					from: account1,
 				}),
-				'Cannot transfer staked or escrowed HZN'
+				'Cannot transfer staked or escrowed SNX'
 			);
 		});
 
@@ -662,13 +773,13 @@ contract('BaseSynthetix', async accounts => {
 			const ensureTransferReverts = async () => {
 				await assert.revert(
 					baseSynthetix.transfer(account2, value, { from: account1 }),
-					'A zasset or HZN rate is invalid'
+					'A synth or SNX rate is invalid'
 				);
 				await assert.revert(
 					baseSynthetix.transferFrom(account2, account1, value, {
 						from: account3,
 					}),
-					'A zasset or HZN rate is invalid'
+					'A synth or SNX rate is invalid'
 				);
 			};
 
@@ -818,7 +929,7 @@ contract('BaseSynthetix', async accounts => {
 						// Ensure the transfer fails as all the synthetix are in escrow
 						await assert.revert(
 							baseSynthetix.transfer(account2, toUnit('990'), { from: account1 }),
-							'Cannot transfer staked or escrowed HZN'
+							'Cannot transfer staked or escrowed SNX'
 						);
 					});
 				});
@@ -839,7 +950,7 @@ contract('BaseSynthetix', async accounts => {
 				baseSynthetix.transfer(account2, toUnit(issuedSynthetixs), {
 					from: account1,
 				}),
-				'Cannot transfer staked or escrowed HZN'
+				'Cannot transfer staked or escrowed SNX'
 			);
 		});
 

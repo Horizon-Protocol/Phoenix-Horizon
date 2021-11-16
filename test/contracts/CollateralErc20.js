@@ -94,7 +94,7 @@ contract('CollateralErc20', async accounts => {
 			from: oracle,
 		});
 
-		const sBTC = toBytes32('zBTC');
+		const sBTC = toBytes32('sBTC');
 
 		await exchangeRates.updateRates([sBTC], ['10000'].map(toUnit), timestamp, {
 			from: oracle,
@@ -125,7 +125,7 @@ contract('CollateralErc20', async accounts => {
 	};
 
 	const setupMultiCollateral = async () => {
-		synths = ['zUSD', 'zBTC'];
+		synths = ['sUSD', 'sBTC'];
 		({
 			SystemStatus: systemStatus,
 			ExchangeRates: exchangeRates,
@@ -228,14 +228,14 @@ contract('CollateralErc20', async accounts => {
 		await manager.addCollaterals([cerc20.address], { from: owner });
 
 		await cerc20.addSynths(
-			['ZassetzUSD', 'ZassetzBTC'].map(toBytes32),
-			['zUSD', 'zBTC'].map(toBytes32),
+			['SynthsUSD', 'SynthsBTC'].map(toBytes32),
+			['sUSD', 'sBTC'].map(toBytes32),
 			{ from: owner }
 		);
 
 		await manager.addSynths(
-			['ZassetzUSD', 'ZassetzBTC'].map(toBytes32),
-			['zUSD', 'zBTC'].map(toBytes32),
+			['SynthsUSD', 'SynthsBTC'].map(toBytes32),
+			['sUSD', 'sBTC'].map(toBytes32),
 			{ from: owner }
 		);
 		// rebuild the cache to add the synths we need.
@@ -272,8 +272,8 @@ contract('CollateralErc20', async accounts => {
 		assert.equal(await cerc20.owner(), owner);
 		assert.equal(await cerc20.resolver(), addressResolver.address);
 		assert.equal(await cerc20.collateralKey(), sBTC);
-		assert.equal(await cerc20.synths(0), toBytes32('ZassetzUSD'));
-		assert.equal(await cerc20.synths(1), toBytes32('ZassetzBTC'));
+		assert.equal(await cerc20.synths(0), toBytes32('SynthsUSD'));
+		assert.equal(await cerc20.synths(1), toBytes32('SynthsBTC'));
 		assert.bnEqual(await cerc20.minCratio(), toUnit(1.5));
 		assert.bnEqual(await cerc20.minCollateral(), toUnit(0.1));
 		assert.equal(await cerc20.underlyingContract(), renBTC.address);
@@ -289,7 +289,7 @@ contract('CollateralErc20', async accounts => {
 	});
 
 	it('should access its dependencies via the address resolver', async () => {
-		assert.equal(await addressResolver.getAddress(toBytes32('ZassetzUSD')), sUSDSynth.address);
+		assert.equal(await addressResolver.getAddress(toBytes32('SynthsUSD')), sUSDSynth.address);
 		assert.equal(await addressResolver.getAddress(toBytes32('FeePool')), feePool.address);
 		assert.equal(
 			await addressResolver.getAddress(toBytes32('ExchangeRates')),

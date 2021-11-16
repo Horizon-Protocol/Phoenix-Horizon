@@ -1,13 +1,13 @@
 'use strict';
 
-const { artifacts, contract, web3 } = require('@nomiclabs/buidler');
+const { artifacts, contract, web3 } = require('hardhat');
 
 const { assert, addSnapshotBeforeRestoreAfterEach } = require('./common');
 
-const MultiCollateralSynth = artifacts.require('MultiCollateralSynth');
-const CollateralState = artifacts.require('CollateralState');
-const CollateralManagerState = artifacts.require('CollateralManagerState');
-const CollateralManager = artifacts.require('CollateralManager');
+let MultiCollateralSynth;
+let CollateralState;
+let CollateralManagerState;
+let CollateralManager;
 
 const { onlyGivenAddressCanInvoke, ensureOnlyExpectedMutativeFunctions } = require('./helpers');
 const { toUnit, currentTime, fastForward } = require('../utils')();
@@ -18,7 +18,7 @@ const {
 
 const { setupAllContracts, setupContract } = require('./setup');
 
-contract('MultiCollateralSynth @gas-skip @ovm-skip', accounts => {
+contract('MultiCollateralSynth', accounts => {
 	const [deployerAccount, owner, oracle, , account1] = accounts;
 
 	const sETH = toBytes32('zBNB');
@@ -77,6 +77,13 @@ contract('MultiCollateralSynth @gas-skip @ovm-skip', accounts => {
 	};
 
 	before(async () => {
+		MultiCollateralSynth = artifacts.require('MultiCollateralSynth');
+		CollateralState = artifacts.require('CollateralState');
+		CollateralManagerState = artifacts.require('CollateralManagerState');
+		CollateralManager = artifacts.require('CollateralManager');
+	});
+
+	before(async () => {
 		synths = ['zUSD'];
 		({
 			AddressResolver: resolver,
@@ -96,6 +103,7 @@ contract('MultiCollateralSynth @gas-skip @ovm-skip', accounts => {
 				'SystemStatus',
 				'Exchanger',
 				'FeePool',
+				'CollateralUtil',
 				'CollateralManager',
 			],
 		}));
@@ -227,7 +235,7 @@ contract('MultiCollateralSynth @gas-skip @ovm-skip', accounts => {
 					fnc: this.synth.issue,
 					args: [account1, toUnit('1')],
 					accounts,
-					reason: 'Only FeePool, Exchanger, Issuer or MultiCollateral contracts allowed',
+					reason: 'Only FeePool, Exchanger, Issuer, MultiCollateral contracts allowed',
 				});
 			});
 		});
@@ -237,7 +245,7 @@ contract('MultiCollateralSynth @gas-skip @ovm-skip', accounts => {
 					fnc: this.synth.burn,
 					args: [account1, toUnit('1')],
 					accounts,
-					reason: 'Only FeePool, Exchanger, Issuer or MultiCollateral contracts allowed',
+					reason: 'Only FeePool, Exchanger, Issuer, MultiCollateral contracts allowed',
 				});
 			});
 		});

@@ -10,7 +10,7 @@ contract('Collateral', async accounts => {
 	before(async () => {
 		Collateral = artifacts.require(`Collateral`);
 	});
-
+	
 	it('should ensure only expected functions are mutative', async () => {
 		ensureOnlyExpectedMutativeFunctions({
 			abi: Collateral.abi,

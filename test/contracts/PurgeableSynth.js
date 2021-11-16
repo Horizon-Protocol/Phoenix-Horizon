@@ -1,9 +1,11 @@
 'use strict';
 
-const { artifacts, contract, web3 } = require('@nomiclabs/buidler');
+const { artifacts, contract, web3 } = require('hardhat');
 
 const { assert, addSnapshotBeforeRestoreAfterEach } = require('./common');
 
+const TokenState = artifacts.require('TokenState');
+const Proxy = artifacts.require('Proxy');
 const PurgeableSynth = artifacts.require('PurgeableSynth');
 
 const { currentTime, fastForward, toUnit } = require('../utils')();
@@ -23,18 +25,15 @@ const {
 const { setupAllContracts } = require('./setup');
 
 contract('PurgeableSynth', accounts => {
-	const [hUSD, HZN, hAUD, iBNB] = ['zUSD', 'HZN', 'zAUD', 'iBNB'].map(toBytes32);
-	const synthKeys = [hUSD, hAUD, iBNB];
+	const [sUSD, SNX, sAUD, iETH] = ['sUSD', 'SNX', 'sAUD', 'iETH'].map(toBytes32);
+	const synthKeys = [sUSD, sAUD, iETH];
 	const [deployerAccount, owner, oracle, , account1, account2] = accounts;
-
-	let TokenState;
-	let Proxy;
 
 	let exchangeRates,
 		exchanger,
 		systemSettings,
-		hUSDContract,
-		hAUDContract,
+		sUSDContract,
+		sAUDContract,
 		iETHContract,
 		systemStatus,
 		timestamp,
@@ -43,25 +42,21 @@ contract('PurgeableSynth', accounts => {
 		issuer;
 
 	before(async () => {
-		// As either of these could be legacy, we require them in the testing context (see buidler.config.js)
-		TokenState = artifacts.require('TokenState');
-		Proxy = artifacts.require('Proxy');
-
 		PurgeableSynth.link(await artifacts.require('SafeDecimalMath').new());
 
 		({
 			AddressResolver: addressResolver,
 			ExchangeRates: exchangeRates,
 			Exchanger: exchanger,
-			ZassetzUSD: hUSDContract,
-			ZassetzAUD: hAUDContract,
+			SynthsUSD: sUSDContract,
+			SynthsAUD: sAUDContract,
 			SystemStatus: systemStatus,
 			SystemSettings: systemSettings,
 			DebtCache: debtCache,
 			Issuer: issuer,
 		} = await setupAllContracts({
 			accounts,
-			synths: ['zUSD', 'zAUD'],
+			synths: ['sUSD', 'sAUD'],
 			contracts: [
 				'ExchangeRates',
 				'Exchanger',
@@ -122,7 +117,7 @@ contract('PurgeableSynth', accounts => {
 			// Create iETH as a PurgeableSynth as we do not create any PurgeableSynth
 			// in the migration script
 			const { synth, tokenState, proxy } = await deploySynth({
-				currencyKey: 'iBNB',
+				currencyKey: 'iETH',
 			});
 			await tokenState.setAssociatedContract(synth.address, { from: owner });
 			await proxy.setTarget(synth.address, { from: owner });
@@ -161,7 +156,7 @@ contract('PurgeableSynth', accounts => {
 		describe("when there's a price for the purgeable synth", () => {
 			beforeEach(async () => {
 				await exchangeRates.updateRates(
-					[hAUD, HZN, iBNB],
+					[sAUD, SNX, iETH],
 					['0.5', '1', '170'].map(toUnit),
 					timestamp,
 					{
@@ -171,14 +166,14 @@ contract('PurgeableSynth', accounts => {
 				await debtCache.takeDebtSnapshot();
 			});
 
-			describe('and a user holds 100K USD worth of purgeable synth iBNB', () => {
+			describe('and a user holds 100K USD worth of purgeable synth iETH', () => {
 				let amountToExchange;
 				let usersUSDBalance;
 				let balanceBeforePurge;
 				beforeEach(async () => {
-					// issue the user 100K USD worth of iBNB
+					// issue the user 100K USD worth of iETH
 					amountToExchange = toUnit(1e5);
-					const iETHAmount = await exchangeRates.effectiveValue(hUSD, amountToExchange, iBNB);
+					const iETHAmount = await exchangeRates.effectiveValue(sUSD, amountToExchange, iETH);
 					await issueSynthsToUser({
 						owner,
 						issuer,
@@ -187,7 +182,7 @@ contract('PurgeableSynth', accounts => {
 						user: account1,
 						amount: iETHAmount,
 					});
-					usersUSDBalance = await hUSDContract.balanceOf(account1);
+					usersUSDBalance = await sUSDContract.balanceOf(account1);
 					balanceBeforePurge = await iETHContract.balanceOf(account1);
 				});
 
@@ -212,7 +207,7 @@ contract('PurgeableSynth', accounts => {
 					});
 					describe('when rates are received', () => {
 						beforeEach(async () => {
-							await exchangeRates.updateRates([iBNB], ['170'].map(toUnit), await currentTime(), {
+							await exchangeRates.updateRates([iETH], ['170'].map(toUnit), await currentTime(), {
 								from: oracle,
 							});
 							await debtCache.takeDebtSnapshot();
@@ -237,13 +232,13 @@ contract('PurgeableSynth', accounts => {
 						);
 					});
 					it('and they have the value added back to sUSD (with fees taken out)', async () => {
-						const userBalance = await hUSDContract.balanceOf(account1);
+						const userBalance = await sUSDContract.balanceOf(account1);
 
 						const {
 							amountReceived,
 							// exchangeFee,
 							// exchangeFeeRate,
-						} = await exchanger.getAmountsForExchange(balanceBeforePurge, iBNB, hUSD);
+						} = await exchanger.getAmountsForExchange(balanceBeforePurge, iETH, sUSD);
 
 						assert.bnEqual(
 							userBalance,
@@ -294,13 +289,13 @@ contract('PurgeableSynth', accounts => {
 					});
 				});
 
-				describe('when the user holds 5000 USD worth of the purgeable synth iBNB', () => {
+				describe('when the user holds 5000 USD worth of the purgeable synth iETH', () => {
 					let balanceBeforePurgeUser2;
 					beforeEach(async () => {
 						// Note: 5000 is chosen to be large enough to accommodate exchange fees which
 						// ultimately limit the total supply of that synth
 						const amountToExchange = toUnit(5000);
-						const iETHAmount = await exchangeRates.effectiveValue(hUSD, amountToExchange, iBNB);
+						const iETHAmount = await exchangeRates.effectiveValue(sUSD, amountToExchange, iETH);
 						await issueSynthsToUser({
 							owner,
 							issuer,
@@ -328,7 +323,7 @@ contract('PurgeableSynth', accounts => {
 							await systemSettings.setPriceDeviationThresholdFactor(toUnit('5'), { from: owner });
 
 							await exchangeRates.setInversePricing(
-								iBNB,
+								iETH,
 								toUnit(100),
 								toUnit(150),
 								toUnit(50),
@@ -336,7 +331,7 @@ contract('PurgeableSynth', accounts => {
 								false,
 								{ from: owner }
 							);
-							await exchangeRates.updateRates([iBNB], ['160'].map(toUnit), timestamp, {
+							await exchangeRates.updateRates([iETH], ['160'].map(toUnit), timestamp, {
 								from: oracle,
 							});
 							await debtCache.takeDebtSnapshot();
@@ -407,7 +402,7 @@ contract('PurgeableSynth', accounts => {
 	describe('Replacing an existing Synth with a Purgeable one to purge and remove it', () => {
 		describe('when sAUD has a price', () => {
 			beforeEach(async () => {
-				await exchangeRates.updateRates([hAUD], ['0.776845993'].map(toUnit), timestamp, {
+				await exchangeRates.updateRates([sAUD], ['0.776845993'].map(toUnit), timestamp, {
 					from: oracle,
 				});
 				await debtCache.takeDebtSnapshot();
@@ -419,10 +414,10 @@ contract('PurgeableSynth', accounts => {
 					const amountToExchange = toUnit('100');
 
 					// as sAUD is MockSynth, we can invoke this directly
-					await hAUDContract.issue(account1, amountToExchange);
+					await sAUDContract.issue(account1, amountToExchange);
 
-					usersUSDBalance = await hUSDContract.balanceOf(account1);
-					this.oldSynth = hAUDContract;
+					usersUSDBalance = await sUSDContract.balanceOf(account1);
+					this.oldSynth = sAUDContract;
 					userBalanceOfOldSynth = await this.oldSynth.balanceOf(account1);
 					assert.equal(
 						userBalanceOfOldSynth.gt(toUnit('0')),
@@ -440,12 +435,12 @@ contract('PurgeableSynth', accounts => {
 					});
 					describe('and the old sAUD synth is removed from Synthetix', () => {
 						beforeEach(async () => {
-							await issuer.removeSynth(hAUD, { from: owner });
+							await issuer.removeSynth(sAUD, { from: owner });
 						});
 						describe('when a Purgeable synth is added to replace the existing sAUD', () => {
 							beforeEach(async () => {
 								const { synth } = await deploySynth({
-									currencyKey: 'zAUD',
+									currencyKey: 'sAUD',
 									proxy: this.oldProxy,
 									tokenState: this.oldTokenState,
 								});
@@ -474,11 +469,6 @@ contract('PurgeableSynth', accounts => {
 											'The balance after connecting TokenState must not have changed'
 										);
 									});
-									describe('when owner attemps to remove new synth from the system', () => {
-										it('then it reverts', async () => {
-											await assert.revert(issuer.removeSynth(hAUD, { from: owner }));
-										});
-									});
 									describe('and purge is called on the replacement sAUD contract', () => {
 										let txn;
 
@@ -490,12 +480,12 @@ contract('PurgeableSynth', accounts => {
 											assert.bnEqual(balance, toUnit('0'), 'The balance after purge must be 0');
 										});
 										it('and their balance must have gone back into sUSD', async () => {
-											const balance = await hUSDContract.balanceOf(account1);
+											const balance = await sUSDContract.balanceOf(account1);
 
 											const { amountReceived } = await exchanger.getAmountsForExchange(
 												userBalanceOfOldSynth,
-												hAUD,
-												hUSD
+												sAUD,
+												sUSD
 											);
 
 											assert.bnEqual(
@@ -514,15 +504,15 @@ contract('PurgeableSynth', accounts => {
 										});
 										describe('when the purged synth is removed from the system', () => {
 											beforeEach(async () => {
-												await issuer.removeSynth(hAUD, { from: owner });
+												await issuer.removeSynth(sAUD, { from: owner });
 											});
 											it('then the balance remains in USD (and no errors occur)', async () => {
-												const balance = await hUSDContract.balanceOf(account1);
+												const balance = await sUSDContract.balanceOf(account1);
 
 												const { amountReceived } = await exchanger.getAmountsForExchange(
 													userBalanceOfOldSynth,
-													hAUD,
-													hUSD
+													sAUD,
+													sUSD
 												);
 
 												assert.bnEqual(

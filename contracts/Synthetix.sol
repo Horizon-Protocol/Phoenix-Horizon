@@ -8,9 +8,10 @@ import "./interfaces/IRewardEscrow.sol";
 import "./interfaces/IRewardEscrowV2.sol";
 import "./interfaces/ISupplySchedule.sol";
 
-
 // https://docs.synthetix.io/contracts/source/contracts/synthetix
 contract Synthetix is BaseSynthetix {
+    bytes32 public constant CONTRACT_NAME = "Synthetix";
+
     // ========== ADDRESS RESOLVER CONFIGURATION ==========
     bytes32 private constant CONTRACT_REWARD_ESCROW = "RewardEscrow";
     bytes32 private constant CONTRACT_REWARDESCROW_V2 = "RewardEscrowV2";
@@ -50,70 +51,6 @@ contract Synthetix is BaseSynthetix {
     }
 
     // ========== OVERRIDDEN FUNCTIONS ==========
-
-    function exchange(
-        bytes32 sourceCurrencyKey,
-        uint sourceAmount,
-        bytes32 destinationCurrencyKey
-    ) external exchangeActive(sourceCurrencyKey, destinationCurrencyKey) optionalProxy returns (uint amountReceived) {
-        return exchanger().exchange(messageSender, sourceCurrencyKey, sourceAmount, destinationCurrencyKey, messageSender);
-    }
-
-    function exchangeOnBehalf(
-        address exchangeForAddress,
-        bytes32 sourceCurrencyKey,
-        uint sourceAmount,
-        bytes32 destinationCurrencyKey
-    ) external exchangeActive(sourceCurrencyKey, destinationCurrencyKey) optionalProxy returns (uint amountReceived) {
-        return
-            exchanger().exchangeOnBehalf(
-                exchangeForAddress,
-                messageSender,
-                sourceCurrencyKey,
-                sourceAmount,
-                destinationCurrencyKey
-            );
-    }
-
-    function exchangeWithTracking(
-        bytes32 sourceCurrencyKey,
-        uint sourceAmount,
-        bytes32 destinationCurrencyKey,
-        address originator,
-        bytes32 trackingCode
-    ) external exchangeActive(sourceCurrencyKey, destinationCurrencyKey) optionalProxy returns (uint amountReceived) {
-        return
-            exchanger().exchangeWithTracking(
-                messageSender,
-                sourceCurrencyKey,
-                sourceAmount,
-                destinationCurrencyKey,
-                messageSender,
-                originator,
-                trackingCode
-            );
-    }
-
-    function exchangeOnBehalfWithTracking(
-        address exchangeForAddress,
-        bytes32 sourceCurrencyKey,
-        uint sourceAmount,
-        bytes32 destinationCurrencyKey,
-        address originator,
-        bytes32 trackingCode
-    ) external exchangeActive(sourceCurrencyKey, destinationCurrencyKey) optionalProxy returns (uint amountReceived) {
-        return
-            exchanger().exchangeOnBehalfWithTracking(
-                exchangeForAddress,
-                messageSender,
-                sourceCurrencyKey,
-                sourceAmount,
-                destinationCurrencyKey,
-                originator,
-                trackingCode
-            );
-    }
-
     function exchangeWithVirtual(
         bytes32 sourceCurrencyKey,
         uint sourceAmount,
@@ -126,14 +63,41 @@ contract Synthetix is BaseSynthetix {
         returns (uint amountReceived, IVirtualSynth vSynth)
     {
         return
-            exchanger().exchangeWithVirtual(
+            exchanger().exchange(
+                messageSender,
                 messageSender,
                 sourceCurrencyKey,
                 sourceAmount,
                 destinationCurrencyKey,
                 messageSender,
+                true,
+                messageSender,
                 trackingCode
             );
+    }
+
+    // SIP-140 The initiating user of this exchange will receive the proceeds of the exchange
+    // Note: this function may have unintended consequences if not understood correctly. Please
+    // read SIP-140 for more information on the use-case
+    function exchangeWithTrackingForInitiator(
+        bytes32 sourceCurrencyKey,
+        uint sourceAmount,
+        bytes32 destinationCurrencyKey,
+        address rewardAddress,
+        bytes32 trackingCode
+    ) external exchangeActive(sourceCurrencyKey, destinationCurrencyKey) optionalProxy returns (uint amountReceived) {
+        (amountReceived, ) = exchanger().exchange(
+            messageSender,
+            messageSender,
+            sourceCurrencyKey,
+            sourceAmount,
+            destinationCurrencyKey,
+            // solhint-disable avoid-tx-origin
+            tx.origin,
+            false,
+            rewardAddress,
+            trackingCode
+        );
     }
 
     function settle(bytes32 currencyKey)
@@ -191,11 +155,8 @@ contract Synthetix is BaseSynthetix {
         optionalProxy
         returns (bool)
     {
-        (uint totalRedeemed, uint amountLiquidated) = issuer().liquidateDelinquentAccount(
-            account,
-            zUSDAmount,
-            messageSender
-        );
+        (uint totalRedeemed, uint amountLiquidated) =
+            issuer().liquidateDelinquentAccount(account, zUSDAmount, messageSender);
 
         emitAccountLiquidated(account, totalRedeemed, amountLiquidated, messageSender);
 
@@ -217,69 +178,6 @@ contract Synthetix is BaseSynthetix {
     }
 
     // ========== EVENTS ==========
-    event SynthExchange(
-        address indexed account,
-        bytes32 fromCurrencyKey,
-        uint256 fromAmount,
-        bytes32 toCurrencyKey,
-        uint256 toAmount,
-        address toAddress
-    );
-    bytes32 internal constant SYNTHEXCHANGE_SIG = keccak256(
-        "SynthExchange(address,bytes32,uint256,bytes32,uint256,address)"
-    );
-
-    function emitSynthExchange(
-        address account,
-        bytes32 fromCurrencyKey,
-        uint256 fromAmount,
-        bytes32 toCurrencyKey,
-        uint256 toAmount,
-        address toAddress
-    ) external onlyExchanger {
-        proxy._emit(
-            abi.encode(fromCurrencyKey, fromAmount, toCurrencyKey, toAmount, toAddress),
-            2,
-            SYNTHEXCHANGE_SIG,
-            addressToBytes32(account),
-            0,
-            0
-        );
-    }
-
-    event ExchangeTracking(bytes32 indexed trackingCode, bytes32 toCurrencyKey, uint256 toAmount);
-    bytes32 internal constant EXCHANGE_TRACKING_SIG = keccak256("ExchangeTracking(bytes32,bytes32,uint256)");
-
-    function emitExchangeTracking(
-        bytes32 trackingCode,
-        bytes32 toCurrencyKey,
-        uint256 toAmount
-    ) external onlyExchanger {
-        proxy._emit(abi.encode(toCurrencyKey, toAmount), 2, EXCHANGE_TRACKING_SIG, trackingCode, 0, 0);
-    }
-
-    event ExchangeReclaim(address indexed account, bytes32 currencyKey, uint amount);
-    bytes32 internal constant EXCHANGERECLAIM_SIG = keccak256("ExchangeReclaim(address,bytes32,uint256)");
-
-    function emitExchangeReclaim(
-        address account,
-        bytes32 currencyKey,
-        uint256 amount
-    ) external onlyExchanger {
-        proxy._emit(abi.encode(currencyKey, amount), 2, EXCHANGERECLAIM_SIG, addressToBytes32(account), 0, 0);
-    }
-
-    event ExchangeRebate(address indexed account, bytes32 currencyKey, uint amount);
-    bytes32 internal constant EXCHANGEREBATE_SIG = keccak256("ExchangeRebate(address,bytes32,uint256)");
-
-    function emitExchangeRebate(
-        address account,
-        bytes32 currencyKey,
-        uint256 amount
-    ) external onlyExchanger {
-        proxy._emit(abi.encode(currencyKey, amount), 2, EXCHANGEREBATE_SIG, addressToBytes32(account), 0, 0);
-    }
-
     event AccountLiquidated(address indexed account, uint hznRedeemed, uint amountLiquidated, address liquidator);
     bytes32 internal constant ACCOUNTLIQUIDATED_SIG = keccak256("AccountLiquidated(address,uint256,uint256,address)");
 
@@ -297,26 +195,5 @@ contract Synthetix is BaseSynthetix {
             0,
             0
         );
-    }
-
-    // ========== MODIFIERS ==========
-
-    modifier onlyExchanger() {
-        _onlyExchanger();
-        _;
-    }
-
-    function _onlyExchanger() private {
-        require(msg.sender == address(exchanger()), "Only Exchanger can invoke this");
-    }
-
-    modifier exchangeActive(bytes32 src, bytes32 dest) {
-        _exchangeActive(src, dest);
-        _;
-    }
-
-    function _exchangeActive(bytes32 src, bytes32 dest) private {
-        systemStatus().requireExchangeActive();
-        systemStatus().requireSynthsActive(src, dest);
     }
 }
