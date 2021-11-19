@@ -902,13 +902,13 @@ const setupAllContracts = async ({
 			synth,
 			supply: 0, // add synths with 0 supply initially
 			skipInitialAllocation: true,
-			name: `Synth ${synth}`,
+			name: `Zasset ${synth}`,
 			symbol: synth,
 		});
 
 		returnObj[`ProxyERC20${synth}`] = proxy;
 		returnObj[`TokenState${synth}`] = tokenState;
-		returnObj[`Synth${synth}`] = token;
+		returnObj[`Zasset${synth}`] = token;
 
 		// We'll defer adding the tokens into the Issuer as it must
 		// be synchronised with the FlexibleStorage address first.
