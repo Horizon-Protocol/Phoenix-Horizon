@@ -33,6 +33,7 @@ module.exports = {
 		assert.equal(log.address, emittedFrom);
 		args.forEach((arg, i) => {
 			const { type, value } = log.events[i];
+
 			if (type === 'address') {
 				assert.equal(web3.utils.toChecksumAddress(value), web3.utils.toChecksumAddress(arg));
 			} else if (/^u?int/.test(type)) {
@@ -82,18 +83,18 @@ module.exports = {
 	async updateRatesWithDefaults({ exchangeRates, oracle, debtCache }) {
 		const timestamp = await currentTime();
 
-		const [HZN, zAUD, zEUR, zBTC, iBTC, zBNB, BNB] = [
+		const [HZN, zAUD, zEUR, zBTC, iBTC, zETH, ETH] = [
 			'HZN',
 			'zAUD',
 			'zEUR',
 			'zBTC',
 			'iBTC',
-			'zBNB',
-			'BNB',
+			'zETH',
+			'ETH',
 		].map(toBytes32);
 
 		await exchangeRates.updateRates(
-			[HZN, zAUD, zEUR, zBTC, iBTC, zBNB, BNB],
+			[HZN, zAUD, zEUR, zBTC, iBTC, zETH, ETH],
 			['0.1', '0.5', '1.25', '5000', '4000', '172', '172'].map(toUnit),
 			timestamp,
 			{
@@ -185,7 +186,9 @@ module.exports = {
 			return clone;
 		};
 
-		const combinedParentsABI = ignoreParents.map(removeExcessParams);
+		const combinedParentsABI = ignoreParents
+			.reduce((memo, parent) => memo.concat(artifacts.require(parent).abi), [])
+			.map(removeExcessParams);
 
 		const fncs = abi
 			.filter(
