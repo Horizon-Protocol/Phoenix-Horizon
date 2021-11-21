@@ -25,8 +25,8 @@ contract('CollateralEth', async accounts => {
 	const YEAR = 31556926;
 	const INTERACTION_DELAY = 300;
 
-	const sUSD = toBytes32('sUSD');
-	const sETH = toBytes32('sETH');
+	const sUSD = toBytes32('zUSD');
+	const sETH = toBytes32('zETH');
 
 	const oneETH = toUnit(1);
 	const twoETH = toUnit(2);
@@ -94,12 +94,12 @@ contract('CollateralEth', async accounts => {
 	};
 
 	const setupMultiCollateral = async () => {
-		synths = ['sUSD', 'sETH'];
+		synths = ['zUSD', 'zETH'];
 		({
 			SystemStatus: systemStatus,
 			ExchangeRates: exchangeRates,
-			SynthsUSD: sUSDSynth,
-			SynthsETH: sETHSynth,
+			ZassetzUSD: sUSDSynth,
+			ZassetzETH: sETHSynth,
 			FeePool: feePool,
 			AddressResolver: addressResolver,
 			Issuer: issuer,
@@ -172,14 +172,14 @@ contract('CollateralEth', async accounts => {
 		await manager.addCollaterals([ceth.address], { from: owner });
 
 		await ceth.addSynths(
-			['SynthsUSD', 'SynthsETH'].map(toBytes32),
-			['sUSD', 'sETH'].map(toBytes32),
+			['ZassetzUSD', 'ZassetzETH'].map(toBytes32),
+			['zUSD', 'zETH'].map(toBytes32),
 			{ from: owner }
 		);
 
 		await manager.addSynths(
-			['SynthsUSD', 'SynthsETH'].map(toBytes32),
-			['sUSD', 'sETH'].map(toBytes32),
+			['ZassetzUSD', 'ZassetzETH'].map(toBytes32),
+			['zUSD', 'zETH'].map(toBytes32),
 			{ from: owner }
 		);
 		// rebuild the cache to add the synths we need.
@@ -195,7 +195,7 @@ contract('CollateralEth', async accounts => {
 			from: oracle,
 		});
 
-		const sBTC = toBytes32('sBTC');
+		const sBTC = toBytes32('zBTC');
 
 		await exchangeRates.updateRates([sBTC], ['10000'].map(toUnit), timestamp, {
 			from: oracle,
@@ -232,8 +232,8 @@ contract('CollateralEth', async accounts => {
 		assert.equal(await ceth.owner(), owner);
 		assert.equal(await ceth.resolver(), addressResolver.address);
 		assert.equal(await ceth.collateralKey(), sETH);
-		assert.equal(await ceth.synths(0), toBytes32('SynthsUSD'));
-		assert.equal(await ceth.synths(1), toBytes32('SynthsETH'));
+		assert.equal(await ceth.synths(0), toBytes32('ZassetzUSD'));
+		assert.equal(await ceth.synths(1), toBytes32('ZassetzETH'));
 		assert.bnEqual(await ceth.minCratio(), toUnit('1.3'));
 		assert.bnEqual(await ceth.minCollateral(), toUnit('2'));
 	});
@@ -247,7 +247,7 @@ contract('CollateralEth', async accounts => {
 	});
 
 	it('should access its dependencies via the address resolver', async () => {
-		assert.equal(await addressResolver.getAddress(toBytes32('SynthsUSD')), sUSDSynth.address);
+		assert.equal(await addressResolver.getAddress(toBytes32('ZassetzUSD')), sUSDSynth.address);
 		assert.equal(await addressResolver.getAddress(toBytes32('FeePool')), feePool.address);
 		assert.equal(
 			await addressResolver.getAddress(toBytes32('ExchangeRates')),

@@ -1,4 +1,17 @@
--
+- AddressResolver.js
+- AddressSetLib.js
+- BaseMigration.spec.js
+- BaseRewardEscrowV2.js
+- BaseSynthetix.js
+- BaseSynthetixBridge.unit.js
+- Bytes32SetLib.js
+- Collateral.js
+- ContractStorage.js
+- DappMaintenance.js
+- DelegateApprovals.js
+- Depot.js
+- EternalStorage.js
+- EtherWrapper.js (L:344 Issue)
 - SystemSettings.js
 - SystemStatus.js
 - TokenState.js

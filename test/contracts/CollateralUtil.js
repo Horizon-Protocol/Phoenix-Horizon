@@ -18,9 +18,9 @@ const {
 let CollateralState;
 
 contract('CollateralUtil', async accounts => {
-	const sUSD = toBytes32('sUSD');
-	const sETH = toBytes32('sETH');
-	const sBTC = toBytes32('sBTC');
+	const sUSD = toBytes32('zUSD');
+	const sETH = toBytes32('zETH');
+	const sBTC = toBytes32('zBTC');
 
 	const oneRenBTC = web3.utils.toBN('100000000');
 	const oneThousandsUSD = toUnit(1000);
@@ -77,7 +77,7 @@ contract('CollateralUtil', async accounts => {
 			from: oracle,
 		});
 
-		const sBTC = toBytes32('sBTC');
+		const sBTC = toBytes32('zBTC');
 
 		await exchangeRates.updateRates([sBTC], ['10000'].map(toUnit), timestamp, {
 			from: oracle,
@@ -103,11 +103,11 @@ contract('CollateralUtil', async accounts => {
 	};
 
 	const setupMultiCollateral = async () => {
-		synths = ['sUSD', 'sBTC'];
+		synths = ['zUSD', 'zBTC'];
 		({
 			ExchangeRates: exchangeRates,
-			SynthsUSD: sUSDSynth,
-			SynthsBTC: sBTCSynth,
+			ZassetzUSD: sUSDSynth,
+			ZassetzBTC: sBTCSynth,
 			FeePool: feePool,
 			AddressResolver: addressResolver,
 			Issuer: issuer,
@@ -174,14 +174,14 @@ contract('CollateralUtil', async accounts => {
 		await manager.addCollaterals([cerc20.address], { from: owner });
 
 		await cerc20.addSynths(
-			['SynthsUSD', 'SynthsBTC'].map(toBytes32),
-			['sUSD', 'sBTC'].map(toBytes32),
+			['ZassetzUSD', 'ZassetzBTC'].map(toBytes32),
+			['zUSD', 'zBTC'].map(toBytes32),
 			{ from: owner }
 		);
 
 		await manager.addSynths(
-			['SynthsUSD', 'SynthsBTC'].map(toBytes32),
-			['sUSD', 'sBTC'].map(toBytes32),
+			['ZassetzUSD', 'ZassetzBTC'].map(toBytes32),
+			['zUSD', 'zBTC'].map(toBytes32),
 			{ from: owner }
 		);
 		// rebuild the cache to add the synths we need.

@@ -20,9 +20,9 @@ let CollateralState;
 contract('CollateralManager', async accounts => {
 	const [deployerAccount, owner, oracle, , account1] = accounts;
 
-	const sETH = toBytes32('sETH');
-	const sUSD = toBytes32('sUSD');
-	const sBTC = toBytes32('sBTC');
+	const sETH = toBytes32('zETH');
+	const sUSD = toBytes32('zUSD');
+	const sBTC = toBytes32('zBTC');
 
 	const INTERACTION_DELAY = 300;
 
@@ -110,7 +110,7 @@ contract('CollateralManager', async accounts => {
 			from: oracle,
 		});
 
-		const sBTC = toBytes32('sBTC');
+		const sBTC = toBytes32('zBTC');
 
 		await exchangeRates.updateRates([sBTC], ['10000'].map(toUnit), timestamp, {
 			from: oracle,
@@ -123,12 +123,12 @@ contract('CollateralManager', async accounts => {
 	};
 
 	const setupManager = async () => {
-		synths = ['sUSD', 'sBTC', 'sETH', 'iBTC', 'iETH'];
+		synths = ['zUSD', 'zBTC', 'zETH', 'iBTC', 'iETH'];
 		({
 			ExchangeRates: exchangeRates,
-			SynthsUSD: sUSDSynth,
-			SynthsETH: sETHSynth,
-			SynthsBTC: sBTCSynth,
+			ZassetzUSD: sUSDSynth,
+			ZassetzETH: sETHSynth,
+			ZassetzBTC: sBTCSynth,
 			FeePool: feePool,
 			AddressResolver: addressResolver,
 			Issuer: issuer,
@@ -256,24 +256,24 @@ contract('CollateralManager', async accounts => {
 		await manager.addCollaterals([ceth.address, cerc20.address, short.address], { from: owner });
 
 		await ceth.addSynths(
-			['SynthsUSD', 'SynthsETH'].map(toBytes32),
-			['sUSD', 'sETH'].map(toBytes32),
+			['ZassetzUSD', 'ZassetzETH'].map(toBytes32),
+			['zUSD', 'zETH'].map(toBytes32),
 			{ from: owner }
 		);
 		await cerc20.addSynths(
-			['SynthsUSD', 'SynthsBTC'].map(toBytes32),
-			['sUSD', 'sBTC'].map(toBytes32),
+			['ZassetzUSD', 'ZassetzBTC'].map(toBytes32),
+			['zUSD', 'zBTC'].map(toBytes32),
 			{ from: owner }
 		);
 		await short.addSynths(
-			['SynthsBTC', 'SynthsETH'].map(toBytes32),
-			['sBTC', 'sETH'].map(toBytes32),
+			['ZassetzBTC', 'ZassetzETH'].map(toBytes32),
+			['zBTC', 'zETH'].map(toBytes32),
 			{ from: owner }
 		);
 
 		await manager.addSynths(
-			[toBytes32('SynthsUSD'), toBytes32('SynthsBTC'), toBytes32('SynthsETH')],
-			[toBytes32('sUSD'), toBytes32('sBTC'), toBytes32('sETH')],
+			[toBytes32('ZassetzUSD'), toBytes32('ZassetzBTC'), toBytes32('ZassetzETH')],
+			[toBytes32('zUSD'), toBytes32('zBTC'), toBytes32('zETH')],
 			{
 				from: owner,
 			}
@@ -281,10 +281,10 @@ contract('CollateralManager', async accounts => {
 
 		await manager.addShortableSynths(
 			[
-				[toBytes32('SynthsBTC'), toBytes32('SynthiBTC')],
-				[toBytes32('SynthsETH'), toBytes32('SynthiETH')],
+				[toBytes32('ZassetzBTC'), toBytes32('ZassetiBTC')],
+				[toBytes32('ZassetzETH'), toBytes32('ZassetiETH')],
 			],
-			['sBTC', 'sETH'].map(toBytes32),
+			['zBTC', 'zETH'].map(toBytes32),
 			{
 				from: owner,
 			}
@@ -293,8 +293,8 @@ contract('CollateralManager', async accounts => {
 		// check synths are set and currencyKeys set
 		assert.isTrue(
 			await manager.areSynthsAndCurrenciesSet(
-				['SynthsUSD', 'SynthsBTC', 'SynthsETH'].map(toBytes32),
-				['sUSD', 'sBTC', 'sETH'].map(toBytes32)
+				['ZassetzUSD', 'ZassetzBTC', 'ZassetzETH'].map(toBytes32),
+				['zUSD', 'zBTC', 'zETH'].map(toBytes32)
 			)
 		);
 
@@ -353,7 +353,7 @@ contract('CollateralManager', async accounts => {
 	});
 
 	it('should access its dependencies via the address resolver', async () => {
-		assert.equal(await addressResolver.getAddress(toBytes32('SynthsUSD')), sUSDSynth.address);
+		assert.equal(await addressResolver.getAddress(toBytes32('ZassetzUSD')), sUSDSynth.address);
 		assert.equal(await addressResolver.getAddress(toBytes32('FeePool')), feePool.address);
 		assert.equal(
 			await addressResolver.getAddress(toBytes32('ExchangeRates')),

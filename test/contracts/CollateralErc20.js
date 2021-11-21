@@ -56,8 +56,8 @@ contract('CollateralErc20', async accounts => {
 		feePool,
 		exchangeRates,
 		addressResolver,
-		zUSDZasset,
-		zBTCZasset,
+		sUSDSynth,
+		sBTCSynth,
 		renBTC,
 		systemStatus,
 		synths,
@@ -94,7 +94,7 @@ contract('CollateralErc20', async accounts => {
 			from: oracle,
 		});
 
-		const sBTC = toBytes32('zBTC');
+		// const sBTC = toBytes32('zBTC');
 
 		await exchangeRates.updateRates([sBTC], ['10000'].map(toUnit), timestamp, {
 			from: oracle,
@@ -107,16 +107,16 @@ contract('CollateralErc20', async accounts => {
 	};
 
 	const deployCollateral = async ({
-										state,
-										owner,
-										manager,
-										resolver,
-										collatKey,
-										minColat,
-										minSize,
-										underCon,
-										decimals,
-									}) => {
+		state,
+		owner,
+		manager,
+		resolver,
+		collatKey,
+		minColat,
+		minSize,
+		underCon,
+		decimals,
+	}) => {
 		return setupContract({
 			accounts,
 			contract: 'CollateralErc20',
@@ -129,8 +129,8 @@ contract('CollateralErc20', async accounts => {
 		({
 			SystemStatus: systemStatus,
 			ExchangeRates: exchangeRates,
-			ZassetzUSD: zUSDZasset,
-			ZassetzBTC: zBTCZasset,
+			ZassetzUSD: sUSDSynth,
+			ZassetzBTC: sBTCSynth,
 			FeePool: feePool,
 			AddressResolver: addressResolver,
 			Issuer: issuer,
@@ -299,7 +299,7 @@ contract('CollateralErc20', async accounts => {
 
 	// PUBLIC VIEW TESTS
 	describe('cratio test', async () => {
-		describe('sUSD loans', async () => {
+		describe('zUSD loans', async () => {
 			beforeEach(async () => {
 				tx = await cerc20.open(oneRenBTC, fiveThousandsUSD, sUSD, {
 					from: account1,

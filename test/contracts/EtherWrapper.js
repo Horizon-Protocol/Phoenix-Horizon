@@ -18,8 +18,8 @@ const { toBytes32 } = require('../..');
 const { toBN } = require('web3-utils');
 
 contract('EtherWrapper', async accounts => {
-	const synths = ['sUSD', 'sETH', 'ETH', 'SNX'];
-	const [sETH, ETH] = ['sETH', 'ETH'].map(toBytes32);
+	const synths = ['zUSD', 'zBNB', 'BNB', 'HZN'];
+	const [zBNB, BNB] = ['zBNB', 'BNB'].map(toBytes32);
 
 	const ONE = toBN('1');
 
@@ -32,28 +32,28 @@ contract('EtherWrapper', async accounts => {
 		depot,
 		issuer,
 		FEE_ADDRESS,
-		sUSDSynth,
-		sETHSynth,
+		zUSDSynth,
+		zBNBSynth,
 		etherWrapper,
 		weth,
 		timestamp;
 
-	const calculateETHToUSD = async feesInETH => {
-		// Ask the Depot how many sUSD I will get for this ETH
-		const expectedFeesUSD = await depot.synthsReceivedForEther(feesInETH);
-		return expectedFeesUSD;
+	const calculateBNBToUSD = async feesInBNB => {
+		// Ask the Depot how many zUSD I will get for this BNB
+		const expectedFeezUSD = await depot.synthsReceivedForEther(feesInBNB);
+		return expectedFeezUSD;
 	};
 
 	const calculateMintFees = async amount => {
 		const mintFee = await etherWrapper.calculateMintFee(amount);
-		const expectedFeesUSD = await calculateETHToUSD(mintFee);
-		return { mintFee, expectedFeesUSD };
+		const expectedFeezUSD = await calculateBNBToUSD(mintFee);
+		return { mintFee, expectedFeezUSD };
 	};
 
 	const calculateBurnFees = async amount => {
 		const burnFee = await etherWrapper.calculateBurnFee(amount);
-		const expectedFeesUSD = await calculateETHToUSD(burnFee);
-		return { burnFee, expectedFeesUSD };
+		const expectedFeezUSD = await calculateBNBToUSD(burnFee);
+		return { burnFee, expectedFeezUSD };
 	};
 
 	before(async () => {
@@ -65,8 +65,8 @@ contract('EtherWrapper', async accounts => {
 			Depot: depot,
 			ExchangeRates: exchangeRates,
 			EtherWrapper: etherWrapper,
-			SynthsUSD: sUSDSynth,
-			SynthsETH: sETHSynth,
+			ZassetzUSD: zUSDSynth,
+			ZassetzBNB: zBNBSynth,
 			WETH: weth,
 		} = await setupAllContracts({
 			accounts,
@@ -95,8 +95,8 @@ contract('EtherWrapper', async accounts => {
 		FEE_ADDRESS = await feePool.FEE_ADDRESS();
 		timestamp = await currentTime();
 
-		// Depot requires ETH rates
-		await exchangeRates.updateRates([sETH, ETH], ['1500', '1500'].map(toUnit), timestamp, {
+		// Depot requires BNB rates
+		await exchangeRates.updateRates([zBNB, BNB], ['1500', '1500'].map(toUnit), timestamp, {
 			from: oracle,
 		});
 	});
@@ -123,8 +123,8 @@ contract('EtherWrapper', async accounts => {
 		});
 
 		it('should access its dependencies via the address resolver', async () => {
-			assert.equal(await addressResolver.getAddress(toBytes32('SynthsETH')), sETHSynth.address);
-			assert.equal(await addressResolver.getAddress(toBytes32('SynthsUSD')), sUSDSynth.address);
+			assert.equal(await addressResolver.getAddress(toBytes32('ZassetzBNB')), zBNBSynth.address);
+			assert.equal(await addressResolver.getAddress(toBytes32('ZassetzUSD')), zUSDSynth.address);
 			assert.equal(
 				await addressResolver.getAddress(toBytes32('ExchangeRates')),
 				exchangeRates.address
@@ -134,14 +134,14 @@ contract('EtherWrapper', async accounts => {
 		});
 
 		describe('should have a default', async () => {
-			const MAX_ETH = toUnit('5000');
+			const MAX_BNB = toUnit('5000');
 			const FIFTY_BIPS = toUnit('0.005');
 
-			it('maxETH of 5,000 ETH', async () => {
-				assert.bnEqual(await etherWrapper.maxETH(), MAX_ETH);
+			it('maxBNB of 5,000 BNB', async () => {
+				assert.bnEqual(await etherWrapper.maxETH(), MAX_BNB);
 			});
-			it('capacity of 5,000 ETH', async () => {
-				assert.bnEqual(await etherWrapper.capacity(), MAX_ETH);
+			it('capacity of 5,000 BNB', async () => {
+				assert.bnEqual(await etherWrapper.capacity(), MAX_BNB);
 			});
 			it('mintFeeRate of 50 bps', async () => {
 				assert.bnEqual(await etherWrapper.mintFeeRate(), FIFTY_BIPS);
@@ -150,10 +150,10 @@ contract('EtherWrapper', async accounts => {
 				assert.bnEqual(await etherWrapper.burnFeeRate(), FIFTY_BIPS);
 			});
 			describe('totalIssuedSynths', async () => {
-				it('sETH = 0', async () => {
+				it('zBNB = 0', async () => {
 					assert.bnEqual(await etherWrapper.sETHIssued(), toBN('0'));
 				});
-				it('sUSD = 0', async () => {
+				it('zUSD = 0', async () => {
 					assert.bnEqual(await etherWrapper.sUSDIssued(), toBN('0'));
 				});
 			});
@@ -161,7 +161,7 @@ contract('EtherWrapper', async accounts => {
 	});
 
 	describe('totalIssuedSynths', async () => {
-		describe('when mint(1 sETH) is called', async () => {
+		describe('when mint(1 zBNB) is called', async () => {
 			const mintAmount = toUnit('1.0');
 
 			beforeEach(async () => {
@@ -170,25 +170,25 @@ contract('EtherWrapper', async accounts => {
 				await etherWrapper.mint(mintAmount, { from: account1 });
 			});
 
-			it('total issued sETH = 1.0', async () => {
+			it('total issued zBNB = 1.0', async () => {
 				assert.bnEqual(await etherWrapper.sETHIssued(), toUnit('1.0'));
 			});
 			it('fees escrowed = 0.005', async () => {
 				assert.bnEqual(await etherWrapper.feesEscrowed(), toUnit('0.005'));
 			});
 
-			describe('then burn(`reserves + fees` WETH) is called', async () => {
+			describe('then burn(`reserves + fees` WBNB) is called', async () => {
 				const burnAmount = toUnit('1.0');
 
 				beforeEach(async () => {
 					const { burnFee } = await calculateBurnFees(burnAmount);
 					const amountIn = burnAmount.add(burnFee);
-					await sETHSynth.issue(account1, amountIn);
-					await sETHSynth.approve(etherWrapper.address, amountIn, { from: account1 });
+					await zBNBSynth.issue(account1, amountIn);
+					await zBNBSynth.approve(etherWrapper.address, amountIn, { from: account1 });
 					await etherWrapper.burn(amountIn, { from: account1 });
 				});
 
-				it('total issued sETH = 0.0', async () => {
+				it('total issued zBNB = 0.0', async () => {
 					assert.bnEqual(await etherWrapper.sETHIssued(), toUnit('0.0'));
 				});
 				it('fees escrowed = 0.01', async () => {
@@ -201,7 +201,7 @@ contract('EtherWrapper', async accounts => {
 						await etherWrapper.distributeFees();
 					});
 
-					it('total issued sUSD = $15', async () => {
+					it('total issued zUSD = $15', async () => {
 						// 1500*0.01 = 15
 						assert.bnEqual(await etherWrapper.sUSDIssued(), toUnit('15.0'));
 					});
@@ -235,7 +235,7 @@ contract('EtherWrapper', async accounts => {
 				mintTx = await etherWrapper.mint(amount, { from: account1 });
 			});
 
-			it('locks `amount` WETH in the contract', async () => {
+			it('locks `amount` WBNB in the contract', async () => {
 				const logs = await getDecodedLogs({
 					hash: mintTx.tx,
 					contracts: [weth],
@@ -248,10 +248,10 @@ contract('EtherWrapper', async accounts => {
 					log: logs[0],
 				});
 			});
-			it('mints amount(1-mintFeeRate) sETH into the user’s wallet', async () => {
-				assert.bnEqual(await sETHSynth.balanceOf(account1), amount.sub(mintFee));
+			it('mints amount(1-mintFeeRate) zBNB into the user’s wallet', async () => {
+				assert.bnEqual(await zBNBSynth.balanceOf(account1), amount.sub(mintFee));
 			});
-			it('escrows `amount * mintFeeRate` worth of sETH as fees', async () => {
+			it('escrows `amount * mintFeeRate` worth of zBNB as fees', async () => {
 				assert.bnEqual(await etherWrapper.feesEscrowed(), feesEscrowed.add(mintFee));
 			});
 			it('has a capacity of (capacity - amount) after', async () => {
@@ -284,7 +284,7 @@ contract('EtherWrapper', async accounts => {
 				amount = initialCapacity.add(ONE);
 
 				// Calculate the mint fees on the capacity amount,
-				// as this will be the ETH accepted by the contract.
+				// as this will be the BNB accepted by the contract.
 				({ mintFee } = await calculateMintFees(initialCapacity));
 
 				feesEscrowed = await etherWrapper.feesEscrowed();
@@ -294,7 +294,7 @@ contract('EtherWrapper', async accounts => {
 				mintTx = await etherWrapper.mint(amount, { from: account1 });
 			});
 
-			it('locks `capacity` ETH in the contract', async () => {
+			it('locks `capacity` BNB in the contract', async () => {
 				const logs = await getDecodedLogs({
 					hash: mintTx.tx,
 					contracts: [weth],
@@ -307,10 +307,10 @@ contract('EtherWrapper', async accounts => {
 					log: logs[0],
 				});
 			});
-			it('mints capacity(1-mintFeeRate) sETH into the user’s wallet', async () => {
-				assert.bnEqual(await sETHSynth.balanceOf(account1), initialCapacity.sub(mintFee));
+			it('mints capacity(1-mintFeeRate) zBNB into the user’s wallet', async () => {
+				assert.bnEqual(await zBNBSynth.balanceOf(account1), initialCapacity.sub(mintFee));
 			});
-			it('escrows `capacity * mintFeeRate` worth of sETH as fees', async () => {
+			it('escrows `capacity * mintFeeRate` worth of zBNB as fees', async () => {
 				assert.bnEqual(await etherWrapper.feesEscrowed(), feesEscrowed.add(mintFee));
 			});
 			it('has a capacity of 0 after', async () => {
@@ -337,7 +337,7 @@ contract('EtherWrapper', async accounts => {
 	});
 
 	describe('burn', async () => {
-		describe('when the contract has 0 WETH', async () => {
+		describe('when the contract has 0 WBNB', async () => {
 			it('reverts', async () => {
 				await assert.revert(
 					etherWrapper.burn('1', { from: account1 }),
@@ -346,7 +346,7 @@ contract('EtherWrapper', async accounts => {
 			});
 		});
 
-		describe('when the contract has WETH reserves', async () => {
+		describe('when the contract has WBNB reserves', async () => {
 			let burnTx;
 
 			beforeEach(async () => {
@@ -369,26 +369,26 @@ contract('EtherWrapper', async accounts => {
 
 					({ burnFee } = await calculateBurnFees(principal));
 					amount = principal.add(burnFee);
-					await sETHSynth.issue(account1, amount);
-					await sETHSynth.approve(etherWrapper.address, amount, { from: account1 });
+					await zBNBSynth.issue(account1, amount);
+					await zBNBSynth.approve(etherWrapper.address, amount, { from: account1 });
 
 					burnTx = await etherWrapper.burn(amount, { from: account1 });
 				});
 
-				it('burns `amount` of sETH from user', async () => {
+				it('burns `amount` of zBNB from user', async () => {
 					const logs = await getDecodedLogs({
 						hash: burnTx.tx,
-						contracts: [sETHSynth],
+						contracts: [zBNBSynth],
 					});
 
 					decodedEventEqual({
 						event: 'Burned',
-						emittedFrom: sETHSynth.address,
+						emittedFrom: zBNBSynth.address,
 						args: [account1, amount],
 						log: logs.filter(l => !!l).find(({ name }) => name === 'Burned'),
 					});
 				});
-				it('sends amount(1-burnFeeRate) WETH to user', async () => {
+				it('sends amount(1-burnFeeRate) WBNB to user', async () => {
 					const logs = await getDecodedLogs({
 						hash: burnTx.tx,
 						contracts: [weth],
@@ -404,10 +404,10 @@ contract('EtherWrapper', async accounts => {
 							.find(({ name }) => name === 'Transfer'),
 					});
 				});
-				it('escrows `amount * burnFeeRate` worth of sETH as fees', async () => {
+				it('escrows `amount * burnFeeRate` worth of zBNB as fees', async () => {
 					assert.bnEqual(await etherWrapper.feesEscrowed(), feesEscrowed.add(burnFee));
 				});
-				it('increases capacity by `amount - fees` WETH', async () => {
+				it('increases capacity by `amount - fees` WBNB', async () => {
 					assert.bnEqual(await etherWrapper.capacity(), initialCapacity.add(amount.sub(burnFee)));
 				});
 				it('emits Burned event', async () => {
@@ -441,26 +441,26 @@ contract('EtherWrapper', async accounts => {
 					amount = reserves.add(burnFee).add(toBN('100000000'));
 					feesEscrowed = await etherWrapper.feesEscrowed();
 
-					await sETHSynth.issue(account1, amount);
-					await sETHSynth.approve(etherWrapper.address, amount, { from: account1 });
+					await zBNBSynth.issue(account1, amount);
+					await zBNBSynth.approve(etherWrapper.address, amount, { from: account1 });
 
 					burnTx = await etherWrapper.burn(amount, { from: account1 });
 				});
 
-				it('burns `reserves(1+burnFeeRate)` amount of sETH from user', async () => {
+				it('burns `reserves(1+burnFeeRate)` amount of zBNB from user', async () => {
 					const logs = await getDecodedLogs({
 						hash: burnTx.tx,
-						contracts: [sETHSynth],
+						contracts: [zBNBSynth],
 					});
 
 					decodedEventEqual({
 						event: 'Burned',
-						emittedFrom: sETHSynth.address,
+						emittedFrom: zBNBSynth.address,
 						args: [account1, reserves.add(burnFee)],
 						log: logs.filter(l => !!l).find(({ name }) => name === 'Burned'),
 					});
 				});
-				it('sends `reserves` WETH to user', async () => {
+				it('sends `reserves` WBNB to user', async () => {
 					const logs = await getDecodedLogs({
 						hash: burnTx.tx,
 						contracts: [weth],
@@ -476,7 +476,7 @@ contract('EtherWrapper', async accounts => {
 							.find(({ name }) => name === 'Transfer'),
 					});
 				});
-				it('escrows `amount * burnFeeRate` worth of sETH as fees', async () => {
+				it('escrows `amount * burnFeeRate` worth of zBNB as fees', async () => {
 					assert.bnEqual(await etherWrapper.feesEscrowed(), feesEscrowed.add(burnFee));
 				});
 				it('has a max capacity after', async () => {
@@ -498,19 +498,19 @@ contract('EtherWrapper', async accounts => {
 					await etherWrapper.mint(amount, { from: account1 });
 
 					burnAmount = toUnit('0.9');
-					await sETHSynth.issue(account1, burnAmount);
-					await sETHSynth.approve(etherWrapper.address, burnAmount, { from: account1 });
+					await zBNBSynth.issue(account1, burnAmount);
+					await zBNBSynth.approve(etherWrapper.address, burnAmount, { from: account1 });
 					burnTx = await etherWrapper.burn(burnAmount, { from: account1 });
 				});
-				it('emits a Burn event which burns 0.9 sETH', async () => {
+				it('emits a Burn event which burns 0.9 zBNB', async () => {
 					const logs = await getDecodedLogs({
 						hash: burnTx.tx,
-						contracts: [sETHSynth],
+						contracts: [zBNBSynth],
 					});
 
 					decodedEventEqual({
 						event: 'Burned',
-						emittedFrom: sETHSynth.address,
+						emittedFrom: zBNBSynth.address,
 						args: [account1, burnAmount],
 						log: logs.filter(l => !!l).find(({ name }) => name === 'Burned'),
 						bnCloseVariance: 0,
@@ -523,7 +523,7 @@ contract('EtherWrapper', async accounts => {
 	describe('distributeFees', async () => {
 		let tx;
 		let feesEscrowed;
-		let sETHIssued;
+		let zBNBIssued;
 
 		before(async () => {
 			const amount = toUnit('10');
@@ -532,33 +532,33 @@ contract('EtherWrapper', async accounts => {
 			await etherWrapper.mint(amount, { from: account1 });
 
 			feesEscrowed = await etherWrapper.feesEscrowed();
-			sETHIssued = await etherWrapper.sETHIssued();
+			zBNBIssued = await etherWrapper.sETHIssued();
 			tx = await etherWrapper.distributeFees();
 		});
 
-		it('burns `feesEscrowed` sETH', async () => {
+		it('burns `feesEscrowed` zBNB', async () => {
 			const logs = await getDecodedLogs({
 				hash: tx.tx,
-				contracts: [sETHSynth],
+				contracts: [zBNBSynth],
 			});
 
 			decodedEventEqual({
 				event: 'Burned',
-				emittedFrom: sETHSynth.address,
+				emittedFrom: zBNBSynth.address,
 				args: [etherWrapper.address, feesEscrowed],
 				log: logs.filter(l => !!l).find(({ name }) => name === 'Burned'),
 			});
 		});
-		it('issues sUSD to the feepool', async () => {
+		it('issues zUSD to the feepool', async () => {
 			const logs = await getDecodedLogs({
 				hash: tx.tx,
-				contracts: [sUSDSynth],
+				contracts: [zUSDSynth],
 			});
-			const rate = await exchangeRates.rateForCurrency(sETH);
+			const rate = await exchangeRates.rateForCurrency(zBNB);
 
 			decodedEventEqual({
 				event: 'Issued',
-				emittedFrom: sUSDSynth.address,
+				emittedFrom: zUSDSynth.address,
 				args: [FEE_ADDRESS, multiplyDecimal(feesEscrowed, rate)],
 				log: logs
 					.reverse()
@@ -566,8 +566,8 @@ contract('EtherWrapper', async accounts => {
 					.find(({ name }) => name === 'Issued'),
 			});
 		});
-		it('sETHIssued is reduced by `feesEscrowed`', async () => {
-			assert.bnEqual(await etherWrapper.sETHIssued(), sETHIssued.sub(feesEscrowed));
+		it('zBNBIssued is reduced by `feesEscrowed`', async () => {
+			assert.bnEqual(await etherWrapper.sETHIssued(), zBNBIssued.sub(feesEscrowed));
 		});
 		it('feesEscrowed = 0', async () => {
 			assert.bnEqual(await etherWrapper.feesEscrowed(), toBN(0));
