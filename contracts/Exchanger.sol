@@ -22,7 +22,6 @@ import "./interfaces/ITradingRewards.sol";
 import "./interfaces/IVirtualSynth.sol";
 import "./Proxyable.sol";
 
-
 // Used to have strongly-typed access to internal mutative functions in Synthetix
 interface ISynthetixInternal {
     function emitExchangeTracking(
@@ -54,13 +53,11 @@ interface ISynthetixInternal {
     ) external;
 }
 
-
 interface IExchangerInternalDebtCache {
     function updateCachedSynthDebtsWithRates(bytes32[] calldata currencyKeys, uint[] calldata currencyRates) external;
 
     function updateCachedSynthDebts(bytes32[] calldata currencyKeys) external;
 }
-
 
 // https://docs.synthetix.io/contracts/source/contracts/exchanger
 contract Exchanger is Owned, MixinSystemSettings, IExchanger {
@@ -208,13 +205,14 @@ contract Exchanger is Owned, MixinSystemSettings, IExchanger {
             (uint srcRoundIdAtPeriodEnd, uint destRoundIdAtPeriodEnd) = getRoundIdsAtPeriodEnd(exchangeEntry);
 
             // given these round ids, determine what effective value they should have received
-            uint destinationAmount = exchangeRates().effectiveValueAtRound(
-                exchangeEntry.src,
-                exchangeEntry.amount,
-                exchangeEntry.dest,
-                srcRoundIdAtPeriodEnd,
-                destRoundIdAtPeriodEnd
-            );
+            uint destinationAmount =
+                exchangeRates().effectiveValueAtRound(
+                    exchangeEntry.src,
+                    exchangeEntry.amount,
+                    exchangeEntry.dest,
+                    srcRoundIdAtPeriodEnd,
+                    destRoundIdAtPeriodEnd
+                );
 
             // and deduct the fee from this amount using the exchangeFeeRate from storage
             uint amountShouldHaveReceived = _getAmountReceivedForExchange(destinationAmount, exchangeEntry.exchangeFeeRate);
@@ -648,12 +646,8 @@ contract Exchanger is Owned, MixinSystemSettings, IExchanger {
     {
         require(maxSecsLeftInWaitingPeriod(from, currencyKey) == 0, "Cannot settle during waiting period");
 
-        (
-            uint reclaimAmount,
-            uint rebateAmount,
-            uint entries,
-            ExchangeEntrySettlement[] memory settlements
-        ) = _settlementOwing(from, currencyKey);
+        (uint reclaimAmount, uint rebateAmount, uint entries, ExchangeEntrySettlement[] memory settlements) =
+            _settlementOwing(from, currencyKey);
 
         if (reclaimAmount > rebateAmount) {
             reclaimed = reclaimAmount.sub(rebateAmount);
@@ -743,8 +737,8 @@ contract Exchanger is Owned, MixinSystemSettings, IExchanger {
 
         // Is this a swing trade? long to short or short to long skipping zUSD.
         if (
-            (sourceCurrencyKey[0] == 0x73 && destinationCurrencyKey[0] == 0x69) ||
-            (sourceCurrencyKey[0] == 0x69 && destinationCurrencyKey[0] == 0x73)
+            (sourceCurrencyKey[0] == 0x7a && destinationCurrencyKey[0] == 0x69) ||
+            (sourceCurrencyKey[0] == 0x69 && destinationCurrencyKey[0] == 0x7a)
         ) {
             // Double the exchange fee
             exchangeFeeRate = exchangeFeeRate.mul(2);

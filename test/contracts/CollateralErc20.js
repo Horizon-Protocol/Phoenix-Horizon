@@ -30,7 +30,7 @@ contract('CollateralErc20', async accounts => {
 	const INTERACTION_DELAY = 300;
 
 	const sUSD = toBytes32('zUSD');
-	const sETH = toBytes32('zETH');
+	const sETH = toBytes32('zBNB');
 	const sBTC = toBytes32('zBTC');
 
 	const oneRenBTC = web3.utils.toBN('100000000');

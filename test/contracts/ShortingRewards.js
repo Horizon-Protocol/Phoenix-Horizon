@@ -26,9 +26,9 @@ contract('ShortingRewards', accounts => {
 		account2,
 	] = accounts;
 
-	const sUSD = toBytes32('sUSD');
-	const sETH = toBytes32('sETH');
-	const sBTC = toBytes32('sBTC');
+	const sUSD = toBytes32('zUSD');
+	const sETH = toBytes32('zBNB');
+	const sBTC = toBytes32('zBTC');
 
 	// Synthetix is the rewardsToken
 	let rewardsToken,
@@ -121,7 +121,7 @@ contract('ShortingRewards', accounts => {
 	});
 
 	before(async () => {
-		synths = ['sUSD', 'sBTC', 'sETH', 'iBTC', 'iETH'];
+		synths = ['zUSD', 'zBTC', 'zBNB', 'iBTC', 'iBNB'];
 		({
 			ExchangeRates: exchangeRates,
 			SynthsUSD: sUSDSynth,

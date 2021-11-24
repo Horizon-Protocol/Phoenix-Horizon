@@ -33,14 +33,14 @@ const MockAggregator = artifacts.require('MockAggregatorV2V3');
 
 contract('Exchanger (spec tests)', async accounts => {
 	const [sUSD, sAUD, sEUR, SNX, sBTC, iBTC, sETH, iETH] = [
-		'sUSD',
-		'sAUD',
-		'sEUR',
-		'SNX',
-		'sBTC',
+		'zUSD',
+		'zAUD',
+		'zEUR',
+		'HZN',
+		'zBTC',
 		'iBTC',
-		'sETH',
-		'iETH',
+		'zBNB',
+		'iBNB',
 	].map(toBytes32);
 
 	const trackingCode = toBytes32('1INCH');
@@ -1883,9 +1883,9 @@ contract('Exchanger (spec tests)', async accounts => {
 						const synthExchangeEvent = txn.logs.find(log => log.event === 'SynthExchange');
 						assert.eventEqual(synthExchangeEvent, 'SynthExchange', {
 							account: account1,
-							fromCurrencyKey: toBytes32('sUSD'),
+							fromCurrencyKey: toBytes32('zUSD'),
 							fromAmount: amountIssued,
-							toCurrencyKey: toBytes32('sAUD'),
+							toCurrencyKey: toBytes32('zAUD'),
 							toAmount: sAUDBalance,
 							toAddress: account1,
 						});
@@ -1912,9 +1912,9 @@ contract('Exchanger (spec tests)', async accounts => {
 						const synthExchangeEvent = txn.logs.find(log => log.event === 'SynthExchange');
 						assert.eventEqual(synthExchangeEvent, 'SynthExchange', {
 							account: account1,
-							fromCurrencyKey: toBytes32('sUSD'),
+							fromCurrencyKey: toBytes32('zUSD'),
 							fromAmount: amountIssued,
-							toCurrencyKey: toBytes32('sAUD'),
+							toCurrencyKey: toBytes32('zAUD'),
 							toAmount: sAUDBalance,
 							toAddress: account1,
 						});
@@ -1922,7 +1922,7 @@ contract('Exchanger (spec tests)', async accounts => {
 						const trackingEvent = txn.logs.find(log => log.event === 'ExchangeTracking');
 						assert.eventEqual(trackingEvent, 'ExchangeTracking', {
 							trackingCode,
-							toCurrencyKey: toBytes32('sAUD'),
+							toCurrencyKey: toBytes32('zAUD'),
 							toAmount: sAUDBalance,
 							fee: usdFeeAmount,
 						});
@@ -2259,7 +2259,7 @@ contract('Exchanger (spec tests)', async accounts => {
 								const trackingEvent = txn.logs.find(log => log.event === 'ExchangeTracking');
 								assert.eventEqual(trackingEvent, 'ExchangeTracking', {
 									trackingCode,
-									toCurrencyKey: toBytes32('sAUD'),
+									toCurrencyKey: toBytes32('zAUD'),
 									toAmount: sAUDBalance,
 									fee: usdFeeAmount,
 								});
@@ -3368,7 +3368,7 @@ contract('Exchanger (spec tests)', async accounts => {
 					describe('suspension invoked by anyone via suspendSynthWithInvalidRate()', () => {
 						// sTRX relies on the fact that sTRX is a valid synth but never given a rate in the setup code
 						// above
-						const synthWithNoRate = toBytes32('sTRX');
+						const synthWithNoRate = toBytes32('zTRX');
 						it('when called with invalid synth, then reverts', async () => {
 							await assert.revert(
 								exchanger.suspendSynthWithInvalidRate(toBytes32('XYZ')),
@@ -3830,12 +3830,12 @@ contract('Exchanger (spec tests)', async accounts => {
 				ExchangeState: exchangeState,
 				FeePool: feePool,
 				SystemStatus: systemStatus,
-				SynthsUSD: sUSDContract,
-				SynthsBTC: sBTCContract,
-				SynthsEUR: sEURContract,
-				SynthsAUD: sAUDContract,
-				SynthiBTC: iBTCContract,
-				SynthsETH: sETHContract,
+				ZassetzUSD: sUSDContract,
+				ZassetzBTC: sBTCContract,
+				ZassetzEUR: sEURContract,
+				ZassetzAUD: sAUDContract,
+				ZassetiBTC: iBTCContract,
+				ZassetzBNB: sETHContract,
 				SystemSettings: systemSettings,
 				DelegateApprovals: delegateApprovals,
 				AddressResolver: resolver,
@@ -3844,7 +3844,7 @@ contract('Exchanger (spec tests)', async accounts => {
 				FlexibleStorage: flexibleStorage,
 			} = await setupAllContracts({
 				accounts,
-				synths: ['sUSD', 'sETH', 'sEUR', 'sAUD', 'sBTC', 'iBTC', 'sTRX'],
+				synths: ['zUSD', 'zBNB', 'zEUR', 'zAUD', 'zBTC', 'iBTC', 'zTRX'],
 				contracts: [
 					'Exchanger',
 					'ExchangeState',
@@ -3935,12 +3935,12 @@ contract('Exchanger (spec tests)', async accounts => {
 				ExchangeState: exchangeState,
 				FeePool: feePool,
 				SystemStatus: systemStatus,
-				SynthsUSD: sUSDContract,
-				SynthsBTC: sBTCContract,
-				SynthsEUR: sEURContract,
-				SynthsAUD: sAUDContract,
-				SynthiBTC: iBTCContract,
-				SynthsETH: sETHContract,
+				ZassetzUSD: sUSDContract,
+				ZassetzBTC: sBTCContract,
+				ZassetzEUR: sEURContract,
+				ZassetzAUD: sAUDContract,
+				ZassetiBTC: iBTCContract,
+				ZassetzBNB: sETHContract,
 				SystemSettings: systemSettings,
 				DelegateApprovals: delegateApprovals,
 				AddressResolver: resolver,
@@ -3949,7 +3949,7 @@ contract('Exchanger (spec tests)', async accounts => {
 				FlexibleStorage: flexibleStorage,
 			} = await setupAllContracts({
 				accounts,
-				synths: ['sUSD', 'sETH', 'sEUR', 'sAUD', 'sBTC', 'iBTC', 'sTRX'],
+				synths: ['zUSD', 'zBNB', 'zEUR', 'zAUD', 'zBTC', 'iBTC', 'zTRX'],
 				contracts: [
 					'Exchanger',
 					'ExchangeState',

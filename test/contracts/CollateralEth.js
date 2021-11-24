@@ -26,7 +26,7 @@ contract('CollateralEth', async accounts => {
 	const INTERACTION_DELAY = 300;
 
 	const sUSD = toBytes32('zUSD');
-	const sETH = toBytes32('zETH');
+	const sETH = toBytes32('zBNB');
 
 	const oneETH = toUnit(1);
 	const twoETH = toUnit(2);
@@ -336,7 +336,7 @@ contract('CollateralEth', async accounts => {
 			assert.bnClose(sUSDAmount, toUnit('200'), '100');
 
 			// $260 worth of eth should allow $200 (0.02) of sBTC to be issued.
-			const sBTCAmount = await ceth.maxLoan(toUnit('2.6'), toBytes32('sBTC'));
+			const sBTCAmount = await ceth.maxLoan(toUnit('2.6'), toBytes32('zBTC'));
 
 			assert.bnEqual(sBTCAmount, toUnit('0.02'));
 		});

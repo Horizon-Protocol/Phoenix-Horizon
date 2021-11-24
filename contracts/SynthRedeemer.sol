@@ -11,7 +11,6 @@ import "./SafeDecimalMath.sol";
 import "./interfaces/IERC20.sol";
 import "./interfaces/IIssuer.sol";
 
-
 contract SynthRedeemer is ISynthRedeemer, MixinResolver {
     using SafeDecimalMath for uint;
 
@@ -20,7 +19,7 @@ contract SynthRedeemer is ISynthRedeemer, MixinResolver {
     mapping(address => uint) public redemptions;
 
     bytes32 private constant CONTRACT_ISSUER = "Issuer";
-    bytes32 private constant CONTRACT_SYNTHSUSD = "SynthsUSD";
+    bytes32 private constant CONTRACT_SYNTHSUSD = "ZassetzUSD";
 
     constructor(address _resolver) public MixinResolver(_resolver) {}
 

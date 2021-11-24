@@ -25,13 +25,13 @@ const {
 
 contract('DebtCache', async accounts => {
 	const [sUSD, sAUD, sEUR, SNX, sETH, ETH, iETH] = [
-		'sUSD',
-		'sAUD',
-		'sEUR',
-		'SNX',
-		'sETH',
-		'ETH',
-		'iETH',
+		'zUSD',
+		'zAUD',
+		'zEUR',
+		'HZN',
+		'zBNB',
+		'BNB',
+		'iBNB',
 	].map(toBytes32);
 	const synthKeys = [sUSD, sAUD, sEUR, sETH, SNX];
 
@@ -81,7 +81,7 @@ contract('DebtCache', async accounts => {
 		const CollateralState = artifacts.require(`CollateralState`);
 		const CollateralManagerState = artifacts.require('CollateralManagerState');
 
-		synths = ['sUSD', 'sETH', 'sAUD'];
+		synths = ['zUSD', 'zBNB', 'zAUD'];
 
 		// Deploy CollateralManagerState.
 		const managerState = await CollateralManagerState.new(owner, ZERO_ADDRESS, {
@@ -137,14 +137,14 @@ contract('DebtCache', async accounts => {
 		await manager.addCollaterals([ceth.address], { from: owner });
 
 		await ceth.addSynths(
-			['SynthsUSD', 'SynthsETH'].map(toBytes32),
-			['sUSD', 'sETH'].map(toBytes32),
+			['ZassetzUSD', 'ZassetzBNB'].map(toBytes32),
+			['zUSD', 'zBNB'].map(toBytes32),
 			{ from: owner }
 		);
 
 		await manager.addSynths(
-			['SynthsUSD', 'SynthsETH'].map(toBytes32),
-			['sUSD', 'sETH'].map(toBytes32),
+			['ZassetzUSD', 'ZassetzBNB'].map(toBytes32),
+			['zUSD', 'zBNB'].map(toBytes32),
 			{ from: owner }
 		);
 		// rebuild the cache to add the synths we need.
@@ -222,11 +222,11 @@ contract('DebtCache', async accounts => {
 
 		await manager.addCollaterals([short.address], { from: owner });
 
-		await short.addSynths(['SynthsETH'].map(toBytes32), ['sETH'].map(toBytes32), { from: owner });
+		await short.addSynths(['ZassetzBNB'].map(toBytes32), ['zBNB'].map(toBytes32), { from: owner });
 
 		await manager.addShortableSynths(
-			[[toBytes32('SynthsETH'), toBytes32('SynthiETH')]],
-			['sETH'].map(toBytes32),
+			[[toBytes32('ZassetzBNB'), toBytes32('ZassetiBNB')]],
+			['zBNB'].map(toBytes32),
 			{
 				from: owner,
 			}
@@ -238,16 +238,16 @@ contract('DebtCache', async accounts => {
 	// run this once before all tests to prepare our environment, snapshots on beforeEach will take
 	// care of resetting to this state
 	before(async () => {
-		synths = ['sUSD', 'sAUD', 'sEUR', 'sETH', 'iETH'];
+		synths = ['zUSD', 'zAUD', 'zEUR', 'zBNB', 'iBNB'];
 		({
 			Synthetix: synthetix,
 			SystemStatus: systemStatus,
 			SystemSettings: systemSettings,
 			ExchangeRates: exchangeRates,
-			SynthsUSD: sUSDContract,
-			SynthsETH: sETHContract,
-			SynthsAUD: sAUDContract,
-			SynthsEUR: sEURContract,
+			ZassetzUSD: sUSDContract,
+			ZassetzBNB: sETHContract,
+			ZassetzAUD: sAUDContract,
+			ZassetzEUR: sEURContract,
 			FeePool: feePool,
 			DebtCache: debtCache,
 			Issuer: issuer,
@@ -581,20 +581,20 @@ contract('DebtCache', async accounts => {
 
 				await assert.revert(
 					synthetix.issueSynths(toUnit('10'), { from: account1 }),
-					'A synth or SNX rate is invalid'
+					'A zasset or HZN rate is invalid'
 				);
 
 				await assert.revert(
 					synthetix.burnSynths(toUnit('1'), { from: account1 }),
-					'A synth or SNX rate is invalid'
+					'A zasset or HZN rate is invalid'
 				);
 
-				await assert.revert(feePool.claimFees(), 'A synth or SNX rate is invalid');
+				await assert.revert(feePool.claimFees(), 'A zasset or HZN rate is invalid');
 
 				// Can't transfer SNX if issued debt
 				await assert.revert(
 					synthetix.transfer(owner, toUnit('1'), { from: account1 }),
-					'A synth or SNX rate is invalid'
+					'A zasset or HZN rate is invalid'
 				);
 
 				// But can transfer if not

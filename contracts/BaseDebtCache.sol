@@ -18,7 +18,6 @@ import "./interfaces/IERC20.sol";
 import "./interfaces/ICollateralManager.sol";
 import "./interfaces/IEtherWrapper.sol";
 
-
 // https://docs.synthetix.io/contracts/source/contracts/debtcache
 contract BaseDebtCache is Owned, MixinSystemSettings, IDebtCache {
     using SafeMath for uint;
@@ -31,8 +30,8 @@ contract BaseDebtCache is Owned, MixinSystemSettings, IDebtCache {
 
     /* ========== ENCODED NAMES ========== */
 
-    bytes32 internal constant sUSD = "sUSD";
-    bytes32 internal constant sETH = "sETH";
+    bytes32 internal constant sUSD = "zUSD";
+    bytes32 internal constant sETH = "zBNB";
 
     /* ========== ADDRESS RESOLVER CONFIGURATION ========== */
 

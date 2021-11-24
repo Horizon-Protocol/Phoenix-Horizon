@@ -58,9 +58,9 @@ contract('ExchangerWithVirtualSynth (unit tests)', async accounts => {
 																	this.instance.exchange(
 																		owner,
 																		owner,
-																		toBytes32('sUSD'),
+																		toBytes32('zUSD'),
 																		'0',
-																		toBytes32('sETH'),
+																		toBytes32('zBNB'),
 																		owner,
 																		true,
 																		owner,
@@ -116,9 +116,9 @@ contract('ExchangerWithVirtualSynth (unit tests)', async accounts => {
 															txn = await this.instance.exchange(
 																owner,
 																owner,
-																toBytes32('sUSD'),
+																toBytes32('zUSD'),
 																amount,
-																toBytes32('sETH'),
+																toBytes32('zBNB'),
 																owner,
 																true,
 																owner,
@@ -129,7 +129,7 @@ contract('ExchangerWithVirtualSynth (unit tests)', async accounts => {
 														it('emits a VirtualSynthCreated event with the correct underlying synth and amount', async () => {
 															assert.eventEqual(txn, 'VirtualSynthCreated', {
 																synth: this.mocks.synth.smocked.proxy.will.returnValue,
-																currencyKey: toBytes32('sETH'),
+																currencyKey: toBytes32('zBNB'),
 																amount,
 																recipient: owner,
 															});

@@ -25,11 +25,9 @@ import "./interfaces/IRewardEscrowV2.sol";
 import "./interfaces/ISynthRedeemer.sol";
 import "./Proxyable.sol";
 
-
 interface IProxy {
     function target() external view returns (address);
 }
-
 
 interface IIssuerInternalDebtCache {
     function updateCachedSynthDebtWithRate(bytes32 currencyKey, uint currencyRate) external;
@@ -50,7 +48,6 @@ interface IIssuerInternalDebtCache {
             bool isStale
         );
 }
-
 
 // https://docs.synthetix.io/contracts/source/contracts/issuer
 contract Issuer is Owned, MixinSystemSettings, IIssuer {
@@ -227,15 +224,15 @@ contract Issuer is Owned, MixinSystemSettings, IIssuer {
 
         // Figure out the global debt percentage delta from when they entered the system.
         // This is a high precision integer of 27 (1e27) decimals.
-        uint currentDebtOwnership = state
-            .lastDebtLedgerEntry()
-            .divideDecimalRoundPrecise(state.debtLedger(debtEntryIndex))
-            .multiplyDecimalRoundPrecise(initialDebtOwnership);
+        uint currentDebtOwnership =
+            state
+                .lastDebtLedgerEntry()
+                .divideDecimalRoundPrecise(state.debtLedger(debtEntryIndex))
+                .multiplyDecimalRoundPrecise(initialDebtOwnership);
 
         // Their debt balance is their portion of the total system value.
-        uint highPrecisionBalance = totalSystemValue.decimalToPreciseDecimal().multiplyDecimalRoundPrecise(
-            currentDebtOwnership
-        );
+        uint highPrecisionBalance =
+            totalSystemValue.decimalToPreciseDecimal().multiplyDecimalRoundPrecise(currentDebtOwnership);
 
         // Convert back into 18 decimals (1e18)
         debtBalance = highPrecisionBalance.preciseDecimalToDecimal();
@@ -463,11 +460,8 @@ contract Issuer is Owned, MixinSystemSettings, IIssuer {
         uint synthSupply = IERC20(synthToRemove).totalSupply();
 
         if (synthSupply > 0) {
-            (uint amountOfzUSD, uint rateToRedeem, ) = exchangeRates().effectiveValueAndRates(
-                currencyKey,
-                synthSupply,
-                "zUSD"
-            );
+            (uint amountOfzUSD, uint rateToRedeem, ) =
+                exchangeRates().effectiveValueAndRates(currencyKey, synthSupply, "zUSD");
             require(rateToRedeem > 0, "Cannot remove synth to redeem without rate");
             ISynthRedeemer _synthRedeemer = synthRedeemer();
             synths[zUSD].issue(address(_synthRedeemer), amountOfzUSD);
@@ -599,10 +593,8 @@ contract Issuer is Owned, MixinSystemSettings, IIssuer {
         _requireRatesNotInvalid(anyRateIsInvalid || snxRateInvalid);
 
         uint collateralForAccount = _collateral(account);
-        uint amountToFixRatio = liquidations().calculateAmountToFixCollateral(
-            debtBalance,
-            _snxToUSD(collateralForAccount, snxRate)
-        );
+        uint amountToFixRatio =
+            liquidations().calculateAmountToFixCollateral(debtBalance, _snxToUSD(collateralForAccount, snxRate));
 
         // Cap amount to liquidate to repair collateral ratio based on issuance ratio
         amountToLiquidate = amountToFixRatio < zUSDAmount ? amountToFixRatio : zUSDAmount;
@@ -639,7 +631,7 @@ contract Issuer is Owned, MixinSystemSettings, IIssuer {
     /* ========== INTERNAL FUNCTIONS ========== */
 
     function _requireRatesNotInvalid(bool anyRateIsInvalid) internal pure {
-        require(!anyRateIsInvalid, "A synth or HZN rate is invalid");
+        require(!anyRateIsInvalid, "A zasset or HZN rate is invalid");
     }
 
     function _requireCanIssueOnBehalf(address issueForAddress, address from) internal view {

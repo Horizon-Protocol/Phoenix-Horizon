@@ -25,7 +25,7 @@ const {
 } = require('../..');
 
 contract('BaseSynthetix', async accounts => {
-	const [sUSD, sAUD, sEUR, SNX, sETH] = ['zUSD', 'zAUD', 'zEUR', 'HZN', 'zETH'].map(toBytes32);
+	const [sUSD, sAUD, sEUR, SNX, sETH] = ['zUSD', 'zAUD', 'zEUR', 'HZN', 'zBNB'].map(toBytes32);
 
 	const [, owner, account1, account2, account3] = accounts;
 

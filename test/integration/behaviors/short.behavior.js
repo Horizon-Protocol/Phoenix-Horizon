@@ -40,8 +40,8 @@ function itCanOpenAndCloseShort({ ctx }) {
 			// CollateralManager.getShortRate requires existing sETH else div by zero
 			await exchangeSynths({
 				ctx,
-				src: 'sUSD',
-				dest: 'sETH',
+				src: 'zUSD',
+				dest: 'zBNB',
 				amount: parseEther('10'),
 				user: ctx.users.otherUser,
 			});
@@ -65,7 +65,7 @@ function itCanOpenAndCloseShort({ ctx }) {
 				before('skip if max borrowing power reached', async function() {
 					const maxBorrowingPower = await CollateralShort.maxLoan(
 						amountToDeposit,
-						toBytes32('sETH')
+						toBytes32('zBNB')
 					);
 					const maxBorrowingPowerReached = maxBorrowingPower <= amountToBorrow;
 
@@ -89,7 +89,7 @@ function itCanOpenAndCloseShort({ ctx }) {
 				});
 
 				before('open the loan', async () => {
-					tx = await CollateralShort.open(amountToDeposit, amountToBorrow, toBytes32('sETH'));
+					tx = await CollateralShort.open(amountToDeposit, amountToBorrow, toBytes32('zBNB'));
 
 					const { events } = await tx.wait();
 					const event = events.find(l => l.event === 'LoanCreated');
@@ -147,7 +147,7 @@ function itCanOpenAndCloseShort({ ctx }) {
 						await exchangeSynths({
 							ctx,
 							src: 'sUSD',
-							dest: 'sETH',
+							dest: 'zBNB',
 							amount: parseEther('50000'),
 							user,
 						});
@@ -159,7 +159,7 @@ function itCanOpenAndCloseShort({ ctx }) {
 					});
 
 					before('settle', async () => {
-						const tx = await Synthetix.settle(toBytes32('sETH'));
+						const tx = await Synthetix.settle(toBytes32('zBNB'));
 						await tx.wait();
 					});
 

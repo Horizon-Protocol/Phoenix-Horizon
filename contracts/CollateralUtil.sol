@@ -11,7 +11,6 @@ import "./MixinSystemSettings.sol";
 
 import "./SafeDecimalMath.sol";
 
-
 contract CollateralUtil is ICollateralUtil, ICollateralLoan, MixinSystemSettings {
     /* ========== LIBRARIES ========== */
     using SafeMath for uint;
@@ -19,7 +18,7 @@ contract CollateralUtil is ICollateralUtil, ICollateralLoan, MixinSystemSettings
 
     /* ========== CONSTANTS ========== */
 
-    bytes32 private constant sUSD = "sUSD";
+    bytes32 private constant zUSD = "zUSD";
 
     /* ========== ADDRESS RESOLVER CONFIGURATION ========== */
 
@@ -43,8 +42,8 @@ contract CollateralUtil is ICollateralUtil, ICollateralLoan, MixinSystemSettings
     /* ========== UTILITY VIEW FUNCS ========== */
 
     function getCollateralRatio(Loan calldata loan, bytes32 collateralKey) external view returns (uint cratio) {
-        uint cvalue = _exchangeRates().effectiveValue(collateralKey, loan.collateral, sUSD);
-        uint dvalue = _exchangeRates().effectiveValue(loan.currency, loan.amount.add(loan.accruedInterest), sUSD);
+        uint cvalue = _exchangeRates().effectiveValue(collateralKey, loan.collateral, zUSD);
+        uint dvalue = _exchangeRates().effectiveValue(loan.currency, loan.amount.add(loan.accruedInterest), zUSD);
         return cvalue.divideDecimal(dvalue);
     }
 
@@ -73,16 +72,16 @@ contract CollateralUtil is ICollateralUtil, ICollateralLoan, MixinSystemSettings
         bytes32 collateralKey
     ) external view returns (uint amount) {
         uint liquidationPenalty = getLiquidationPenalty();
-        uint debtValue = _exchangeRates().effectiveValue(loan.currency, loan.amount.add(loan.accruedInterest), sUSD);
-        uint collateralValue = _exchangeRates().effectiveValue(collateralKey, loan.collateral, sUSD);
+        uint debtValue = _exchangeRates().effectiveValue(loan.currency, loan.amount.add(loan.accruedInterest), zUSD);
+        uint collateralValue = _exchangeRates().effectiveValue(collateralKey, loan.collateral, zUSD);
         uint unit = SafeDecimalMath.unit();
 
         uint dividend = debtValue.sub(collateralValue.divideDecimal(minCratio));
         uint divisor = unit.sub(unit.add(liquidationPenalty).divideDecimal(minCratio));
 
-        uint sUSDamount = dividend.divideDecimal(divisor);
+        uint zUSDamount = dividend.divideDecimal(divisor);
 
-        return _exchangeRates().effectiveValue(sUSD, sUSDamount, loan.currency);
+        return _exchangeRates().effectiveValue(zUSD, zUSDamount, loan.currency);
     }
 
     function collateralRedeemed(

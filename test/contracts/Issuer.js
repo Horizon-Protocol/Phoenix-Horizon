@@ -36,7 +36,7 @@ const {
 contract('Issuer (via Synthetix)', async accounts => {
 	const WEEK = 604800;
 
-	const [sUSD, sAUD, sEUR, SNX, sETH, ETH] = ['sUSD', 'sAUD', 'sEUR', 'SNX', 'sETH', 'ETH'].map(
+	const [sUSD, sAUD, sEUR, SNX, sETH, ETH] = ['zUSD', 'zAUD', 'zEUR', 'HZN', 'zBNB', 'BNB'].map(
 		toBytes32
 	);
 	const synthKeys = [sUSD, sAUD, sEUR, sETH, SNX];
@@ -70,7 +70,7 @@ contract('Issuer (via Synthetix)', async accounts => {
 	// run this once before all tests to prepare our environment, snapshots on beforeEach will take
 	// care of resetting to this state
 	before(async () => {
-		synths = ['sUSD', 'sAUD', 'sEUR', 'sETH'];
+		synths = ['zUSD', 'zAUD', 'zEUR', 'zBNB'];
 		({
 			Synthetix: synthetix,
 			SynthetixState: synthetixState,
@@ -79,10 +79,10 @@ contract('Issuer (via Synthetix)', async accounts => {
 			ExchangeRates: exchangeRates,
 			SynthetixEscrow: escrow,
 			RewardEscrowV2: rewardEscrowV2,
-			SynthsUSD: sUSDContract,
-			SynthsETH: sETHContract,
-			SynthsAUD: sAUDContract,
-			SynthsEUR: sEURContract,
+			ZassetzUSD: sUSDContract,
+			ZassetzBNB: sETHContract,
+			ZassetzAUD: sAUDContract,
+			ZassetzEUR: sEURContract,
 			Exchanger: exchanger,
 			FeePool: feePool,
 			DebtCache: debtCache,
@@ -457,8 +457,8 @@ contract('Issuer (via Synthetix)', async accounts => {
 						from: owner,
 					});
 
-					const debt1 = await synthetix.debtBalanceOf(account1, toBytes32('sUSD'));
-					const debt2 = await synthetix.debtBalanceOf(account2, toBytes32('sUSD'));
+					const debt1 = await synthetix.debtBalanceOf(account1, toBytes32('zUSD'));
+					const debt2 = await synthetix.debtBalanceOf(account2, toBytes32('zUSD'));
 					assert.bnEqual(debt1, 0);
 					assert.bnEqual(debt2, 0);
 				});
@@ -473,7 +473,7 @@ contract('Issuer (via Synthetix)', async accounts => {
 					const issuedSynths = toUnit('1001');
 					await synthetix.issueSynths(issuedSynths, { from: account1 });
 
-					const debt = await synthetix.debtBalanceOf(account1, toBytes32('sUSD'));
+					const debt = await synthetix.debtBalanceOf(account1, toBytes32('zUSD'));
 					assert.bnEqual(debt, issuedSynths);
 				});
 			});
@@ -522,7 +522,7 @@ contract('Issuer (via Synthetix)', async accounts => {
 
 			describe('maxIssuableSynths()', () => {
 				it("should correctly calculate a user's maximum issuable synths without prior issuance", async () => {
-					const rate = await exchangeRates.rateForCurrency(toBytes32('SNX'));
+					const rate = await exchangeRates.rateForCurrency(toBytes32('HZN'));
 					const issuedSynthetixs = web3.utils.toBN('200000');
 					await synthetix.transfer(account1, toUnit(issuedSynthetixs), {
 						from: owner,
@@ -1028,7 +1028,7 @@ contract('Issuer (via Synthetix)', async accounts => {
 							});
 						});
 					});
-					['SNX', 'sAUD', ['SNX', 'sAUD'], 'none'].forEach(type => {
+					['HZN', 'zAUD', ['HZN', 'zAUD'], 'none'].forEach(type => {
 						describe(`when ${type} is stale`, () => {
 							beforeEach(async () => {
 								await fastForward(
@@ -1036,9 +1036,9 @@ contract('Issuer (via Synthetix)', async accounts => {
 								);
 
 								// set all rates minus those to ignore
-								const ratesToUpdate = ['SNX']
+								const ratesToUpdate = ['HZN']
 									.concat(synths)
-									.filter(key => key !== 'sUSD' && ![].concat(type).includes(key));
+									.filter(key => key !== 'zUSD' && ![].concat(type).includes(key));
 
 								const timestamp = await currentTime();
 
@@ -1260,7 +1260,7 @@ contract('Issuer (via Synthetix)', async accounts => {
 						});
 					});
 
-					['SNX', 'sAUD', ['SNX', 'sAUD'], 'none'].forEach(type => {
+					['HZN', 'sAUD', ['HZN', 'sAUD'], 'none'].forEach(type => {
 						describe(`when ${type} is stale`, () => {
 							beforeEach(async () => {
 								await fastForward(
@@ -1268,15 +1268,15 @@ contract('Issuer (via Synthetix)', async accounts => {
 								);
 
 								// set all rates minus those to ignore
-								const ratesToUpdate = ['SNX']
+								const ratesToUpdate = ['HZN']
 									.concat(synths)
-									.filter(key => key !== 'sUSD' && ![].concat(type).includes(key));
+									.filter(key => key !== 'zUSD' && ![].concat(type).includes(key));
 
 								const timestamp = await currentTime();
 
 								await exchangeRates.updateRates(
 									ratesToUpdate.map(toBytes32),
-									ratesToUpdate.map(rate => toUnit(rate === 'SNX' ? '0.1' : '1')),
+									ratesToUpdate.map(rate => toUnit(rate === 'HZN' ? '0.1' : '1')),
 									timestamp,
 									{
 										from: oracle,
@@ -1913,7 +1913,7 @@ contract('Issuer (via Synthetix)', async accounts => {
 					await synthetix.issueSynths(toUnit('51'), { from: account2 });
 					await synthetix.burnSynths(burntSynthsPt2, { from: account1 });
 
-					const debt = await synthetix.debtBalanceOf(account1, toBytes32('sUSD'));
+					const debt = await synthetix.debtBalanceOf(account1, toBytes32('zUSD'));
 					const expectedDebt = issuedSynthsPt1
 						.add(issuedSynthsPt2)
 						.sub(burntSynthsPt1)
