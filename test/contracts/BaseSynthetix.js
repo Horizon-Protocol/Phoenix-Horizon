@@ -50,7 +50,7 @@ contract('BaseSynthetix', async accounts => {
 			SynthetixEscrow: escrow,
 		} = await setupAllContracts({
 			accounts,
-			synths: ['zUSD', 'zETH', 'zEUR', 'zAUD'],
+			synths: ['zUSD', 'zBNB', 'zEUR', 'zAUD'],
 			contracts: [
 				'BaseSynthetix',
 				'SynthetixState',

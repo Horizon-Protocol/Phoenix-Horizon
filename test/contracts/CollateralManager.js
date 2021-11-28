@@ -123,11 +123,11 @@ contract('CollateralManager', async accounts => {
 	};
 
 	const setupManager = async () => {
-		synths = ['zUSD', 'zBTC', 'zETH', 'iBTC', 'iETH'];
+		synths = ['zUSD', 'zBTC', 'zBNB', 'iBTC', 'iBNB'];
 		({
 			ExchangeRates: exchangeRates,
 			ZassetzUSD: sUSDSynth,
-			ZassetzETH: sETHSynth,
+			ZassetzBNB: sETHSynth,
 			ZassetzBTC: sBTCSynth,
 			FeePool: feePool,
 			AddressResolver: addressResolver,
@@ -256,8 +256,8 @@ contract('CollateralManager', async accounts => {
 		await manager.addCollaterals([ceth.address, cerc20.address, short.address], { from: owner });
 
 		await ceth.addSynths(
-			['ZassetzUSD', 'ZassetzETH'].map(toBytes32),
-			['zUSD', 'zETH'].map(toBytes32),
+			['ZassetzUSD', 'ZassetzBNB'].map(toBytes32),
+			['zUSD', 'zBNB'].map(toBytes32),
 			{ from: owner }
 		);
 		await cerc20.addSynths(
@@ -266,14 +266,14 @@ contract('CollateralManager', async accounts => {
 			{ from: owner }
 		);
 		await short.addSynths(
-			['ZassetzBTC', 'ZassetzETH'].map(toBytes32),
-			['zBTC', 'zETH'].map(toBytes32),
+			['ZassetzBTC', 'ZassetzBNB'].map(toBytes32),
+			['zBTC', 'zBNB'].map(toBytes32),
 			{ from: owner }
 		);
 
 		await manager.addSynths(
-			[toBytes32('ZassetzUSD'), toBytes32('ZassetzBTC'), toBytes32('ZassetzETH')],
-			[toBytes32('zUSD'), toBytes32('zBTC'), toBytes32('zETH')],
+			[toBytes32('ZassetzUSD'), toBytes32('ZassetzBTC'), toBytes32('ZassetzBNB')],
+			[toBytes32('zUSD'), toBytes32('zBTC'), toBytes32('zBNB')],
 			{
 				from: owner,
 			}
@@ -282,9 +282,9 @@ contract('CollateralManager', async accounts => {
 		await manager.addShortableSynths(
 			[
 				[toBytes32('ZassetzBTC'), toBytes32('ZassetiBTC')],
-				[toBytes32('ZassetzETH'), toBytes32('ZassetiETH')],
+				[toBytes32('ZassetzBNB'), toBytes32('ZassetiBNB')],
 			],
-			['zBTC', 'zETH'].map(toBytes32),
+			['zBTC', 'zBNB'].map(toBytes32),
 			{
 				from: owner,
 			}
@@ -293,8 +293,8 @@ contract('CollateralManager', async accounts => {
 		// check synths are set and currencyKeys set
 		assert.isTrue(
 			await manager.areSynthsAndCurrenciesSet(
-				['ZassetzUSD', 'ZassetzBTC', 'ZassetzETH'].map(toBytes32),
-				['zUSD', 'zBTC', 'zETH'].map(toBytes32)
+				['ZassetzUSD', 'ZassetzBTC', 'ZassetzBNB'].map(toBytes32),
+				['zUSD', 'zBTC', 'zBNB'].map(toBytes32)
 			)
 		);
 

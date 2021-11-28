@@ -94,12 +94,12 @@ contract('CollateralEth', async accounts => {
 	};
 
 	const setupMultiCollateral = async () => {
-		synths = ['zUSD', 'zETH'];
+		synths = ['zUSD', 'zBNB'];
 		({
 			SystemStatus: systemStatus,
 			ExchangeRates: exchangeRates,
 			ZassetzUSD: sUSDSynth,
-			ZassetzETH: sETHSynth,
+			ZassetzBNB: sETHSynth,
 			FeePool: feePool,
 			AddressResolver: addressResolver,
 			Issuer: issuer,
@@ -172,14 +172,14 @@ contract('CollateralEth', async accounts => {
 		await manager.addCollaterals([ceth.address], { from: owner });
 
 		await ceth.addSynths(
-			['ZassetzUSD', 'ZassetzETH'].map(toBytes32),
-			['zUSD', 'zETH'].map(toBytes32),
+			['ZassetzUSD', 'ZassetzBNB'].map(toBytes32),
+			['zUSD', 'zBNB'].map(toBytes32),
 			{ from: owner }
 		);
 
 		await manager.addSynths(
-			['ZassetzUSD', 'ZassetzETH'].map(toBytes32),
-			['zUSD', 'zETH'].map(toBytes32),
+			['ZassetzUSD', 'ZassetzBNB'].map(toBytes32),
+			['zUSD', 'zBNB'].map(toBytes32),
 			{ from: owner }
 		);
 		// rebuild the cache to add the synths we need.
@@ -233,7 +233,7 @@ contract('CollateralEth', async accounts => {
 		assert.equal(await ceth.resolver(), addressResolver.address);
 		assert.equal(await ceth.collateralKey(), sETH);
 		assert.equal(await ceth.synths(0), toBytes32('ZassetzUSD'));
-		assert.equal(await ceth.synths(1), toBytes32('ZassetzETH'));
+		assert.equal(await ceth.synths(1), toBytes32('ZassetzBNB'));
 		assert.bnEqual(await ceth.minCratio(), toUnit('1.3'));
 		assert.bnEqual(await ceth.minCollateral(), toUnit('2'));
 	});

@@ -25,7 +25,7 @@ const {
 const { setupAllContracts } = require('./setup');
 
 contract('PurgeableSynth', accounts => {
-	const [sUSD, SNX, sAUD, iETH] = ['sUSD', 'SNX', 'sAUD', 'iETH'].map(toBytes32);
+	const [sUSD, SNX, sAUD, iETH] = ['zUSD', 'HZN', 'zAUD', 'iBNB'].map(toBytes32);
 	const synthKeys = [sUSD, sAUD, iETH];
 	const [deployerAccount, owner, oracle, , account1, account2] = accounts;
 
@@ -48,15 +48,15 @@ contract('PurgeableSynth', accounts => {
 			AddressResolver: addressResolver,
 			ExchangeRates: exchangeRates,
 			Exchanger: exchanger,
-			SynthsUSD: sUSDContract,
-			SynthsAUD: sAUDContract,
+			ZassetzUSD: sUSDContract,
+			ZassetzAUD: sAUDContract,
 			SystemStatus: systemStatus,
 			SystemSettings: systemSettings,
 			DebtCache: debtCache,
 			Issuer: issuer,
 		} = await setupAllContracts({
 			accounts,
-			synths: ['sUSD', 'sAUD'],
+			synths: ['zUSD', 'zAUD'],
 			contracts: [
 				'ExchangeRates',
 				'Exchanger',
@@ -117,7 +117,7 @@ contract('PurgeableSynth', accounts => {
 			// Create iETH as a PurgeableSynth as we do not create any PurgeableSynth
 			// in the migration script
 			const { synth, tokenState, proxy } = await deploySynth({
-				currencyKey: 'iETH',
+				currencyKey: 'iBNB',
 			});
 			await tokenState.setAssociatedContract(synth.address, { from: owner });
 			await proxy.setTarget(synth.address, { from: owner });
@@ -440,7 +440,7 @@ contract('PurgeableSynth', accounts => {
 						describe('when a Purgeable synth is added to replace the existing sAUD', () => {
 							beforeEach(async () => {
 								const { synth } = await deploySynth({
-									currencyKey: 'sAUD',
+									currencyKey: 'zAUD',
 									proxy: this.oldProxy,
 									tokenState: this.oldTokenState,
 								});

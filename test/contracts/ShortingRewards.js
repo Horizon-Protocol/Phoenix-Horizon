@@ -66,7 +66,7 @@ contract('ShortingRewards', accounts => {
 			from: oracle,
 		});
 
-		const sBTC = toBytes32('sBTC');
+		const sBTC = toBytes32('zBTC');
 
 		await exchangeRates.updateRates([sBTC], ['10000'].map(toUnit), timestamp, {
 			from: oracle,
@@ -124,9 +124,9 @@ contract('ShortingRewards', accounts => {
 		synths = ['zUSD', 'zBTC', 'zBNB', 'iBTC', 'iBNB'];
 		({
 			ExchangeRates: exchangeRates,
-			SynthsUSD: sUSDSynth,
-			SynthsBTC: sBTCSynth,
-			SynthsETH: sETHSynth,
+			ZassetzUSD: sUSDSynth,
+			ZassetzBTC: sBTCSynth,
+			ZassetzBNB: sETHSynth,
 			FeePool: feePool,
 			AddressResolver: addressResolver,
 			Issuer: issuer,
@@ -201,17 +201,17 @@ contract('ShortingRewards', accounts => {
 		await manager.addCollaterals([short.address], { from: owner });
 
 		await short.addSynths(
-			['SynthsBTC', 'SynthsETH'].map(toBytes32),
-			['sBTC', 'sETH'].map(toBytes32),
+			['ZassetzBTC', 'ZassetzBNB'].map(toBytes32),
+			['zBTC', 'zBNB'].map(toBytes32),
 			{ from: owner }
 		);
 
 		await manager.addShortableSynths(
 			[
-				[toBytes32('SynthsBTC'), toBytes32('SynthiBTC')],
-				[toBytes32('SynthsETH'), toBytes32('SynthiETH')],
+				[toBytes32('ZassetzBTC'), toBytes32('ZassetiBTC')],
+				[toBytes32('ZassetzBNB'), toBytes32('ZassetiBNB')],
 			],
-			['sBTC', 'sETH'].map(toBytes32),
+			['zBTC', 'zBNB'].map(toBytes32),
 			{
 				from: owner,
 			}

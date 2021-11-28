@@ -152,7 +152,7 @@ contract('SynthetixBridgeToBase (unit tests)', accounts => {
 				describe('failure modes', () => {
 					it('does not work when the user has less trasferable snx than the withdrawal amount', async () => {
 						mintableSynthetix.smocked.transferableSynthetix.will.return.with(() => '0');
-						await assert.revert(instance.withdraw('1'), 'Not enough transferable SNX');
+						await assert.revert(instance.withdraw('1'), 'Not enough transferable HZN');
 					});
 					it('does not work when initiation has been suspended', async () => {
 						await instance.suspendInitiation({ from: owner });
@@ -203,7 +203,7 @@ contract('SynthetixBridgeToBase (unit tests)', accounts => {
 						mintableSynthetix.smocked.transferableSynthetix.will.return.with(() => '0');
 						await assert.revert(
 							instance.withdrawTo(randomAddress, '1'),
-							'Not enough transferable SNX'
+							'Not enough transferable HZN'
 						);
 					});
 					it('does not work when initiation has been suspended', async () => {

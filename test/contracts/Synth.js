@@ -222,12 +222,12 @@ contract('Synth', async accounts => {
 					await setStatus({ owner, systemStatus, section: 'SynthExchange', synth, suspend: true });
 				});
 				it('when transfer() is invoked for sUSD, it works as expected', async () => {
-					await sUSDContract.transfer(account1, amount, {
+					await zUSDContract.transfer(account1, amount, {
 						from: owner,
 					});
 				});
 				it('when transferFrom() is invoked for sETH, it works as expected', async () => {
-					await sUSDContract.transferFrom(owner, account1, amount, {
+					await zUSDContract.transferFrom(owner, account1, amount, {
 						from: account1,
 					});
 				});

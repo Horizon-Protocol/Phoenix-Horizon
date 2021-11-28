@@ -89,8 +89,8 @@ module.exports = {
 			'zEUR',
 			'zBTC',
 			'iBTC',
-			'zETH',
-			'ETH',
+			'zBNB',
+			'BNB',
 		].map(toBytes32);
 
 		await exchangeRates.updateRates(
