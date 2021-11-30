@@ -1,6 +1,6 @@
 'use strict';
 
-const { artifacts, contract, web3 } = require('@nomiclabs/buidler');
+const { artifacts, contract, web3 } = require('hardhat');
 
 const { assert, addSnapshotBeforeRestoreAfterEach } = require('./common');
 
@@ -49,7 +49,7 @@ const createRandomKeysAndRates = quantity => {
 };
 
 contract('Exchange Rates', async accounts => {
-	const [deployerAccount, owner, oracle, bandProtocolOracle, accountOne, accountTwo] = accounts;
+	const [deployerAccount, owner, oracle, accountOne, accountTwo] = accounts;
 	const [HZN, hJPY, hXTZ, hBNB, hUSD, hEUR, hAUD, fastGasPrice] = [
 		'HZN',
 		'hJPY',

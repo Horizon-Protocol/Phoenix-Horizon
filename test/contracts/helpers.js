@@ -1,4 +1,4 @@
-const { artifacts, web3 } = require('@nomiclabs/buidler');
+const { artifacts, web3 } = require('hardhat');
 
 const abiDecoder = require('abi-decoder');
 const { smockit } = require('@eth-optimism/smock');
@@ -33,6 +33,7 @@ module.exports = {
 		assert.equal(log.address, emittedFrom);
 		args.forEach((arg, i) => {
 			const { type, value } = log.events[i];
+
 			if (type === 'address') {
 				assert.equal(web3.utils.toChecksumAddress(value), web3.utils.toChecksumAddress(arg));
 			} else if (/^u?int/.test(type)) {
@@ -60,6 +61,14 @@ module.exports = {
 		}
 	},
 
+	buildMinimalProxyCode(baseAddress, { includePrefix = true } = {}) {
+		// See EIP-1167: https://eips.ethereum.org/EIPS/eip-1167#specification
+		// Assumes the non-optimized version of the proxy
+		const sanitizedBaseAddress = baseAddress.replace(/^0x/, '').toLowerCase();
+		const code = `363d3d373d3d3d363d73${sanitizedBaseAddress}5af43d82803e903d91602b57fd5bf3`;
+		return includePrefix ? `0x${code}` : code;
+	},
+
 	timeIsClose({ actual, expected, variance = 1 }) {
 		assert.ok(
 			Math.abs(Number(actual) - Number(expected)) <= variance,
@@ -67,10 +76,14 @@ module.exports = {
 		);
 	},
 
+	trimUtf8EscapeChars(input) {
+		return web3.utils.hexToAscii(web3.utils.utf8ToHex(input));
+	},
+
 	async updateRatesWithDefaults({ exchangeRates, oracle, debtCache }) {
 		const timestamp = await currentTime();
 
-		const [HZN, zAUD, zEUR, zBTC, iBTC, zBNB, BNB] = [
+		const [HZN, zAUD, zEUR, zBTC, iBTC, zETH, ETH] = [
 			'HZN',
 			'zAUD',
 			'zEUR',
@@ -81,7 +94,7 @@ module.exports = {
 		].map(toBytes32);
 
 		await exchangeRates.updateRates(
-			[HZN, zAUD, zEUR, zBTC, iBTC, zBNB, BNB],
+			[HZN, zAUD, zEUR, zBTC, iBTC, zETH, ETH],
 			['0.1', '0.5', '1.25', '5000', '4000', '172', '172'].map(toUnit),
 			timestamp,
 			{
@@ -174,10 +187,7 @@ module.exports = {
 		};
 
 		const combinedParentsABI = ignoreParents
-			.reduce(
-				(memo, parent) => memo.concat(artifacts.require(parent, { ignoreLegacy: true }).abi),
-				[]
-			)
+			.reduce((memo, parent) => memo.concat(artifacts.require(parent).abi), [])
 			.map(removeExcessParams);
 
 		const fncs = abi
@@ -235,6 +245,12 @@ module.exports = {
 			} else {
 				await systemStatus.resumeExchange({ from: owner });
 			}
+		} else if (section === 'SynthExchange') {
+			if (suspend) {
+				await systemStatus.suspendSynthExchange(synth, reason, { from: owner });
+			} else {
+				await systemStatus.resumeSynthExchange(synth, { from: owner });
+			}
 		} else if (section === 'Synth') {
 			if (suspend) {
 				await systemStatus.suspendSynth(synth, reason, { from: owner });
@@ -246,15 +262,18 @@ module.exports = {
 		}
 	},
 
-	async prepareSmocks({ contracts, accounts = [] }) {
-		const mocks = {};
+	async prepareSmocks({ accounts = [], contracts, mocks = {} }) {
 		for (const [i, contract] of Object.entries(contracts).concat([
 			[contracts.length, 'AddressResolver'],
 		])) {
-			if (mocks[contract]) {
+			const contractParts = contract.split(/:/);
+			const source = contractParts[0];
+			const label = contractParts[1] || source;
+
+			if (mocks[label]) {
 				continue; // prevent dupes
 			}
-			mocks[contract] = await smockit(artifacts.require(contract).abi, { address: accounts[i] });
+			mocks[label] = await smockit(artifacts.require(source).abi, { address: accounts[i] });
 		}
 
 		const resolver = mocks['AddressResolver'];

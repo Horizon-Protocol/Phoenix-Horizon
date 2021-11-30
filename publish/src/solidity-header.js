@@ -43,6 +43,7 @@ module.exports = {
 * Horizon Protocol: ${contract}
 *
 * Latest source (may be newer): https://github.com/Horizon-Protocol/Horizon-Smart-Contract/blob/master/contracts/${contract}
+* Docs: https://docs.horizonprotocol.com/
 *
 * Contract Dependencies: ${deps.length ? '\n*\t- ' + deps.join('\n*\t- ') : '(none)'}
 * Libraries: ${libraries.length ? '\n*\t- ' + libraries.join('\n*\t- ') : '(none)'}

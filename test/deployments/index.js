@@ -16,8 +16,12 @@ describe('deployments', () => {
 	networks
 		.filter(n => n !== 'local')
 		.forEach(network => {
-			(network === 'goerli' ? describe.skip : describe)(network, () => {
-				const { getTarget, getSource, getStakingRewards, getSynths } = wrap({ network, fs, path });
+			(['goerli'].indexOf(network) > -1 ? describe.skip : describe)(network, () => {
+				const { getTarget, getSource, getStakingRewards, getSynths } = wrap({
+					network,
+					fs,
+					path,
+				});
 
 				// we need this outside the test runner in order to generate tests per contract name
 				const targets = getTarget();
@@ -201,15 +205,13 @@ describe('deployments', () => {
 							// Note: instead of manually managing this list, it would be better to read this
 							// on-chain for each environment when a contract had the MixinResolver function
 							// `resolverAddressesRequired()` and compile and check these. The problem is then
-							// that would omit the deps from Depot and EtherCollateral which were not
+							// that would omit the deps from Depot which were not
 							// redeployed in Hadar (v2.21)
 							[
-								'BinaryOptionMarketFactory',
-								'BinaryOptionMarketManager',
 								'DebtCache',
 								'DelegateApprovals',
 								'Depot',
-								'EtherCollateral',
+								'EtherWrapper',
 								'Exchanger',
 								'ExchangeRates',
 								'ExchangeState',
@@ -265,6 +267,8 @@ describe('deployments', () => {
 							});
 
 							it(`${target} isResolverCached is true`, async () => {
+								// not every contract with a resolver will actually be a MixinResolver, so
+								// only check those with the MixinResolver.isResolverCached function
 								if ('isResolverCached' in Contract.methods) {
 									// prior to Shaula (v2.35.x), contracts with isResolverCached took the old resolver as an argument
 									const usesLegacy = !!Contract.options.jsonInterface.find(
@@ -275,10 +279,6 @@ describe('deployments', () => {
 											.isResolverCached(...[].concat(usesLegacy ? foundResolver : []))
 											.call()
 									);
-									// Depot is the only contract not currently updated to the latest MixinResolver so it
-									// doesn't expose the is cached predicate
-								} else if (target !== 'Depot') {
-									throw Error(`${target} is missing isResolverCached() function`);
 								}
 							});
 						});

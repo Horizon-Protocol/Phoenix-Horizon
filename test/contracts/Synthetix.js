@@ -1,6 +1,6 @@
 'use strict';
 
-const { artifacts, contract, web3 } = require('@nomiclabs/buidler');
+const { artifacts, contract, web3 } = require('hardhat');
 
 const { assert, addSnapshotBeforeRestoreAfterEach } = require('./common');
 
@@ -10,11 +10,10 @@ require('./common'); // import common test scaffolding
 
 const { setupContract, setupAllContracts } = require('./setup');
 
-const { currentTime, fastForward, fastForwardTo, toUnit, fromUnit } = require('../utils')();
+const { fastForwardTo, toUnit, fromUnit } = require('../utils')();
 
 const {
 	ensureOnlyExpectedMutativeFunctions,
-	onlyGivenAddressCanInvoke,
 	updateRatesWithDefaults,
 	setStatus,
 } = require('./helpers');
@@ -25,20 +24,21 @@ const {
 } = require('../..');
 
 contract('Synthetix', async accounts => {
-	const [hUSD, hAUD, hEUR, hBNB] = ['zUSD', 'zAUD', 'zEUR', 'zBNB'].map(toBytes32);
+	const [sAUD, sEUR, sUSD, sETH] = ['zAUD', 'zEUR', 'zUSD', 'zBNB'].map(toBytes32);
 
-	const [, owner, account1, account2] = accounts;
+	const [, owner, account1, account2, account3] = accounts;
 
 	let synthetix,
 		exchangeRates,
 		debtCache,
-		systemSettings,
 		supplySchedule,
 		rewardEscrow,
 		rewardEscrowV2,
 		oracle,
 		addressResolver,
-		systemStatus;
+		systemStatus,
+		sUSDContract,
+		sETHContract;
 
 	before(async () => {
 		({
@@ -47,10 +47,11 @@ contract('Synthetix', async accounts => {
 			ExchangeRates: exchangeRates,
 			DebtCache: debtCache,
 			SystemStatus: systemStatus,
-			SystemSettings: systemSettings,
 			RewardEscrow: rewardEscrow,
 			RewardEscrowV2: rewardEscrowV2,
 			SupplySchedule: supplySchedule,
+			ZassetzUSD: sUSDContract,
+			ZassetzBNB: sETHContract,
 		} = await setupAllContracts({
 			accounts,
 			synths: ['zUSD', 'zBNB', 'zEUR', 'zAUD'],
@@ -58,7 +59,6 @@ contract('Synthetix', async accounts => {
 				'Synthetix',
 				'SynthetixState',
 				'SupplySchedule',
-				'SystemSettings',
 				'AddressResolver',
 				'ExchangeRates',
 				'SystemStatus',
@@ -82,13 +82,7 @@ contract('Synthetix', async accounts => {
 		ensureOnlyExpectedMutativeFunctions({
 			abi: synthetix.abi,
 			ignoreParents: ['BaseSynthetix'],
-			expected: [
-				'emitExchangeRebate',
-				'emitExchangeReclaim',
-				'emitSynthExchange',
-				'emitExchangeTracking',
-				'migrateEscrowBalanceToRewardEscrowV2',
-			],
+			expected: ['migrateEscrowBalanceToRewardEscrowV2'],
 		});
 	});
 
@@ -110,112 +104,11 @@ contract('Synthetix', async accounts => {
 		});
 	});
 
-	describe('only Exchanger can call emit event functions', () => {
-		const amount1 = 10;
-		const amount2 = 100;
-		const currencyKey1 = hAUD;
-		const currencyKey2 = hEUR;
-		const trackingCode = toBytes32('1inch');
-		it('emitExchangeTracking() cannot be invoked directly by any account', async () => {
-			await onlyGivenAddressCanInvoke({
-				fnc: synthetix.emitExchangeTracking,
-				accounts,
-				args: [trackingCode, currencyKey1, account1],
-				reason: 'Only Exchanger can invoke this',
-			});
-		});
-		it('emitExchangeRebate() cannot be invoked directly by any account', async () => {
-			await onlyGivenAddressCanInvoke({
-				fnc: synthetix.emitExchangeRebate,
-				accounts,
-				args: [account1, currencyKey1, amount1],
-				reason: 'Only Exchanger can invoke this',
-			});
-		});
-		it('emitExchangeReclaim() cannot be invoked directly by any account', async () => {
-			await onlyGivenAddressCanInvoke({
-				fnc: synthetix.emitExchangeReclaim,
-				accounts,
-				args: [account1, currencyKey1, amount1],
-				reason: 'Only Exchanger can invoke this',
-			});
-		});
-		it('emitSynthExchange() cannot be invoked directly by any account', async () => {
-			await onlyGivenAddressCanInvoke({
-				fnc: synthetix.emitSynthExchange,
-				accounts,
-				args: [account1, currencyKey1, amount1, currencyKey2, amount2, account2],
-				reason: 'Only Exchanger can invoke this',
-			});
-		});
-
-		describe('Exchanger calls emit', () => {
-			const exchanger = account1;
-			let tx1, tx2, tx3, tx4;
-			beforeEach('pawn Exchanger and sync cache', async () => {
-				await addressResolver.importAddresses(['Exchanger'].map(toBytes32), [exchanger], {
-					from: owner,
-				});
-				await synthetix.rebuildCache();
-			});
-			beforeEach('call event emission functions', async () => {
-				tx1 = await synthetix.emitExchangeRebate(account1, currencyKey1, amount1, {
-					from: exchanger,
-				});
-				tx2 = await synthetix.emitExchangeReclaim(account1, currencyKey1, amount1, {
-					from: exchanger,
-				});
-				tx3 = await synthetix.emitSynthExchange(
-					account1,
-					currencyKey1,
-					amount1,
-					currencyKey2,
-					amount2,
-					account2,
-					{ from: exchanger }
-				);
-				tx4 = await synthetix.emitExchangeTracking(trackingCode, currencyKey1, amount1, {
-					from: exchanger,
-				});
-			});
-
-			it('the corresponding events are emitted', async () => {
-				assert.eventEqual(tx1, 'ExchangeRebate', {
-					account: account1,
-					currencyKey: currencyKey1,
-					amount: amount1,
-				});
-				assert.eventEqual(tx2, 'ExchangeReclaim', {
-					account: account1,
-					currencyKey: currencyKey1,
-					amount: amount1,
-				});
-				assert.eventEqual(tx3, 'SynthExchange', {
-					account: account1,
-					fromCurrencyKey: currencyKey1,
-					fromAmount: amount1,
-					toCurrencyKey: currencyKey2,
-					toAmount: amount2,
-					toAddress: account2,
-				});
-				assert.eventEqual(tx4, 'ExchangeTracking', {
-					trackingCode: trackingCode,
-					toCurrencyKey: currencyKey1,
-					toAmount: amount1,
-				});
-			});
-		});
-	});
-
-	describe('Exchanger calls @cov-skip', () => {
+	describe('Exchanger calls', () => {
 		let smockExchanger;
 		beforeEach(async () => {
 			smockExchanger = await smockit(artifacts.require('Exchanger').abi);
-			smockExchanger.smocked.exchangeOnBehalf.will.return.with(() => '1');
-			smockExchanger.smocked.exchangeWithTracking.will.return.with(() => '1');
-			smockExchanger.smocked.exchangeOnBehalfWithTracking.will.return.with(() => '1');
-			smockExchanger.smocked.exchangeWithVirtual.will.return.with(() => ['1', account1]);
-			smockExchanger.smocked.settle.will.return.with(() => ['1', '2', '3']);
+			smockExchanger.smocked.exchange.will.return.with(() => ['1', account1]);
 			await addressResolver.importAddresses(
 				['Exchanger'].map(toBytes32),
 				[smockExchanger.address],
@@ -225,266 +118,44 @@ contract('Synthetix', async accounts => {
 		});
 
 		const amount1 = '10';
-		const currencyKey1 = hAUD;
-		const currencyKey2 = hEUR;
+		const currencyKey1 = sAUD;
+		const currencyKey2 = sEUR;
 		const trackingCode = toBytes32('1inch');
 		const msgSender = owner;
 
-		it('exchangeOnBehalf is called with the right arguments ', async () => {
-			await synthetix.exchangeOnBehalf(account1, currencyKey1, amount1, currencyKey2, {
-				from: owner,
-			});
-			assert.equal(smockExchanger.smocked.exchangeOnBehalf.calls[0][0], account1);
-			assert.equal(smockExchanger.smocked.exchangeOnBehalf.calls[0][1], msgSender);
-			assert.equal(smockExchanger.smocked.exchangeOnBehalf.calls[0][2], currencyKey1);
-			assert.equal(smockExchanger.smocked.exchangeOnBehalf.calls[0][3].toString(), amount1);
-			assert.equal(smockExchanger.smocked.exchangeOnBehalf.calls[0][4], currencyKey2);
-		});
-
-		it('exchangeWithTracking is called with the right arguments ', async () => {
-			await synthetix.exchangeWithTracking(
-				currencyKey1,
-				amount1,
-				currencyKey2,
-				account2,
-				trackingCode,
-				{ from: owner }
-			);
-			assert.equal(smockExchanger.smocked.exchangeWithTracking.calls[0][0], msgSender);
-			assert.equal(smockExchanger.smocked.exchangeWithTracking.calls[0][1], currencyKey1);
-			assert.equal(smockExchanger.smocked.exchangeWithTracking.calls[0][2].toString(), amount1);
-			assert.equal(smockExchanger.smocked.exchangeWithTracking.calls[0][3], currencyKey2);
-			assert.equal(smockExchanger.smocked.exchangeWithTracking.calls[0][4], msgSender);
-			assert.equal(smockExchanger.smocked.exchangeWithTracking.calls[0][5], account2);
-			assert.equal(smockExchanger.smocked.exchangeWithTracking.calls[0][6], trackingCode);
-		});
-
-		it('exchangeOnBehalfWithTracking is called with the right arguments ', async () => {
-			await synthetix.exchangeOnBehalfWithTracking(
-				account1,
-				currencyKey1,
-				amount1,
-				currencyKey2,
-				account2,
-				trackingCode,
-				{ from: owner }
-			);
-			assert.equal(smockExchanger.smocked.exchangeOnBehalfWithTracking.calls[0][0], account1);
-			assert.equal(smockExchanger.smocked.exchangeOnBehalfWithTracking.calls[0][1], msgSender);
-			assert.equal(smockExchanger.smocked.exchangeOnBehalfWithTracking.calls[0][2], currencyKey1);
-			assert.equal(
-				smockExchanger.smocked.exchangeOnBehalfWithTracking.calls[0][3].toString(),
-				amount1
-			);
-			assert.equal(smockExchanger.smocked.exchangeOnBehalfWithTracking.calls[0][4], currencyKey2);
-			assert.equal(smockExchanger.smocked.exchangeOnBehalfWithTracking.calls[0][5], account2);
-			assert.equal(smockExchanger.smocked.exchangeOnBehalfWithTracking.calls[0][6], trackingCode);
-		});
-
 		it('exchangeWithVirtual is called with the right arguments ', async () => {
 			await synthetix.exchangeWithVirtual(currencyKey1, amount1, currencyKey2, trackingCode, {
-				from: owner,
+				from: msgSender,
 			});
-			assert.equal(smockExchanger.smocked.exchangeWithVirtual.calls[0][0], msgSender);
-			assert.equal(smockExchanger.smocked.exchangeWithVirtual.calls[0][1], currencyKey1);
-			assert.equal(smockExchanger.smocked.exchangeWithVirtual.calls[0][2].toString(), amount1);
-			assert.equal(smockExchanger.smocked.exchangeWithVirtual.calls[0][3], currencyKey2);
-			assert.equal(smockExchanger.smocked.exchangeWithVirtual.calls[0][4], msgSender);
-			assert.equal(smockExchanger.smocked.exchangeWithVirtual.calls[0][5], trackingCode);
+			assert.equal(smockExchanger.smocked.exchange.calls[0][0], msgSender);
+			assert.equal(smockExchanger.smocked.exchange.calls[0][1], msgSender);
+			assert.equal(smockExchanger.smocked.exchange.calls[0][2], currencyKey1);
+			assert.equal(smockExchanger.smocked.exchange.calls[0][3].toString(), amount1);
+			assert.equal(smockExchanger.smocked.exchange.calls[0][4], currencyKey2);
+			assert.equal(smockExchanger.smocked.exchange.calls[0][5], msgSender);
+			assert.equal(smockExchanger.smocked.exchange.calls[0][6], true);
+			assert.equal(smockExchanger.smocked.exchange.calls[0][7], msgSender);
+			assert.equal(smockExchanger.smocked.exchange.calls[0][8], trackingCode);
 		});
 
-		it('settle is called with the right arguments ', async () => {
-			await synthetix.settle(currencyKey1, {
-				from: owner,
-			});
-			assert.equal(smockExchanger.smocked.settle.calls[0][0], msgSender);
-			assert.equal(smockExchanger.smocked.settle.calls[0][1].toString(), currencyKey1);
-		});
-	});
-	describe('isWaitingPeriod()', () => {
-		it('returns false by default', async () => {
-			assert.isFalse(await synthetix.isWaitingPeriod(hBNB));
-		});
-		describe('when a user has exchanged into sETH', () => {
-			beforeEach(async () => {
-				await updateRatesWithDefaults({ exchangeRates, oracle, debtCache });
-
-				await synthetix.issueSynths(toUnit('100'), { from: owner });
-				await synthetix.exchange(hUSD, toUnit('10'), hBNB, { from: owner });
-			});
-			it('then waiting period is true', async () => {
-				assert.isTrue(await synthetix.isWaitingPeriod(hBNB));
-			});
-			describe('when the waiting period expires', () => {
-				beforeEach(async () => {
-					await fastForward(await systemSettings.waitingPeriodSecs());
-				});
-				it('returns false by default', async () => {
-					assert.isFalse(await synthetix.isWaitingPeriod(hBNB));
-				});
-			});
-		});
-	});
-
-	describe('transfer()', () => {
-		beforeEach(async () => {
-			// Ensure all synths have rates to allow issuance
-			await updateRatesWithDefaults({ exchangeRates, oracle, debtCache });
-		});
-
-		describe('when the user has issued some sUSD and exchanged for other synths', () => {
-			beforeEach(async () => {
-				await synthetix.issueSynths(toUnit('100'), { from: owner });
-				await synthetix.exchange(hUSD, toUnit('10'), hBNB, { from: owner });
-				await synthetix.exchange(hUSD, toUnit('10'), hAUD, { from: owner });
-				await synthetix.exchange(hUSD, toUnit('10'), hEUR, { from: owner });
-			});
-			it('should transfer using the ERC20 transfer function @gasprofile', async () => {
-				await synthetix.transfer(account1, toUnit('10'), { from: owner });
-
-				assert.bnEqual(await synthetix.balanceOf(account1), toUnit('10'));
-			});
-
-			it('should transfer using the ERC20 transferFrom function @gasprofile', async () => {
-				const previousOwnerBalance = await synthetix.balanceOf(owner);
-
-				// Approve account1 to act on our behalf for 10 HZN.
-				await synthetix.approve(account1, toUnit('10'), { from: owner });
-
-				// Assert that transferFrom works.
-				await synthetix.transferFrom(owner, account2, toUnit('10'), {
-					from: account1,
-				});
-
-				// Assert that account2 has 10 HZN and owner has 10 less HZN
-				assert.bnEqual(await synthetix.balanceOf(account2), toUnit('10'));
-				assert.bnEqual(await synthetix.balanceOf(owner), previousOwnerBalance.sub(toUnit('10')));
-
-				// Assert that we can't transfer more even though there's a balance for owner.
-				await assert.revert(
-					synthetix.transferFrom(owner, account2, '1', {
-						from: account1,
-					})
-				);
-			});
-		});
-
-		it("should lock newly received synthetix if the user's collaterisation is too high", async () => {
-			// Set sEUR for purposes of this test
-			const timestamp1 = await currentTime();
-			await exchangeRates.updateRates([hEUR], [toUnit('0.75')], timestamp1, { from: oracle });
-			await debtCache.takeDebtSnapshot();
-
-			const issuedSynthetixs = web3.utils.toBN('200000');
-			await synthetix.transfer(account1, toUnit(issuedSynthetixs), {
-				from: owner,
-			});
-			await synthetix.transfer(account2, toUnit(issuedSynthetixs), {
-				from: owner,
-			});
-
-			const maxIssuableSynths = await synthetix.maxIssuableSynths(account1);
-
-			// Issue
-			await synthetix.issueSynths(maxIssuableSynths, { from: account1 });
-
-			// Exchange into sEUR
-			await synthetix.exchange(hUSD, maxIssuableSynths, hEUR, { from: account1 });
-
-			// Ensure that we can transfer in and out of the account successfully
-			await synthetix.transfer(account1, toUnit('10000'), {
-				from: account2,
-			});
-			await synthetix.transfer(account2, toUnit('10000'), {
-				from: account1,
-			});
-
-			// Increase the value of sEUR relative to synthetix
-			const timestamp2 = await currentTime();
-			await exchangeRates.updateRates([hEUR], [toUnit('2.10')], timestamp2, { from: oracle });
-			await debtCache.takeDebtSnapshot();
-
-			// Ensure that the new synthetix account1 receives cannot be transferred out.
-			await synthetix.transfer(account1, toUnit('10000'), {
-				from: account2,
-			});
-			await assert.revert(synthetix.transfer(account2, toUnit('10000'), { from: account1 }));
-		});
-
-		it('should unlock synthetix when collaterisation ratio changes', async () => {
-			// prevent circuit breaker from firing by upping the threshold to factor 5
-			await systemSettings.setPriceDeviationThresholdFactor(toUnit('5'), { from: owner });
-
-			// Set sAUD for purposes of this test
-			const timestamp1 = await currentTime();
-			const aud2usdrate = toUnit('2');
-
-			await exchangeRates.updateRates([hAUD], [aud2usdrate], timestamp1, { from: oracle });
-			await debtCache.takeDebtSnapshot();
-
-			const issuedSynthetixs = web3.utils.toBN('200000');
-			await synthetix.transfer(account1, toUnit(issuedSynthetixs), {
-				from: owner,
-			});
-
-			// Issue
-			const issuedSynths = await synthetix.maxIssuableSynths(account1);
-			await synthetix.issueSynths(issuedSynths, { from: account1 });
-			const remainingIssuable = (await synthetix.remainingIssuableSynths(account1))[0];
-
-			assert.bnClose(remainingIssuable, '0');
-
-			const transferable1 = await synthetix.transferableSynthetix(account1);
-			assert.bnEqual(transferable1, '0');
-
-			// Exchange into sAUD
-			await synthetix.exchange(hUSD, issuedSynths, hAUD, { from: account1 });
-
-			// Increase the value of sAUD relative to synthetix
-			const timestamp2 = await currentTime();
-			const newAUDExchangeRate = toUnit('1');
-			await exchangeRates.updateRates([hAUD], [newAUDExchangeRate], timestamp2, { from: oracle });
-			await debtCache.takeDebtSnapshot();
-
-			const transferable2 = await synthetix.transferableSynthetix(account1);
-			assert.equal(transferable2.gt(toUnit('1000')), true);
-		});
-
-		describe('when the user has issued some sUSD and exchanged for other synths', () => {
-			beforeEach(async () => {
-				await synthetix.issueSynths(toUnit('100'), { from: owner });
-				await synthetix.exchange(hUSD, toUnit('10'), hBNB, { from: owner });
-				await synthetix.exchange(hUSD, toUnit('10'), hAUD, { from: owner });
-				await synthetix.exchange(hUSD, toUnit('10'), hEUR, { from: owner });
-			});
-			it('should transfer using the ERC20 transfer function @gasprofile', async () => {
-				await synthetix.transfer(account1, toUnit('10'), { from: owner });
-
-				assert.bnEqual(await synthetix.balanceOf(account1), toUnit('10'));
-			});
-
-			it('should transfer using the ERC20 transferFrom function @gasprofile', async () => {
-				const previousOwnerBalance = await synthetix.balanceOf(owner);
-
-				// Approve account1 to act on our behalf for 10 HZN.
-				await synthetix.approve(account1, toUnit('10'), { from: owner });
-
-				// Assert that transferFrom works.
-				await synthetix.transferFrom(owner, account2, toUnit('10'), {
-					from: account1,
-				});
-
-				// Assert that account2 has 10 HZN and owner has 10 less HZN
-				assert.bnEqual(await synthetix.balanceOf(account2), toUnit('10'));
-				assert.bnEqual(await synthetix.balanceOf(owner), previousOwnerBalance.sub(toUnit('10')));
-
-				// Assert that we can't transfer more even though there's a balance for owner.
-				await assert.revert(
-					synthetix.transferFrom(owner, account2, '1', {
-						from: account1,
-					})
-				);
-			});
+		it('exchangeWithTrackingForInitiator is called with the right arguments ', async () => {
+			await synthetix.exchangeWithTrackingForInitiator(
+				currencyKey1,
+				amount1,
+				currencyKey2,
+				account2,
+				trackingCode,
+				{ from: account3 }
+			);
+			assert.equal(smockExchanger.smocked.exchange.calls[0][0], account3);
+			assert.equal(smockExchanger.smocked.exchange.calls[0][1], account3);
+			assert.equal(smockExchanger.smocked.exchange.calls[0][2], currencyKey1);
+			assert.equal(smockExchanger.smocked.exchange.calls[0][3].toString(), amount1);
+			assert.equal(smockExchanger.smocked.exchange.calls[0][4], currencyKey2);
+			assert.equal(smockExchanger.smocked.exchange.calls[0][5], account3); // destination address (tx.origin)
+			assert.equal(smockExchanger.smocked.exchange.calls[0][6], false);
+			assert.equal(smockExchanger.smocked.exchange.calls[0][7], account2);
+			assert.equal(smockExchanger.smocked.exchange.calls[0][8], trackingCode);
 		});
 	});
 
@@ -744,6 +415,60 @@ contract('Synthetix', async accounts => {
 
 			// rewardEscrow should have 0 balance
 			assert.bnEqual(await synthetix.balanceOf(rewardEscrow.address), 0);
+		});
+	});
+
+	describe('Using a contract to invoke exchangeWithTrackingForInitiator', () => {
+		describe('when a third party contract is setup to exchange synths', () => {
+			let contractExample;
+			let amountOfsUSD;
+			beforeEach(async () => {
+				amountOfsUSD = toUnit('100');
+
+				const MockThirdPartyExchangeContract = artifacts.require('MockThirdPartyExchangeContract');
+
+				// create a contract
+				contractExample = await MockThirdPartyExchangeContract.new(addressResolver.address);
+
+				// ensure rates are set
+				await updateRatesWithDefaults({ exchangeRates, oracle, debtCache });
+
+				// issue sUSD from the owner
+				await synthetix.issueSynths(amountOfsUSD, { from: owner });
+
+				// transfer the sUSD to the contract
+				await sUSDContract.transfer(contractExample.address, toUnit('100'), { from: owner });
+			});
+
+			describe('when Barrie invokes the exchange function on the contract', () => {
+				let txn;
+				beforeEach(async () => {
+					// Barrie has no sETH to start
+					assert.equal(await sETHContract.balanceOf(account3), '0');
+
+					txn = await contractExample.exchange(sUSD, amountOfsUSD, sETH, { from: account3 });
+				});
+				it('then Barrie has the synths in her account', async () => {
+					assert.bnGt(await sETHContract.balanceOf(account3), toUnit('0.01'));
+				});
+				it('and the contract has none', async () => {
+					assert.equal(await sETHContract.balanceOf(contractExample.address), '0');
+				});
+				it('and the event emitted indicates that Barrie was the destinationAddress', async () => {
+					const logs = artifacts.require('Synthetix').decodeLogs(txn.receipt.rawLogs);
+					assert.eventEqual(
+						logs.find(log => log.event === 'SynthExchange'),
+						'SynthExchange',
+						{
+							account: contractExample.address,
+							fromCurrencyKey: sUSD,
+							fromAmount: amountOfsUSD,
+							toCurrencyKey: sETH,
+							toAddress: account3,
+						}
+					);
+				});
+			});
 		});
 	});
 });

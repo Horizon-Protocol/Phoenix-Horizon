@@ -1,6 +1,6 @@
 'use strict';
 
-const { contract } = require('@nomiclabs/buidler');
+const { contract } = require('hardhat');
 
 const { assert, addSnapshotBeforeRestoreAfterEach } = require('./common');
 
@@ -22,7 +22,7 @@ contract('RewardEscrowV2', async accounts => {
 	// Run once at beginning - snapshots will take care of resetting this before each test
 	before(async () => {
 		// Mock SNX
-		({ token: synthetix } = await mockToken({ accounts, name: 'Synthetix', symbol: 'SNX' }));
+		({ token: synthetix } = await mockToken({ accounts, name: 'Synthetix', symbol: 'HZN' }));
 
 		feePool = { address: feePoolAccount }; // mock contract with address
 

@@ -55,8 +55,10 @@ node publish deploy # "--help" for options
 ### Examples
 
 ```bash
-# deploy to testnet with 20 gwei gas
-node publish deploy -n testnet -d publish/deployed/testnet -g 20
+# deploy to rinkeby with 8 gwei gas
+node publish deploy -n ropsten -d publish/deployed/ropsten -g 20
+node publish deploy -n rinkeby -d publish/deployed/rinkeby -g 20
+node publish deploy -n kovan -d publish/deployed/kovan -g 8
 node publish deploy -n local -d publish/deployed/local -g 8
 ```
 
@@ -139,6 +141,28 @@ Will initiate the synthetix release process, publishing the synthetix `npm` modu
 
 ```bash
 node publish release # "--help" for options
+```
+
+## 9. Staking Rewards
+
+Will deploy an instance of StakingRewards.sol with the configured stakingToken and rewardsToken in rewards.json. Then `run node publish verify`
+
+```bash
+node publish deploy-staking-rewards # "--help" for options
+```
+
+### Examples
+
+```bash
+node publish deploy-staking-rewards -n kovan -d publish/deployed/kovan -t iBTC --dry-run
+node publish deploy-staking-rewards -n local -d publish/deployed/local
+
+```
+
+### Example
+
+```bash
+node publish release --version 2.22.0 --branch master --release Altair
 ```
 
 ### Branching

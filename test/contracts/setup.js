@@ -1,6 +1,6 @@
 'use strict';
 
-const { artifacts, web3, log, linkWithLegacySupport } = require('@nomiclabs/buidler');
+const { artifacts, web3, log } = require('hardhat');
 
 const { toWei } = web3.utils;
 const { toUnit } = require('../utils')();
@@ -24,6 +24,9 @@ const {
 		CROSS_DOMAIN_REWARD_GAS_LIMIT,
 		CROSS_DOMAIN_ESCROW_GAS_LIMIT,
 		CROSS_DOMAIN_WITHDRAWAL_GAS_LIMIT,
+		ETHER_WRAPPER_MAX_ETH,
+		ETHER_WRAPPER_MINT_FEE_RATE,
+		ETHER_WRAPPER_BURN_FEE_RATE,
 	},
 } = require('../../');
 
@@ -112,14 +115,13 @@ const setupContract = async ({
 		return artifact.new(
 			...constructorArgs.concat({
 				from: deployerAccount,
-				gas: 9e15,
-				gasPrice: toWei('0.000001', 'gwei'),
 			})
 		);
 	};
 
-	if (artifacts.contractNeedsLinking(artifact)) {
-		await linkWithLegacySupport(artifact, 'SafeDecimalMath');
+	// if it needs library linking
+	if (Object.keys((await artifacts.readArtifact(source || contract)).linkReferences).length > 0) {
+		await artifact.link(await artifacts.require('SafeDecimalMath').new());
 	}
 
 	const tryGetAddressOf = name => (cache[name] ? cache[name].address : ZERO_ADDRESS);
@@ -139,8 +141,6 @@ const setupContract = async ({
 
 	const defaultArgs = {
 		GenericMock: [],
-		SynthetixBridgeToOptimism: [owner, tryGetAddressOf('AddressResolver')],
-		SynthetixBridgeToBase: [owner, tryGetAddressOf('AddressResolver')],
 		TradingRewards: [owner, owner, tryGetAddressOf('AddressResolver')],
 		AddressResolver: [owner],
 		SystemStatus: [owner],
@@ -185,6 +185,9 @@ const setupContract = async ({
 			SUPPLY_100M,
 			tryGetAddressOf('AddressResolver'),
 		],
+		SynthetixBridgeToOptimism: [owner, tryGetAddressOf('AddressResolver')],
+		SynthetixBridgeToBase: [owner, tryGetAddressOf('AddressResolver')],
+		SynthetixBridgeEscrow: [owner],
 		RewardsDistribution: [
 			owner,
 			tryGetAddressOf('Synthetix'),
@@ -199,14 +202,14 @@ const setupContract = async ({
 		SynthetixEscrow: [owner, tryGetAddressOf('Synthetix')],
 		// use deployerAccount as associated contract to allow it to call setBalanceOf()
 		TokenState: [owner, deployerAccount],
-		EtherCollateral: [owner, tryGetAddressOf('AddressResolver')],
-		EtherCollateralsUSD: [owner, tryGetAddressOf('AddressResolver')],
+		EtherWrapper: [owner, tryGetAddressOf('AddressResolver'), tryGetAddressOf('WETH')],
+		NativeEtherWrapper: [owner, tryGetAddressOf('AddressResolver')],
 		FeePoolState: [owner, tryGetAddressOf('FeePool')],
 		FeePool: [tryGetAddressOf('ProxyFeePool'), owner, tryGetAddressOf('AddressResolver')],
 		Synth: [
 			tryGetAddressOf('ProxyERC20Synth'),
 			tryGetAddressOf('TokenStateSynth'),
-			tryGetProperty({ property: 'name', otherwise: 'Zasset zUSD' }),
+			tryGetProperty({ property: 'name', otherwise: 'Horizon zUSD' }),
 			tryGetProperty({ property: 'symbol', otherwise: 'zUSD' }),
 			owner,
 			tryGetProperty({ property: 'currencyKey', otherwise: toBytes32('zUSD') }),
@@ -217,20 +220,7 @@ const setupContract = async ({
 		FeePoolEternalStorage: [owner, tryGetAddressOf('FeePool')],
 		DelegateApprovals: [owner, tryGetAddressOf('EternalStorageDelegateApprovals')],
 		Liquidations: [owner, tryGetAddressOf('AddressResolver')],
-		BinaryOptionMarketFactory: [owner, tryGetAddressOf('AddressResolver')],
-		BinaryOptionMarketManager: [
-			owner,
-			tryGetAddressOf('AddressResolver'),
-			61 * 60, // max oracle price age: 61 minutes
-			26 * 7 * 24 * 60 * 60, // expiry duration: 26 weeks (~ 6 months)
-			365 * 24 * 60 * 60, // Max time to maturity: ~ 1 year
-			toWei('2'), // Capital requirement
-			toWei('0.05'), // Skew Limit
-			toWei('0.008'), // pool fee
-			toWei('0.002'), // creator fee
-			toWei('0.02'), // refund fee
-		],
-		BinaryOptionMarketData: [],
+		CollateralManagerState: [owner, tryGetAddressOf('CollateralManager')],
 		CollateralManager: [
 			tryGetAddressOf('CollateralManagerState'),
 			owner,
@@ -239,6 +229,18 @@ const setupContract = async ({
 			0,
 			0,
 		],
+		CollateralUtil: [tryGetAddressOf('AddressResolver')],
+		Collateral: [
+			tryGetAddressOf('CollateralState'),
+			tryGetAddressOf('CollateralManager'),
+			tryGetAddressOf('AddressResolver'),
+			'zUSD',
+			1.2,
+			100,
+		],
+		CollateralState: [owner, tryGetAddressOf('Collateral')],
+		WETH: [],
+		SynthRedeemer: [tryGetAddressOf('AddressResolver')],
 	};
 
 	let instance;
@@ -276,7 +278,7 @@ const setupContract = async ({
 			);
 		},
 		async Synthetix() {
-			// first give all SNX supply to the owner (using the hack that the deployerAccount was setup as the associatedContract via
+			// first give all HZN supply to the owner (using the hack that the deployerAccount was setup as the associatedContract via
 			// the constructor args)
 			await cache['TokenStateSynthetix'].setBalanceOf(owner, SUPPLY_100M, {
 				from: deployerAccount,
@@ -309,14 +311,6 @@ const setupContract = async ({
 						}) || []
 					)
 					.concat(
-						// If there's an escrow that's the legacy version
-						tryInvocationIfNotMocked({
-							name: 'SynthetixEscrow',
-							fncName: 'setHavven',
-							args: [instance.address],
-						}) || []
-					)
-					.concat(
 						// If there's a reward escrow that's not a mock
 						tryInvocationIfNotMocked({
 							name: 'RewardEscrow',
@@ -342,7 +336,7 @@ const setupContract = async ({
 			);
 		},
 		async BaseSynthetix() {
-			// first give all SNX supply to the owner (using the hack that the deployerAccount was setup as the associatedContract via
+			// first give all HZN supply to the owner (using the hack that the deployerAccount was setup as the associatedContract via
 			// the constructor args)
 			await cache['TokenStateBaseSynthetix'].setBalanceOf(owner, SUPPLY_100M, {
 				from: deployerAccount,
@@ -378,7 +372,7 @@ const setupContract = async ({
 			);
 		},
 		async MintableSynthetix() {
-			// first give all SNX supply to the owner (using the hack that the deployerAccount was setup as the associatedContract via
+			// first give all HZN supply to the owner (using the hack that the deployerAccount was setup as the associatedContract via
 			// the constructor args)
 			await cache['TokenStateMintableSynthetix'].setBalanceOf(owner, SUPPLY_100M, {
 				from: deployerAccount,
@@ -469,7 +463,7 @@ const setupContract = async ({
 				cache['ExchangeState'].setAssociatedContract(instance.address, { from: owner }),
 
 				cache['SystemStatus'].updateAccessControl(
-					toBytes32('Zasset'),
+					toBytes32('Synth'),
 					instance.address,
 					true,
 					false,
@@ -478,10 +472,27 @@ const setupContract = async ({
 			]);
 		},
 
+		async CollateralManager() {
+			await cache['CollateralManagerState'].setAssociatedContract(instance.address, {
+				from: owner,
+			});
+		},
+
+		async SystemStatus() {
+			// ensure the owner has suspend/resume control over everything
+			await instance.updateAccessControls(
+				['System', 'Issuance', 'Exchange', 'SynthExchange', 'Synth'].map(toBytes32),
+				[owner, owner, owner, owner, owner],
+				[true, true, true, true, true],
+				[true, true, true, true, true],
+				{ from: owner }
+			);
+		},
+
 		async GenericMock() {
 			if (mock === 'RewardEscrow' || mock === 'SynthetixEscrow') {
 				await mockGenericContractFnc({ instance, mock, fncName: 'balanceOf', returns: ['0'] });
-			} else if (mock === 'EtherCollateral' || mock === 'EtherCollateralsUSD') {
+			} else if (mock === 'EtherWrapper') {
 				await mockGenericContractFnc({
 					instance,
 					mock,
@@ -616,26 +627,30 @@ const setupAllContracts = async ({
 		{ contract: 'Depot', deps: ['AddressResolver', 'SystemStatus'] },
 		{ contract: 'SynthUtil', deps: ['AddressResolver'] },
 		{ contract: 'DappMaintenance' },
+		{ contract: 'WETH' },
 		{
-			contract: 'EtherCollateral',
-			mocks: ['Issuer', 'Depot'],
-			deps: ['AddressResolver', 'SystemStatus'],
+			contract: 'EtherWrapper',
+			mocks: [],
+			deps: ['AddressResolver', 'WETH'],
 		},
 		{
-			contract: 'EtherCollateralsUSD',
-			mocks: ['Issuer', 'ExchangeRates', 'FeePool'],
-			deps: ['AddressResolver', 'SystemStatus'],
+			contract: 'NativeEtherWrapper',
+			mocks: [],
+			deps: ['AddressResolver', 'EtherWrapper', 'WETH', 'ZassetzBNB'],
+		},
+		{
+			contract: 'SynthRedeemer',
+			mocks: ['Issuer'],
+			deps: ['AddressResolver'],
 		},
 		{
 			contract: 'DebtCache',
-			mocks: ['Issuer', 'Exchanger', 'CollateralManager'],
+			mocks: ['Issuer', 'Exchanger', 'CollateralManager', 'EtherWrapper'],
 			deps: ['ExchangeRates', 'SystemStatus'],
 		},
 		{
 			contract: 'Issuer',
 			mocks: [
-				'EtherCollateral',
-				'EtherCollateralsUSD',
 				'CollateralManager',
 				'Synthetix',
 				'SynthetixState',
@@ -643,13 +658,15 @@ const setupAllContracts = async ({
 				'FeePool',
 				'DelegateApprovals',
 				'FlexibleStorage',
+				'EtherWrapper',
+				'SynthRedeemer',
 			],
 			deps: ['AddressResolver', 'SystemStatus', 'FlexibleStorage', 'DebtCache'],
 		},
 		{
 			contract: 'Exchanger',
 			source: 'ExchangerWithVirtualSynth',
-			mocks: ['Synthetix', 'FeePool', 'DelegateApprovals'],
+			mocks: ['Synthetix', 'FeePool', 'DelegateApprovals', 'VirtualSynthMastercopy'],
 			deps: [
 				'AddressResolver',
 				'TradingRewards',
@@ -662,7 +679,7 @@ const setupAllContracts = async ({
 		},
 		{
 			contract: 'Synth',
-			mocks: ['Issuer', 'Exchanger', 'FeePool'],
+			mocks: ['Issuer', 'Exchanger', 'FeePool', 'EtherWrapper'],
 			deps: ['TokenState', 'ProxyERC20', 'SystemStatus', 'AddressResolver'],
 		}, // a generic synth
 		{
@@ -731,13 +748,23 @@ const setupAllContracts = async ({
 		},
 		{
 			contract: 'SynthetixBridgeToOptimism',
-			mocks: ['ext:Messenger', 'ovm:SynthetixBridgeToBase'],
-			deps: ['AddressResolver', 'Issuer', 'RewardEscrowV2'],
+			mocks: [
+				'ext:Messenger',
+				'ovm:SynthetixBridgeToBase',
+				'SynthetixBridgeEscrow',
+				'RewardsDistribution',
+			],
+			deps: ['AddressResolver', 'Issuer', 'RewardEscrowV2', 'Synthetix'],
 		},
 		{
 			contract: 'SynthetixBridgeToBase',
 			mocks: ['ext:Messenger', 'base:SynthetixBridgeToOptimism', 'RewardEscrowV2'],
-			deps: ['AddressResolver', 'Issuer'],
+			deps: ['AddressResolver', 'Synthetix'],
+		},
+		{
+			contract: 'SynthetixBridgeEscrow',
+			mocks: [],
+			deps: [],
 		},
 		{ contract: 'TradingRewards', deps: ['AddressResolver', 'Synthetix'] },
 		{
@@ -753,33 +780,38 @@ const setupAllContracts = async ({
 				'FeePoolEternalStorage',
 				'RewardsDistribution',
 				'FlexibleStorage',
-				'EtherCollateralsUSD',
 				'CollateralManager',
+				'EtherWrapper',
 			],
 			deps: ['SystemStatus', 'FeePoolState', 'AddressResolver'],
 		},
 		{
-			contract: 'BinaryOptionMarketFactory',
-			deps: ['AddressResolver'],
+			contract: 'CollateralState',
+			deps: [],
 		},
 		{
-			contract: 'BinaryOptionMarketManager',
-			deps: [
-				'SystemStatus',
-				'AddressResolver',
-				'ExchangeRates',
-				'FeePool',
-				'Synthetix',
-				'BinaryOptionMarketFactory',
-			],
+			contract: 'CollateralManagerState',
+			deps: [],
 		},
 		{
-			contract: 'BinaryOptionMarketData',
-			deps: ['BinaryOptionMarketManager', 'BinaryOptionMarket', 'BinaryOption'],
+			contract: 'CollateralUtil',
+			deps: ['AddressResolver', 'ExchangeRates'],
 		},
 		{
 			contract: 'CollateralManager',
-			deps: ['AddressResolver', 'SystemStatus', 'Issuer', 'ExchangeRates', 'DebtCache'],
+			deps: [
+				'AddressResolver',
+				'SystemStatus',
+				'Issuer',
+				'ExchangeRates',
+				'DebtCache',
+				'CollateralUtil',
+				'CollateralManagerState',
+			],
+		},
+		{
+			contract: 'Collateral',
+			deps: ['CollateralState', 'CollateralManager', 'AddressResolver'],
 		},
 	];
 
@@ -859,7 +891,7 @@ const setupAllContracts = async ({
 		});
 	}
 
-	// ZASSETS
+	// SYNTHS
 
 	const synthsToAdd = [];
 
@@ -959,6 +991,15 @@ const setupAllContracts = async ({
 			returnObj['SystemSettings'].setRateStalePeriod(RATE_STALE_PERIOD, { from: owner }),
 			returnObj['SystemSettings'].setMinimumStakeTime(MINIMUM_STAKE_TIME, { from: owner }),
 			returnObj['SystemSettings'].setDebtSnapshotStaleTime(DEBT_SNAPSHOT_STALE_TIME, {
+				from: owner,
+			}),
+			returnObj['SystemSettings'].setEtherWrapperMaxETH(ETHER_WRAPPER_MAX_ETH, {
+				from: owner,
+			}),
+			returnObj['SystemSettings'].setEtherWrapperMintFeeRate(ETHER_WRAPPER_MINT_FEE_RATE, {
+				from: owner,
+			}),
+			returnObj['SystemSettings'].setEtherWrapperBurnFeeRate(ETHER_WRAPPER_BURN_FEE_RATE, {
 				from: owner,
 			}),
 		]);

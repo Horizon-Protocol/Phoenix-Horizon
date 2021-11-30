@@ -11,37 +11,54 @@ const data = {
 
 const assets = require('./publish/assets.json');
 const ovmIgnored = require('./publish/ovm-ignore.json');
+const nonUpgradeable = require('./publish/non-upgradeable.json');
 const releases = require('./publish/releases.json');
 
 const networks = ['local', 'testnet', 'mainnet'];
 
-const chainIdMapping = {
+const chainIdMapping = Object.entries({
 	56: {
 		network: 'mainnet',
 	},
 	97: {
 		network: 'testnet',
 	},
-};
+	// Hardhat fork of mainnet: https://hardhat.org/config/#hardhat-network
+	31337: {
+		network: 'mainnet',
+		fork: true,
+	},
+
+	// now append any defaults
+}).reduce((memo, [id, body]) => {
+	memo[id] = Object.assign({ useOvm: false, fork: false }, body);
+	return memo;
+}, {});
 
 const getNetworkFromId = ({ id }) => chainIdMapping[id];
 
-const networkToChainId = Object.entries(chainIdMapping).reduce((memo, [id, { network }]) => {
-	memo[network] = id;
-	return memo;
-}, {});
+const networkToChainId = Object.entries(chainIdMapping).reduce(
+	(memo, [id, { network, useOvm, fork }]) => {
+		memo[network + (useOvm ? '-ovm' : '') + (fork ? '-fork' : '')] = id;
+		return memo;
+	},
+	{}
+);
 
 const constants = {
 	BUILD_FOLDER: 'build',
 	CONTRACTS_FOLDER: 'contracts',
+	MIGRATIONS_FOLDER: 'migrations',
 	COMPILED_FOLDER: 'compiled',
 	FLATTENED_FOLDER: 'flattened',
 	AST_FOLDER: 'ast',
 
 	CONFIG_FILENAME: 'config.json',
+	RELEASES_FILENAME: 'releases.json',
 	PARAMS_FILENAME: 'params.json',
 	SYNTHS_FILENAME: 'synths.json',
 	STAKING_REWARDS_FILENAME: 'rewards.json',
+	SHORTING_REWARDS_FILENAME: 'shorting-rewards.json',
 	OWNER_ACTIONS_FILENAME: 'owner-actions.json',
 	DEPLOYMENT_FILENAME: 'deployment.json',
 	VERSIONS_FILENAME: 'versions.json',
@@ -50,10 +67,12 @@ const constants = {
 	AST_FILENAME: 'asts.json',
 
 	ZERO_ADDRESS: '0x' + '0'.repeat(40),
+	ZERO_BYTES32: '0x' + '0'.repeat(64),
 
-	OVM_MAX_GAS_LIMIT: '8999999',
+	OVM_GAS_PRICE_GWEI: '0.015',
 
-	inflationStartTimestampInSecs: 1672448400, // 2022-12-31T01:00:00+00:00 AMT
+	// inflationStartTimestampInSecs: 1551830400, // 2019-03-06T00:00:00Z
+	inflationStartTimestampInSecs: 1672448400
 };
 
 const knownAccounts = {
@@ -63,16 +82,14 @@ const knownAccounts = {
 			address: '0xF977814e90dA44bFA03b6295A0616a897441aceC',
 		},
 		{
-			name: 'renBTCWallet',
-			address: '0x53463cd0b074E5FDafc55DcE7B1C82ADF1a43B2E',
+			name: 'renBTCWallet', // KeeperDAO wallet (has renBTC and ETH)
+			address: '0x35ffd6e268610e764ff6944d07760d0efe5e40e5',
 		},
 		{
 			name: 'loansAccount',
 			address: '0x62f7A1F94aba23eD2dD108F8D23Aa3e7d452565B',
 		},
 	],
-	rinkeby: [],
-	kovan: [],
 };
 
 // The solidity defaults are managed here in the same format they will be stored, hence all
@@ -103,31 +120,37 @@ const defaults = {
 	DEBT_SNAPSHOT_STALE_TIME: (43800).toString(), // 12 hour heartbeat + 10 minutes mining time
 	AGGREGATOR_WARNING_FLAGS: {
 		mainnet: '0x4A5b9B4aD08616D11F3A402FF7cBEAcB732a76C6',
-		testnet: '0x6292aa9a6650ae14fbf974e5029f36f95a1848fd',
+		kovan: '0x6292aa9a6650ae14fbf974e5029f36f95a1848fd',
 	},
 	RENBTC_ERC20_ADDRESSES: {
 		mainnet: '0xEB4C2781e4ebA804CE9a9803C67d0893436bB27D',
 		kovan: '0x9B2fE385cEDea62D839E4dE89B0A23EF4eacC717',
-		rinkeby: '0xEDC0C23864B041607D624E2d9a67916B6cf40F7a',
+	},
+	WETH_ERC20_ADDRESSES: {
+		mainnet: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
+		kovan: '0xd0A1E359811322d97991E03f863a0C30C2cF029C',
+		goerli: '0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6',
+		'mainnet-ovm': '0x4200000000000000000000000000000000000006',
+		'kovan-ovm': '0x4200000000000000000000000000000000000006',
 	},
 	INITIAL_ISSUANCE: w3utils.toWei(`${100e6}`),
 	CROSS_DOMAIN_DEPOSIT_GAS_LIMIT: `${3e6}`,
 	CROSS_DOMAIN_ESCROW_GAS_LIMIT: `${8e6}`,
-	CROSS_DOMAIN_REWARD_GAS_LIMIT: `${3e6}`,
+	CROSS_DOMAIN_REWARD_GAS_LIMIT: `${8e6}`,
 	CROSS_DOMAIN_WITHDRAWAL_GAS_LIMIT: `${3e6}`,
 
 	COLLATERAL_MANAGER: {
-		SYNTHS: ['zUSD', 'zBTC', 'zBNB'],
+		SYNTHS: ['zUSD', 'zBTC', 'zETH'],
 		SHORTS: [
-			{ long: 'sBTC', short: 'iBTC' },
-			{ long: 'sETH', short: 'iETH' },
+			{ long: 'zBTC', short: 'iBTC' },
+			{ long: 'zETH', short: 'iETH' },
 		],
-		MAX_DEBT: w3utils.toWei('20000000'), // 20 million zUSD
+		MAX_DEBT: w3utils.toWei('75000000'), // 75 million zUSD
 		BASE_BORROW_RATE: Math.round((0.005 * 1e18) / 31556926).toString(), // 31556926 is CollateralManager seconds per year
 		BASE_SHORT_RATE: Math.round((0.005 * 1e18) / 31556926).toString(),
 	},
 	COLLATERAL_ETH: {
-		SYNTHS: ['zUSD', 'zBNB'],
+		SYNTHS: ['zUSD', 'zETH'],
 		MIN_CRATIO: w3utils.toWei('1.3'),
 		MIN_COLLATERAL: w3utils.toWei('2'),
 		ISSUE_FEE_RATE: w3utils.toWei('0.001'),
@@ -139,18 +162,23 @@ const defaults = {
 		ISSUE_FEE_RATE: w3utils.toWei('0.001'),
 	},
 	COLLATERAL_SHORT: {
-		SYNTHS: ['zBTC', 'zBNB'],
+		SYNTHS: ['zBTC', 'zETH'],
 		MIN_CRATIO: w3utils.toWei('1.2'),
 		MIN_COLLATERAL: w3utils.toWei('1000'),
 		ISSUE_FEE_RATE: w3utils.toWei('0.005'),
 		INTERACTION_DELAY: '3600', // 1 hour in secs
 	},
+
+	ETHER_WRAPPER_MAX_ETH: w3utils.toWei('5000'),
+	ETHER_WRAPPER_MINT_FEE_RATE: w3utils.toWei('0.02'), // 200 bps
+	ETHER_WRAPPER_BURN_FEE_RATE: w3utils.toWei('0.0005'), // 5 bps
 };
 
 /**
  * Converts a string into a hex representation of bytes32, with right padding
  */
 const toBytes32 = key => w3utils.rightPad(w3utils.asciiToHex(key), 64);
+const fromBytes32 = key => w3utils.hexToAscii(key);
 
 const getFolderNameForNetwork = ({ network, useOvm = false }) => {
 	if (network.includes('ovm')) {
@@ -287,7 +315,7 @@ const getFeeds = ({ network, path, fs, deploymentPath, useOvm = false } = {}) =>
 	return Object.entries(feeds).reduce((memo, [asset, entry]) => {
 		memo[asset] = Object.assign(
 			// standalone feeds are those without a synth using them
-			// Note: ETH still used as a rate for Depot, can remove the below once the Depot uses sETH rate or is
+			// Note: ETH still used as a rate for Depot, can remove the below once the Depot uses zETH rate or is
 			// removed from the system
 			{ standalone: !synths.find(synth => synth.asset === asset) || asset === 'ETH' },
 			assets[asset],
@@ -393,10 +421,38 @@ const getStakingRewards = ({
 };
 
 /**
+ * Retrieve the list of shorting rewards for the network - returning the names and rewardTokens
+ */
+const getShortingRewards = ({
+	network = 'mainnet',
+	useOvm = false,
+	path,
+	fs,
+	deploymentPath,
+} = {}) => {
+	if (!deploymentPath && network !== 'local' && (!path || !fs)) {
+		return data[getFolderNameForNetwork({ network, useOvm })]['shorting-rewards'];
+	}
+
+	const pathToShortingRewardsList = deploymentPath
+		? path.join(deploymentPath, constants.SHORTING_REWARDS_FILENAME)
+		: getPathToNetwork({
+				network,
+				path,
+				useOvm,
+				file: constants.SHORTING_REWARDS_FILENAME,
+		  });
+	if (!fs.existsSync(pathToShortingRewardsList)) {
+		return [];
+	}
+	return JSON.parse(fs.readFileSync(pathToShortingRewardsList));
+};
+
+/**
  * Retrieve the list of system user addresses
  */
 const getUsers = ({ network = 'mainnet', user, useOvm = false } = {}) => {
-	const testnetOwner = '0xB64fF7a4a33Acdf48d97dab0D764afD0F6176882';
+	const testnetOwner = '0x73570075092502472E4b61A7058Df1A4a1DB12f2';
 	const base = {
 		owner: testnetOwner,
 		deployer: testnetOwner,
@@ -413,10 +469,13 @@ const getUsers = ({ network = 'mainnet', user, useOvm = false } = {}) => {
 			marketClosure: '0xC105Ea57Eb434Fbe44690d7Dec2702e4a2FBFCf7',
 			oracle: '0xaC1ED4Fabbd5204E02950D68b6FC8c446AC95362',
 		}),
-		testnet: Object.assign({}, base),
+		kovan: Object.assign({}, base),
+		rinkeby: Object.assign({}, base),
+		ropsten: Object.assign({}, base),
+		goerli: Object.assign({}, base),
 		local: Object.assign({}, base, {
-			// Deterministic account #0 when using `npx buidler node`
-			owner: '0xc783df8a850f42e7F7e57013759C285caa701eB6',
+			// Deterministic account #0 when using `npx hardhat node`
+			owner: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
 		}),
 	};
 
@@ -469,6 +528,8 @@ const getSuspensionReasons = ({ code = undefined } = {}) => {
 	const suspensionReasonMap = {
 		1: 'System Upgrade',
 		2: 'Market Closure',
+		4: 'iZasset Reprice',
+		6: 'Index Rebalance',
 		55: 'Circuit Breaker (Phase one)', // https://sips.synthetix.io/SIPS/sip-55
 		65: 'Decentralized Circuit Breaker (Phase two)', // https://sips.synthetix.io/SIPS/sip-65
 		99999: 'Emergency',
@@ -503,7 +564,8 @@ const getTokens = ({ network = 'mainnet', path, fs, useOvm = false } = {}) => {
 				symbol: synth.name,
 				asset: synth.asset,
 				name: synth.description,
-				address: targets[`Proxy${synth.name === 'zUSD' ? 'ERC20zUSD' : synth.name}`].address,
+				address: (targets[`Proxy${synth.name === 'zUSD' ? 'ERC20sUSD' : synth.name}`] || {})
+					.address,
 				index: synth.index,
 				inverted: synth.inverted,
 				decimals: 18,
@@ -535,6 +597,7 @@ const wrap = ({ network, deploymentPath, fs, path, useOvm = false }) =>
 		'getPathToNetwork',
 		'getSource',
 		'getStakingRewards',
+		'getShortingRewards',
 		'getFeeds',
 		'getSynths',
 		'getTarget',
@@ -548,13 +611,16 @@ const wrap = ({ network, deploymentPath, fs, path, useOvm = false }) =>
 	}, {});
 
 module.exports = {
+	chainIdMapping,
 	constants,
 	decode,
 	defaults,
 	getAST,
+	getNetworkFromId,
 	getPathToNetwork,
 	getSource,
 	getStakingRewards,
+	getShortingRewards,
 	getSuspensionReasons,
 	getFeeds,
 	getSynths,
@@ -564,10 +630,11 @@ module.exports = {
 	getVersions,
 	networks,
 	networkToChainId,
-	getNetworkFromId,
 	toBytes32,
+	fromBytes32,
 	wrap,
 	ovmIgnored,
+	nonUpgradeable,
 	releases,
 	knownAccounts,
 };

@@ -1,6 +1,6 @@
 'use strict';
 
-const { artifacts, contract } = require('@nomiclabs/buidler');
+const { artifacts, contract } = require('hardhat');
 
 const { assert } = require('./common');
 
@@ -21,7 +21,7 @@ contract('ExchangeState', accounts => {
 		account1,
 		account2,
 	] = accounts;
-	const [hUSD, hBTC, hAUD] = ['hUSD', 'hBTC', 'hAUD'].map(toBytes32);
+	const [hUSD, hBTC, hAUD] = ['zUSD', 'zBTC', 'zAUD'].map(toBytes32);
 
 	let exchangeState;
 	beforeEach(async () => {

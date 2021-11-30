@@ -1,6 +1,6 @@
 'use strict';
 
-const { artifacts, contract } = require('@nomiclabs/buidler');
+const { artifacts, contract } = require('hardhat');
 
 const { assert, addSnapshotBeforeRestoreAfterEach } = require('./common');
 
@@ -15,11 +15,9 @@ const {
 	constants: { ZERO_ADDRESS },
 } = require('../..');
 
-const CollateralManager = artifacts.require(`CollateralManager`);
-const CollateralState = artifacts.require(`CollateralState`);
-const CollateralManagerState = artifacts.require('CollateralManagerState');
+let CollateralState;
 
-contract('CollateralManager @ovm-skip', async accounts => {
+contract('CollateralManager', async accounts => {
 	const [deployerAccount, owner, oracle, , account1] = accounts;
 
 	const sETH = toBytes32('zBNB');
@@ -135,6 +133,8 @@ contract('CollateralManager @ovm-skip', async accounts => {
 			AddressResolver: addressResolver,
 			Issuer: issuer,
 			DebtCache: debtCache,
+			CollateralManager: manager,
+			CollateralManagerState: managerState,
 		} = await setupAllContracts({
 			accounts,
 			synths,
@@ -147,25 +147,12 @@ contract('CollateralManager @ovm-skip', async accounts => {
 				'Issuer',
 				'DebtCache',
 				'Exchanger',
+				'CollateralManager',
+				'CollateralManagerState',
 			],
 		}));
 
-		managerState = await CollateralManagerState.new(owner, ZERO_ADDRESS, { from: deployerAccount });
-
 		maxDebt = toUnit(50000000);
-
-		manager = await CollateralManager.new(
-			managerState.address,
-			owner,
-			addressResolver.address,
-			maxDebt,
-			// 5% / 31536000 (seconds in common year)
-			1585489599,
-			0,
-			{
-				from: deployerAccount,
-			}
-		);
 
 		await managerState.setAssociatedContract(manager.address, { from: owner });
 
@@ -316,6 +303,8 @@ contract('CollateralManager @ovm-skip', async accounts => {
 	};
 
 	before(async () => {
+		CollateralState = artifacts.require(`CollateralState`);
+
 		await setupManager();
 	});
 

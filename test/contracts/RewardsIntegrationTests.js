@@ -1,6 +1,6 @@
 'use strict';
 
-const { contract, web3 } = require('@nomiclabs/buidler');
+const { contract, web3 } = require('hardhat');
 
 const { assert, addSnapshotBeforeRestoreAfterEach } = require('./common');
 
@@ -12,7 +12,7 @@ const { setExchangeFeeRateForSynths } = require('./helpers');
 
 const { setupAllContracts } = require('./setup');
 
-contract('Rewards Integration Tests', async accounts => {
+contract('Rewards Integration Tests', accounts => {
 	// These functions are for manual debugging:
 
 	// const logFeePeriods = async () => {
@@ -63,7 +63,6 @@ contract('Rewards Integration Tests', async accounts => {
 	// Updates rates with defaults so they're not stale.
 	const updateRatesWithDefaults = async () => {
 		const timestamp = await currentTime();
-
 		await exchangeRates.updateRates(
 			[hAUD, hEUR, HZN, hBTC, iBTC, hBNB, BNB],
 			['0.5', '1.25', '0.1', '5000', '4000', '172', '172'].map(toUnit),
@@ -147,7 +146,9 @@ contract('Rewards Integration Tests', async accounts => {
 
 	// run this once before all tests to prepare our environment, snapshots on beforeEach will take
 	// care of resetting to this state
-	before(async () => {
+	before(async function() {
+		// set a very long timeout for these (requires a non-fat-arrow above)
+		this.timeout(180e3);
 		({
 			ExchangeRates: exchangeRates,
 			Exchanger: exchanger,
