@@ -20,7 +20,6 @@ import "./MixinSystemSettings.sol";
 import "openzeppelin-solidity-2.3.0/contracts/math/SafeMath.sol";
 import "./SafeDecimalMath.sol";
 
-
 // https://docs.synthetix.io/contracts/source/contracts/etherwrapper
 contract EtherWrapper is Owned, Pausable, MixinResolver, MixinSystemSettings, IEtherWrapper {
     using SafeMath for uint;

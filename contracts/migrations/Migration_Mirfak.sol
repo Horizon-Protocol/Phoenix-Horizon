@@ -26,12 +26,10 @@ import "../TokenState.sol";
 import "../ProxyERC20.sol";
 import "../Issuer.sol";
 
-
 interface ISynthetixNamedContract {
     // solhint-disable func-name-mixedcase
     function CONTRACT_NAME() external view returns (bytes32);
 }
-
 
 // solhint-disable contract-name-camelcase
 contract Migration_Mirfak is BaseMigration {
@@ -47,9 +45,8 @@ contract Migration_Mirfak is BaseMigration {
     // https://etherscan.io/address/0xb440DD674e1243644791a4AdfE3A2AbB0A92d309
     Proxy public constant proxyfeepool_i = Proxy(0xb440DD674e1243644791a4AdfE3A2AbB0A92d309);
     // https://etherscan.io/address/0xC9DFff5fA5605fd94F8B7927b892F2B57391e8bB
-    FeePoolEternalStorage public constant feepooleternalstorage_i = FeePoolEternalStorage(
-        0xC9DFff5fA5605fd94F8B7927b892F2B57391e8bB
-    );
+    FeePoolEternalStorage public constant feepooleternalstorage_i =
+        FeePoolEternalStorage(0xC9DFff5fA5605fd94F8B7927b892F2B57391e8bB);
     // https://etherscan.io/address/0x11164F6a47C3f8472D19b9aDd516Fc780cb7Ee02
     FeePoolState public constant feepoolstate_i = FeePoolState(0x11164F6a47C3f8472D19b9aDd516Fc780cb7Ee02);
     // https://etherscan.io/address/0xC011a73ee8576Fb46F5E1c5751cA3B9Fe0af2a6F
@@ -67,9 +64,8 @@ contract Migration_Mirfak is BaseMigration {
     // https://etherscan.io/address/0xb671F2210B1F6621A2607EA63E6B2DC3e2464d1F
     RewardEscrow public constant rewardescrow_i = RewardEscrow(0xb671F2210B1F6621A2607EA63E6B2DC3e2464d1F);
     // https://etherscan.io/address/0x29C295B046a73Cde593f21f63091B072d407e3F2
-    RewardsDistribution public constant rewardsdistribution_i = RewardsDistribution(
-        0x29C295B046a73Cde593f21f63091B072d407e3F2
-    );
+    RewardsDistribution public constant rewardsdistribution_i =
+        RewardsDistribution(0x29C295B046a73Cde593f21f63091B072d407e3F2);
     // https://etherscan.io/address/0x510adfDF6E7554C571b7Cd9305Ce91473610015e
     FeePool public constant feepool_i = FeePool(0x510adfDF6E7554C571b7Cd9305Ce91473610015e);
     // https://etherscan.io/address/0x967968963517AFDC9b8Ccc9AD6649bC507E83a7b

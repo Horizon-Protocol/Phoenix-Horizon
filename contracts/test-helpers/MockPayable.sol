@@ -1,6 +1,5 @@
 pragma solidity ^0.5.16;
 
-
 contract MockPayable {
     uint256 public paidTimes;
 

@@ -46,7 +46,6 @@ pragma solidity 0.5.16;
 import 'Horizon-Smart-Contract/contracts/interfaces/IAddressResolver.sol';
 import 'Horizon-Smart-Contract/contracts/interfaces/IHorizon.sol';
 
-
 contract MyContract {
   // This should be instantiated with our ReadProxyAddressResolver
   // it's a ReadProxy that won't change, so safe to code it here without a setter

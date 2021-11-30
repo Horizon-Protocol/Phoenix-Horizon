@@ -2,7 +2,6 @@ pragma solidity ^0.5.16;
 
 import "./LegacyOwned.sol";
 
-
 contract LegacyTokenState is LegacyOwned {
     // the address of the contract that can modify balances and allowances
     // this can only be changed by the owner of this contract

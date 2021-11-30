@@ -7,7 +7,6 @@ import "./Synth.sol";
 import "./interfaces/ICollateralManager.sol";
 import "./interfaces/IEtherWrapper.sol";
 
-
 // https://docs.synthetix.io/contracts/source/contracts/multicollateralsynth
 contract MultiCollateralSynth is Synth {
     bytes32 public constant CONTRACT_NAME = "MultiCollateralSynth";

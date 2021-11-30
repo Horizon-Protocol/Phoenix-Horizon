@@ -2,7 +2,6 @@ pragma solidity >=0.4.24;
 
 import "./IERC20.sol";
 
-
 interface ISynthRedeemer {
     // Rate of redemption - 0 for none
     function redemptions(address synthProxy) external view returns (uint redeemRate);

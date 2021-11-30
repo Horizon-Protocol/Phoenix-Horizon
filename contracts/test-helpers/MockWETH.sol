@@ -4,7 +4,6 @@ import "openzeppelin-solidity-2.3.0/contracts/token/ERC20/ERC20.sol";
 import "openzeppelin-solidity-2.3.0/contracts/token/ERC20/ERC20Detailed.sol";
 import "../interfaces/IWETH.sol";
 
-
 // IWETH
 contract MockWETH is ERC20, ERC20Detailed {
     constructor() public ERC20Detailed("Wrapped Ether", "WETH", 18) {

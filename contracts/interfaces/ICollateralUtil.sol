@@ -4,7 +4,6 @@ pragma experimental ABIEncoderV2;
 
 import "./ICollateralLoan.sol";
 
-
 interface ICollateralUtil {
     function getCollateralRatio(ICollateralLoan.Loan calldata loan, bytes32 collateralKey)
         external

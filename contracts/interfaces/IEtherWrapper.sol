@@ -2,7 +2,6 @@ pragma solidity >=0.4.24;
 
 import "./IWETH.sol";
 
-
 // https://docs.synthetix.io/contracts/source/interfaces/ietherwrapper
 contract IEtherWrapper {
     function mint(uint amount) external;

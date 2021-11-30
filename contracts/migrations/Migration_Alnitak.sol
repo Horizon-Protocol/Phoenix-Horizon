@@ -10,12 +10,10 @@ import "../legacy/LegacyTokenState.sol";
 import "../RewardEscrow.sol";
 import "../RewardsDistribution.sol";
 
-
 interface ISynthetixNamedContract {
     // solhint-disable func-name-mixedcase
     function CONTRACT_NAME() external view returns (bytes32);
 }
-
 
 // solhint-disable contract-name-camelcase
 contract Migration_Alnitak is BaseMigration {
@@ -37,9 +35,8 @@ contract Migration_Alnitak is BaseMigration {
     // https://etherscan.io/address/0xb671F2210B1F6621A2607EA63E6B2DC3e2464d1F
     RewardEscrow public constant rewardescrow_i = RewardEscrow(0xb671F2210B1F6621A2607EA63E6B2DC3e2464d1F);
     // https://etherscan.io/address/0x29C295B046a73Cde593f21f63091B072d407e3F2
-    RewardsDistribution public constant rewardsdistribution_i = RewardsDistribution(
-        0x29C295B046a73Cde593f21f63091B072d407e3F2
-    );
+    RewardsDistribution public constant rewardsdistribution_i =
+        RewardsDistribution(0x29C295B046a73Cde593f21f63091B072d407e3F2);
 
     constructor() public BaseMigration(OWNER) {}
 

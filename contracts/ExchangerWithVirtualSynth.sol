@@ -8,7 +8,6 @@ import "./MinimalProxyFactory.sol";
 import "./interfaces/IAddressResolver.sol";
 import "./interfaces/IERC20.sol";
 
-
 interface IVirtualSynthInternal {
     function initialize(
         IERC20 _synth,
@@ -18,7 +17,6 @@ interface IVirtualSynthInternal {
         bytes32 _currencyKey
     ) external;
 }
-
 
 // https://docs.synthetix.io/contracts/source/contracts/exchangerwithvirtualsynth
 contract ExchangerWithVirtualSynth is MinimalProxyFactory, Exchanger {
@@ -52,9 +50,8 @@ contract ExchangerWithVirtualSynth is MinimalProxyFactory, Exchanger {
         // prevent inverse synths from being allowed due to purgeability
         require(currencyKey[0] != 0x69, "Cannot virtualize this synth");
 
-        IVirtualSynthInternal vSynth = IVirtualSynthInternal(
-            _cloneAsMinimalProxy(_virtualSynthMastercopy(), "Could not create new vSynth")
-        );
+        IVirtualSynthInternal vSynth =
+            IVirtualSynthInternal(_cloneAsMinimalProxy(_virtualSynthMastercopy(), "Could not create new vSynth"));
         vSynth.initialize(synth, resolver, recipient, amount, currencyKey);
         emit VirtualSynthCreated(address(synth), recipient, address(vSynth), currencyKey, amount);
 

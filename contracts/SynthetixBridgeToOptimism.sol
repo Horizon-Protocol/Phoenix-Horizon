@@ -12,7 +12,6 @@ import "./interfaces/IIssuer.sol";
 import "./interfaces/ISynthetixBridgeToBase.sol";
 import "@eth-optimism/contracts/iOVM/bridge/tokens/iOVM_L2DepositedToken.sol";
 
-
 contract SynthetixBridgeToOptimism is BaseSynthetixBridge, ISynthetixBridgeToOptimism, iOVM_L1TokenGateway {
     using SafeERC20 for IERC20;
 
@@ -193,12 +192,13 @@ contract SynthetixBridgeToOptimism is BaseSynthetixBridge, ISynthetixBridgeToOpt
                 synthetixERC20().transfer(synthetixBridgeEscrow(), escrowedAccountBalance);
                 // create message payload for L2
                 ISynthetixBridgeToBase bridgeToBase;
-                bytes memory messageData = abi.encodeWithSelector(
-                    bridgeToBase.finalizeEscrowMigration.selector,
-                    msg.sender,
-                    escrowedAccountBalance,
-                    vestingEntries
-                );
+                bytes memory messageData =
+                    abi.encodeWithSelector(
+                        bridgeToBase.finalizeEscrowMigration.selector,
+                        msg.sender,
+                        escrowedAccountBalance,
+                        vestingEntries
+                    );
                 // relay the message to this contract on L2 via L1 Messenger
                 messenger().sendMessage(
                     synthetixBridgeToBase(),

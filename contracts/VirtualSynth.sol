@@ -12,7 +12,6 @@ import "./interfaces/IAddressResolver.sol";
 import "./interfaces/IVirtualSynth.sol";
 import "./interfaces/IExchanger.sol";
 
-
 // https://docs.synthetix.io/contracts/source/contracts/virtualsynth
 // Note: this contract should be treated as an abstract contract and should not be directly deployed.
 //       On higher versions of solidity, it would be marked with the `abstract` keyword.

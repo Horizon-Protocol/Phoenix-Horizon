@@ -3,7 +3,6 @@ pragma solidity ^0.5.16;
 import "../interfaces/IAddressResolver.sol";
 import "../interfaces/ISynthetix.sol";
 
-
 contract MockThirdPartyExchangeContract {
     IAddressResolver public resolver;
 

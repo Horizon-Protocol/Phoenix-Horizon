@@ -2,7 +2,6 @@ pragma solidity ^0.5.16;
 
 import "./Owned.sol";
 
-
 contract BaseMigration is Owned {
     address public deployer;
 

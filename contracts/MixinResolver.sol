@@ -3,7 +3,6 @@ pragma solidity ^0.5.16;
 // Internal references
 import "./AddressResolver.sol";
 
-
 // https://docs.synthetix.io/contracts/source/contracts/mixinresolver
 contract MixinResolver {
     AddressResolver public resolver;
@@ -43,10 +42,8 @@ contract MixinResolver {
         for (uint i = 0; i < requiredAddresses.length; i++) {
             bytes32 name = requiredAddresses[i];
             // Note: can only be invoked once the resolver has all the targets needed added
-            address destination = resolver.requireAndGetAddress(
-                name,
-                string(abi.encodePacked("Resolver missing target: ", name))
-            );
+            address destination =
+                resolver.requireAndGetAddress(name, string(abi.encodePacked("Resolver missing target: ", name)));
             addressCache[name] = destination;
             emit CacheUpdated(name, destination);
         }

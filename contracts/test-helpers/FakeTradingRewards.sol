@@ -4,7 +4,6 @@ import "../TradingRewards.sol";
 
 import "../interfaces/IExchanger.sol";
 
-
 contract FakeTradingRewards is TradingRewards {
     IERC20 public _mockSynthetixToken;
 
