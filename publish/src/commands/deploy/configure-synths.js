@@ -29,7 +29,7 @@ module.exports = async ({
 		const tokenStateForSynth = deployer.deployedContracts[`TokenState${currencyKey}`];
 		const proxyForSynth = deployer.deployedContracts[`Proxy${currencyKey}`];
 		const proxyERC20ForSynth =
-			currencyKey === 'sUSD' ? deployer.deployedContracts[`ProxyERC20sUSD`] : undefined;
+			currencyKey === 'zUSD' ? deployer.deployedContracts[`ProxyERC20sUSD`] : undefined;
 
 		let ExistingSynth;
 		try {
