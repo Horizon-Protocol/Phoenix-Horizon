@@ -72,7 +72,7 @@ const constants = {
 	OVM_GAS_PRICE_GWEI: '0.015',
 
 	// inflationStartTimestampInSecs: 1551830400, // 2019-03-06T00:00:00Z
-	inflationStartTimestampInSecs: 1672448400
+	inflationStartTimestampInSecs: 1672448400,
 };
 
 const knownAccounts = {

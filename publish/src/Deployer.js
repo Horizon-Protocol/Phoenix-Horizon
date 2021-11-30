@@ -15,23 +15,23 @@ class Deployer {
 	 * @param {object} deployment An object with full combined contract name keys mapping to existing deployment addresses (if any)
 	 */
 	constructor({
-					compiled,
-					config,
-					configFile,
-					contractDeploymentGasLimit,
-					deployment,
-					deploymentFile,
-					dryRun,
-					gasPrice,
-					methodCallGasLimit,
-					network,
-					providerUrl,
-					privateKey,
-					useFork,
-					useOvm,
-					ignoreSafetyChecks,
-					nonceManager,
-				}) {
+		compiled,
+		config,
+		configFile,
+		contractDeploymentGasLimit,
+		deployment,
+		deploymentFile,
+		dryRun,
+		gasPrice,
+		methodCallGasLimit,
+		network,
+		providerUrl,
+		privateKey,
+		useFork,
+		useOvm,
+		ignoreSafetyChecks,
+		nonceManager,
+	}) {
 		this.compiled = compiled;
 		this.config = config;
 		this.configFile = configFile;
@@ -130,8 +130,8 @@ class Deployer {
 		const gasLimit = this.useOvm
 			? undefined
 			: type === 'method-call'
-				? this.methodCallGasLimit
-				: this.contractDeploymentGasLimit;
+			? this.methodCallGasLimit
+			: this.contractDeploymentGasLimit;
 
 		const params = {
 			gasLimit,
@@ -232,8 +232,8 @@ class Deployer {
 							key === 'owner'
 								? Promise.resolve(account)
 								: key === 'resolverAddressesRequired'
-									? Promise.resolve([])
-									: undefined,
+								? Promise.resolve([])
+								: undefined,
 					});
 				});
 				deployedContract.address = '0x' + this._dryRunCounter.toString().padStart(40, '0');
@@ -386,13 +386,13 @@ class Deployer {
 	}
 
 	async deployContract({
-							 name,
-							 source = name,
-							 args = [],
-							 deps = [],
-							 force = false,
-							 dryRun = this.dryRun,
-						 }) {
+		name,
+		source = name,
+		args = [],
+		deps = [],
+		force = false,
+		dryRun = this.dryRun,
+	}) {
 		const forbiddenAddress = (this.deployedContracts['AddressResolver'] || {}).address;
 		for (const arg of args) {
 			if (

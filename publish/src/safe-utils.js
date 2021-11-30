@@ -107,23 +107,23 @@ const getNewTxNonce = async ({ lastTx, safeContract }) => {
 };
 
 const saveTransactionToApi = async ({
-										safeContract,
-										network,
-										baseGas = 0,
-										data,
-										gasPrice = 0,
-										gasToken = ZERO_ADDRESS,
-										nonce,
-										operation = CALL,
-										refundReceiver = ZERO_ADDRESS,
-										safeTxGas = 0,
-										to,
-										valueInWei = 0,
-										sender,
-										origin = null,
-										transactionHash,
-										signature,
-									}) => {
+	safeContract,
+	network,
+	baseGas = 0,
+	data,
+	gasPrice = 0,
+	gasToken = ZERO_ADDRESS,
+	nonce,
+	operation = CALL,
+	refundReceiver = ZERO_ADDRESS,
+	safeTxGas = 0,
+	to,
+	valueInWei = 0,
+	sender,
+	origin = null,
+	transactionHash,
+	signature,
+}) => {
 	const safeAddress = safeContract.address;
 	const endpoint = safeTransactionApi({ network, safeAddress });
 
