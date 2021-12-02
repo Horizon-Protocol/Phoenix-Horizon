@@ -103,13 +103,13 @@ module.exports = async ({
 			target: CollateralEth,
 			read: 'areSynthsAndCurrenciesSet',
 			readArg: [
-				CollateralEthSynths.map(key => toBytes32(`Synth${key}`)),
+				CollateralEthSynths.map(key => toBytes32(`Zasset${key}`)),
 				CollateralEthSynths.map(toBytes32),
 			],
 			expected: input => input,
 			write: 'addSynths',
 			writeArg: [
-				CollateralEthSynths.map(key => toBytes32(`Synth${key}`)),
+				CollateralEthSynths.map(key => toBytes32(`Zasset${key}`)),
 				CollateralEthSynths.map(toBytes32),
 			],
 			comment: 'Ensure the CollateralEth contract has all associated synths added',
@@ -143,13 +143,13 @@ module.exports = async ({
 			target: CollateralErc20,
 			read: 'areSynthsAndCurrenciesSet',
 			readArg: [
-				CollateralErc20Synths.map(key => toBytes32(`Synth${key}`)),
+				CollateralErc20Synths.map(key => toBytes32(`Zasset${key}`)),
 				CollateralErc20Synths.map(toBytes32),
 			],
 			expected: input => input,
 			write: 'addSynths',
 			writeArg: [
-				CollateralErc20Synths.map(key => toBytes32(`Synth${key}`)),
+				CollateralErc20Synths.map(key => toBytes32(`Zasset${key}`)),
 				CollateralErc20Synths.map(toBytes32),
 			],
 			comment: 'Ensure the CollateralErc20 contract has all associated synths added',
@@ -184,13 +184,13 @@ module.exports = async ({
 			target: CollateralShort,
 			read: 'areSynthsAndCurrenciesSet',
 			readArg: [
-				CollateralShortSynths.map(key => toBytes32(`Synth${key}`)),
+				CollateralShortSynths.map(key => toBytes32(`Zasset${key}`)),
 				CollateralShortSynths.map(toBytes32),
 			],
 			expected: input => input,
 			write: 'addSynths',
 			writeArg: [
-				CollateralShortSynths.map(key => toBytes32(`Synth${key}`)),
+				CollateralShortSynths.map(key => toBytes32(`Zasset${key}`)),
 				CollateralShortSynths.map(toBytes32),
 			],
 			comment: 'Ensure the CollateralShort contract has all associated synths added',
@@ -260,13 +260,13 @@ module.exports = async ({
 			target: CollateralManager,
 			read: 'areSynthsAndCurrenciesSet',
 			readArg: [
-				CollateralManagerSynths.map(key => toBytes32(`Synth${key}`)),
+				CollateralManagerSynths.map(key => toBytes32(`Zasset${key}`)),
 				CollateralManagerSynths.map(toBytes32),
 			],
 			expected: input => input,
 			write: 'addSynths',
 			writeArg: [
-				CollateralManagerSynths.map(key => toBytes32(`Synth${key}`)),
+				CollateralManagerSynths.map(key => toBytes32(`Zasset${key}`)),
 				CollateralManagerSynths.map(toBytes32),
 			],
 			comment: 'Ensure the CollateralManager contract has all associated synths added',
@@ -279,7 +279,7 @@ module.exports = async ({
 			target: CollateralManager,
 			read: 'areShortableSynthsSet',
 			readArg: [
-				CollateralManagerShorts.map(({ long }) => toBytes32(`Synth${long}`)),
+				CollateralManagerShorts.map(({ long }) => toBytes32(`Zasset${long}`)),
 				CollateralManagerShorts.map(({ long }) => toBytes32(long)),
 			],
 			expected: input => input,
