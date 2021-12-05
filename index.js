@@ -119,8 +119,8 @@ const defaults = {
 	MINIMUM_STAKE_TIME: (3600 * 24).toString(), // 1 days
 	DEBT_SNAPSHOT_STALE_TIME: (43800).toString(), // 12 hour heartbeat + 10 minutes mining time
 	AGGREGATOR_WARNING_FLAGS: {
-		mainnet: '0x4A5b9B4aD08616D11F3A402FF7cBEAcB732a76C6',
-		testnet: '0x6292aa9a6650ae14fbf974e5029f36f95a1848fd',
+		mainnet: '0x72a4116ec4d7de427f57e972639a3d29af2d6e18',
+		testnet: '0x771141128c59797f37ba19e21c9aa368bc0842b6',
 	},
 	RENBTC_ERC20_ADDRESSES: {
 		mainnet: '0xfCe146bF3146100cfe5dB4129cf6C82b0eF4Ad8c',
