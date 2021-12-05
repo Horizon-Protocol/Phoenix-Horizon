@@ -59,7 +59,7 @@ module.exports = async ({
 				const currentRateForCurrency = await oldExrates.rateForCurrency(toBytes32(currencyKey));
 
 				// and total supply, if any
-				const synth = deployer.deployedContracts[`Synth${currencyKey}`];
+				const synth = deployer.deployedContracts[`Zasset${currencyKey}`];
 				const totalSynthSupply = await synth.totalSupply();
 				console.log(gray(`totalSupply of ${currencyKey}: ${Number(totalSynthSupply)}`));
 

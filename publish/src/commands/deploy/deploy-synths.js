@@ -34,7 +34,7 @@ module.exports = async ({
 	const synthsToAdd = [];
 
 	for (const { name: currencyKey, subclass } of synths) {
-		console.log(gray(`\n   --- ZASSET ${currencyKey} ---\n`));
+		console.log(gray(`\n   --- ZASSET ${currencyKey} - ${subclass} ---\n`));
 
 		const tokenStateForSynth = await deployer.deployContract({
 			name: `TokenState${currencyKey}`,
