@@ -14,5 +14,35 @@
 		"description": "Binance Coin",
 		"name": "zBNB",
 		"subclass": "MultiCollateralSynth"
+	},
+	{
+		"name": "iBNB",
+		"asset": "BNB",
+		"subclass": "PurgeableSynth",
+		"inverted": {
+			"entryPoint": 253,
+			"upperLimit": 379.5,
+			"lowerLimit": 126.5
+		}
+	},
+	{
+		"name": "zBTC",
+		"asset": "BTC",
+		"subclass": "MultiCollateralSynth"
+	},
+	{
+		"name": "iBTC",
+		"asset": "BTC",
+		"subclass": "PurgeableSynth",
+		"inverted": {
+			"entryPoint": 58785,
+			"upperLimit": 88177.5,
+			"lowerLimit": 29392.5
+		}
+	},
+	{
+		"name": "zETH",
+		"asset": "ETH",
+		"subclass": "PurgeableSynth"
 	}
 ]
