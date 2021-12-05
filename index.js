@@ -120,11 +120,11 @@ const defaults = {
 	DEBT_SNAPSHOT_STALE_TIME: (43800).toString(), // 12 hour heartbeat + 10 minutes mining time
 	AGGREGATOR_WARNING_FLAGS: {
 		mainnet: '0x4A5b9B4aD08616D11F3A402FF7cBEAcB732a76C6',
-		kovan: '0x6292aa9a6650ae14fbf974e5029f36f95a1848fd',
+		testnet: '0x6292aa9a6650ae14fbf974e5029f36f95a1848fd',
 	},
 	RENBTC_ERC20_ADDRESSES: {
-		mainnet: '0xEB4C2781e4ebA804CE9a9803C67d0893436bB27D',
-		kovan: '0x9B2fE385cEDea62D839E4dE89B0A23EF4eacC717',
+		mainnet: '0xfCe146bF3146100cfe5dB4129cf6C82b0eF4Ad8c',
+		testnet: '0x5eB4F537889eC3C7Ec397F1acB33c70D8C0ee438',
 	},
 	WETH_ERC20_ADDRESSES: {
 		mainnet: '0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c',
