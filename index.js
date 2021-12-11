@@ -466,10 +466,7 @@ const getUsers = ({ network = 'mainnet', user, useOvm = false } = {}) => {
 			marketClosure: '0xC105Ea57Eb434Fbe44690d7Dec2702e4a2FBFCf7',
 			oracle: '0xaC1ED4Fabbd5204E02950D68b6FC8c446AC95362',
 		}),
-		kovan: Object.assign({}, base),
-		rinkeby: Object.assign({}, base),
-		ropsten: Object.assign({}, base),
-		goerli: Object.assign({}, base),
+		testnet: Object.assign({}, base),
 		local: Object.assign({}, base, {
 			// Deterministic account #0 when using `npx hardhat node`
 			owner: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
