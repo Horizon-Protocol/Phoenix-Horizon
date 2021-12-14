@@ -29,7 +29,7 @@ module.exports = async ({
 		const tokenStateForSynth = deployer.deployedContracts[`TokenState${currencyKey}`];
 		const proxyForSynth = deployer.deployedContracts[`Proxy${currencyKey}`];
 		const proxyERC20ForSynth =
-			currencyKey === 'zUSD' ? deployer.deployedContracts[`ProxyERC20sUSD`] : undefined;
+			currencyKey === 'zUSD' ? deployer.deployedContracts[`ProxyERC20zUSD`] : undefined;
 
 		let ExistingSynth;
 		try {
@@ -85,7 +85,7 @@ module.exports = async ({
 				comment: `Ensure the ${currencyKey} synth Proxy is correctly connected to the Synth`,
 			});
 
-			// Migration Phrase 2: if there's a ProxyERC20sUSD then the Synth's proxy must use it
+			// Migration Phrase 2: if there's a ProxyERC20zUSD then the Synth's proxy must use it
 			await runStep({
 				contract: `Zasset${currencyKey}`,
 				target: synth,
@@ -99,13 +99,13 @@ module.exports = async ({
 			if (proxyERC20ForSynth) {
 				// and make sure this new proxy has the target of the synth
 				await runStep({
-					contract: `ProxyERC20sUSD`,
+					contract: `ProxyERC20zUSD`,
 					target: proxyERC20ForSynth,
 					read: 'target',
 					expected: input => input === addressOf(synth),
 					write: 'setTarget',
 					writeArg: addressOf(synth),
-					comment: 'Ensure the special ERC20 proxy for sUSD has its target set to the Synth',
+					comment: 'Ensure the special ERC20 proxy for zUSD has its target set to the Synth',
 				});
 			}
 		}
