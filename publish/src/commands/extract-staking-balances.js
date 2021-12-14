@@ -48,7 +48,7 @@ async function extractStakingBalances({ network = DEFAULTS.network, deploymentPa
 
 	// The address of the inverse synth that is about to be purged.
 	// Note that this must be the PROXY address, where Transfer events are emitted from.
-	const iSynthContract = getTarget({ contract: `Proxy${synth === 'zUSD' ? 'ERC20sUSD' : synth}` });
+	const iSynthContract = getTarget({ contract: `Proxy${synth === 'zUSD' ? 'ERC20zUSD' : synth}` });
 
 	if (!iSynthContract) {
 		throw new Error(`Cannot find synth contract for synth: "${synth}"`);
@@ -110,7 +110,7 @@ async function extractStakingBalances({ network = DEFAULTS.network, deploymentPa
 		provider
 	);
 
-	// The exchange fee incurred when users are purged into sUSD
+	// The exchange fee incurred when users are purged into zUSD
 	const exchangeFee = await SystemSettings.exchangeFeeRate(toBytes32('zUSD'));
 
 	console.log(gray(`Exchange fee of zUSD is`), yellow(ethers.utils.formatEther(exchangeFee)));
@@ -232,12 +232,12 @@ async function extractStakingBalances({ network = DEFAULTS.network, deploymentPa
 		const totalOwed = result.reduce((total, curr) => total.add(curr.owed), ethers.constants.Zero);
 
 		console.log(`\n${ethers.utils.formatEther(totalStaked, 'ether')} staked in total.`);
-		console.log(`${ethers.utils.formatEther(totalOwed, 'ether')} total sUSD owed.\n`);
+		console.log(`${ethers.utils.formatEther(totalOwed, 'ether')} total zUSD owed.\n`);
 		return result;
 	}
 
 	function saveOwedBalances(owedSUSDBalances) {
-		let csvString = 'Address,Staked Balance,Owed sUSD,Readable Staked Balance,Readable Owed sUSD\n';
+		let csvString = 'Address,Staked Balance,Owed zUSD,Readable Staked Balance,Readable Owed zUSD\n';
 
 		for (const balance of owedSUSDBalances) {
 			const line = `${balance.address},${balance.balance},${balance.owed},${balance.readableBalance},${balance.readableOwed}\n`;

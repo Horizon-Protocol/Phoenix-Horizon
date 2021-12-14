@@ -136,7 +136,7 @@ module.exports = async ({
 			writeArg: addressOf(CollateralManager),
 			comment: 'Ensure the CollateralErc20 contract is connected to the CollateralManager',
 		});
-		const CollateralErc20Synths = (await getDeployParameter('COLLATERAL_RENBTC'))['SYNTHS']; // COLLATERAL_RENBTC synths - ['sUSD', 'sBTC']
+		const CollateralErc20Synths = (await getDeployParameter('COLLATERAL_RENBTC'))['SYNTHS']; // COLLATERAL_RENBTC synths - ['zUSD', 'sBTC']
 		await runStep({
 			contract: 'CollateralErc20',
 			gasLimit: 1e6,
