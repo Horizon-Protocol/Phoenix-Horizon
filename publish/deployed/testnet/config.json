@@ -71,19 +71,10 @@
 	"SynthUtil": {
 		"deploy": false
 	},
-	"StakingRewardsiBTC": {
-		"deploy": true
-	},
-	"StakingRewardsiETH": {
-		"deploy": true
-	},
 	"DappMaintenance": {
 		"deploy": false
 	},
 	"ZassetzUSD": {
-		"deploy": false
-	},
-	"ZassetzBTC": {
 		"deploy": false
 	},
 	"ProxyERC20": {
@@ -98,9 +89,6 @@
 	"ProxyzUSD": {
 		"deploy": false
 	},
-	"ProxyzBTC": {
-		"deploy": false
-	},
 	"SafeDecimalMath": {
 		"deploy": false
 	},
@@ -113,18 +101,6 @@
 	"TokenStatezUSD": {
 		"deploy": false
 	},
-	"TokenStatezBTC": {
-		"deploy": false
-	},
-	"TokenStatezETH": {
-		"deploy": false
-	},
-	"ProxyzETH": {
-		"deploy": false
-	},
-	"ZassetzETH": {
-		"deploy": false
-	},
 	"TokenStatezBNB": {
 		"deploy": false
 	},
@@ -134,53 +110,8 @@
 	"ZassetzBNB": {
 		"deploy": false
 	},
-	"TokenStateiBTC": {
+	"ProxyERC20zUSD": {
 		"deploy": false
-	},
-	"ProxyiBTC": {
-		"deploy": false
-	},
-	"ZassetiBTC": {
-		"deploy": false
-	},
-	"TokenStateiETH": {
-		"deploy": true
-	},
-	"ProxyiETH": {
-		"deploy": true
-	},
-	"ZassetiETH": {
-		"deploy": true
-	},
-	"TokenStateiBNB": {
-		"deploy": false
-	},
-	"ProxyiBNB": {
-		"deploy": false
-	},
-	"ZassetiBNB": {
-		"deploy": false
-	},
-	"ProxyERC20sUSD": {
-		"deploy": false
-	},
-	"TokenStatezETC": {
-		"deploy": true
-	},
-	"ProxyzETC": {
-		"deploy": true
-	},
-	"ZassetzETC": {
-		"deploy": true
-	},
-	"TokenStateiETC": {
-		"deploy": true
-	},
-	"ProxyiETC": {
-		"deploy": true
-	},
-	"ZassetiETC": {
-		"deploy": true
 	},
 	"FlexibleStorage": {
 		"deploy": false

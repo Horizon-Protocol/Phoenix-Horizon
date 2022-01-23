@@ -217,22 +217,6 @@
 				"keccak256": "0xece63ae84bb70597ce14e76c817a0eceac734a7a4c32de5aad6592029b7207c4",
 				"replaced_in": "v1.0.6"
 			},
-			"TokenStatezETH": {
-				"address": "0xda07cC593329C7d31085D7606ae7386F13908BE6",
-				"status": "deleted",
-				"keccak256": "0x06cfc019b2f22fe404e9a6171feae309c2fad373ec12b6019eaf34777f431a2e"
-			},
-			"ProxyzETH": {
-				"address": "0xd11483416a8F7E9A78CC8c91F918EDAe80464952",
-				"status": "deleted",
-				"keccak256": "0x13c7f97d31997cae012867a0babf08e01f08428cb04007381f89ac204b1cb2c6"
-			},
-			"ZassetzETH": {
-				"address": "0x90B6b174b5EB4AD9A99D449Ef730436606c19CFa",
-				"status": "replaced",
-				"keccak256": "0xbf5741b15f6cacf304ecd0f622365a5d09dfbfc1a5c12d1096db6a50a2f02efc",
-				"replaced_in": "v1.0.6"
-			},
 			"TokenStatezBNB": {
 				"address": "0x0D2806b214EA95c4983aE1346Db655030A3CC978",
 				"status": "replaced",
@@ -677,51 +661,6 @@
 			},
 			"ZassetiBNB": {
 				"address": "0x9c87fb862484b64a46347380F1f86B5263F5C668",
-				"status": "current",
-				"keccak256": "0x2f19b326fb30f01761993831c5c8fc38fdde588ab3578db96b23c93ec40f60f9"
-			},
-			"TokenStatezBTC": {
-				"address": "0x43E73662F9A30654547A33Fd25eC79C355A9d3F8",
-				"status": "current",
-				"keccak256": "0x9fb41dc6d7a97830a3f9c8f1d00c9110d81c67dd8c4897239492cbac89a7eac6"
-			},
-			"ProxyzBTC": {
-				"address": "0xf7e760C95e17119aedac823d12fD60777ba2960B",
-				"status": "current",
-				"keccak256": "0xba394a157eeee4c50b4c3d389ad918089531f4fdf033a49b68099010e5562ec3"
-			},
-			"ZassetzBTC": {
-				"address": "0x697a5Fd14e5E5cc1a87d3b9BEb724D4bb4026B54",
-				"status": "current",
-				"keccak256": "0xc915e315b400c518263cdd2d0137d13eae2bbb999c76525ef5d32d8aa0428d04"
-			},
-			"TokenStateiBTC": {
-				"address": "0x180005dFc37FBdD488eFc0B545DddD0310c4d101",
-				"status": "current",
-				"keccak256": "0x9fb41dc6d7a97830a3f9c8f1d00c9110d81c67dd8c4897239492cbac89a7eac6"
-			},
-			"ProxyiBTC": {
-				"address": "0xc486d2B7150E2AD06ac8416de17158c8ED79c781",
-				"status": "current",
-				"keccak256": "0xba394a157eeee4c50b4c3d389ad918089531f4fdf033a49b68099010e5562ec3"
-			},
-			"ZassetiBTC": {
-				"address": "0xae73AC950325295A12bdAeC76cF903F11a0Ff568",
-				"status": "current",
-				"keccak256": "0x2f19b326fb30f01761993831c5c8fc38fdde588ab3578db96b23c93ec40f60f9"
-			},
-			"TokenStatezETH": {
-				"address": "0x48ffa816b62d91BB2de67EfF19D0EC5cC04ffa4E",
-				"status": "current",
-				"keccak256": "0x9fb41dc6d7a97830a3f9c8f1d00c9110d81c67dd8c4897239492cbac89a7eac6"
-			},
-			"ProxyzETH": {
-				"address": "0xc9311C9736449d659bBBdA9ad92e6A71099267B4",
-				"status": "current",
-				"keccak256": "0xba394a157eeee4c50b4c3d389ad918089531f4fdf033a49b68099010e5562ec3"
-			},
-			"ZassetzETH": {
-				"address": "0x17EE1cD292F40b97eE324E3A1D48e84f6e803CDf",
 				"status": "current",
 				"keccak256": "0x2f19b326fb30f01761993831c5c8fc38fdde588ab3578db96b23c93ec40f60f9"
 			},
