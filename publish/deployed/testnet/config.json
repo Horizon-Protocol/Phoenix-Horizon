@@ -77,6 +77,9 @@
 	"ZassetzUSD": {
 		"deploy": false
 	},
+	"ZassetzBTC": {
+		"deploy": false
+	},
 	"ProxyERC20": {
 		"deploy": false
 	},
@@ -89,6 +92,9 @@
 	"ProxyzUSD": {
 		"deploy": false
 	},
+	"ProxyzBTC": {
+		"deploy": false
+	},
 	"SafeDecimalMath": {
 		"deploy": false
 	},
@@ -99,6 +105,18 @@
 		"deploy": false
 	},
 	"TokenStatezUSD": {
+		"deploy": false
+	},
+	"TokenStatezBTC": {
+		"deploy": false
+	},
+	"TokenStatezETH": {
+		"deploy": false
+	},
+	"ProxyzETH": {
+		"deploy": false
+	},
+	"ZassetzETH": {
 		"deploy": false
 	},
 	"TokenStatezBNB": {
@@ -152,12 +170,6 @@
 	"SynthetixBridgeToOptimism": {
 		"deploy": false
 	},
-	"ShortingRewardszBTC": {
-		"deploy": true
-	},
-	"ShortingRewardszETH": {
-		"deploy": true
-	},
 	"VirtualSynthMastercopy": {
 		"deploy": false
 	},
@@ -174,6 +186,24 @@
 		"deploy": false
 	},
 	"CollateralUtil": {
+		"deploy": false
+	},
+	"TokenStateiBTC": {
+		"deploy": false
+	},
+	"ProxyiBTC": {
+		"deploy": false
+	},
+	"ZassetiBTC": {
+		"deploy": false
+	},
+	"TokenStateiBNB": {
+		"deploy": false
+	},
+	"ProxyiBNB": {
+		"deploy": false
+	},
+	"ZassetiBNB": {
 		"deploy": false
 	}
 }
