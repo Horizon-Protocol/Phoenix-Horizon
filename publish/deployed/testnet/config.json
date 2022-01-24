@@ -205,5 +205,68 @@
 	},
 	"ZassetiBNB": {
 		"deploy": false
+	},
+	"TokenStatezADA": {
+		"deploy": false
+	},
+	"ProxyzADA": {
+		"deploy": false
+	},
+	"ZassetzADA": {
+		"deploy": false
+	},
+	"TokenStatezCAKE": {
+		"deploy": false
+	},
+	"ProxyzCAKE": {
+		"deploy": false
+	},
+	"ZassetzCAKE": {
+		"deploy": false
+	},
+	"TokenStatezDOT": {
+		"deploy": false
+	},
+	"ProxyzDOT": {
+		"deploy": false
+	},
+	"ZassetzDOT": {
+		"deploy": false
+	},
+	"TokenStatezLINK": {
+		"deploy": false
+	},
+	"ProxyzLINK": {
+		"deploy": false
+	},
+	"ZassetzLINK": {
+		"deploy": false
+	},
+	"TokenStatezMATIC": {
+		"deploy": false
+	},
+	"ProxyzMATIC": {
+		"deploy": false
+	},
+	"ZassetzMATIC": {
+		"deploy": false
+	},
+	"TokenStatezXRP": {
+		"deploy": false
+	},
+	"ProxyzXRP": {
+		"deploy": false
+	},
+	"ZassetzXRP": {
+		"deploy": false
+	},
+	"TokenStatezDOGE": {
+		"deploy": false
+	},
+	"ProxyzDOGE": {
+		"deploy": false
+	},
+	"ZassetzDOGE": {
+		"deploy": false
 	}
 }

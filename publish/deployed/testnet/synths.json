@@ -26,6 +26,41 @@
 		"subclass": "PurgeableSynth"
 	},
 	{
+		"name": "zADA",
+		"asset": "ADA",
+		"subclass": "PurgeableSynth"
+	},
+	{
+		"name": "zCAKE",
+		"asset": "CAKE",
+		"subclass": "PurgeableSynth"
+	},
+	{
+		"name": "zDOT",
+		"asset": "DOT",
+		"subclass": "PurgeableSynth"
+	},
+	{
+		"name": "zLINK",
+		"asset": "LINK",
+		"subclass": "PurgeableSynth"
+	},
+	{
+		"name": "zMATIC",
+		"asset": "MATIC",
+		"subclass": "PurgeableSynth"
+	},
+	{
+		"name": "zXRP",
+		"asset": "XRP",
+		"subclass": "PurgeableSynth"
+	},
+	{
+		"name": "zDOGE",
+		"asset": "DOGE",
+		"subclass": "PurgeableSynth"
+	},
+	{
 		"name": "iBNB",
 		"asset": "BNB",
 		"subclass": "PurgeableSynth",

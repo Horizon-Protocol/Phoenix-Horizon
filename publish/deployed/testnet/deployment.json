@@ -665,6 +665,195 @@
 			"timestamp": "2022-01-24T03:32:25.326Z",
 			"txn": "",
 			"network": "testnet"
+		},
+		"TokenStatezADA": {
+			"name": "TokenStatezADA",
+			"address": "0x6B350f4B65644bc8327E9C9fCdBa7bBB43c6a664",
+			"source": "TokenState",
+			"link": "https://testnet.bscscan.com/address/0x6B350f4B65644bc8327E9C9fCdBa7bBB43c6a664",
+			"timestamp": "2022-01-24T09:22:08.622Z",
+			"txn": "",
+			"network": "testnet"
+		},
+		"ProxyzADA": {
+			"name": "ProxyzADA",
+			"address": "0x960CaeB681EE37fB259B6caBB1b6BD075421C4ca",
+			"source": "ProxyERC20",
+			"link": "https://testnet.bscscan.com/address/0x960CaeB681EE37fB259B6caBB1b6BD075421C4ca",
+			"timestamp": "2022-01-24T09:22:25.402Z",
+			"txn": "",
+			"network": "testnet"
+		},
+		"ZassetzADA": {
+			"name": "ZassetzADA",
+			"address": "0x9B9dA5Dfa4EdEc0A59E8E3964D73244e46DbA9cB",
+			"source": "PurgeableSynth",
+			"link": "https://testnet.bscscan.com/address/0x9B9dA5Dfa4EdEc0A59E8E3964D73244e46DbA9cB",
+			"timestamp": "2022-01-24T09:22:46.264Z",
+			"txn": "",
+			"network": "testnet"
+		},
+		"TokenStatezCAKE": {
+			"name": "TokenStatezCAKE",
+			"address": "0x494eBaD44BEbD30F8e65e4461c5a653A45D6f99D",
+			"source": "TokenState",
+			"link": "https://testnet.bscscan.com/address/0x494eBaD44BEbD30F8e65e4461c5a653A45D6f99D",
+			"timestamp": "2022-01-24T09:22:57.005Z",
+			"txn": "",
+			"network": "testnet"
+		},
+		"ProxyzCAKE": {
+			"name": "ProxyzCAKE",
+			"address": "0xa40644645Fe97963C7eDE6B8FB2049b5177D590f",
+			"source": "ProxyERC20",
+			"link": "https://testnet.bscscan.com/address/0xa40644645Fe97963C7eDE6B8FB2049b5177D590f",
+			"timestamp": "2022-01-24T09:23:09.322Z",
+			"txn": "",
+			"network": "testnet"
+		},
+		"ZassetzCAKE": {
+			"name": "ZassetzCAKE",
+			"address": "0x2D1666BD9Ec6eE9136E5D656721f041dc627011E",
+			"source": "PurgeableSynth",
+			"link": "https://testnet.bscscan.com/address/0x2D1666BD9Ec6eE9136E5D656721f041dc627011E",
+			"timestamp": "2022-01-24T09:23:22.187Z",
+			"txn": "",
+			"network": "testnet"
+		},
+		"TokenStatezDOT": {
+			"name": "TokenStatezDOT",
+			"address": "0xCb2c240A0Bd486A11aD9FDe22b9CC6D2805Db27F",
+			"source": "TokenState",
+			"link": "https://testnet.bscscan.com/address/0xCb2c240A0Bd486A11aD9FDe22b9CC6D2805Db27F",
+			"timestamp": "2022-01-24T09:23:34.448Z",
+			"txn": "",
+			"network": "testnet"
+		},
+		"ProxyzDOT": {
+			"name": "ProxyzDOT",
+			"address": "0x7ea660B5FbEc26c3A74f598384bC6397Fe1A3005",
+			"source": "ProxyERC20",
+			"link": "https://testnet.bscscan.com/address/0x7ea660B5FbEc26c3A74f598384bC6397Fe1A3005",
+			"timestamp": "2022-01-24T09:23:45.724Z",
+			"txn": "",
+			"network": "testnet"
+		},
+		"ZassetzDOT": {
+			"name": "ZassetzDOT",
+			"address": "0x4Be8aC3f1cD472f1E49BdF5A5aB70fdEeeB6b912",
+			"source": "PurgeableSynth",
+			"link": "https://testnet.bscscan.com/address/0x4Be8aC3f1cD472f1E49BdF5A5aB70fdEeeB6b912",
+			"timestamp": "2022-01-24T09:24:02.411Z",
+			"txn": "",
+			"network": "testnet"
+		},
+		"TokenStatezLINK": {
+			"name": "TokenStatezLINK",
+			"address": "0x5669e7f3A16fD2d6D494c9435F97bF1Fd959f3ed",
+			"source": "TokenState",
+			"link": "https://testnet.bscscan.com/address/0x5669e7f3A16fD2d6D494c9435F97bF1Fd959f3ed",
+			"timestamp": "2022-01-24T09:24:13.836Z",
+			"txn": "",
+			"network": "testnet"
+		},
+		"ProxyzLINK": {
+			"name": "ProxyzLINK",
+			"address": "0xEA4add20BDA400d20B301028C5da82DF10B32983",
+			"source": "ProxyERC20",
+			"link": "https://testnet.bscscan.com/address/0xEA4add20BDA400d20B301028C5da82DF10B32983",
+			"timestamp": "2022-01-24T09:24:26.615Z",
+			"txn": "",
+			"network": "testnet"
+		},
+		"ZassetzLINK": {
+			"name": "ZassetzLINK",
+			"address": "0x7E4D7Ff4180055E4340fF60766C863405C5f156B",
+			"source": "PurgeableSynth",
+			"link": "https://testnet.bscscan.com/address/0x7E4D7Ff4180055E4340fF60766C863405C5f156B",
+			"timestamp": "2022-01-24T09:24:39.489Z",
+			"txn": "",
+			"network": "testnet"
+		},
+		"TokenStatezMATIC": {
+			"name": "TokenStatezMATIC",
+			"address": "0xdBFfd13AC8473d6A2156c91fc0cb7C6aD3CE34cB",
+			"source": "TokenState",
+			"link": "https://testnet.bscscan.com/address/0xdBFfd13AC8473d6A2156c91fc0cb7C6aD3CE34cB",
+			"timestamp": "2022-01-24T09:24:53.947Z",
+			"txn": "",
+			"network": "testnet"
+		},
+		"ProxyzMATIC": {
+			"name": "ProxyzMATIC",
+			"address": "0x90CF193bD9c236d9b0D425C35b407a24E21C058E",
+			"source": "ProxyERC20",
+			"link": "https://testnet.bscscan.com/address/0x90CF193bD9c236d9b0D425C35b407a24E21C058E",
+			"timestamp": "2022-01-24T09:25:03.012Z",
+			"txn": "",
+			"network": "testnet"
+		},
+		"ZassetzMATIC": {
+			"name": "ZassetzMATIC",
+			"address": "0xb81BE1113e54863bfe70F65bB8664693020324C0",
+			"source": "PurgeableSynth",
+			"link": "https://testnet.bscscan.com/address/0xb81BE1113e54863bfe70F65bB8664693020324C0",
+			"timestamp": "2022-01-24T09:25:20.707Z",
+			"txn": "",
+			"network": "testnet"
+		},
+		"TokenStatezXRP": {
+			"name": "TokenStatezXRP",
+			"address": "0xa7D1840Fa7F075713926f1f3e0ef2b8be72c93aF",
+			"source": "TokenState",
+			"link": "https://testnet.bscscan.com/address/0xa7D1840Fa7F075713926f1f3e0ef2b8be72c93aF",
+			"timestamp": "2022-01-24T09:25:37.877Z",
+			"txn": "",
+			"network": "testnet"
+		},
+		"ProxyzXRP": {
+			"name": "ProxyzXRP",
+			"address": "0xef1bc2A008aA9e45808a049c53560c7fBC447d57",
+			"source": "ProxyERC20",
+			"link": "https://testnet.bscscan.com/address/0xef1bc2A008aA9e45808a049c53560c7fBC447d57",
+			"timestamp": "2022-01-24T09:25:53.251Z",
+			"txn": "",
+			"network": "testnet"
+		},
+		"ZassetzXRP": {
+			"name": "ZassetzXRP",
+			"address": "0x2c0A60f415465F334C15D6fDB013cc87EF11E4a5",
+			"source": "PurgeableSynth",
+			"link": "https://testnet.bscscan.com/address/0x2c0A60f415465F334C15D6fDB013cc87EF11E4a5",
+			"timestamp": "2022-01-24T09:26:08.529Z",
+			"txn": "",
+			"network": "testnet"
+		},
+		"TokenStatezDOGE": {
+			"name": "TokenStatezDOGE",
+			"address": "0xbc326be1Bc08aE39Ff525F1883A930643fBa5BFa",
+			"source": "TokenState",
+			"link": "https://testnet.bscscan.com/address/0xbc326be1Bc08aE39Ff525F1883A930643fBa5BFa",
+			"timestamp": "2022-01-24T09:26:24.543Z",
+			"txn": "",
+			"network": "testnet"
+		},
+		"ProxyzDOGE": {
+			"name": "ProxyzDOGE",
+			"address": "0xeE025E221c0f72A3356fF8580E6A3d53F63BB1AD",
+			"source": "ProxyERC20",
+			"link": "https://testnet.bscscan.com/address/0xeE025E221c0f72A3356fF8580E6A3d53F63BB1AD",
+			"timestamp": "2022-01-24T09:26:37.847Z",
+			"txn": "",
+			"network": "testnet"
+		},
+		"ZassetzDOGE": {
+			"name": "ZassetzDOGE",
+			"address": "0x7F56a615bC00feCe25B0EB16438619F21c540ed1",
+			"source": "PurgeableSynth",
+			"link": "https://testnet.bscscan.com/address/0x7F56a615bC00feCe25B0EB16438619F21c540ed1",
+			"timestamp": "2022-01-24T09:26:50.750Z",
+			"txn": "",
+			"network": "testnet"
 		}
 	},
 	"sources": {
