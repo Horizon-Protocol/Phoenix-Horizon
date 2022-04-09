@@ -14,5 +14,15 @@
 		"description": "Binance Coin",
 		"name": "zBNB",
 		"subclass": "MultiCollateralSynth"
+	},
+	{
+		"name": "zBTC",
+		"asset": "BTC",
+		"subclass": "MultiCollateralSynth"
+	},
+	{
+		"name": "zETH",
+		"asset": "ETH",
+		"subclass": "MultiCollateralSynth"
 	}
 ]

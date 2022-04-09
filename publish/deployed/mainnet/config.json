@@ -1,29 +1,20 @@
 {
-	"SystemSettings": {
-		"deploy": false
-	},
 	"AddressResolver": {
 		"deploy": false
 	},
 	"ReadProxyAddressResolver": {
 		"deploy": false
 	},
-	"BinaryOptionMarketFactory": {
-		"deploy": false
-	},
-	"BinaryOptionMarketManager": {
-		"deploy": false
-	},
-	"BinaryOptionMarketData": {
-		"deploy": false
-	},
 	"DebtCache": {
 		"deploy": false
 	},
-	"Depot": {
+	"DelegateApprovals": {
 		"deploy": false
 	},
-	"TradingRewards": {
+	"DelegateApprovalsEternalStorage": {
+		"deploy": false
+	},
+	"Depot": {
 		"deploy": false
 	},
 	"EscrowChecker": {
@@ -38,12 +29,6 @@
 	"ExchangeState": {
 		"deploy": false
 	},
-	"EtherCollateral": {
-		"deploy": false
-	},
-	"EtherCollateralsUSD": {
-		"deploy": false
-	},
 	"FeePool": {
 		"deploy": false
 	},
@@ -51,15 +36,6 @@
 		"deploy": false
 	},
 	"FeePoolEternalStorage": {
-		"deploy": false
-	},
-	"FlexibleStorage": {
-		"deploy": false
-	},
-	"DelegateApprovals": {
-		"deploy": false
-	},
-	"DelegateApprovalsEternalStorage": {
 		"deploy": false
 	},
 	"Issuer": {
@@ -71,6 +47,12 @@
 	"Liquidations": {
 		"deploy": false
 	},
+	"RewardEscrow": {
+		"deploy": false
+	},
+	"RewardsDistribution": {
+		"deploy": false
+	},
 	"SupplySchedule": {
 		"deploy": false
 	},
@@ -78,12 +60,6 @@
 		"deploy": false
 	},
 	"SynthetixEscrow": {
-		"deploy": false
-	},
-	"RewardEscrow": {
-		"deploy": false
-	},
-	"RewardsDistribution": {
 		"deploy": false
 	},
 	"SynthetixState": {
@@ -101,10 +77,10 @@
 	"ZassetzUSD": {
 		"deploy": false
 	},
-	"ProxyERC20": {
+	"ZassetzBTC": {
 		"deploy": false
 	},
-	"ProxyERC20zUSD": {
+	"ProxyERC20": {
 		"deploy": false
 	},
 	"ProxyFeePool": {
@@ -114,6 +90,9 @@
 		"deploy": false
 	},
 	"ProxyzUSD": {
+		"deploy": false
+	},
+	"ProxyzBTC": {
 		"deploy": false
 	},
 	"SafeDecimalMath": {
@@ -128,6 +107,18 @@
 	"TokenStatezUSD": {
 		"deploy": false
 	},
+	"TokenStatezBTC": {
+		"deploy": false
+	},
+	"TokenStatezETH": {
+		"deploy": false
+	},
+	"ProxyzETH": {
+		"deploy": false
+	},
+	"ZassetzETH": {
+		"deploy": false
+	},
 	"TokenStatezBNB": {
 		"deploy": false
 	},
@@ -135,6 +126,66 @@
 		"deploy": false
 	},
 	"ZassetzBNB": {
+		"deploy": false
+	},
+	"ProxyERC20zUSD": {
+		"deploy": false
+	},
+	"FlexibleStorage": {
+		"deploy": false
+	},
+	"SystemSettings": {
+		"deploy": false
+	},
+	"TradingRewards": {
+		"deploy": false
+	},
+	"CollateralErc20": {
+		"deploy": false
+	},
+	"CollateralEth": {
+		"deploy": false
+	},
+	"CollateralManager": {
+		"deploy": false
+	},
+	"CollateralManagerState": {
+		"deploy": false
+	},
+	"CollateralStateErc20": {
+		"deploy": false
+	},
+	"CollateralStateEth": {
+		"deploy": false
+	},
+	"CollateralStateShort": {
+		"deploy": false
+	},
+	"CollateralShort": {
+		"deploy": false
+	},
+	"RewardEscrowV2": {
+		"deploy": false
+	},
+	"SynthetixBridgeToOptimism": {
+		"deploy": false
+	},
+	"VirtualSynthMastercopy": {
+		"deploy": false
+	},
+	"SynthetixBridgeEscrow": {
+		"deploy": false
+	},
+	"EtherWrapper": {
+		"deploy": false
+	},
+	"NativeEtherWrapper": {
+		"deploy": false
+	},
+	"SynthRedeemer": {
+		"deploy": false
+	},
+	"CollateralUtil": {
 		"deploy": false
 	}
 }

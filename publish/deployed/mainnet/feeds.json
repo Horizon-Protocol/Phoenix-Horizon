@@ -1,10 +1,18 @@
 {
 	"HZN": {
 		"asset": "HZN",
-		"feed": "0x52B952337194353cb919391552B4560dC3068eCf"
+		"feed": "0xf4F9EEeB9338b4B7F53CA754C9C43f1a20622B33"
 	},
 	"BNB": {
 		"asset": "BNB",
 		"feed": "0x0567F2323251f0Aab15c8dFb1967E4e8A7D42aeE"
+	},
+	"BTC": {
+		"asset": "BTC",
+		"feed": "0x264990fbd0A4796A3E3d8E37C4d5F87a3aCa5Ebf"
+	},
+	"ETH": {
+		"asset": "ETH",
+		"feed": "0x9ef1B8c0E4F7dc8bF5719Ea496883DC6401d5b2e"
 	}
 }
