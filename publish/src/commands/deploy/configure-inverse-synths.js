@@ -60,8 +60,7 @@ module.exports = async ({
 
 				// and total supply, if any
 				const synth = deployer.deployedContracts[`Zasset${currencyKey}`];
-				// const totalSynthSupply = await synth.totalSupply();
-				const totalSynthSupply = 0;
+				const totalSynthSupply = await synth.totalSupply();
 				console.log(gray(`totalSupply of ${currencyKey}: ${Number(totalSynthSupply)}`));
 
 				const inversePricingOnCurrentExRates = await ExchangeRates.inversePricing(
