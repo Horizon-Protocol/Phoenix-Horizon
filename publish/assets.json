@@ -412,17 +412,17 @@
 		"description": "Pancakeswap Finance"
 	},
 	"MATIC": {
-                "asset": "MATIC",
-                "category": "crypto",
-                "sign": "",
-                "description": "Polygon Token"
-        },
-        "DOGE": {
-                "asset": "DOGE",
-                "category": "crypto",
-                "sign": "",
-                "description": "DOGE"
-        },
+		"asset": "MATIC",
+		"category": "crypto",
+		"sign": "",
+		"description": "Polygon Token"
+	},
+	"DOGE": {
+		"asset": "DOGE",
+		"category": "crypto",
+		"sign": "",
+		"description": "DOGE"
+	},
 	"ALPHA": {
 		"asset": "ALPHA",
 		"category": "crypto",
