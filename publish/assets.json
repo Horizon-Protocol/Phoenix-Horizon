@@ -9,13 +9,7 @@
 		"asset": "HZN",
 		"category": "crypto",
 		"sign": "",
-		"description": "Horizon Protocol Token"
-	},
-	"SNX": {
-		"asset": "SNX",
-		"category": "crypto",
-		"sign": "",
-		"description": "Synthetix Network Token"
+		"description": "Horizon Protocol"
 	},
 	"ETH": {
 		"asset": "ETH",
@@ -35,6 +29,114 @@
 		"sign": "",
 		"description": "Binance Coin"
 	},
+	"ADA": {
+		"asset": "ADA",
+		"category": "crypto",
+		"sign": "",
+		"description": "Cardano"
+	},
+	"DOT": {
+		"asset": "DOT",
+		"category": "crypto",
+		"sign": "",
+		"description": "Polkadot"
+	},
+	"SOL": {
+		"asset": "SOL",
+		"category": "crypto",
+		"sign": "",
+		"description": "Solana"
+	},
+	"XRP": {
+		"asset": "XRP",
+		"category": "crypto",
+		"sign": "",
+		"description": "Ripple"
+	},
+	"CAKE": {
+		"asset": "CAKE",
+		"category": "crypto",
+		"sign": "",
+		"description": "Pancakeswap"
+	},
+	"LINK": {
+		"asset": "LINK",
+		"category": "crypto",
+		"sign": "",
+		"description": "Chainlink"
+	},
+	"XAU": {
+		"asset": "XAU",
+		"category": "commodity",
+		"sign": "oz",
+		"description": "Gold Ounce"
+	},
+	"XAG": {
+		"asset": "XAG",
+		"category": "commodity",
+		"sign": "oz",
+		"description": "Silver Ounce"
+	},
+	"WTI": {
+		"asset": "WTI",
+		"category": "commodity",
+		"sign": "oz",
+		"description": "West Texas Intermediate"
+	},
+	"EUR": {
+		"asset": "EUR",
+		"category": "forex",
+		"sign": "€",
+		"description": "Euros"
+	},
+	"JPY": {
+		"asset": "JPY",
+		"category": "forex",
+		"sign": "¥",
+		"description": "Japanese Yen"
+	},
+	"SPY": {
+		"asset": "SPY",
+		"category": "equities",
+		"sign": "",
+		"exchange": "",
+		"description": "S&P 500 ETF"
+	},
+	"QQQ": {
+		"asset": "QQQ",
+		"category": "equities",
+		"sign": "",
+		"exchange": "",
+		"description": "Invesco QQQ Trust"
+	},
+	"GOOGL": {
+		"asset": "GOOGL",
+		"category": "equities",
+		"sign": "",
+		"exchange": "",
+		"description": "Alphabet"
+	},
+	"AAPL": {
+		"asset": "AAPL",
+		"category": "equities",
+		"sign": "",
+		"exchange": "",
+		"description": "Apple"
+	},
+	"TSLA": {
+		"asset": "TSLA",
+		"category": "equities",
+		"sign": "",
+		"exchange": "",
+		"description": "Tesla"
+	},
+	"COIN": {
+		"asset": "COIN",
+		"category": "equities",
+		"sign": "",
+		"exchange": "",
+		"description": "Coinbase"
+	},
 	"TRX": {
 		"asset": "TRX",
 		"category": "crypto",
@@ -47,23 +149,30 @@
 		"sign": "",
 		"description": "Tezos"
 	},
-	"XRP": {
-		"asset": "XRP",
-		"category": "crypto",
-		"sign": "",
-		"description": "Ripple"
-	},
 	"LTC": {
 		"asset": "LTC",
 		"category": "crypto",
 		"sign": "",
 		"description": "Litecoin"
 	},
-	"LINK": {
-		"asset": "LINK",
+	"TRX": {
+		"asset": "TRX",
 		"category": "crypto",
 		"sign": "",
-		"description": "Chainlink"
+		"description": "TRON"
+	},
+	"XTZ": {
+		"asset": "XTZ",
+		"category": "crypto",
+		"sign": "",
+		"description": "Tezos"
+	},
+
+	"LTC": {
+		"asset": "LTC",
+		"category": "crypto",
+		"sign": "",
+		"description": "Litecoin"
 	},
 	"EOS": {
 		"asset": "EOS",
@@ -95,12 +204,7 @@
 		"sign": "",
 		"description": "Monero"
 	},
-	"ADA": {
-		"asset": "ADA",
-		"category": "crypto",
-		"sign": "",
-		"description": "Cardano"
-	},
+
 	"COMP": {
 		"asset": "COMP",
 		"category": "crypto",
@@ -173,12 +277,7 @@
 		"sign": "",
 		"description": "yearn.finance"
 	},
-	"DOT": {
-		"asset": "DOT",
-		"category": "crypto",
-		"sign": "",
-		"description": "Polkadot"
-	},
+
 	"LRC": {
 		"asset": "LRC",
 		"category": "crypto",
@@ -245,18 +344,7 @@
 		"sign": "",
 		"description": "DeFi Index"
 	},
-	"EUR": {
-		"asset": "EUR",
-		"category": "forex",
-		"sign": "€",
-		"description": "Euros"
-	},
-	"JPY": {
-		"asset": "JPY",
-		"category": "forex",
-		"sign": "¥",
-		"description": "Japanese Yen"
-	},
+
 	"AUD": {
 		"asset": "AUD",
 		"category": "forex",
@@ -281,18 +369,7 @@
 		"sign": "₩",
 		"description": "South Korean Won"
 	},
-	"XAU": {
-		"asset": "XAU",
-		"category": "commodity",
-		"sign": "oz",
-		"description": "Gold Ounce"
-	},
-	"XAG": {
-		"asset": "XAG",
-		"category": "commodity",
-		"sign": "oz",
-		"description": "Silver Ounce"
-	},
+
 	"OIL": {
 		"asset": "OIL",
 		"category": "commodity",
@@ -313,13 +390,7 @@
 		"exchange": "TSE",
 		"description": "Nikkei 225 Index"
 	},
-	"TSLA": {
-		"asset": "TSLA",
-		"category": "equities",
-		"sign": "",
-		"exchange": "NASDAQ",
-		"description": "Tesla"
-	},
+
 	"SUSHI": {
 		"asset": "SUSHI",
 		"category": "crypto",
@@ -338,13 +409,7 @@
 		"sign": "",
 		"description": "THORChain"
 	},
-	"AAPL": {
-		"asset": "AAPL",
-		"category": "equities",
-		"sign": "",
-		"exchange": "NASDAQ",
-		"description": "Apple"
-	},
+
 	"FB": {
 		"asset": "FB",
 		"category": "equities",
@@ -373,13 +438,6 @@
 		"exchange": "NASDAQ",
 		"description": "Amazon"
 	},
-	"COIN": {
-		"asset": "COIN",
-		"category": "equities",
-		"sign": "",
-		"exchange": "NASDAQ",
-		"description": "Coinbase"
-	},
 	"MSFT": {
 		"asset": "MSFT",
 		"category": "equities",
@@ -405,12 +463,7 @@
 		"sign": "",
 		"description": "Cream Finance"
 	},
-	"CAKE": {
-		"asset": "CAKE",
-		"category": "crypto",
-		"sign": "",
-		"description": "Pancakeswap Finance"
-	},
+
 	"MATIC": {
 		"asset": "MATIC",
 		"category": "crypto",
