@@ -170,8 +170,9 @@
 			},
 			"SupplySchedule": {
 				"address": "0x93eb24D58FC29E36A76a038738e738114FF1c23B",
-				"status": "current",
-				"keccak256": "0xfcb2687f0065e632ef483dae5da14c0a51fa77997510925c8c39bbb84ff0f869"
+				"status": "replaced",
+				"keccak256": "0xfcb2687f0065e632ef483dae5da14c0a51fa77997510925c8c39bbb84ff0f869",
+				"replaced_in": "v1.2.0"
 			},
 			"TokenStatezUSD": {
 				"address": "0xD33E97EDC5bE7Ba1c61F3B782044981D352f73BC",
@@ -569,6 +570,35 @@
 				"address": "0x7F56a615bC00feCe25B0EB16438619F21c540ed1",
 				"status": "current",
 				"keccak256": "0x8d9714e95ba7232aa5f18320ffe015b7acec369b0783eeddf474946b2862a271"
+			}
+		}
+	},
+	"v1.2.0": {
+		"tag": "v1.2.0",
+		"fulltag": "v1.2.0",
+		"network": "testnet",
+		"date": "2022-04-09T10:33:29+08:00",
+		"commit": "d91ee3c35c80d5bd43feb2863d769d87bc358f4a",
+		"contracts": {
+			"SupplySchedule": {
+				"address": "0x79168A3a05cCDa8a60E7799886675E4bc3162CC2",
+				"status": "current",
+				"keccak256": "0x52ec518077be65672265c408af7a91ea998ea414810f58ff9959c7b3561ea450"
+			},
+			"TokenStatezXVS": {
+				"address": "0x02Af92A2ce054aE8b3ce2D30cbBD9050FB4c7B6C",
+				"status": "current",
+				"keccak256": "0xdb7148211c37bcb4f779c0b4296bb6b17c2b69a124238fece74d15995c49e7af"
+			},
+			"ProxyzXVS": {
+				"address": "0x522BAea64dA4B33eB14d8a038d15A9652f6b1bD2",
+				"status": "current",
+				"keccak256": "0xae29627d9662e9e7c9a0253c4bd8b8753d5ace46bb8043c5ca5149912c5de8a4"
+			},
+			"ZassetzXVS": {
+				"address": "0x809CbF85b2BCC3B3F83AfA2D62a1c0a4837F3040",
+				"status": "current",
+				"keccak256": "0x4a543b76fafa941578dac4d45dabe9c2ac676c8a8f0cf071ecae8ce3ccd18033"
 			}
 		}
 	}

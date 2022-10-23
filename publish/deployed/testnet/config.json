@@ -268,5 +268,14 @@
 	},
 	"ZassetzDOGE": {
 		"deploy": false
+	},
+	"TokenStatezXVS": {
+		"deploy": false
+	},
+	"ProxyzXVS": {
+		"deploy": false
+	},
+	"ZassetzXVS": {
+		"deploy": false
 	}
 }

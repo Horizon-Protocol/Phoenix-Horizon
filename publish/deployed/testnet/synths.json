@@ -79,5 +79,10 @@
 			"upperLimit": 88177.5,
 			"lowerLimit": 29392.5
 		}
+	},
+	{
+		"name": "zXVS",
+		"asset": "XVS",
+		"subclass": "MultiCollateralSynth"
 	}
 ]

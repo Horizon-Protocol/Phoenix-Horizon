@@ -854,6 +854,33 @@
 			"timestamp": "2022-01-24T09:26:50.750Z",
 			"txn": "",
 			"network": "testnet"
+		},
+		"TokenStatezXVS": {
+			"name": "TokenStatezXVS",
+			"address": "0x02Af92A2ce054aE8b3ce2D30cbBD9050FB4c7B6C",
+			"source": "TokenState",
+			"link": "https://testnet.bscscan.com/address/0x02Af92A2ce054aE8b3ce2D30cbBD9050FB4c7B6C",
+			"timestamp": "2022-10-23T05:00:55.746Z",
+			"txn": "",
+			"network": "testnet"
+		},
+		"ProxyzXVS": {
+			"name": "ProxyzXVS",
+			"address": "0x522BAea64dA4B33eB14d8a038d15A9652f6b1bD2",
+			"source": "ProxyERC20",
+			"link": "https://testnet.bscscan.com/address/0x522BAea64dA4B33eB14d8a038d15A9652f6b1bD2",
+			"timestamp": "2022-10-23T05:01:10.893Z",
+			"txn": "",
+			"network": "testnet"
+		},
+		"ZassetzXVS": {
+			"name": "ZassetzXVS",
+			"address": "0x809CbF85b2BCC3B3F83AfA2D62a1c0a4837F3040",
+			"source": "MultiCollateralSynth",
+			"link": "https://testnet.bscscan.com/address/0x809CbF85b2BCC3B3F83AfA2D62a1c0a4837F3040",
+			"timestamp": "2022-10-23T05:01:26.261Z",
+			"txn": "",
+			"network": "testnet"
 		}
 	},
 	"sources": {
