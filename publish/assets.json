@@ -463,7 +463,6 @@
 		"sign": "",
 		"description": "Cream Finance"
 	},
-
 	"MATIC": {
 		"asset": "MATIC",
 		"category": "crypto",
@@ -487,5 +486,18 @@
 		"category": "crypto",
 		"sign": "",
 		"description": "Venus Protocol"
+	},
+	"NVDA": {
+		"asset": "NVDA",
+		"category": "equities",
+		"sign": "",
+		"exchange": "NASDAQ",
+		"description": "Nvidia Corporation"
+	},
+	"AVAX": {
+		"asset": "AVAX",
+		"category": "crypto",
+		"sign": "",
+		"description": "Avalanche"
 	}
 }

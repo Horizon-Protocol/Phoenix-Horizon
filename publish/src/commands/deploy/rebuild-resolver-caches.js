@@ -24,9 +24,9 @@ module.exports = async ({
 	if (network === 'mainnet' && !useOvm) {
 		// v2.35.2 contracts.
 		// TODO  -fetch these from getVersions()
-		const CollateralEth = '0x3FF5c0A14121Ca39211C95f6cEB221b86A90729E';
-		const CollateralErc20 = '0x3B3812BB9f6151bEb6fa10783F1ae848a77a0d46'; // REN
-		const CollateralShort = '0x188C2274B04Ea392B21487b5De299e382Ff84246';
+		const CollateralEth = '0xfF1d16ae6B5C2573820d5b6D470D770E5f5b5D98'; // '0x3FF5c0A14121Ca39211C95f6cEB221b86A90729E';
+		const CollateralErc20 = '0xcA24f3CADDf1d0B3d5B6303d2fD53F5b599b4829'; // '0x3B3812BB9f6151bEb6fa10783F1ae848a77a0d46'; // REN
+		const CollateralShort = '0xb03346454F0f16144c881f5ACBCCd35dec937F7E'; // '0x188C2274B04Ea392B21487b5De299e382Ff84246';
 
 		const legacyContracts = Object.entries({
 			CollateralEth,

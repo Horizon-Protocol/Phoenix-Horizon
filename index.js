@@ -139,8 +139,8 @@ const defaults = {
 	COLLATERAL_MANAGER: {
 		SYNTHS: ['zUSD', 'zBTC', 'zBNB'],
 		SHORTS: [
-			{ long: 'zBTC', short: 'iBTC' },
-			{ long: 'zBNB', short: 'iBNB' },
+			// { long: 'zBTC', short: 'iBTC' },
+			// { long: 'zBNB', short: 'iBNB' },
 		],
 		MAX_DEBT: w3utils.toWei('75000000'), // 75 million zUSD
 		BASE_BORROW_RATE: Math.round((0.005 * 1e18) / 31556926).toString(), // 31556926 is CollateralManager seconds per year
