@@ -1,0 +1,29 @@
+{
+	"name": "@horizon-protocol/smart-contract",
+	"version": "2.50.12",
+	"license": "MIT",
+	"author": "Horizon",
+	"description": "The smart contracts which make up the Horizon system.",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/Horizon-Protocol/Horizon-Smart-Contract.git"
+	},
+	"keywords": [
+		"Horizon Protocol",
+		"HZN",
+		"zUSD",
+		"Solidity",
+		"BinanceSmartChain",
+		"BSC",
+		"DeFi"
+	],
+	"bugs": {
+		"url": "https://github.com/Horizon-Protocol/Horizon-Smart-Contract/issues"
+	},
+	"homepage": "https://www.horizonprotocol.com/",
+	"devDependencies": {
+		"@chainlink/contracts-0.0.10": "npm:@chainlink/contracts@0.0.10",
+		"openzeppelin-solidity-2.3.0": "npm:openzeppelin-solidity@2.3.0",
+		"@eth-optimism/contracts": "0.3.4"
+	}
+}
