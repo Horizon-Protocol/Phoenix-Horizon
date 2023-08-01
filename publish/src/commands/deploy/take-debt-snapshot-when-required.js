@@ -72,8 +72,11 @@ module.exports = async ({
 
 		// NOTE: This line be removed once https://github.com/ethers-io/ethers.js/issues/1862 is resolved. See comments at function's definition
 		await cacheCurrentDebtResults({ contract: DebtCache, useFork });
+		console.log('RETURNING cacheCurrentDebtResults');
+
 		const currentDebt = await DebtCache.currentDebt();
 
+		console.log('RETURNING TRUE 0', currentDebt);
 		// Check if the snapshot is stale and can be fixed.
 		if (cacheInfo.isStale && !currentDebt.anyRateIsInvalid) {
 			console.log(yellow('Debt snapshot is stale, and can be refreshed.'));
@@ -82,6 +85,7 @@ module.exports = async ({
 				currentDebt.anyRateIsInvalid,
 				cacheInfo.isStale
 			);
+			console.log('RETURNING TRUE 1');
 			return true;
 		}
 
@@ -95,6 +99,7 @@ module.exports = async ({
 					currentDebt.anyRateIsInvalid,
 					cacheInfo.isStale
 				);
+				console.log('RETURNING TRUE 2');
 				return true;
 			} else {
 				const cachedDebtEther = formatUnits(cacheInfo.debt);
@@ -111,6 +116,8 @@ module.exports = async ({
 						)
 					);
 					await refreshSnapshotIfPossible(cacheInfo.isInvalid, currentDebt.anyRateIsInvalid, true);
+					console.log('RETURNING TRUE 3');
+					console.log('RETURNING TRUE 3');
 					return true;
 				}
 			}
@@ -126,6 +133,7 @@ module.exports = async ({
 	};
 
 	try {
+		console.log('WE ARE AT START');
 		const performedSnapshot = await checkSnapshot({ useFork });
 
 		if (performedSnapshot) {

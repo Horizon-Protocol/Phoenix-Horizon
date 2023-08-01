@@ -20,9 +20,9 @@ module.exports = ({
 }) => {
 	if (!ignoreSafetyChecks) {
 		// Using Goerli without manageNonces?
-		if (network.toLowerCase() === 'goerli' && !useOvm && !manageNonces) {
-			throw new Error(`Deploying on Goerli needs to be performed with --manage-nonces.`);
-		}
+		// if (network.toLowerCase() === 'goerli' && !useOvm && !manageNonces) {
+		// 	throw new Error(`Deploying on Goerli needs to be performed with --manage-nonces.`);
+		// }
 
 		// Cannot re-deploy legacy contracts
 		if (!freshDeploy) {

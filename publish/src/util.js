@@ -5,7 +5,10 @@ const fs = require('fs');
 const readline = require('readline');
 const { gray, cyan, yellow, redBright, green } = require('chalk');
 const { table } = require('table');
-const { BigNumber } = require('ethers');
+const {
+	BigNumber,
+	utils: { parseUnits },
+} = require('ethers');
 
 const {
 	constants: {
@@ -137,9 +140,15 @@ const loadAndCheckRequiredSources = ({ deploymentPath, network, freshDeploy }) =
 
 const getExplorerLinkPrefix = ({ network, useOvm }) => {
 	return `https://${network !== 'mainnet' ? network + (useOvm ? '-' : '.') : ''}${
-		useOvm ? 'explorer.optimism' : 'bscscan'
-	}.com`;
+		useOvm ? 'explorer.optimism' : 'etherscan'
+	}.io`;
 };
+
+// const getExplorerLinkPrefix = ({ network, useOvm }) => {
+// 	return `https://${network !== 'mainnet' ? network + (useOvm ? '-' : '.') : ''}${
+// 		useOvm ? 'explorer.optimism' : 'bscscan'
+// 	}.com`;
+// };
 
 const loadConnections = ({ network, useFork, useOvm }) => {
 	// Note: If using a fork, providerUrl will need to be 'localhost', even if the target network is not 'local'.
@@ -164,7 +173,11 @@ const loadConnections = ({ network, useFork, useOvm }) => {
 
 	const etherscanUrl = `https://api${network !== 'mainnet' ? `-${network}` : ''}${
 		useOvm ? '-optimistic' : ''
-	}.bscscan.com/api`;
+	}.etherscan.io/api`;
+
+	// const etherscanUrl = `https://api${network !== 'mainnet' ? `-${network}` : ''}${
+	// 	useOvm ? '-optimistic' : ''
+	// }.bscscan.com/api`;
 
 	const explorerLinkPrefix = getExplorerLinkPrefix({ network, useOvm });
 
@@ -249,6 +262,25 @@ const catchMissingResolverWhenGeneratingSolidity = ({
 	}
 };
 
+const assignGasOptions = async ({ tx, provider, maxFeePerGas, maxPriorityFeePerGas }) => {
+	// only add EIP-1559 options if the network supports EIP-1559
+	const gasOptions = {};
+
+	let feeData = {};
+	try {
+		feeData = await provider.getFeeData();
+	} catch (_) {} // network does not support the `getFeeData` rpc call
+	if (feeData.maxFeePerGas) {
+		gasOptions.type = 2;
+		if (maxFeePerGas)
+			gasOptions.maxFeePerGas = parseUnits(maxFeePerGas.toString() || '100', 'gwei');
+		if (maxPriorityFeePerGas)
+			gasOptions.maxPriorityFeePerGas = parseUnits(maxPriorityFeePerGas.toString(), 'gwei');
+	}
+
+	return Object.assign(gasOptions, tx);
+};
+
 module.exports = {
 	ensureNetwork,
 	ensureDeploymentPath,
@@ -262,4 +294,5 @@ module.exports = {
 	parameterNotice,
 	reportDeployedContracts,
 	catchMissingResolverWhenGeneratingSolidity,
+	assignGasOptions,
 };

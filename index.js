@@ -7,6 +7,7 @@ const abiDecoder = require('abi-decoder');
 const data = {
 	testnet: require('./publish/deployed/testnet'),
 	mainnet: require('./publish/deployed/mainnet'),
+	goerli: require('./publish/deployed/goerli'),
 };
 
 const assets = require('./publish/assets.json');
@@ -14,7 +15,7 @@ const ovmIgnored = require('./publish/ovm-ignore.json');
 const nonUpgradeable = require('./publish/non-upgradeable.json');
 const releases = require('./publish/releases.json');
 
-const networks = ['local', 'testnet', 'mainnet'];
+const networks = ['local', 'testnet', 'mainnet', 'goerli'];
 
 const chainIdMapping = Object.entries({
 	56: {
@@ -22,6 +23,9 @@ const chainIdMapping = Object.entries({
 	},
 	97: {
 		network: 'testnet',
+	},
+	5: {
+		network: 'goerli',
 	},
 	// Hardhat fork of mainnet: https://hardhat.org/config/#hardhat-network
 	31337: {
@@ -120,15 +124,16 @@ const defaults = {
 	DEBT_SNAPSHOT_STALE_TIME: (43800).toString(), // 12 hour heartbeat + 10 minutes mining time
 	AGGREGATOR_WARNING_FLAGS: {
 		mainnet: '0x72a4116ec4d7de427f57e972639a3d29af2d6e18',
-		testnet: '0x771141128c59797f37ba19e21c9aa368bc0842b6',
 	},
 	RENBTC_ERC20_ADDRESSES: {
 		mainnet: '0xfCe146bF3146100cfe5dB4129cf6C82b0eF4Ad8c',
 		testnet: '0x5eB4F537889eC3C7Ec397F1acB33c70D8C0ee438',
+		goerli: '0x9B2fE385cEDea62D839E4dE89B0A23EF4eacC717',
 	},
 	WETH_ERC20_ADDRESSES: {
 		mainnet: '0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c',
 		testnet: '0x094616f0bdfb0b526bd735bf66eca0ad254ca81f',
+		goerli: '0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6',
 	},
 	INITIAL_ISSUANCE: w3utils.toWei(`${100e6}`),
 	CROSS_DOMAIN_DEPOSIT_GAS_LIMIT: `${3e6}`,
@@ -467,6 +472,7 @@ const getUsers = ({ network = 'mainnet', user, useOvm = false } = {}) => {
 			oracle: '0xaC1ED4Fabbd5204E02950D68b6FC8c446AC95362',
 		}),
 		testnet: Object.assign({}, base),
+		goerli: Object.assign({}, base),
 		local: Object.assign({}, base, {
 			// Deterministic account #0 when using `npx hardhat node`
 			owner: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',

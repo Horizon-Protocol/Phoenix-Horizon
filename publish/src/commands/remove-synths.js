@@ -23,15 +23,16 @@ const {
 const { performTransactionalStep } = require('../command-utils/transact');
 
 const DEFAULTS = {
-	network: 'kovan',
+	network: 'goerli',
 	gasLimit: 3e5,
-	gasPrice: '1',
+	priorityGasPrice: '1',
 };
 
 const removeSynths = async ({
 	network = DEFAULTS.network,
 	deploymentPath,
-	gasPrice = DEFAULTS.gasPrice,
+	maxFeePerGas,
+	maxPriorityFeePerGas = DEFAULTS.priorityGasPrice,
 	gasLimit = DEFAULTS.gasLimit,
 	synthsToRemove = [],
 	yes,
@@ -96,8 +97,11 @@ const removeSynths = async ({
 	}
 
 	console.log(gray(`Using account with public key ${wallet.address}`));
-	console.log(gray(`Using gas of ${gasPrice} GWEI with a max of ${gasLimit}`));
-
+	console.log(
+		gray(
+			`Using max base gas of ${maxFeePerGas} GWEI, miner tip ${maxPriorityFeePerGas} GWEI with a gas limit of ${gasLimit}`
+		)
+	);
 	console.log(gray('Dry-run:'), dryRun ? green('yes') : yellow('no'));
 
 	if (!yes) {
@@ -180,7 +184,8 @@ const removeSynths = async ({
 				write: 'removeSynth',
 				writeArg: toBytes32(currencyKey),
 				gasLimit,
-				gasPrice,
+				maxFeePerGas,
+				maxPriorityFeePerGas,
 				explorerLinkPrefix,
 				ownerActions,
 				ownerActionsFile,

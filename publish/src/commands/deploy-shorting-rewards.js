@@ -31,10 +31,8 @@ const {
 } = require('../../../.');
 
 const DEFAULTS = {
-	gasPrice: '1',
-	methodCallGasLimit: 250e3, // 250k
-	contractDeploymentGasLimit: 6.9e6, // TODO split out into seperate limits for different contracts, Proxys, Synths, Synthetix
-	network: 'kovan',
+	priorityGasPrice: '1',
+	network: 'testnet',
 	buildPath: path.join(__dirname, '..', '..', '..', BUILD_FOLDER),
 	rewardsToDeploy: [],
 };
@@ -43,9 +41,8 @@ const addressOf = c => (c ? c.address : '');
 
 const deployShortingRewards = async ({
 	rewardsToDeploy = DEFAULTS.rewardsToDeploy,
-	gasPrice = DEFAULTS.gasPrice,
-	methodCallGasLimit = DEFAULTS.methodCallGasLimit,
-	contractDeploymentGasLimit = DEFAULTS.contractDeploymentGasLimit,
+	maxFeePerGas,
+	maxPriorityFeePerGas = DEFAULTS.priorityGasPrice,
 	network = DEFAULTS.network,
 	buildPath = DEFAULTS.buildPath,
 	deploymentPath,
@@ -130,8 +127,8 @@ const deployShortingRewards = async ({
 		configFile: null, // null configFile so it doesn't overwrite config.json
 		deployment,
 		deploymentFile,
-		gasPrice,
-		methodCallGasLimit,
+		maxFeePerGas,
+		maxPriorityFeePerGas,
 		network,
 		privateKey,
 		providerUrl,
@@ -143,7 +140,7 @@ const deployShortingRewards = async ({
 	parameterNotice({
 		'Dry Run': dryRun ? green('true') : yellow('⚠ NO'),
 		Network: network,
-		'Gas price to use': `${gasPrice} GWEI`,
+		'Gas Options': `eip-1559 (with fallback) base fee max = ${maxFeePerGas} GWEI, miner tip = ${maxPriorityFeePerGas} GWEI`,
 		'Deployment Path': new RegExp(network, 'gi').test(deploymentPath)
 			? deploymentPath
 			: yellow('⚠⚠⚠ cant find network name in path. Please double check this! ') + deploymentPath,

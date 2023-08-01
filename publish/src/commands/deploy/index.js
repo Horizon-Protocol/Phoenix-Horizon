@@ -48,9 +48,7 @@ const systemAndParameterCheck = require('./system-and-parameter-check');
 const takeDebtSnapshotWhenRequired = require('./take-debt-snapshot-when-required');
 
 const DEFAULTS = {
-	gasPrice: '1',
-	methodCallGasLimit: 250e3, // 250k
-	contractDeploymentGasLimit: 6.9e6, // TODO split out into separate limits for different contracts, Proxys, Synths, Synthetix
+	priorityGasPrice: '1',
 	debtSnapshotMaxDeviation: 0.01, // a 1 percent deviation will trigger a snapshot
 	network: 'testnet',
 	buildPath: path.join(__dirname, '..', '..', '..', '..', BUILD_FOLDER),
@@ -65,7 +63,8 @@ const deploy = async ({
 	dryRun = false,
 	forceUpdateInverseSynthsOnTestnet = false,
 	freshDeploy,
-	gasPrice = DEFAULTS.gasPrice,
+	maxFeePerGas,
+	maxPriorityFeePerGas = DEFAULTS.priorityGasPrice,
 	generateSolidity = false,
 	ignoreCustomParameters,
 	ignoreSafetyChecks,
@@ -144,8 +143,8 @@ const deploy = async ({
 		freshDeploy,
 		ignoreSafetyChecks,
 		manageNonces,
-		methodCallGasLimit,
-		gasPrice,
+		maxFeePerGas,
+		maxPriorityFeePerGas,
 		network,
 		useOvm,
 	});
@@ -204,8 +203,8 @@ const deploy = async ({
 		configFile,
 		deployment,
 		deploymentFile,
-		gasPrice,
-		methodCallGasLimit,
+		maxFeePerGas,
+		maxPriorityFeePerGas,
 		network,
 		privateKey,
 		providerUrl,
@@ -240,9 +239,9 @@ const deploy = async ({
 		dryRun,
 		earliestCompiledTimestamp,
 		freshDeploy,
-		gasPrice,
+		maxFeePerGas,
+		maxPriorityFeePerGas,
 		getDeployParameter,
-		methodCallGasLimit,
 		network,
 		oracleExrates,
 		providerUrl,
@@ -269,7 +268,8 @@ const deploy = async ({
 			signer,
 			dryRun,
 			explorerLinkPrefix,
-			gasPrice,
+			maxFeePerGas,
+			maxPriorityFeePerGas,
 			generateSolidity,
 			nonceManager: manageNonces ? nonceManager : undefined,
 			ownerActions,
@@ -485,7 +485,12 @@ module.exports = {
 				'-f, --fee-auth <value>',
 				'The address of the fee authority for this network (default is to use existing)'
 			)
-			.option('-g, --gas-price <value>', 'Gas price in GWEI', DEFAULTS.gasPrice)
+			.option('-g, --max-fee-per-gas <value>', 'Maximum base gas fee price in GWEI')
+			.option(
+				'--max-priority-fee-per-gas <value>',
+				'Priority gas fee price in GWEI',
+				DEFAULTS.priorityGasPrice
+			)
 			.option('--generate-solidity', 'Whether or not to output the migration as a Solidity file')
 			.option(
 				'-h, --fresh-deploy',
