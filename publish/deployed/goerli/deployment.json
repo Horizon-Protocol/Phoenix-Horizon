@@ -539,6 +539,60 @@
 			"timestamp": "2023-07-29T21:29:18.068Z",
 			"txn": "",
 			"network": "goerli"
+		},
+		"TokenStatezSNX": {
+			"name": "TokenStatezSNX",
+			"address": "0xc634eCAaC1851B3a1AEddDFf8137636C0320C773",
+			"source": "TokenState",
+			"link": "https://goerli.etherscan.io/address/0xc634eCAaC1851B3a1AEddDFf8137636C0320C773",
+			"timestamp": "2023-08-07T12:52:52.824Z",
+			"txn": "",
+			"network": "goerli"
+		},
+		"ProxyzSNX": {
+			"name": "ProxyzSNX",
+			"address": "0x8c6f4673D3bBe37D8AA813de01d2e368AA3cAE56",
+			"source": "ProxyERC20",
+			"link": "https://goerli.etherscan.io/address/0x8c6f4673D3bBe37D8AA813de01d2e368AA3cAE56",
+			"timestamp": "2023-08-07T12:53:25.687Z",
+			"txn": "",
+			"network": "goerli"
+		},
+		"ZassetzSNX": {
+			"name": "ZassetzSNX",
+			"address": "0x18f868721C46d0fC10aAEb698b828Bb75283B1DB",
+			"source": "MultiCollateralSynth",
+			"link": "https://goerli.etherscan.io/address/0x18f868721C46d0fC10aAEb698b828Bb75283B1DB",
+			"timestamp": "2023-08-07T12:53:51.896Z",
+			"txn": "",
+			"network": "goerli"
+		},
+		"TokenStatezLINK": {
+			"name": "TokenStatezLINK",
+			"address": "0xF2c9F608A12059Ee17F209F0cE72Ea848c2C6b60",
+			"source": "TokenState",
+			"link": "https://goerli.etherscan.io/address/0xF2c9F608A12059Ee17F209F0cE72Ea848c2C6b60",
+			"timestamp": "2023-08-07T16:27:30.419Z",
+			"txn": "",
+			"network": "goerli"
+		},
+		"ProxyzLINK": {
+			"name": "ProxyzLINK",
+			"address": "0x474139895540058A3A80037D6c9BdfAbb771e5Be",
+			"source": "ProxyERC20",
+			"link": "https://goerli.etherscan.io/address/0x474139895540058A3A80037D6c9BdfAbb771e5Be",
+			"timestamp": "2023-08-07T16:27:54.473Z",
+			"txn": "",
+			"network": "goerli"
+		},
+		"ZassetzLINK": {
+			"name": "ZassetzLINK",
+			"address": "0xFB2500599fbAA27c9adc4f9650cC7E9f51215114",
+			"source": "MultiCollateralSynth",
+			"link": "https://goerli.etherscan.io/address/0xFB2500599fbAA27c9adc4f9650cC7E9f51215114",
+			"timestamp": "2023-08-07T16:28:16.566Z",
+			"txn": "",
+			"network": "goerli"
 		}
 	},
 	"sources": {

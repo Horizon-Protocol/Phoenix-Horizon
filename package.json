@@ -52,7 +52,8 @@
 		"contracts/**/*.sol",
 		"publish/*.json",
 		"publish/deployed/testnet/*",
-		"publish/deployed/mainnet/*"
+		"publish/deployed/mainnet/*",
+		"publish/deployed/goerli/*"
 	],
 	"bin": {
 		"hzn": "bin.js"

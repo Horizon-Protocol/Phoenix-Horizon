@@ -178,5 +178,23 @@
 	},
 	"CollateralUtil": {
 		"deploy": false
+	},
+	"TokenStatezSNX": {
+		"deploy": false
+	},
+	"ProxyzSNX": {
+		"deploy": false
+	},
+	"ZassetzSNX": {
+		"deploy": false
+	},
+	"TokenStatezLINK": {
+		"deploy": false
+	},
+	"ProxyzLINK": {
+		"deploy": false
+	},
+	"ZassetzLINK": {
+		"deploy": false
 	}
 }

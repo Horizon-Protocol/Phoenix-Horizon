@@ -472,7 +472,11 @@ const getUsers = ({ network = 'mainnet', user, useOvm = false } = {}) => {
 			oracle: '0xaC1ED4Fabbd5204E02950D68b6FC8c446AC95362',
 		}),
 		testnet: Object.assign({}, base),
-		goerli: Object.assign({}, base),
+		// goerli: Object.assign({}, base),
+		goerli: Object.assign({}, base, {
+			owner: '0xA3F3E41cc12Abf3608480d9272fca44594a0cC4B',
+			// deployer: '0xD9e11e52D2fAF7E735613CcB54478461611Fd4b7',
+		}),
 		local: Object.assign({}, base, {
 			// Deterministic account #0 when using `npx hardhat node`
 			owner: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
