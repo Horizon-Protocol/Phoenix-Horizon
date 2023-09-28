@@ -16,6 +16,7 @@ const performTransactionalStep = async ({
 	target,
 	read,
 	readArg, // none, 1 or an array of args, array will be spread into params
+	readTarget = target,
 	expected,
 	write,
 	writeArg, // none, 1 or an array of args, array will be spread into params
@@ -30,18 +31,40 @@ const performTransactionalStep = async ({
 	encodeABI,
 	nonceManager,
 	publiclyCallable,
+	useFork,
 }) => {
 	const argumentsForWriteFunction = [].concat(writeArg).filter(entry => entry !== undefined); // reduce to array of args
-	const action = `${contract}.${write}(${argumentsForWriteFunction.map(arg =>
-		arg.length === 66 ? ethers.utils.toUtf8String(arg) : arg
-	)})`;
+
+	const action = `${contract}.${write}(${argumentsForWriteFunction.map(arg => {
+		let parsedArg = arg;
+		// bytes32 that are not string representation throw an error
+		if (typeof arg === 'string' && arg.length === 66) {
+			try {
+				parsedArg = ethers.utils.toUtf8String(arg);
+			} catch (e) {}
+		}
+		return parsedArg;
+	})})`;
 
 	// check to see if action required
 	console.log(yellow(`Attempting action: ${action}`));
 
 	if (read) {
 		const argumentsForReadFunction = [].concat(readArg).filter(entry => entry !== undefined); // reduce to array of args
-		let response = await target[read](...argumentsForReadFunction);
+		let response;
+		try {
+			response = await readTarget[read](...argumentsForReadFunction);
+		} catch (err) {
+			if (generateSolidity || useFork) {
+				console.log(
+					gray(
+						`Warning: Could not read ${contract}.${read}(). Proceeding as though this value is not set.`
+					)
+				);
+			} else {
+				throw err;
+			}
+		}
 
 		// Ethers returns uints as BigNumber objects, while web3 stringified them.
 		// This can cause BigNumber(0) !== '0' and make runStep think there is nothing to do
@@ -51,7 +74,9 @@ const performTransactionalStep = async ({
 			response = response.toString();
 		}
 
-		if (expected(response)) {
+		// if an error is thrown above then response is undefined, never consider that sufficient
+		// reason to skip
+		if (response !== undefined && expected(response)) {
 			console.log(gray(`Nothing required for this action.`));
 			return { noop: true };
 		}
@@ -71,7 +96,7 @@ const performTransactionalStep = async ({
 
 	// otherwise check the owner
 	const owner = await target.owner();
-	if (owner === signer.address || publiclyCallable) {
+	if (signer && (owner === (await signer.getAddress()) || publiclyCallable)) {
 		// perform action
 		let hash;
 		let gasUsed = 0;
@@ -113,7 +138,7 @@ const performTransactionalStep = async ({
 
 		return { mined: true, hash };
 	} else {
-		console.log(gray(`  > Account ${signer.address} is not owner ${owner}`));
+		console.log(gray(`  > Account ${signer ? signer.address : ''} is not owner ${owner}`));
 	}
 
 	let data;

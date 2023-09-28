@@ -1,7 +1,7 @@
 'use strict';
 
 const ethers = require('ethers');
-const { gray, yellow, red, cyan } = require('chalk');
+const { gray, yellow, cyan } = require('chalk');
 
 const {
 	getUsers,
@@ -16,6 +16,8 @@ const {
 	loadConnections,
 	confirmAction,
 } = require('../util');
+
+const { performTransactionalStep } = require('../command-utils/transact');
 
 const DEFAULTS = {
 	gasPrice: '15',
@@ -44,31 +46,45 @@ const nominate = async ({
 	}
 
 	if (!newOwner || !ethers.utils.isAddress(newOwner)) {
-		console.error(red('Invalid new owner to nominate. Please check the option and try again.'));
-		process.exit(1);
+		throw Error('Invalid new owner to nominate. Please check the option and try again.');
 	} else {
 		newOwner = newOwner.toLowerCase();
 	}
 
-	const { config, deployment } = loadAndCheckRequiredSources({
+	const { config, deployment, ownerActions, ownerActionsFile } = loadAndCheckRequiredSources({
 		deploymentPath,
 		network,
 	});
 
 	contracts.forEach(contract => {
 		if (!(contract in config)) {
-			console.error(red(`Contract ${contract} isn't in the config for this deployment!`));
-			process.exit(1);
+			throw Error(`Contract ${contract} isn't in the config for this deployment!`);
 		}
 	});
+
+	// Contracts maintained by non-pDAO owners
+	// DappMaintenance (UI control)
+	// StakingRewardsSNXWETHUniswapV3
+	// StakingRewardssUSDDAIUniswapV3
+	const excludedContracts = [
+		'StakingRewardssUSDDAIUniswapV3',
+		'StakingRewardsSNXWETHUniswapV3',
+		'DappMaintenance',
+	];
+
 	if (!contracts.length) {
 		// if contracts not supplied, use all contracts except the DappMaintenance (UI control)
-		contracts = Object.keys(config).filter(contract => contract !== 'DappMaintenance');
+		contracts = Object.keys(config).filter(contract => !excludedContracts.includes(contract));
 	}
 
-	const { providerUrl: envProviderUrl, privateKey: envPrivateKey } = loadConnections({
+	const {
+		providerUrl: envProviderUrl,
+		privateKey: envPrivateKey,
+		explorerLinkPrefix,
+	} = loadConnections({
 		network,
 		useFork,
+		useOvm,
 	});
 
 	if (!providerUrl) {
@@ -137,24 +153,29 @@ const nominate = async ({
 
 		console.log(
 			gray(
-				`${contract} current owner is ${currentOwner}.\nCurrent nominated owner is ${nominatedOwner}.`
+				`${yellow(contract)} current owner is ${yellow(
+					currentOwner
+				)}.\nCurrent nominated owner is ${yellow(nominatedOwner)}.`
 			)
 		);
-		if (signerAddress.toLowerCase() !== currentOwner) {
-			console.log(cyan(`Cannot nominateNewOwner for ${contract} as you aren't the owner!`));
-		} else if (currentOwner !== newOwner && nominatedOwner !== newOwner) {
+		if (currentOwner !== newOwner && nominatedOwner !== newOwner) {
 			// check for legacy function
 			const nominationFnc =
 				'nominateOwner' in deployedContract ? 'nominateOwner' : 'nominateNewOwner';
 
-			console.log(yellow(`Invoking ${contract}.${nominationFnc}(${newOwner})`));
-			const overrides = {
+			await performTransactionalStep({
+				contract,
+				encodeABI: network === 'mainnet',
+				explorerLinkPrefix,
 				gasLimit,
-				gasPrice: ethers.utils.parseUnits(gasPrice, 'gwei'),
-			};
-
-			const tx = await deployedContract[nominationFnc](newOwner, overrides);
-			await tx.wait();
+				gasPrice,
+				ownerActions,
+				ownerActionsFile,
+				signer: wallet,
+				target: deployedContract,
+				write: nominationFnc,
+				writeArg: newOwner, // explicitly pass array of args so array not splat as params
+			});
 		} else {
 			console.log(gray('No change required.'));
 		}

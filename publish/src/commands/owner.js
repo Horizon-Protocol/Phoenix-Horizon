@@ -19,15 +19,8 @@ const {
 	stringify,
 } = require('../util');
 
-const {
-	getSafeInstance,
-	getSafeNonce,
-	getSafeTransactions,
-	checkExistingPendingTx,
-	getNewTransactionHash,
-	saveTransactionToApi,
-	getSafeSignature,
-} = require('../safe-utils');
+const { getContract } = require('../command-utils/contract');
+const { safeInitializer } = require('../command-utils/safe-initializer');
 
 const DEFAULTS = {
 	gasPrice: '15',
@@ -45,8 +38,8 @@ const owner = async ({
 	useOvm,
 	useFork,
 	providerUrl,
+	skipAcceptance = false,
 	throwOnNotNominatedOwner = false,
-	isContract,
 }) => {
 	ensureNetwork(network);
 	deploymentPath = deploymentPath || getDeploymentPathForNetwork({ network, useOvm });
@@ -62,9 +55,8 @@ const owner = async ({
 
 	if (!ethers.utils.isAddress(newOwner)) {
 		console.error(red('Invalid new owner to nominate. Please check the option and try again.'));
-		process.exit(1);
-	} else {
-		newOwner = newOwner.toLowerCase();
+		process.exitCode = 1;
+		return;
 	}
 	// ensure all nominated owners are accepted
 	const { config, deployment, ownerActions, ownerActionsFile } = loadAndCheckRequiredSources({
@@ -75,6 +67,7 @@ const owner = async ({
 	const { providerUrl: envProviderUrl, privateKey: envPrivateKey } = loadConnections({
 		network,
 		useFork,
+		useOvm,
 	});
 
 	if (!providerUrl) {
@@ -92,56 +85,87 @@ const owner = async ({
 
 	const provider = new ethers.providers.JsonRpcProvider(providerUrl);
 
-	if (!isContract && !yes) {
-		try {
-			await confirmAction(
-				yellow(
-					'\nHeads up! You are about to set ownership to an EOA (externally owned address), i.e. not a multisig or a DAO. Are you sure? (y/n) '
-				)
-			);
-		} catch (err) {
-			console.log(gray('Operation cancelled'));
-			process.exit();
-		}
-	}
-
-	let wallet;
+	let signer;
 	if (!privateKey) {
-		const account = getUsers({ network, user: 'owner' }).address; // protocolDAO
-		wallet = provider.getSigner(account);
-		wallet.address = await wallet.getAddress();
+		const account = getUsers({ network, user: 'owner', useOvm }).address;
+		signer = provider.getSigner(account);
+		signer.address = await signer.getAddress();
 	} else {
-		wallet = new ethers.Wallet(privateKey, provider);
+		signer = new ethers.Wallet(privateKey, provider);
 	}
 
-	const signerAddress = wallet.address;
+	console.log(gray(`Using account with public key ${signer.address}`));
 
-	console.log(gray(`Using account with public key ${signerAddress}`));
+	let relayers;
 
-	if (!isContract && wallet.address.toLowerCase() !== newOwner.toLowerCase()) {
-		throw new Error(
-			`New owner is ${newOwner} and signer is ${wallet.address}. The signer needs to be the new owner in order to be able to claim ownership and/or execute owner actions.`
-		);
+	let safeBatchSubmitter;
+	if (!useFork) {
+		// console.log(gray('********** SIGNER', signer, signer[1]));
+		safeBatchSubmitter = await safeInitializer({ network, signer, safeAddress: newOwner });
 	}
 
-	console.log(gray(`Gas Price: ${gasPrice} gwei`));
+	if (!safeBatchSubmitter) {
+		console.log(gray('New owner is not a Gnosis safe.'));
+		console.log(gray('New owner set to'), yellow(newOwner));
 
-	let lastNonce;
-	let protocolDaoContract;
-	let currentSafeNonce;
-	if (isContract) {
-		// new owner should be gnosis safe proxy address
-		protocolDaoContract = getSafeInstance({ provider, safeAddress: newOwner });
+		const deployedCode = await provider.getCode(newOwner);
+		const isContract = deployedCode !== '0x';
 
-		// get protocolDAO nonce
-		currentSafeNonce = await getSafeNonce(protocolDaoContract);
+		if (isContract && useOvm) {
+			console.log(gray('New owner is a contract. Assuming it is a relayer.'));
+			// load up L1 deployment for relaying
+			const { providerUrl: l1ProviderUrl, privateKey: l1PrivateKey } = loadConnections({
+				network,
+				useOvm: false,
+			});
+			const l1Owner = getUsers({ network, user: 'owner', useOvm: false }).address;
 
-		if (!currentSafeNonce) {
-			console.log(gray('Cannot access safe. Exiting.'));
-			process.exit();
+			const l1Provider = new ethers.providers.JsonRpcProvider(l1ProviderUrl);
+			relayers = {
+				actions: [],
+				l1Provider,
+				OwnerRelayOnOptimism: getContract({
+					contract: 'OwnerRelayOnOptimism',
+					network,
+					useOvm,
+					provider,
+				}),
+				OwnerRelayOnEthereum: getContract({
+					contract: 'OwnerRelayOnEthereum',
+					network,
+					useOvm: false,
+					provider: l1Provider,
+				}),
+				l1Signer: new ethers.Wallet(l1PrivateKey, l1Provider),
+				l1Owner,
+			};
+
+			console.log(
+				gray('L2 relayer'),
+				yellow(relayers.OwnerRelayOnOptimism.address),
+				gray('L1 base relayer'),
+				yellow(relayers.OwnerRelayOnEthereum.address)
+			);
+		} else if (signer.address.toLowerCase() !== newOwner.toLowerCase()) {
+			throw new Error(
+				`New owner is ${newOwner} and signer is ${signer.address}. The signer needs to be the new owner in order to be able to claim ownership and/or execute owner actions.`
+			);
 		}
 
-		console.log(yellow(`Using Protocol DAO Safe contract at ${protocolDaoContract.address}`));
+		if (!yes && !isContract) {
+			try {
+				await confirmAction(
+					yellow(
+						'\nHeads up! You are about to set ownership to an EOA (externally owned address), i.e. not a multisig or a DAO. Are you sure? (y/n) '
+					)
+				);
+			} catch (err) {
+				console.log(gray('Operation cancelled'));
+				return;
+			}
+		}
+
+		// console.log(gray(`Gas: base fee ${maxFeePerGas} GWEI, miner tip ${maxPriorityFeePerGas} GWEI`));
 	}
 
 	const confirmOrEnd = async message => {
@@ -153,7 +177,7 @@ const owner = async ({
 					message +
 						cyan(
 							`\nPlease type "y" to ${
-								isContract ? 'stage' : 'submit'
+								safeBatchSubmitter ? 'stage' : 'submit'
 							} transaction, or enter "n" to cancel and resume this later? (y/n) `
 						)
 				);
@@ -164,70 +188,34 @@ const owner = async ({
 		}
 	};
 
-	let stagedTransactions;
-	if (isContract) {
-		// Load staged transactions
-		stagedTransactions = await getSafeTransactions({
-			network,
-			safeAddress: protocolDaoContract.address,
-		});
-	}
-
 	console.log(
-		gray('Running through operations during deployment that couldnt complete as not owner.')
+		gray('Running through operations during deployment that could not complete as not owner.')
 	);
+
 	// Read owner-actions.json + encoded data to stage tx's
 	for (const [key, entry] of Object.entries(ownerActions)) {
 		const { target, data, complete } = entry;
 		if (complete) continue;
 
-		let existingTx;
-		if (isContract) {
-			existingTx = checkExistingPendingTx({
-				stagedTransactions,
-				target,
-				encodedData: data,
-				currentSafeNonce,
+		entry.complete = true;
+		if (safeBatchSubmitter && !useFork) {
+			console.log(gray(`Attempting to append`, yellow(key), `to the batch HERE 1`));
+			const { appended } = await safeBatchSubmitter.appendTransaction({
+				to: target,
+				data,
 			});
-
-			if (existingTx) continue;
-		}
-
-		await confirmOrEnd(yellow('Confirm: ') + `Stage ${bgYellow(black(key))} to (${target})`);
-
-		try {
-			if (isContract) {
-				const { txHash, newNonce } = await getNewTransactionHash({
-					safeContract: protocolDaoContract,
-					data,
-					to: target,
-					sender: wallet.address,
-					network,
-					lastNonce,
-				});
-
-				// sign txHash to get signature
-				const sig = await getSafeSignature({
-					privateKey,
-					providerUrl,
-					contractTxHash: txHash,
-				});
-
-				// save transaction and signature to Gnosis Safe API
-				await saveTransactionToApi({
-					safeContract: protocolDaoContract,
-					network,
-					data,
-					nonce: newNonce,
-					to: target,
-					sender: wallet.address,
-					transactionHash: txHash,
-					signature: sig,
-				});
-
-				// track lastNonce submitted
-				lastNonce = newNonce;
+			if (!appended) {
+				console.log(gray('Skipping adding to the batch as already in pending queue'));
 			} else {
+				console.log(gray('Transaction successfully added to the batch.'));
+			}
+		} else if (relayers) {
+			// Relayer
+			console.log(gray('Adding'), yellow(key), gray('to the relayer actions'));
+			relayers.actions.push({ target, data });
+		} else {
+			try {
+				await confirmOrEnd(yellow('Confirm: ') + `Submit ${bgYellow(black(key))} to (${target})`);
 				const params = {
 					to: target,
 					gasPrice: ethers.utils.parseUnits(gasPrice, 'gwei'),
@@ -237,129 +225,238 @@ const owner = async ({
 					params.gasLimit = ethers.BigNumber.from(gasLimit);
 				}
 
-				const tx = await wallet.sendTransaction(params);
+				const tx = await signer.sendTransaction(params);
 				const receipt = await tx.wait();
 
 				logTx(receipt);
-			}
 
-			entry.complete = true;
-			fs.writeFileSync(ownerActionsFile, stringify(ownerActions));
-		} catch (err) {
-			console.log(
-				gray(`Transaction failed, if sending txn to safe api failed retry manually - ${err}`)
-			);
-			return;
-		}
-	}
-
-	console.log(gray('Looking for contracts whose ownership we should accept'));
-	const warnings = [];
-	for (const contract of Object.keys(config)) {
-		if (!deployment.targets[contract]) {
-			const msg = yellow(`WARNING: contract ${contract} not found in deployment file`);
-			console.log(msg);
-			warnings.push(msg);
-			continue;
-		}
-		const { address, source } = deployment.targets[contract];
-		const { abi } = deployment.sources[source];
-		const deployedContract = new ethers.Contract(address, abi, provider);
-
-		// ignore contracts that don't support Owned
-		if (!deployedContract.functions.owner) {
-			continue;
-		}
-		const currentOwner = (await deployedContract.owner()).toLowerCase();
-		const nominatedOwner = (await deployedContract.nominatedOwner()).toLowerCase();
-
-		if (currentOwner === newOwner) {
-			console.log(gray(`${newOwner} is already the owner of ${contract}`));
-		} else if (nominatedOwner === newOwner) {
-			const encodedData = deployedContract.interface.encodeFunctionData('acceptOwnership', []);
-
-			if (isContract) {
-				// Check if similar one already staged and pending
-				const existingTx = checkExistingPendingTx({
-					stagedTransactions,
-					target: address,
-					encodedData,
-					currentSafeNonce,
-				});
-
-				if (existingTx) continue;
-			}
-
-			// continue if no pending tx found
-			await confirmOrEnd(yellow(`Confirm: ${contract}.acceptOwnership()?`));
-
-			if (isContract) console.log(yellow(`Attempting action protocolDaoContract.approveHash()`));
-			else console.log(yellow(`Calling acceptOwnership() on ${contract}...`));
-
-			try {
-				if (isContract && !useFork) {
-					const { txHash, newNonce } = await getNewTransactionHash({
-						safeContract: protocolDaoContract,
-						data: encodedData,
-						to: address,
-						sender: wallet.address,
-						network,
-						lastNonce,
-					});
-
-					// sign txHash to get signature
-					const sig = await getSafeSignature({
-						privateKey,
-						providerUrl,
-						contractTxHash: txHash,
-					});
-
-					// save transaction and signature to Gnosis Safe API
-					await saveTransactionToApi({
-						safeContract: protocolDaoContract,
-						network,
-						data: encodedData,
-						nonce: newNonce,
-						to: address,
-						sender: wallet.address,
-						transactionHash: txHash,
-						signature: sig,
-					});
-
-					// track lastNonce submitted
-					lastNonce = newNonce;
-				} else {
-					const params = {
-						to: address,
-						gasPrice: ethers.utils.parseUnits(gasPrice, 'gwei'),
-						data: encodedData,
-					};
-					if (gasLimit) {
-						params.gasLimit = ethers.BigNumber.from(gasLimit);
-					}
-
-					const tx = await wallet.sendTransaction(params);
-					const receipt = await tx.wait();
-
-					logTx(receipt);
-				}
+				fs.writeFileSync(ownerActionsFile, stringify(ownerActions));
 			} catch (err) {
-				console.log(
-					gray(`Transaction failed, if sending txn to safe api failed retry manually - ${err}`)
-				);
-				return;
-			}
-		} else {
-			const msg = `Cannot acceptOwnership on ${contract} as nominatedOwner: ${nominatedOwner} isn't the newOwner ${newOwner} you specified. Have you run the nominate command yet?`;
-			if (throwOnNotNominatedOwner && contract !== 'DappMaintenance') {
-				throw Error(msg);
-			} else {
-				console.log(cyan(msg));
+				throw Error(`Transaction failed to send.\n${err}`);
 			}
 		}
 	}
+
+	const warnings = [];
+	if (!skipAcceptance) {
+		console.log(gray('Looking for contracts whose ownership we should accept'));
+		// prevent dupes if some contracts are in there twice (looking at you ProxyERC20 and ProxyERC20sUSD)
+		const appendedOwnerCache = {};
+		for (const contract of Object.keys(config)) {
+			if (!deployment.targets[contract]) {
+				const msg = yellow(`WARNING: contract ${contract} not found in deployment file`);
+				console.log(msg);
+				warnings.push(msg);
+				continue;
+			}
+			const { address, source } = deployment.targets[contract];
+			const { abi } = deployment.sources[source];
+			const deployedContract = new ethers.Contract(address, abi, provider);
+
+			// ignore contracts that don't support Owned
+			if (!deployedContract.functions.owner) {
+				continue;
+			}
+			const currentOwner = (await deployedContract.owner()).toLowerCase();
+			const nominatedOwner = (await deployedContract.nominatedOwner()).toLowerCase();
+
+			if (currentOwner === newOwner.toLowerCase()) {
+				console.log(gray(`${newOwner} is already the owner of ${contract}`));
+			} else if (nominatedOwner === newOwner.toLowerCase()) {
+				const encodedData = deployedContract.interface.encodeFunctionData('acceptOwnership', []);
+
+				if (address in appendedOwnerCache) {
+					console.log(gray('Skipping as this action is already in the batch'));
+					continue;
+				} else {
+					appendedOwnerCache[address] = true;
+				}
+
+				if (safeBatchSubmitter && !useFork) {
+					console.log(
+						gray(
+							`Attempting to append`,
+							yellow(`${contract}.acceptOwnership()`),
+							`to the batch HERE 2`
+						)
+					);
+					const { appended } = await safeBatchSubmitter.appendTransaction({
+						to: address,
+						data: encodedData,
+					});
+					if (!appended) {
+						console.log(gray('Skipping adding to the batch as already in pending queue'));
+					}
+				} else if (relayers) {
+					// Relayer
+					console.log(
+						gray('Adding'),
+						yellow(`${contract}.acceptOwnership()`),
+						gray('to the relayer actions')
+					);
+					relayers.actions.push({ target: address, data: encodedData });
+				} else {
+					try {
+						await confirmOrEnd(
+							gray(`Confirm: Submit`, yellow(`${contract}.acceptOwnership()`), `?`)
+						);
+
+						const params = {
+							to: address,
+							gasPrice: ethers.utils.parseUnits(gasPrice, 'gwei'),
+							data: encodedData,
+						};
+
+						if (gasLimit) {
+							params.gasLimit = ethers.BigNumber.from(gasLimit);
+						}
+
+						const tx = await signer.sendTransaction(params);
+						const receipt = await tx.wait();
+
+						logTx(receipt);
+					} catch (err) {
+						throw Error(`Transaction failed to submit.\n${err}`);
+					}
+				}
+			} else {
+				const msg = `Cannot acceptOwnership on ${contract} as nominatedOwner: ${nominatedOwner} isn't the newOwner ${newOwner} you specified. Have you run the nominate command yet?`;
+				if (throwOnNotNominatedOwner && contract !== 'DappMaintenance') {
+					throw Error(msg);
+				} else {
+					console.log(cyan(msg));
+				}
+			}
+		}
+	}
+
+	if (safeBatchSubmitter) {
+		const { transactions } = safeBatchSubmitter;
+
+		if (transactions.length) {
+			if (!yes) {
+				await confirmOrEnd(
+					gray(
+						`Confirm: Stage`,
+						yellow(`${transactions.length}`),
+						`transactions to the safe in a batch?`
+					)
+				);
+			}
+
+			const { nonce } = await safeBatchSubmitter.submit();
+
+			console.log(
+				gray(
+					'Submitted a batch of',
+					yellow(transactions.length),
+					'transactions to the safe',
+					yellow(newOwner),
+					'at nonce position',
+					yellow(nonce)
+				)
+			);
+
+			fs.writeFileSync(ownerActionsFile, stringify(ownerActions));
+		} else {
+			console.log(gray('No transactions to stage'));
+		}
+	}
+	// else if (relayers) {
+	// 	const { l1Provider, actions, OwnerRelayOnEthereum, l1Signer, l1Owner } = relayers;
+
+	// 	// Load the equivalent L1 safe
+	// 	const safeBatchSubmitter = await safeInitializer({
+	// 		network,
+	// 		signer: l1Signer,
+	// 		safeAddress: l1Owner,
+	// 	});
+
+	// 	if (!safeBatchSubmitter) {
+	// 		console.log('The L1 owner for this relayer is NOT a safe, proceeding directly');
+	// 		// await OwnerRelayOnEthereum.connect(l1Signer);
+	// 	}
+
+	// 	// This is the batch of transactions to relay at a time to L2, it's based on the
+	// 	// number of transactions that can be done on a single L2 transaction and fit within the
+	// 	// crossDomainMessageGasLimit for type "Relay" (4)
+	// 	const batchSize = 20;
+
+	// 	for (let i = 0; i < actions.length; i += batchSize) {
+	// 		const batchActions = actions.slice(i, i + batchSize);
+	// 		const batchData = OwnerRelayOnEthereum.interface.encodeFunctionData('initiateRelayBatch', [
+	// 			batchActions.map(({ target }) => target),
+	// 			batchActions.map(({ data }) => data),
+	// 			ethers.BigNumber.from('10000000'),
+	// 		]);
+	// 		if (safeBatchSubmitter) {
+	// 			console.log('APPEND TX HERE 3');
+	// 			await safeBatchSubmitter.appendTransaction({
+	// 				to: OwnerRelayOnEthereum.address,
+	// 				data: batchData,
+	// 			});
+	// 		} else {
+	// 			try {
+	// 				await confirmOrEnd(
+	// 					gray(`Confirm: Submit relay batch of`, yellow(batchActions.length), `transactions?`)
+	// 				);
+
+	// 				console.log(gray('Performing action directly'));
+
+	// 				const params = await assignGasOptions({
+	// 					tx: {
+	// 						to: OwnerRelayOnEthereum.address,
+	// 						data: batchData,
+	// 					},
+	// 					provider: l1Provider,
+	// 					maxFeePerGas,
+	// 					maxPriorityFeePerGas,
+	// 				});
+
+	// 				const tx = await l1Signer.sendTransaction(params);
+
+	// 				const receipt = await tx.wait();
+
+	// 				logTx(receipt);
+	// 			} catch (err) {
+	// 				throw Error(`Transaction failed to submit.\n${err}`);
+	// 			}
+	// 		}
+	// 	}
+
+	// 	if (safeBatchSubmitter) {
+	// 		if (!yes) {
+	// 			await confirmOrEnd(
+	// 				gray(
+	// 					`Confirm: Stage`,
+	// 					yellow(`${Math.ceil(actions.length / batchSize)}`),
+	// 					`batches to the safe with`,
+	// 					yellow(actions.length),
+	// 					'actions within the batch'
+	// 				)
+	// 			);
+	// 		}
+	// 		const { nonce } = await safeBatchSubmitter.submit();
+
+	// 		console.log(
+	// 			gray(
+	// 				'Submitted a batch of',
+	// 				yellow(Math.ceil(actions.length / batchSize)),
+	// 				'transactions to the safe',
+	// 				yellow(l1Owner),
+	// 				'at nonce position',
+	// 				yellow(nonce)
+	// 			)
+	// 		);
+
+	// 		fs.writeFileSync(ownerActionsFile, stringify(ownerActions));
+	// 	} else {
+	// 		console.log(gray('No transactions to stage'));
+	// 	}
+	// }
+
 	if (warnings.length) {
-		console.log(yellow('\nThere were some issues nominating owner\n'));
+		console.log(yellow('\nThere were some issues during ownership\n'));
 		console.log(yellow('---'));
 		warnings.forEach(warning => console.log(warning));
 		console.log(yellow('---'));
@@ -385,16 +482,11 @@ module.exports = {
 				'-o, --new-owner <value>',
 				'The address of protocolDAO proxy contract as owner (please include the 0x prefix)'
 			)
-			.option(
-				'-k, --use-fork',
-				'Perform the deployment on a forked chain running on localhost (see fork command).',
-				false
-			)
-			.option('--is-contract', 'Wether the new owner is a contract wallet or an EOA', false)
 			.option('-v, --private-key [value]', 'The private key of wallet to stage with.')
 			.option('-g, --gas-price <value>', 'Gas price in GWEI', DEFAULTS.gasPrice)
 			.option('-l, --gas-limit <value>', 'Gas limit', parseInt, DEFAULTS.gasLimit)
 			.option('-n, --network <value>', 'The network to run off.', x => x.toLowerCase(), 'kovan')
+			.option('-s, --skip-acceptance', 'Skip ownership acceptance checks.')
 			.option('-y, --yes', 'Dont prompt, just reply yes.')
 			.option('-z, --use-ovm', 'Target deployment for the OVM (Optimism).')
 			.option(
