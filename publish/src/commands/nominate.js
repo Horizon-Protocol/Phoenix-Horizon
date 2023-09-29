@@ -205,7 +205,7 @@ module.exports = {
 				false
 			)
 			.option('-l, --gas-limit <value>', 'Gas limit', parseInt, 15e4)
-			.option('-n, --network <value>', 'The network to run off.', x => x.toLowerCase(), 'kovan')
+			.option('-n, --network <value>', 'The network to run off.', x => x.toLowerCase(), 'goerli')
 			.option(
 				'-o, --new-owner <value>',
 				'The address of the new owner (please include the 0x prefix)'

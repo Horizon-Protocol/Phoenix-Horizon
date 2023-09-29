@@ -20,7 +20,7 @@ class SafeBatchSubmitter {
 		});
 
 		this.service = new SafeApiKit({
-			txServiceUrl: `https://safe-transaction${network === 'goerli' ? '-goerli' : ''}.safe.global`,
+			txServiceUrl: `https://safe-transaction${network === 'mainnet' ? '-bsc' : ''}.safe.global`,
 			ethAdapter: this.ethAdapter,
 		});
 	}

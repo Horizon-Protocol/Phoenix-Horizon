@@ -485,7 +485,7 @@ module.exports = {
 			.option('-v, --private-key [value]', 'The private key of wallet to stage with.')
 			.option('-g, --gas-price <value>', 'Gas price in GWEI', DEFAULTS.gasPrice)
 			.option('-l, --gas-limit <value>', 'Gas limit', parseInt, DEFAULTS.gasLimit)
-			.option('-n, --network <value>', 'The network to run off.', x => x.toLowerCase(), 'kovan')
+			.option('-n, --network <value>', 'The network to run off.', x => x.toLowerCase(), 'goerli')
 			.option('-s, --skip-acceptance', 'Skip ownership acceptance checks.')
 			.option('-y, --yes', 'Dont prompt, just reply yes.')
 			.option('-z, --use-ovm', 'Target deployment for the OVM (Optimism).')
