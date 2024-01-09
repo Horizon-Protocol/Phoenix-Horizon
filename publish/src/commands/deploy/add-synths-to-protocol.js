@@ -12,15 +12,17 @@ module.exports = async ({ addressOf, deployer, runStep, synthsToAdd }) => {
 	// First filter out all those synths which are already properly imported
 	console.log(gray('Filtering synths to add to the issuer.'));
 	const filteredSynths = [];
+	const seen = new Set();
 	for (const synth of synthsToAdd) {
 		const issuerSynthAddress = await Issuer.synths(synth.currencyKeyInBytes);
 		const currentSynthAddress = addressOf(synth.synth);
 		if (issuerSynthAddress === currentSynthAddress) {
 			console.log(gray(`${currentSynthAddress} requires no action`));
-		} else {
+		} else if (!seen.has(synth.currencyKeyInBytes)) {
 			console.log(gray(`${currentSynthAddress} will be added to the issuer.`));
 			filteredSynths.push(synth);
 		}
+		seen.add(synth.currencyKeyInBytes);
 	}
 
 	const synthChunkSize = 15;
@@ -31,12 +33,12 @@ module.exports = async ({ addressOf, deployer, runStep, synthsToAdd }) => {
 			contract: 'Issuer',
 			target: Issuer,
 			read: 'getSynths',
-			readArg: [chunk.map(synth => synth.currencyKeyInBytes)],
-			expected: input =>
+			readArg: [chunk.map((synth) => synth.currencyKeyInBytes)],
+			expected: (input) =>
 				input.length === chunk.length &&
 				input.every((cur, idx) => cur === addressOf(chunk[idx].synth)),
 			write: 'addSynths',
-			writeArg: [chunk.map(synth => addressOf(synth.synth))],
+			writeArg: [chunk.map((synth) => addressOf(synth.synth))],
 			gasLimit: 1e5 * synthChunkSize,
 			comment: `Add synths to the Issuer contract - batch ${batchCounter++}`,
 		});

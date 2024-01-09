@@ -5,7 +5,6 @@ const { gray, yellow } = require('chalk');
 const SafeBatchSubmitter = require('../SafeBatchSubmitter');
 
 const safeInitializer = async ({ network, signer, safeAddress }) => {
-	// console.log("network, signer, safeAddress", network, signer, safeAddress);
 	const safeBatchSubmitter = new SafeBatchSubmitter({ network, signer, safeAddress });
 	try {
 		// attempt to initialize a gnosis safe from the new owner

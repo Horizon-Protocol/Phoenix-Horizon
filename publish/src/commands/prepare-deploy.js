@@ -14,13 +14,13 @@ const DEFAULTS = {
 const { stringify, loadAndCheckRequiredSources } = require('../util');
 
 // Get unreleased releases
-const getReleasesNotYetReleased = (useOvm = false) =>
+const getReleasesNotYetReleased = ({ useOvm = false }) =>
 	releases.releases.filter(
-		release => !release.released && !!release.ovm === useOvm && release.sips.length > 0
+		(release) => !release.released && !!release.ovm === useOvm && release.sips.length > 0
 	);
 
 // Get unreleased sips
-const getSips = (useOvm = false) => {
+const getSips = ({ useOvm = false }) => {
 	const layers = ['both', useOvm ? 'ovm' : 'base'];
 	return releases.sips.filter(
 		({ layer, released }) => layers.includes(layer) && !layers.includes(released)
@@ -28,7 +28,7 @@ const getSips = (useOvm = false) => {
 };
 
 // Get defined source files from the given sip, or an empty Array
-const getSipSources = (sip, useOvm = false) => {
+const getSipSources = ({ sip, useOvm = false }) => {
 	if (!sip.sources) return [];
 	if (Array.isArray(sip.sources)) return sip.sources;
 	const baseSources = sip.sources.base || [];
@@ -50,7 +50,7 @@ const prepareDeploy = async ({
 	ensureDeploymentPath(deploymentPath);
 
 	// Get config and synths
-	const { config, configFile, synths, synthsFile } = loadAndCheckRequiredSources({
+	const { config, configFile, synths, synthsFile, futuresMarkets } = loadAndCheckRequiredSources({
 		deploymentPath,
 		network,
 	});
@@ -72,25 +72,33 @@ const prepareDeploy = async ({
 	let sources;
 	if (useSips) {
 		// Pick unreleased sips that have sources that need to be prepared
-		const sips = getSips();
-		sources = sips.flatMap(sip => getSipSources(sip, useOvm));
+		const sips = getSips({ useOvm });
+		sources = sips.flatMap((sip) => getSipSources({ sip, useOvm }));
 
 		if (sources.length > 0) {
 			console.log(gray(`Preparing SIPs: ${sips.map(({ sip }) => sip).join(', ')}`));
 		}
 	} else if (useReleases) {
 		// Get all the sources coming from the SIPs from the release on the required layer
-		const unreleased = getReleasesNotYetReleased();
+		const unreleased = getReleasesNotYetReleased({ useOvm });
 		sources = unreleased
 			.flatMap(({ sips }) => sips)
-			.flatMap(sipNumber => {
-				const sip = releases.sips.find(sip => sip.sip === sipNumber);
+			.flatMap((sipNumber) => {
+				const sip = releases.sips.find((sip) => sip.sip === sipNumber);
 				if (!sip) throw new Error(`Invalid SIP number "${sipNumber}"`);
-				return getSipSources(sip, useOvm);
+				return getSipSources({ sip, useOvm });
 			});
 
 		if (sources.length > 0) {
 			console.log(gray(`Preparing releases: ${unreleased.map(({ name }) => name).join(', ')}`));
+		}
+	}
+
+	// add futures markets if missing from config file
+	for (const marketConfig of futuresMarkets) {
+		const marketName = 'FuturesMarket' + marketConfig.marketKey.slice('1'); // remove s prefix
+		if (!config[marketName]) {
+			sources.push(marketName); // add to sources to be written into config
 		}
 	}
 
@@ -102,17 +110,17 @@ const prepareDeploy = async ({
 	}
 
 	console.log(gray(`Preparing sources on ${network}:`));
-	console.log(gray(sources.map(source => `  - ${source}`).join('\n')));
+	console.log(gray(sources.map((source) => `  - ${source}`).join('\n')));
 
 	// Sweep sources and,
 	// (1) make sure they have an entry in config.json and,
 	// (2) its deploy value is set to true.
-	sources.forEach(source => {
+	sources.forEach((source) => {
 		// If any non alpha characters in the name, assume regex and match existing names
 		if (/[^\w]/.test(source)) {
 			Object.keys(config)
-				.filter(contract => new RegExp(`^${source}$`).test(contract))
-				.forEach(contract => (config[contract] = { deploy: true }));
+				.filter((contract) => new RegExp(`^${source}$`).test(contract))
+				.forEach((contract) => (config[contract] = { deploy: true }));
 		} else {
 			// otherwise upsert this entry into the config file
 			config[source] = { deploy: true };
@@ -126,7 +134,7 @@ const prepareDeploy = async ({
 
 module.exports = {
 	prepareDeploy,
-	cmd: program =>
+	cmd: (program) =>
 		program
 			.command('prepare-deploy')
 			.description(
@@ -137,7 +145,7 @@ module.exports = {
 			.option(
 				'-n, --network <value>',
 				'The network to run off.',
-				x => x.toLowerCase(),
+				(x) => x.toLowerCase(),
 				DEFAULTS.network
 			)
 			.action(async (...args) => {

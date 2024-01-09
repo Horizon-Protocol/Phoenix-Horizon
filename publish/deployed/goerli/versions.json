@@ -28,13 +28,15 @@
 			},
 			"FlexibleStorage": {
 				"address": "0x0D450AF274b56259E8085748B6107488183e5CF1",
-				"status": "current",
-				"keccak256": "0x43a0196ad81419de701c69b153131f739f2f5250e7a4c4aeb177a94a7cf414e5"
+				"status": "replaced",
+				"keccak256": "0x43a0196ad81419de701c69b153131f739f2f5250e7a4c4aeb177a94a7cf414e5",
+				"replaced_in": "v3.0.0"
 			},
 			"SystemSettings": {
 				"address": "0xC6ed2459315f16493b8d64EAc4dB71d1D2e2822A",
-				"status": "current",
-				"keccak256": "0x3fc4105bbc935c4e0d3d87c6f273f734052dad4cc4916dfd8041f3344303a97a"
+				"status": "replaced",
+				"keccak256": "0x3fc4105bbc935c4e0d3d87c6f273f734052dad4cc4916dfd8041f3344303a97a",
+				"replaced_in": "v3.0.0"
 			},
 			"SystemStatus": {
 				"address": "0x56cBb415013e3ed9e62084E4292BF6cb5Ff47fF0",
@@ -305,6 +307,55 @@
 				"address": "0x0b42D9DA6b6c4cf0d17f1228168Ab883e7705E0c",
 				"status": "current",
 				"keccak256": "0xc8e85b392b01e3c251b993b534786554ddc89a548512f577d72fed99f3425397"
+			}
+		}
+	},
+	"v3.0.0": {
+		"tag": "v3.0.0",
+		"fulltag": "v3.0.0",
+		"network": "goerli",
+		"date": "2023-08-09T15:46:48+05:30",
+		"commit": "9fcc529b2e1826c42640c754b4980de09546d352",
+		"contracts": {
+			"FlexibleStorage": {
+				"address": "0xbE17A9b423E8DD9B9Ecb93240e500DCbc67F81f1",
+				"status": "current",
+				"keccak256": "0x43a0196ad81419de701c69b153131f739f2f5250e7a4c4aeb177a94a7cf414e5"
+			},
+			"SystemSettings": {
+				"address": "0xCC94ea7B225F1606615E3B07cD23Ae0eAA9Aa87D",
+				"status": "current",
+				"keccak256": "0x3fc4105bbc935c4e0d3d87c6f273f734052dad4cc4916dfd8041f3344303a97a"
+			},
+			"TokenStatezSNX": {
+				"address": "0xc634eCAaC1851B3a1AEddDFf8137636C0320C773",
+				"status": "current",
+				"keccak256": "0xaee86fcae08722f4e43f5776b9111c13646123c0b805597ffa2c82728ebc1799"
+			},
+			"ProxyzSNX": {
+				"address": "0x8c6f4673D3bBe37D8AA813de01d2e368AA3cAE56",
+				"status": "current",
+				"keccak256": "0x38771cfc107d9e0be68b39a1f46d041d29ba86facde4fd332556cf40aaa0c00f"
+			},
+			"ZassetzSNX": {
+				"address": "0x18f868721C46d0fC10aAEb698b828Bb75283B1DB",
+				"status": "current",
+				"keccak256": "0xf9f7d385ba5b88c25949f14c16d02195e158b736eaee59eef02e67068f681f70"
+			},
+			"TokenStatezLINK": {
+				"address": "0xF2c9F608A12059Ee17F209F0cE72Ea848c2C6b60",
+				"status": "current",
+				"keccak256": "0xaee86fcae08722f4e43f5776b9111c13646123c0b805597ffa2c82728ebc1799"
+			},
+			"ProxyzLINK": {
+				"address": "0x474139895540058A3A80037D6c9BdfAbb771e5Be",
+				"status": "current",
+				"keccak256": "0x38771cfc107d9e0be68b39a1f46d041d29ba86facde4fd332556cf40aaa0c00f"
+			},
+			"ZassetzLINK": {
+				"address": "0xFB2500599fbAA27c9adc4f9650cC7E9f51215114",
+				"status": "current",
+				"keccak256": "0xf9f7d385ba5b88c25949f14c16d02195e158b736eaee59eef02e67068f681f70"
 			}
 		}
 	}

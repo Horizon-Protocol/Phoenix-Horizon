@@ -18,34 +18,39 @@ const {
 const { performTransactionalStep } = require('../../command-utils/transact');
 
 const {
-	constants: {
-		BUILD_FOLDER,
-		CONFIG_FILENAME,
-		SYNTHS_FILENAME,
-		DEPLOYMENT_FILENAME,
-		OVM_GAS_PRICE_GWEI,
-	},
+	constants: { BUILD_FOLDER, CONFIG_FILENAME, SYNTHS_FILENAME, DEPLOYMENT_FILENAME },
 } = require('../../../..');
 
 const addSynthsToProtocol = require('./add-synths-to-protocol');
-const configureInverseSynths = require('./configure-inverse-synths');
 const configureLegacySettings = require('./configure-legacy-settings');
+const configureRewardEscrow = require('./configure-reward-escrow');
 const configureLoans = require('./configure-loans');
 const configureStandalonePriceFeeds = require('./configure-standalone-price-feeds');
+const configureOffchainPriceFeeds = require('./configure-offchain-price-feeds');
 const configureSynths = require('./configure-synths');
+const configureFutures = require('./configure-futures');
 const configureSystemSettings = require('./configure-system-settings');
 const deployCore = require('./deploy-core');
 const deployDappUtils = require('./deploy-dapp-utils.js');
 const deployLoans = require('./deploy-loans');
 const deploySynths = require('./deploy-synths');
+const deployFutures = require('./deploy-futures');
+const {
+	deployPerpsV2Generics,
+	deployPerpsV2Markets,
+	cleanupPerpsV2,
+	configurePerpsV2GenericParams,
+} = require('./deploy-perpsv2');
 const generateSolidityOutput = require('./generate-solidity-output');
 const getDeployParameterFactory = require('./get-deploy-parameter-factory');
 const importAddresses = require('./import-addresses');
 const importFeePeriods = require('./import-fee-periods');
+const importExcludedDebt = require('./import-excluded-debt');
 const performSafetyChecks = require('./perform-safety-checks');
 const rebuildResolverCaches = require('./rebuild-resolver-caches');
+const rebuildLegacyResolverCaches = require('./rebuild-legacy-resolver-caches');
 const systemAndParameterCheck = require('./system-and-parameter-check');
-const takeDebtSnapshotWhenRequired = require('./take-debt-snapshot-when-required');
+// const takeDebtSnapshotWhenRequired = require('./take-debt-snapshot-when-required');
 
 const DEFAULTS = {
 	priorityGasPrice: '1',
@@ -58,10 +63,8 @@ const deploy = async ({
 	addNewSynths,
 	buildPath = DEFAULTS.buildPath,
 	concurrency,
-	contractDeploymentGasLimit = DEFAULTS.contractDeploymentGasLimit,
 	deploymentPath,
 	dryRun = false,
-	forceUpdateInverseSynthsOnTestnet = false,
 	freshDeploy,
 	maxFeePerGas,
 	maxPriorityFeePerGas = DEFAULTS.priorityGasPrice,
@@ -69,30 +72,29 @@ const deploy = async ({
 	ignoreCustomParameters,
 	ignoreSafetyChecks,
 	manageNonces,
-	methodCallGasLimit = DEFAULTS.methodCallGasLimit,
 	network = DEFAULTS.network,
-	oracleExrates,
 	privateKey,
+	signer,
 	providerUrl,
+	provider,
 	skipFeedChecks = false,
 	specifyContracts,
 	useFork,
 	useOvm,
 	yes,
+	includeFutures = false,
+	includePerpsV2 = false,
+	runPerpsV2Cleanup = false,
+	perpsV2Markets,
+	stepName = '',
 } = {}) => {
 	ensureNetwork(network);
 	deploymentPath = deploymentPath || getDeploymentPathForNetwork({ network, useOvm });
 	ensureDeploymentPath(deploymentPath);
 
-	// Gas price needs to be set to 0.015 gwei in Optimism,
-	// and gas limits need to be dynamically set by the provider.
-	// More info:
-	// https://www.notion.so/How-to-pay-Fees-in-Optimistic-Ethereum-f706f4e5b13e460fa5671af48ce9a695
-	if (useOvm) {
-		gasPrice = OVM_GAS_PRICE_GWEI;
-		methodCallGasLimit = undefined;
-		contractDeploymentGasLimit = undefined;
-	}
+	console.log('deploy/index/deploy privateKey 1', privateKey);
+	console.log('deploy/index/deploy useFork', useFork);
+	console.log('deploy/index/deploy providerUrl', providerUrl);
 
 	const limitPromise = pLimit(concurrency);
 
@@ -106,25 +108,26 @@ const deploy = async ({
 		ownerActions,
 		ownerActionsFile,
 		feeds,
+		offchainFeeds,
 	} = loadAndCheckRequiredSources({
 		deploymentPath,
 		network,
 		freshDeploy,
 	});
 
-	const getDeployParameter = getDeployParameterFactory({ params, yes, ignoreCustomParameters });
+	const getDeployParameter = getDeployParameterFactory({ params, ignoreCustomParameters });
 
-	const addressOf = c => (c ? c.address : '');
-	const sourceOf = c => (c ? c.source : '');
+	const addressOf = (c) => (c ? c.address : '');
+	const sourceOf = (c) => (c ? c.source : '');
 
 	// Mark contracts for deployment specified via an argument
 	if (specifyContracts) {
 		// Ignore config.json
-		Object.keys(config).map(name => {
+		Object.keys(config).map((name) => {
 			config[name].deploy = false;
 		});
 		// Add specified contracts
-		specifyContracts.split(',').map(name => {
+		specifyContracts.split(',').map((name) => {
 			if (!config[name]) {
 				config[name] = {
 					deploy: true,
@@ -137,7 +140,6 @@ const deploy = async ({
 
 	performSafetyChecks({
 		config,
-		contractDeploymentGasLimit,
 		deployment,
 		deploymentPath,
 		freshDeploy,
@@ -149,12 +151,10 @@ const deploy = async ({
 		useOvm,
 	});
 
-	const standaloneFeeds = Object.values(feeds).filter(({ standalone }) => standalone);
-
 	console.log(
 		gray('Checking all contracts not flagged for deployment have addresses in this network...')
 	);
-	const missingDeployments = Object.keys(config).filter(name => {
+	const missingDeployments = Object.keys(config).filter((name) => {
 		return !config[name].deploy && (!deployment.targets[name] || !deployment.targets[name].address);
 	});
 
@@ -170,35 +170,40 @@ const deploy = async ({
 	console.log(gray('Loading the compiled contracts locally...'));
 	const { earliestCompiledTimestamp, compiled } = loadCompiledFiles({ buildPath });
 
-	const {
-		providerUrl: envProviderUrl,
-		privateKey: envPrivateKey,
-		explorerLinkPrefix,
-	} = loadConnections({
+	const { privateKey: envPrivateKey, explorerLinkPrefix } = loadConnections({
+		// const { privateKey: envPrivateKey, explorerLinkPrefix } = loadConnections({
 		network,
 		useFork,
 		useOvm,
 	});
 
-	if (!providerUrl) {
-		if (!envProviderUrl) {
-			throw new Error('Missing .env key of PROVIDER_URL. Please add and retry.');
-		}
-
-		providerUrl = envProviderUrl;
+	// Here we set a default private key for local-ovm deployment, as the
+	// OVM geth node has no notion of local/unlocked accounts.
+	// Deploying without a private key will give the error "OVM: Unsupported RPC method",
+	// as the OVM node does not support eth_sendTransaction, which inherently relies on
+	// the unlocked accounts on the node.
+	if (network === 'local' && useOvm && !privateKey) {
+		// Account #0: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+		privateKey = '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80';
 	}
 
 	// when not in a local network, and not forking, and the privateKey isn't supplied,
 	// use the one from the .env file
+	console.log('OUTSIDE HERE', network, useFork, privateKey);
 	if (network !== 'local' && !useFork && !privateKey) {
+		console.log('Inside HERE', network, useFork, privateKey);
 		privateKey = envPrivateKey;
 	}
+
+	console.log('deploy/index/deploy 2', envPrivateKey);
+	console.log('deploy/index/deploy 3', privateKey);
+	console.log('deploy/index/deploy providerUrl', providerUrl);
 
 	const nonceManager = new NonceManager({});
 
 	const deployer = new Deployer({
+		account: signer ? await signer.getAddress() : null,
 		compiled,
-		contractDeploymentGasLimit,
 		config,
 		configFile,
 		deployment,
@@ -207,51 +212,48 @@ const deploy = async ({
 		maxPriorityFeePerGas,
 		network,
 		privateKey,
+		signer,
 		providerUrl,
+		provider,
 		dryRun,
 		useOvm,
 		useFork,
-		ignoreSafetyChecks,
 		nonceManager: manageNonces ? nonceManager : undefined,
 	});
 
-	const { account, signer } = deployer;
+	const { account } = deployer;
+
+	if (!signer) {
+		signer = deployer.signer;
+	}
 
 	nonceManager.provider = deployer.provider;
 	nonceManager.account = account;
 
-	const {
-		currentSynthetixSupply,
-		currentLastMintEvent,
-		currentWeekOfInflation,
-		oldExrates,
-		oracleAddress,
-		systemSuspended,
-	} = await systemAndParameterCheck({
-		account,
-		buildPath,
-		addNewSynths,
-		concurrency,
-		config,
-		contractDeploymentGasLimit,
-		deployer,
-		deploymentPath,
-		dryRun,
-		earliestCompiledTimestamp,
-		freshDeploy,
-		maxFeePerGas,
-		maxPriorityFeePerGas,
-		getDeployParameter,
-		network,
-		oracleExrates,
-		providerUrl,
-		skipFeedChecks,
-		standaloneFeeds,
-		synths,
-		useFork,
-		useOvm,
-		yes,
-	});
+	const { currentSynthetixSupply, currentLastMintEvent, currentWeekOfInflation, systemSuspended } =
+		await systemAndParameterCheck({
+			account,
+			buildPath,
+			addNewSynths,
+			concurrency,
+			config,
+			deployer,
+			deploymentPath,
+			dryRun,
+			earliestCompiledTimestamp,
+			freshDeploy,
+			maxFeePerGas,
+			maxPriorityFeePerGas,
+			getDeployParameter,
+			network,
+			skipFeedChecks,
+			feeds,
+			synths,
+			providerUrl,
+			useFork,
+			useOvm,
+			yes,
+		});
 
 	console.log(
 		gray(`Starting deployment to ${network.toUpperCase()}${useFork ? ' (fork)' : ''}...`)
@@ -260,11 +262,9 @@ const deploy = async ({
 	// track for use with solidity output
 	const runSteps = [];
 
-	const runStep = async opts => {
+	const runStep = async (opts, overrides) => {
 		const { noop, ...rest } = await performTransactionalStep({
 			...opts,
-			// no gas limit on OVM (use system limit), otherwise use provided limit or the methodCall amount
-			gasLimit: useOvm ? undefined : opts.gasLimit || methodCallGasLimit,
 			signer,
 			dryRun,
 			explorerLinkPrefix,
@@ -274,10 +274,12 @@ const deploy = async ({
 			nonceManager: manageNonces ? nonceManager : undefined,
 			ownerActions,
 			ownerActionsFile,
+			useFork,
+			...overrides,
 		});
 
 		// only add to solidity steps when the transaction is NOT a no-op
-		if (!noop) {
+		if (!noop && !(overrides && overrides.generateSolidity === false)) {
 			runSteps.push(opts);
 		}
 
@@ -291,7 +293,6 @@ const deploy = async ({
 		currentSynthetixSupply,
 		currentWeekOfInflation,
 		deployer,
-		oracleAddress,
 		useOvm,
 	});
 
@@ -302,6 +303,7 @@ const deploy = async ({
 		config,
 		deployer,
 		freshDeploy,
+		deploymentPath,
 		generateSolidity,
 		network,
 		synths,
@@ -310,7 +312,7 @@ const deploy = async ({
 		yes,
 	});
 
-	const { useEmptyCollateralManager, collateralManagerDefaults } = await deployLoans({
+	const { collateralManagerDefaults } = await deployLoans({
 		account,
 		addressOf,
 		deployer,
@@ -318,6 +320,74 @@ const deploy = async ({
 		network,
 		useOvm,
 	});
+
+	const { futuresMarketManager } = await deployPerpsV2Generics({
+		account,
+		addressOf,
+		deployer,
+		runStep,
+		useOvm,
+		limitPromise,
+	});
+
+	if (includeFutures) {
+		await deployFutures({
+			account,
+			addressOf,
+			getDeployParameter,
+			deployer,
+			runStep,
+			useOvm,
+			network,
+			deploymentPath,
+			loadAndCheckRequiredSources,
+			futuresMarketManager,
+		});
+	} else {
+		console.log(gray(`\n------ EXCLUDE LEGACY FUTURES MARKETS ------\n`));
+	}
+
+	if (includePerpsV2) {
+		await deployPerpsV2Markets({
+			account,
+			addressOf,
+			getDeployParameter,
+			deployer,
+			runStep,
+			useOvm,
+			network,
+			deploymentPath,
+			loadAndCheckRequiredSources,
+			futuresMarketManager,
+			generateSolidity,
+			yes,
+			specificMarkets: perpsV2Markets,
+			limitPromise,
+		});
+	} else {
+		console.log(gray(`\n------ EXCLUDE PERPS V2 MARKETS ------\n`));
+	}
+
+	if (runPerpsV2Cleanup) {
+		await cleanupPerpsV2({
+			account,
+			addressOf,
+			getDeployParameter,
+			deployer,
+			runStep,
+			useOvm,
+			network,
+			deploymentPath,
+			loadAndCheckRequiredSources,
+			futuresMarketManager,
+			generateSolidity,
+			yes,
+			specificMarkets: perpsV2Markets,
+			limitPromise,
+		});
+	} else {
+		console.log(gray(`\n------ SKIP PERPS V2 POST-DEPLOY CLEANUP STEP ------\n`));
+	}
 
 	await deployDappUtils({
 		account,
@@ -335,16 +405,23 @@ const deploy = async ({
 	});
 
 	await rebuildResolverCaches({
-		addressOf,
-		compiled,
 		deployer,
 		generateSolidity,
 		limitPromise,
-		network,
 		newContractsBeingAdded,
 		runStep,
+		network,
 		useOvm,
 	});
+
+	// await rebuildLegacyResolverCaches({
+	// 	addressOf,
+	// 	compiled,
+	// 	deployer,
+	// 	network,
+	// 	runStep,
+	// 	useOvm,
+	// });
 
 	await configureLegacySettings({
 		account,
@@ -353,6 +430,13 @@ const deploy = async ({
 		deployer,
 		getDeployParameter,
 		network,
+		runStep,
+		useOvm,
+	});
+
+	await configureRewardEscrow({
+		addressOf,
+		deployer,
 		runStep,
 		useOvm,
 	});
@@ -369,20 +453,42 @@ const deploy = async ({
 		yes,
 	});
 
+	// // Not needed for horizon-protocol
+	// await importExcludedDebt({
+	// 	deployer,
+	// 	freshDeploy,
+	// 	runStep,
+	// });
+
+	// Configure all feeds as standalone in case they are being used as synth currency keys (through synth),
+	// or directly (e.g. futures). Adding just one or the other may cause issues if e.g. initially futures
+	// market exists, but later a synth is added. Or if initially both exist, but later the spot synth
+	// is removed. The standalone feed should always be added and available.
 	await configureStandalonePriceFeeds({
 		deployer,
 		runStep,
-		standaloneFeeds,
+		feeds,
+		useOvm,
 	});
+
+	if (includePerpsV2) {
+		await configureOffchainPriceFeeds({
+			deployer,
+			runStep,
+			offchainFeeds,
+			useOvm,
+		});
+	}
 
 	await configureSynths({
 		addressOf,
 		explorerLinkPrefix,
 		generateSolidity,
-		synths,
 		feeds,
 		deployer,
+		network,
 		runStep,
+		synths,
 	});
 
 	await addSynthsToProtocol({
@@ -392,19 +498,9 @@ const deploy = async ({
 		synthsToAdd,
 	});
 
-	await configureInverseSynths({
+	await configureSystemSettings({
 		addressOf,
 		deployer,
-		forceUpdateInverseSynthsOnTestnet,
-		network,
-		oldExrates,
-		runStep,
-		synths,
-	});
-
-	await configureSystemSettings({
-		deployer,
-		methodCallGasLimit,
 		useOvm,
 		generateSolidity,
 		getDeployParameter,
@@ -419,17 +515,37 @@ const deploy = async ({
 		deployer,
 		getDeployParameter,
 		runStep,
-		useEmptyCollateralManager,
 	});
 
-	await takeDebtSnapshotWhenRequired({
-		debtSnapshotMaxDeviation: DEFAULTS.debtSnapshotMaxDeviation,
-		deployer,
-		generateSolidity,
-		runStep,
-		useOvm,
-		useFork,
-	});
+	if (includeFutures) {
+		await configureFutures({
+			addressOf,
+			deployer,
+			loadAndCheckRequiredSources,
+			runStep,
+			getDeployParameter,
+			useOvm,
+			freshDeploy,
+			deploymentPath,
+			network,
+			generateSolidity,
+			yes,
+		});
+	}
+
+	// Generic Perps V2 configuration
+	if (includePerpsV2) {
+		await configurePerpsV2GenericParams({ deployer, getDeployParameter, runStep, useOvm });
+	}
+
+	// await takeDebtSnapshotWhenRequired({
+	// 	debtSnapshotMaxDeviation: DEFAULTS.debtSnapshotMaxDeviation,
+	// 	deployer,
+	// 	generateSolidity,
+	// 	runStep,
+	// 	useOvm,
+	// 	useFork,
+	// });
 
 	console.log(gray(`\n------ DEPLOY COMPLETE ------\n`));
 
@@ -446,6 +562,7 @@ const deploy = async ({
 			runSteps,
 			sourceOf,
 			useOvm,
+			stepName,
 		});
 	}
 };
@@ -453,24 +570,19 @@ const deploy = async ({
 module.exports = {
 	deploy,
 	DEFAULTS,
-	cmd: program =>
+	cmd: (program) =>
 		program
 			.command('deploy')
 			.description('Deploy compiled solidity files')
 			.option(
 				'-a, --add-new-synths',
-				`Whether or not any new synths in the ${SYNTHS_FILENAME} file should be deployed if there is no entry in the config file`
+				`Whether or not any new synths in the ${SYNTHS_FILENAME} file should be deployed if there is no entry in the config file`,
+				true
 			)
 			.option(
 				'-b, --build-path [value]',
 				'Path to a folder hosting compiled files from the "build" step in this script',
 				DEFAULTS.buildPath
-			)
-			.option(
-				'-c, --contract-deployment-gas-limit <value>',
-				'Contract deployment gas limit',
-				parseFloat,
-				DEFAULTS.contractDeploymentGasLimit
 			)
 			.option(
 				'-d, --deployment-path <value>',
@@ -516,15 +628,9 @@ module.exports = {
 				'The address of the gas limit oracle for this network (default is use existing)'
 			)
 			.option(
-				'-m, --method-call-gas-limit <value>',
-				'Method call gas limit',
-				parseFloat,
-				DEFAULTS.methodCallGasLimit
-			)
-			.option(
 				'-n, --network <value>',
 				'The network to run off.',
-				x => x.toLowerCase(),
+				(x) => x.toLowerCase(),
 				DEFAULTS.network
 			)
 			.option(
@@ -553,15 +659,25 @@ module.exports = {
 				'The private key to deploy with (only works in local mode, otherwise set in .env).'
 			)
 			.option(
-				'-u, --force-update-inverse-synths-on-testnet',
-				'Allow inverse synth pricing to be updated on testnet regardless of total supply'
-			)
-			.option(
 				'-x, --specify-contracts <value>',
 				'Ignore config.json  and specify contracts to be deployed (Comma separated list)'
 			)
+			.option('--include-future', 'Include legacy Futures (deployment and configuration)')
+			.option(
+				'--include-perps-v2',
+				'Include PerpsV2 (deployment, configuration and offchain feeds)'
+			)
+			.option('--run-perps-v2-cleanup', 'Run PerpsV2 post-deployment cleanup')
+			.option(
+				'--perps-v2-markets <market...>',
+				'PerpsV2 Markets to deploy/upgrade. If not present will process all markets'
+			)
 			.option('-y, --yes', 'Dont prompt, just reply yes.')
 			.option('-z, --use-ovm', 'Target deployment for the OVM (Optimism).')
+			.option(
+				'--step-name <value>',
+				'Optional: Step name to add to migration contract if generate solidity is used.'
+			)
 			.action(async (...args) => {
 				try {
 					await deploy(...args);

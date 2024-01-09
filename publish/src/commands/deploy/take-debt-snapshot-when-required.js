@@ -72,7 +72,6 @@ module.exports = async ({
 
 		// NOTE: This line be removed once https://github.com/ethers-io/ethers.js/issues/1862 is resolved. See comments at function's definition
 		await cacheCurrentDebtResults({ contract: DebtCache, useFork });
-
 		const currentDebt = await DebtCache.currentDebt();
 
 		// Check if the snapshot is stale and can be fixed.
@@ -83,7 +82,6 @@ module.exports = async ({
 				currentDebt.anyRateIsInvalid,
 				cacheInfo.isStale
 			);
-			console.log('RETURNING TRUE 1');
 			return true;
 		}
 
@@ -108,8 +106,9 @@ module.exports = async ({
 				if (maxDeviation <= Math.abs(deviation)) {
 					console.log(
 						yellow(
-							`Debt cache deviation is ${deviation * 100}% >= ${maxDeviation *
-								100}%; refreshing it...`
+							`Debt cache deviation is ${deviation * 100}% >= ${
+								maxDeviation * 100
+							}%; refreshing it...`
 						)
 					);
 					await refreshSnapshotIfPossible(cacheInfo.isInvalid, currentDebt.anyRateIsInvalid, true);
@@ -128,7 +127,6 @@ module.exports = async ({
 	};
 
 	try {
-		console.log('WE ARE AT START');
 		const performedSnapshot = await checkSnapshot({ useFork });
 
 		if (performedSnapshot) {

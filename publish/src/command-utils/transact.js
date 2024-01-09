@@ -38,9 +38,9 @@ const performTransactionalStep = async ({
 	publiclyCallable,
 	useFork,
 }) => {
-	const argumentsForWriteFunction = [].concat(writeArg).filter(entry => entry !== undefined); // reduce to array of args
+	const argumentsForWriteFunction = [].concat(writeArg).filter((entry) => entry !== undefined); // reduce to array of args
 
-	const action = `${contract}.${write}(${argumentsForWriteFunction.map(arg => {
+	const action = `${contract}.${write}(${argumentsForWriteFunction.map((arg) => {
 		let parsedArg = arg;
 		// bytes32 that are not string representation throw an error
 		if (typeof arg === 'string' && arg.length === 66) {
@@ -55,7 +55,7 @@ const performTransactionalStep = async ({
 	console.log(yellow(`Attempting action: ${action}`));
 
 	if (read) {
-		const argumentsForReadFunction = [].concat(readArg).filter(entry => entry !== undefined); // reduce to array of args
+		const argumentsForReadFunction = [].concat(readArg).filter((entry) => entry !== undefined); // reduce to array of args
 		let response;
 		try {
 			response = await readTarget[read](...argumentsForReadFunction);

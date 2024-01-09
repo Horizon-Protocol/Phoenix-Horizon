@@ -9,27 +9,14 @@ interface AggregatorV2V3Interface {
 
     function getTimestamp(uint256 roundId) external view returns (uint256);
 
-    function getRoundData(uint80 _roundId)
-        external
-        view
-        returns (
-            uint80 roundId,
-            int256 answer,
-            uint256 startedAt,
-            uint256 updatedAt,
-            uint80 answeredInRound
-        );
+    function getRoundData(
+        uint80 _roundId
+    ) external view returns (uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound);
 
     function latestRoundData()
         external
         view
-        returns (
-            uint80 roundId,
-            int256 answer,
-            uint256 startedAt,
-            uint256 updatedAt,
-            uint80 answeredInRound
-        );
+        returns (uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound);
 }
 
 contract MockAggregatorV2V3 is AggregatorV2V3Interface {
@@ -46,6 +33,9 @@ contract MockAggregatorV2V3 is AggregatorV2V3Interface {
 
     mapping(uint => Entry) public entries;
 
+    bool public allRoundDataShouldRevert;
+    bool public latestRoundDataShouldRevert;
+
     constructor() public {}
 
     // Mock setup function
@@ -60,11 +50,7 @@ contract MockAggregatorV2V3 is AggregatorV2V3Interface {
         });
     }
 
-    function setLatestAnswerWithRound(
-        int256 answer,
-        uint256 timestamp,
-        uint80 _roundId
-    ) external {
+    function setLatestAnswerWithRound(int256 answer, uint256 timestamp, uint80 _roundId) external {
         roundId = _roundId;
         entries[roundId] = Entry({
             roundId: roundId,
@@ -75,21 +61,22 @@ contract MockAggregatorV2V3 is AggregatorV2V3Interface {
         });
     }
 
+    function setAllRoundDataShouldRevert(bool _shouldRevert) external {
+        allRoundDataShouldRevert = _shouldRevert;
+    }
+
+    function setLatestRoundDataShouldRevert(bool _shouldRevert) external {
+        latestRoundDataShouldRevert = _shouldRevert;
+    }
+
     function setDecimals(uint8 _decimals) external {
         keyDecimals = _decimals;
     }
 
-    function latestRoundData()
-        external
-        view
-        returns (
-            uint80,
-            int256,
-            uint256,
-            uint256,
-            uint80
-        )
-    {
+    function latestRoundData() external view returns (uint80, int256, uint256, uint256, uint80) {
+        if (latestRoundDataShouldRevert) {
+            revert("latestRoundData reverted");
+        }
         return getRoundData(uint80(latestRound()));
     }
 
@@ -111,20 +98,13 @@ contract MockAggregatorV2V3 is AggregatorV2V3Interface {
         return entry.updatedAt;
     }
 
-    function getRoundData(uint80 _roundId)
-        public
-        view
-        returns (
-            uint80,
-            int256,
-            uint256,
-            uint256,
-            uint80
-        )
-    {
+    function getRoundData(uint80 _roundId) public view returns (uint80, int256, uint256, uint256, uint80) {
+        if (allRoundDataShouldRevert) {
+            revert("getRoundData reverted");
+        }
+
         Entry memory entry = entries[_roundId];
         // Emulate a Chainlink aggregator
-        require(entry.updatedAt > 0, "No data present");
         return (entry.roundId, entry.answer, entry.startedAt, entry.updatedAt, entry.answeredInRound);
     }
 }

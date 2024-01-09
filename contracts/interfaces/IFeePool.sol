@@ -9,6 +9,10 @@ interface IFeePool {
 
     function feesAvailable(address account) external view returns (uint, uint);
 
+    function feesBurned(address account) external view returns (uint);
+
+    function feesToBurn(address account) external view returns (uint);
+
     function feePeriodDuration() external view returns (uint);
 
     function isFeesClaimable(address account) external view returns (bool);
@@ -16,6 +20,8 @@ interface IFeePool {
     function targetThreshold() external view returns (uint);
 
     function totalFeesAvailable() external view returns (uint);
+
+    function totalFeesBurned() external view returns (uint);
 
     function totalRewardsAvailable() external view returns (uint);
 
@@ -26,12 +32,7 @@ interface IFeePool {
 
     function closeCurrentFeePeriod() external;
 
-    // Restricted: used internally to Synthetix
-    function appendAccountIssuanceRecord(
-        address account,
-        uint lockedAmount,
-        uint debtEntryIndex
-    ) external;
+    function closeSecondary(uint snxBackedDebt, uint debtShareSupply) external;
 
     function recordFeePaid(uint zUSDAmount) external;
 

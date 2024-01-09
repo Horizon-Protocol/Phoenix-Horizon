@@ -1,4 +1,5 @@
 pragma solidity ^0.5.16;
+pragma experimental ABIEncoderV2;
 
 // Inheritance
 import "./BaseSynthetix.sol";
@@ -14,7 +15,6 @@ contract Synthetix is BaseSynthetix {
 
     // ========== ADDRESS RESOLVER CONFIGURATION ==========
     bytes32 private constant CONTRACT_REWARD_ESCROW = "RewardEscrow";
-    bytes32 private constant CONTRACT_REWARDESCROW_V2 = "RewardEscrowV2";
     bytes32 private constant CONTRACT_SUPPLYSCHEDULE = "SupplySchedule";
 
     // ========== CONSTRUCTOR ==========
@@ -29,10 +29,9 @@ contract Synthetix is BaseSynthetix {
 
     function resolverAddressesRequired() public view returns (bytes32[] memory addresses) {
         bytes32[] memory existingAddresses = BaseSynthetix.resolverAddressesRequired();
-        bytes32[] memory newAddresses = new bytes32[](3);
+        bytes32[] memory newAddresses = new bytes32[](2);
         newAddresses[0] = CONTRACT_REWARD_ESCROW;
-        newAddresses[1] = CONTRACT_REWARDESCROW_V2;
-        newAddresses[2] = CONTRACT_SUPPLYSCHEDULE;
+        newAddresses[1] = CONTRACT_SUPPLYSCHEDULE;
         return combineArrays(existingAddresses, newAddresses);
     }
 
@@ -40,10 +39,6 @@ contract Synthetix is BaseSynthetix {
 
     function rewardEscrow() internal view returns (IRewardEscrow) {
         return IRewardEscrow(requireAndGetAddress(CONTRACT_REWARD_ESCROW));
-    }
-
-    function rewardEscrowV2() internal view returns (IRewardEscrowV2) {
-        return IRewardEscrowV2(requireAndGetAddress(CONTRACT_REWARDESCROW_V2));
     }
 
     function supplySchedule() internal view returns (ISupplySchedule) {
@@ -100,15 +95,28 @@ contract Synthetix is BaseSynthetix {
         );
     }
 
-    function settle(bytes32 currencyKey)
-        external
-        optionalProxy
-        returns (
-            uint reclaimed,
-            uint refunded,
-            uint numEntriesSettled
-        )
-    {
+    function exchangeAtomically(
+        bytes32 sourceCurrencyKey,
+        uint sourceAmount,
+        bytes32 destinationCurrencyKey,
+        bytes32 trackingCode,
+        uint minAmount
+    ) external exchangeActive(sourceCurrencyKey, destinationCurrencyKey) optionalProxy returns (uint amountReceived) {
+        return
+            exchanger().exchangeAtomically(
+                messageSender,
+                sourceCurrencyKey,
+                sourceAmount,
+                destinationCurrencyKey,
+                messageSender,
+                trackingCode,
+                minAmount
+            );
+    }
+
+    function settle(
+        bytes32 currencyKey
+    ) external optionalProxy returns (uint reclaimed, uint refunded, uint numEntriesSettled) {
         return exchanger().settle(messageSender, currencyKey);
     }
 
@@ -120,6 +128,8 @@ contract Synthetix is BaseSynthetix {
 
         uint supplyToMint = _supplySchedule.mintableSupply();
         require(supplyToMint > 0, "No supply is mintable");
+
+        emitTransfer(address(0), address(this), supplyToMint);
 
         // record minting event before mutation to token supply
         _supplySchedule.recordMintEvent(supplyToMint);
@@ -144,25 +154,10 @@ contract Synthetix is BaseSynthetix {
         tokenState.setBalanceOf(msg.sender, tokenState.balanceOf(msg.sender).add(minterReward));
         emitTransfer(address(this), msg.sender, minterReward);
 
+        // Increase total supply by minted amount
         totalSupply = totalSupply.add(supplyToMint);
 
         return true;
-    }
-
-    function liquidateDelinquentAccount(address account, uint zUSDAmount)
-        external
-        systemActive
-        optionalProxy
-        returns (bool)
-    {
-        (uint totalRedeemed, uint amountLiquidated) =
-            issuer().liquidateDelinquentAccount(account, zUSDAmount, messageSender);
-
-        emitAccountLiquidated(account, totalRedeemed, amountLiquidated, messageSender);
-
-        // Transfer HZN redeemed to messageSender
-        // Reverts if amount to redeem is more than balanceOf account, ie due to escrowed balance
-        return _transferByProxy(account, messageSender, totalRedeemed);
     }
 
     /* Once off function for SIP-60 to migrate HZN balances in the RewardEscrow contract
@@ -178,19 +173,30 @@ contract Synthetix is BaseSynthetix {
     }
 
     // ========== EVENTS ==========
-    event AccountLiquidated(address indexed account, uint hznRedeemed, uint amountLiquidated, address liquidator);
-    bytes32 internal constant ACCOUNTLIQUIDATED_SIG = keccak256("AccountLiquidated(address,uint256,uint256,address)");
 
-    function emitAccountLiquidated(
+    event AtomicSynthExchange(
+        address indexed account,
+        bytes32 fromCurrencyKey,
+        uint256 fromAmount,
+        bytes32 toCurrencyKey,
+        uint256 toAmount,
+        address toAddress
+    );
+    bytes32 internal constant ATOMIC_SYNTH_EXCHANGE_SIG =
+        keccak256("AtomicSynthExchange(address,bytes32,uint256,bytes32,uint256,address)");
+
+    function emitAtomicSynthExchange(
         address account,
-        uint256 hznRedeemed,
-        uint256 amountLiquidated,
-        address liquidator
-    ) internal {
+        bytes32 fromCurrencyKey,
+        uint256 fromAmount,
+        bytes32 toCurrencyKey,
+        uint256 toAmount,
+        address toAddress
+    ) external onlyExchanger {
         proxy._emit(
-            abi.encode(hznRedeemed, amountLiquidated, liquidator),
+            abi.encode(fromCurrencyKey, fromAmount, toCurrencyKey, toAmount, toAddress),
             2,
-            ACCOUNTLIQUIDATED_SIG,
+            ATOMIC_SYNTH_EXCHANGE_SIG,
             addressToBytes32(account),
             0,
             0

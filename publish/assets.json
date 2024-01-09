@@ -47,6 +47,12 @@
 		"sign": "",
 		"description": "Solana"
 	},
+	"SNX": {
+		"asset": "SNX",
+		"category": "crypto",
+		"sign": "",
+		"description": "Synthetix"
+	},
 	"XRP": {
 		"asset": "XRP",
 		"category": "crypto",
@@ -149,25 +155,6 @@
 		"sign": "",
 		"description": "Tezos"
 	},
-	"LTC": {
-		"asset": "LTC",
-		"category": "crypto",
-		"sign": "",
-		"description": "Litecoin"
-	},
-	"TRX": {
-		"asset": "TRX",
-		"category": "crypto",
-		"sign": "",
-		"description": "TRON"
-	},
-	"XTZ": {
-		"asset": "XTZ",
-		"category": "crypto",
-		"sign": "",
-		"description": "Tezos"
-	},
-
 	"LTC": {
 		"asset": "LTC",
 		"category": "crypto",

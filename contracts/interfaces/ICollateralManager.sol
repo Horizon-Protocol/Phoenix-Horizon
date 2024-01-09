@@ -19,37 +19,26 @@ interface ICollateralManager {
 
     function getShortRate(bytes32 synth) external view returns (uint shortRate, bool rateIsInvalid);
 
-    function getRatesAndTime(uint index)
-        external
-        view
-        returns (
-            uint entryRate,
-            uint lastRate,
-            uint lastUpdated,
-            uint newIndex
-        );
+    function getRatesAndTime(
+        uint index
+    ) external view returns (uint entryRate, uint lastRate, uint lastUpdated, uint newIndex);
 
-    function getShortRatesAndTime(bytes32 currency, uint index)
-        external
-        view
-        returns (
-            uint entryRate,
-            uint lastRate,
-            uint lastUpdated,
-            uint newIndex
-        );
+    function getShortRatesAndTime(
+        bytes32 currency,
+        uint index
+    ) external view returns (uint entryRate, uint lastRate, uint lastUpdated, uint newIndex);
 
     function exceedsDebtLimit(uint amount, bytes32 currency) external view returns (bool canIssue, bool anyRateIsInvalid);
 
-    function areSynthsAndCurrenciesSet(bytes32[] calldata requiredSynthNamesInResolver, bytes32[] calldata synthKeys)
-        external
-        view
-        returns (bool);
+    function areSynthsAndCurrenciesSet(
+        bytes32[] calldata requiredSynthNamesInResolver,
+        bytes32[] calldata synthKeys
+    ) external view returns (bool);
 
-    function areShortableSynthsSet(bytes32[] calldata requiredSynthNamesInResolver, bytes32[] calldata synthKeys)
-        external
-        view
-        returns (bool);
+    function areShortableSynthsSet(
+        bytes32[] calldata requiredSynthNamesInResolver,
+        bytes32[] calldata synthKeys
+    ) external view returns (bool);
 
     // Loans
     function getNewLoanId() external returns (uint id);
@@ -63,15 +52,11 @@ interface ICollateralManager {
 
     function removeSynths(bytes32[] calldata synths, bytes32[] calldata synthKeys) external;
 
-    function addShortableSynths(bytes32[2][] calldata requiredSynthAndInverseNamesInResolver, bytes32[] calldata synthKeys)
-        external;
+    function addShortableSynths(bytes32[] calldata requiredSynthNamesInResolver, bytes32[] calldata synthKeys) external;
 
     function removeShortableSynths(bytes32[] calldata synths) external;
 
     // State mutative
-    function updateBorrowRates(uint rate) external;
-
-    function updateShortRates(bytes32 currency, uint rate) external;
 
     function incrementLongs(bytes32 synth, uint amount) external;
 
@@ -80,4 +65,14 @@ interface ICollateralManager {
     function incrementShorts(bytes32 synth, uint amount) external;
 
     function decrementShorts(bytes32 synth, uint amount) external;
+
+    function accrueInterest(
+        uint interestIndex,
+        bytes32 currency,
+        bool isShort
+    ) external returns (uint difference, uint index);
+
+    function updateBorrowRatesCollateral(uint rate) external;
+
+    function updateShortRatesCollateral(bytes32 currency, uint rate) external;
 }

@@ -19,6 +19,10 @@ class SafeBatchSubmitter {
 			signerOrProvider: signer,
 		});
 
+		const txServiceUrl = `https://safe-transaction${
+			network === 'goerli' ? '-goerli' : ''
+		}.safe.global`;
+
 		this.service = new SafeApiKit({
 			txServiceUrl: `https://safe-transaction${network === 'goerli' ? '-goerli' : ''}.safe.global`,
 			ethAdapter: this.ethAdapter,
@@ -44,7 +48,9 @@ class SafeBatchSubmitter {
 	async appendTransaction({ to, value = '0', data, force }) {
 		const { safe, service, safeAddress, transactions } = this;
 
+		console.log('force1', force);
 		if (!force) {
+			console.log('force2', force);
 			// check it does not exist in the pending list
 			// Note: this means that a duplicate transaction - like an acceptOwnership on
 			// the same contract cannot be added in one batch. This could be useful in situations
@@ -70,7 +76,7 @@ class SafeBatchSubmitter {
 					matchedTxnIsPending =
 						matchedTxnIsPending ||
 						(dataDecoded.valueDecoded || []).find(
-							entry => entry.to === to && entry.data === data && entry.value === value
+							(entry) => entry.to === to && entry.data === data && entry.value === value
 						);
 				}
 			}
@@ -93,14 +99,18 @@ class SafeBatchSubmitter {
 			return { transactions };
 		}
 
+		console.log('HELLOOOOOOOO', transactions);
 		try {
 			const safeTransaction = await safe.createTransaction({ safeTransactionData: transactions });
+			console.log('PROPOSED TXNS DONE1', safeTransaction);
 			const safeTxHash = await safe.getTransactionHash(safeTransaction);
+			console.log('PROPOSED TXNS DONE2', safeTxHash);
 
 			const senderSignature = await safe.signTransactionHash(safeTxHash);
 
 			const senderAddress = await signer.getAddress();
 
+			console.log('PROPOSED TXNS DONE3', senderAddress);
 			await service.proposeTransaction({
 				safeAddress: safeAddress,
 				safeTransactionData: safeTransaction.data,
@@ -109,8 +119,9 @@ class SafeBatchSubmitter {
 				senderSignature: senderSignature.data,
 			});
 
+			console.log('PROPOSED TXNS DONE');
 			return { transactions, nonce };
-		} catch (err) {
+		} catch (e) {
 			throw Error(`Error trying to submit batch to safe.\n${err}`);
 		}
 	}

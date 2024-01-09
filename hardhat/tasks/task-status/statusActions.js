@@ -17,11 +17,11 @@ const ActionNames = {
 	getExchangeRates: 'ExchangeRates',
 };
 
-const logSection = sectionName => {
+const logSection = (sectionName) => {
 	console.log(green(`\n=== ${sectionName}: ===`));
 };
 
-const logActionError = actionName => {
+const logActionError = (actionName) => {
 	logSection(actionName);
 
 	logItem('Action not recognized', actionName, 1, bgRed);
@@ -51,7 +51,7 @@ const logHeader = ({ statusConf }) => {
 };
 
 const actions = {
-	[ActionNames.getSynthetix]: async function({
+	[ActionNames.getSynthetix]: async function ({
 		useOvm,
 		network,
 		provider,
@@ -80,12 +80,12 @@ const actions = {
 		logItem('Synthetix.totalSupply', (await Synthetix.totalSupply(blockOptions)).toString() / 1e18);
 	},
 
-	[ActionNames.getDebtCache]: async function({ useOvm, network, provider, deploymentPath }) {
+	[ActionNames.getDebtCache]: async function ({ useOvm, network, provider, deploymentPath }) {
 		logSection('DebtCache');
 
 		const DebtCache = getContract({
 			contract: 'DebtCache',
-			source: useOvm ? 'RealtimeDebtCache' : 'DebtCache',
+			source: 'DebtCache',
 			network,
 			useOvm,
 			provider,
@@ -99,7 +99,7 @@ const actions = {
 		logItem('DebtCache.info.isStale', info.isStale, 1, info.isStale ? bgRed : undefined);
 	},
 
-	[ActionNames.getSynthetixState]: async function({
+	[ActionNames.getSynthetixState]: async function ({
 		useOvm,
 		network,
 		provider,
@@ -111,6 +111,7 @@ const actions = {
 
 		const SynthetixState = getContract({
 			contract: 'SynthetixState',
+			source: useOvm ? 'SynthetixStateWithLimitedSetup' : 'SynthetixState',
 			network,
 			useOvm,
 			provider,
@@ -129,7 +130,7 @@ const actions = {
 		}
 	},
 
-	[ActionNames.getSupplySchedule]: async function({
+	[ActionNames.getSupplySchedule]: async function ({
 		useOvm,
 		network,
 		provider,
@@ -156,7 +157,7 @@ const actions = {
 		}
 	},
 
-	[ActionNames.getFeePool]: async function({
+	[ActionNames.getFeePool]: async function ({
 		useOvm,
 		network,
 		provider,
@@ -183,7 +184,7 @@ const actions = {
 			const feePeriod = await FeePool.recentFeePeriods(idx, blockOptions);
 			logItem(`feePeriod ${idx}:`);
 
-			Object.keys(feePeriod).map(key => {
+			Object.keys(feePeriod).map((key) => {
 				if (isNaN(key)) {
 					logItem(`${key}`, `${feePeriod[key].toString()}`, 2);
 				}
@@ -201,7 +202,7 @@ const actions = {
 			const feesByPeriod = await FeePool.feesByPeriod(address, blockOptions);
 			logItem(
 				'FeePool.feesByPeriod(address)',
-				feesByPeriod.map(period => period.map(fee => fee.toString())),
+				feesByPeriod.map((period) => period.map((fee) => fee.toString())),
 				2
 			);
 
@@ -221,7 +222,7 @@ const actions = {
 		}
 	},
 
-	[ActionNames.getFeePoolState]: async function({
+	[ActionNames.getFeePoolState]: async function ({
 		useOvm,
 		network,
 		provider,
@@ -249,12 +250,12 @@ const actions = {
 			const debtEntry = await FeePoolState.getAccountsDebtEntry(address, 0, blockOptions);
 			logItem(
 				'FeePoolState.getAccountsDebtEntry(address)',
-				debtEntry.map(item => item.toString())
+				debtEntry.map((item) => item.toString())
 			);
 		}
 	},
 
-	[ActionNames.getAddressResolver]: async function({
+	[ActionNames.getAddressResolver]: async function ({
 		useOvm,
 		network,
 		provider,
@@ -281,7 +282,7 @@ const actions = {
 		await getAddress({ contract: 'RewardsDistribution' });
 	},
 
-	[ActionNames.getSystemSettings]: async function({ useOvm, network, provider, deploymentPath }) {
+	[ActionNames.getSystemSettings]: async function ({ useOvm, network, provider, deploymentPath }) {
 		logSection('SystemSettings');
 
 		const SystemSettings = getContract({
@@ -297,7 +298,7 @@ const actions = {
 		logItem('rateStalePeriod', rateStalePeriod.toString());
 	},
 
-	[ActionNames.getExchangeRates]: async function({
+	[ActionNames.getExchangeRates]: async function ({
 		useOvm,
 		network,
 		provider,
@@ -309,7 +310,6 @@ const actions = {
 
 		const ExchangeRates = getContract({
 			contract: 'ExchangeRates',
-			source: useOvm ? 'ExchangeRatesWithoutInvPricing' : 'ExchangeRates',
 			network,
 			useOvm,
 			provider,
@@ -318,7 +318,6 @@ const actions = {
 
 		const Issuer = getContract({
 			contract: 'Issuer',
-			source: useOvm ? 'IssuerWithoutLiquidations' : 'Issuer',
 			network,
 			useOvm,
 			provider,
@@ -327,7 +326,7 @@ const actions = {
 
 		let currencyKeys;
 		if (listedCurrencies) {
-			currencyKeys = listedCurrencies.map(e => ethers.utils.formatBytes32String(e));
+			currencyKeys = listedCurrencies.map((e) => ethers.utils.formatBytes32String(e));
 		} else {
 			currencyKeys = [
 				...(await Issuer.availableCurrencyKeys()),
@@ -337,7 +336,7 @@ const actions = {
 
 		const now = Math.floor(new Date().getTime() / 60000);
 
-		const logRate = async currencyKey => {
+		const logRate = async (currencyKey) => {
 			const currency = ethers.utils.toUtf8String(currencyKey);
 			const rate = await ExchangeRates.rateForCurrency(currencyKey, blockOptions);
 			const isInvalid = await ExchangeRates.rateIsInvalid(currencyKey, blockOptions);

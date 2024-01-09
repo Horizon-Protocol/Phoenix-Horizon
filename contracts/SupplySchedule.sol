@@ -41,7 +41,7 @@ contract SupplySchedule is Owned, ISupplySchedule {
     // How long each inflation period is before mint can be called
     uint public constant MINT_PERIOD_DURATION = 1 weeks;
 
-    uint public INFLATION_START_DATE = 1690569000; // 2022-12-31T01:00:00+00:00 AMT
+    uint public INFLATION_START_DATE = 1672448400; // 2022-12-31T01:00:00+00:00 AMT
     uint public constant MINT_BUFFER = 1 days;
     uint8 public constant SUPPLY_DECAY_START = 40; // Week 40
     uint8 public constant SUPPLY_DECAY_END = 234; //  Supply Decay ends on Week 234 (inclusive of Week 234 for a total of 195 weeks of inflation decay)
@@ -52,11 +52,7 @@ contract SupplySchedule is Owned, ISupplySchedule {
     // Percentage growth of terminal supply per annum
     uint public constant TERMINAL_SUPPLY_RATE_ANNUAL = 25000000000000000; // 2.5% pa
 
-    constructor(
-        address _owner,
-        uint _lastMintEvent,
-        uint _currentWeek
-    ) public Owned(_owner) {
+    constructor(address _owner, uint _lastMintEvent, uint _currentWeek) public Owned(_owner) {
         lastMintEvent = _lastMintEvent;
         weekCounter = _currentWeek;
     }

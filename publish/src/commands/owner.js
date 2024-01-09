@@ -40,6 +40,7 @@ const owner = async ({
 	useOvm,
 	useFork,
 	providerUrl,
+	isTest = false,
 	skipAcceptance = false,
 	throwOnNotNominatedOwner = false,
 }) => {
@@ -87,9 +88,8 @@ const owner = async ({
 
 	const provider = new ethers.providers.JsonRpcProvider(providerUrl);
 
-	// console.log(gray('********** privateKey', privateKey));
 	let signer;
-	if (!privateKey) {
+	if (!privateKey || isTest) {
 		const account = getUsers({ network, user: 'owner', useOvm }).address;
 		signer = provider.getSigner(account);
 		signer.address = await signer.getAddress();
@@ -102,8 +102,7 @@ const owner = async ({
 	let relayers;
 
 	let safeBatchSubmitter;
-	if (!useFork) {
-		// console.log(gray('********** SIGNER', signer, signer[1]));
+	if (!useFork && !isTest) {
 		safeBatchSubmitter = await safeInitializer({ network, signer, safeAddress: newOwner });
 	}
 
@@ -114,7 +113,7 @@ const owner = async ({
 		const deployedCode = await provider.getCode(newOwner);
 		const isContract = deployedCode !== '0x';
 
-		if (isContract && useOvm) {
+		if (isContract && useOvm && !isTest) {
 			console.log(gray('New owner is a contract. Assuming it is a relayer.'));
 			// load up L1 deployment for relaying
 			const { providerUrl: l1ProviderUrl, privateKey: l1PrivateKey } = loadConnections({
@@ -155,7 +154,7 @@ const owner = async ({
 			);
 		}
 
-		if (!yes && !isContract) {
+		if (!yes && (!isContract || isTest)) {
 			try {
 				await confirmAction(
 					yellow(
@@ -171,7 +170,7 @@ const owner = async ({
 		console.log(gray(`Gas: base fee ${maxFeePerGas} GWEI, miner tip ${maxPriorityFeePerGas} GWEI`));
 	}
 
-	const confirmOrEnd = async message => {
+	const confirmOrEnd = async (message) => {
 		try {
 			if (yes) {
 				console.log(message);
@@ -202,7 +201,7 @@ const owner = async ({
 
 		entry.complete = true;
 		if (safeBatchSubmitter && !useFork) {
-			console.log(gray(`Attempting to append`, yellow(key), `to the batch HERE 1`));
+			console.log(gray(`Attempting to append`, yellow(key), `to the batch`));
 			const { appended } = await safeBatchSubmitter.appendTransaction({
 				to: target,
 				data,
@@ -282,11 +281,7 @@ const owner = async ({
 
 				if (safeBatchSubmitter && !useFork) {
 					console.log(
-						gray(
-							`Attempting to append`,
-							yellow(`${contract}.acceptOwnership()`),
-							`to the batch HERE 2`
-						)
+						gray(`Attempting to append`, yellow(`${contract}.acceptOwnership()`), `to the batch`)
 					);
 					const { appended } = await safeBatchSubmitter.appendTransaction({
 						to: address,
@@ -398,10 +393,9 @@ const owner = async ({
 			const batchData = OwnerRelayOnEthereum.interface.encodeFunctionData('initiateRelayBatch', [
 				batchActions.map(({ target }) => target),
 				batchActions.map(({ data }) => data),
-				ethers.BigNumber.from('10000000'),
+				ethers.BigNumber.from('9500000'),
 			]);
 			if (safeBatchSubmitter) {
-				console.log('APPEND TX HERE 3');
 				await safeBatchSubmitter.appendTransaction({
 					to: OwnerRelayOnEthereum.address,
 					data: batchData,
@@ -469,14 +463,14 @@ const owner = async ({
 	if (warnings.length) {
 		console.log(yellow('\nThere were some issues during ownership\n'));
 		console.log(yellow('---'));
-		warnings.forEach(warning => console.log(warning));
+		warnings.forEach((warning) => console.log(warning));
 		console.log(yellow('---'));
 	}
 };
 
 module.exports = {
 	owner,
-	cmd: program =>
+	cmd: (program) =>
 		program
 			.command('owner')
 			.description('Owner script - a list of transactions required by the owner.')
@@ -497,9 +491,10 @@ module.exports = {
 			.option('-g, --max-fee-per-gas <value>', 'Maximum base gas fee price in GWEI')
 			.option('--max-priority-fee-per-gas <value>', 'Priority gas fee price in GWEI', '1')
 			.option('-l, --gas-limit <value>', 'Gas limit', parseInt, DEFAULTS.gasLimit)
-			.option('-n, --network <value>', 'The network to run off.', x => x.toLowerCase(), 'goerli')
+			.option('-n, --network <value>', 'The network to run off.', (x) => x.toLowerCase(), 'testnet')
 			.option('-s, --skip-acceptance', 'Skip ownership acceptance checks.')
 			.option('-y, --yes', 'Dont prompt, just reply yes.')
+			.option('--is-test', 'Is a test deployment (on a forked network as it were mainnet).')
 			.option('-z, --use-ovm', 'Target deployment for the OVM (Optimism).')
 			.option(
 				'-p, --provider-url <value>',

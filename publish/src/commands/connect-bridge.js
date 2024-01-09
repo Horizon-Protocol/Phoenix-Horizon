@@ -2,11 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const ethers = require('ethers');
 const { gray, red, yellow } = require('chalk');
-const {
-	wrap,
-	toBytes32,
-	constants: { OVM_GAS_PRICE_GWEI },
-} = require('../../..');
+const { wrap, toBytes32 } = require('../../..');
 const { confirmAction } = require('../util');
 const {
 	ensureNetwork,
@@ -29,7 +25,6 @@ const connectBridge = async ({
 	l1Messenger,
 	l2Messenger,
 	dryRun,
-	l1GasPrice,
 	l1GasLimit,
 	quiet,
 }) => {
@@ -47,6 +42,10 @@ const connectBridge = async ({
 		wallet: walletL1,
 		AddressResolver: AddressResolverL1,
 		SynthetixBridge: SynthetixBridgeToOptimism,
+		Synthetix,
+		BridgeEscrow: SynthetixBridgeEscrow,
+		OwnerRelay: OwnerRelayOnEthereum,
+		DebtMigrator: DebtMigratorOnEthereum,
 	} = await setupInstance({
 		network: l1Network,
 		providerUrl: l1ProviderUrl,
@@ -66,6 +65,8 @@ const connectBridge = async ({
 		wallet: walletL2,
 		AddressResolver: AddressResolverL2,
 		SynthetixBridge: SynthetixBridgeToBase,
+		OwnerRelay: OwnerRelayOnOptimism,
+		DebtMigrator: DebtMigratorOnOptimism,
 	} = await setupInstance({
 		network: l2Network,
 		providerUrl: l2ProviderUrl,
@@ -83,12 +84,21 @@ const connectBridge = async ({
 	console.log(gray('* Connecting bridge on L1...'));
 	await connectLayer({
 		wallet: walletL1,
-		gasPrice: l1GasPrice,
 		gasLimit: l1GasLimit,
-		names: ['ext:Messenger', 'ovm:SynthetixBridgeToBase'],
-		addresses: [l1Messenger, SynthetixBridgeToBase.address],
+		names: [
+			'ext:Messenger',
+			'ovm:SynthetixBridgeToBase',
+			'ovm:OwnerRelayOnOptimism',
+			'ovm:DebtMigratorOnOptimism',
+		],
+		addresses: [
+			l1Messenger,
+			SynthetixBridgeToBase.address,
+			OwnerRelayOnOptimism.address,
+			DebtMigratorOnOptimism.address,
+		],
 		AddressResolver: AddressResolverL1,
-		SynthetixBridge: SynthetixBridgeToOptimism,
+		cachables: [SynthetixBridgeToOptimism, OwnerRelayOnEthereum],
 		dryRun,
 	});
 
@@ -99,26 +109,92 @@ const connectBridge = async ({
 	console.log(gray('* Connecting bridge on L2...'));
 	await connectLayer({
 		wallet: walletL2,
-		gasPrice: OVM_GAS_PRICE_GWEI,
 		gasLimit: undefined,
-		names: ['ext:Messenger', 'base:SynthetixBridgeToOptimism'],
-		addresses: [l2Messenger, SynthetixBridgeToOptimism.address],
+		names: [
+			'ext:Messenger',
+			'base:SynthetixBridgeToOptimism',
+			'base:OwnerRelayOnEthereum',
+			'base:DebtMigratorOnEthereum',
+		],
+		addresses: [
+			l2Messenger,
+			SynthetixBridgeToOptimism.address,
+			OwnerRelayOnEthereum.address,
+			DebtMigratorOnEthereum.address,
+		],
 		AddressResolver: AddressResolverL2,
-		SynthetixBridge: SynthetixBridgeToBase,
+		cachables: [SynthetixBridgeToBase, OwnerRelayOnOptimism, DebtMigratorOnOptimism],
 		dryRun,
 	});
+
+	// check approval (bridge needs ERC20 approval to spend bridge escrow's SNX for withdrawals)
+	const currentAllowance = await Synthetix.allowance(
+		SynthetixBridgeEscrow.address,
+		SynthetixBridgeToOptimism.address
+	);
+
+	console.log(
+		gray(
+			'Current allowance for bridge to spend bridge escrow SNX is',
+			ethers.utils.formatEther(currentAllowance)
+		)
+	);
+
+	if (currentAllowance.lt(ethers.utils.parseEther('100000000000'))) {
+		// called when allowance is under 100 B
+
+		console.log(yellow('The bridge does not have sufficient allowance.'));
+
+		if (!dryRun) {
+			console.log(
+				yellow.inverse(
+					`  * CALLING SynthetixBridgeEscrow.approveBridge(SNX, 'SynthetixBridgeToOptimism', UInt256.MAX))`
+				)
+			);
+			const owner = await SynthetixBridgeEscrow.owner();
+			if (walletL1.address.toLowerCase() !== owner.toLowerCase()) {
+				const calldata = await SynthetixBridgeEscrow.interface.encodeFunctionData('approveBridge', [
+					Synthetix.address,
+					SynthetixBridgeToOptimism.address,
+					ethers.constants.MaxUint256,
+				]);
+				console.log('Calldata is', calldata);
+				await confirmAction(
+					yellow(
+						`    ⚠️  AddressResolver is owned by ${owner} and the current signer is ${walletL1.address}.
+						Please execute the above transaction and press "y" when done.`
+					)
+				);
+			} else {
+				const params = {
+					gasLimit: l1GasLimit,
+				};
+				const tx = await SynthetixBridgeEscrow.approveBridge(
+					Synthetix.address,
+					SynthetixBridgeToOptimism.address,
+					ethers.constants.MaxUint256,
+					params
+				);
+				const receipt = await tx.wait();
+				console.log(gray(`    > tx hash: ${receipt.transactionHash}`));
+			}
+		} else {
+			console.log(yellow('  * Skipping, since this is a DRY RUN'));
+		}
+	} else {
+		console.log(gray('this is sufficient'));
+	}
 
 	console.log = logger;
 };
 
 const connectLayer = async ({
 	wallet,
-	gasPrice,
 	gasLimit,
 	names,
 	addresses,
 	AddressResolver,
-	SynthetixBridge,
+	cachables,
 	dryRun,
 }) => {
 	// ---------------------------------
@@ -147,9 +223,7 @@ const connectLayer = async ({
 	// Update AddressResolver if needed
 	// ---------------------------------
 
-	const params = {
-		gasPrice: ethers.utils.parseUnits(gasPrice.toString(), 'gwei'),
-	};
+	const params = {};
 	if (gasLimit) {
 		params.gasLimit = gasLimit;
 	}
@@ -169,6 +243,11 @@ const connectLayer = async ({
 
 			const owner = await AddressResolver.owner();
 			if (wallet.address.toLowerCase() !== owner.toLowerCase()) {
+				const calldata = await AddressResolver.interface.encodeFunctionData('importAddresses', [
+					names.map(toBytes32),
+					addresses,
+				]);
+				console.log('Calldata is', calldata);
 				await confirmAction(
 					yellow(
 						`    ⚠️  AddressResolver is owned by ${owner} and the current signer is $${wallet.address}. Please execute the above transaction and press "y" when done.`
@@ -192,27 +271,20 @@ const connectLayer = async ({
 	// Sync cache on bridge if needed
 	// ---------------------------------
 
-	let needToSyncCacheOnBridge = needToImportAddresses;
-	if (!needToSyncCacheOnBridge) {
-		const isResolverCached = await SynthetixBridge.isResolverCached();
-		if (!isResolverCached) {
-			needToSyncCacheOnBridge = true;
-		}
-	}
+	for (const contract of cachables) {
+		const isCached = await contract.isResolverCached();
+		if (!isCached) {
+			if (!dryRun) {
+				console.log(yellow.inverse(`  * CALLING rebuildCache() on ${contract.address}...`));
 
-	if (needToSyncCacheOnBridge) {
-		console.log(yellow('  * Rebuilding caches...'));
+				tx = await contract.rebuildCache(params);
+				receipt = await tx.wait();
 
-		if (!dryRun) {
-			console.log(yellow.inverse('  * CALLING SynthetixBridge.rebuildCache()...'));
-			tx = await SynthetixBridge.rebuildCache(params);
-			receipt = await tx.wait();
-			console.log(gray(`    > tx hash: ${tx.transactionHash}`));
-		} else {
-			console.log(yellow('  * Skipping, since this is a DRY RUN'));
+				console.log(gray(`    > tx hash: ${receipt.transactionHash}`));
+			} else {
+				console.log(yellow('Skipping rebuildCache(), since this is a DRY RUN'));
+			}
 		}
-	} else {
-		console.log(gray('  * Bridge cache is synced in this layer. Skipping...'));
 	}
 };
 
@@ -259,11 +331,56 @@ const setupInstance = async ({
 		wallet,
 	});
 	console.log(gray(`  > ${bridgeName}:`, SynthetixBridge.address));
+	const relayName = useOvm ? 'OwnerRelayOnOptimism' : 'OwnerRelayOnEthereum';
+	const OwnerRelay = getContract({
+		contract: relayName,
+		getTarget,
+		getSource,
+		deploymentPath,
+		wallet,
+	});
+	console.log(gray(`  > ${relayName}:`, OwnerRelay.address));
+
+	const migratorName = useOvm ? 'DebtMigratorOnOptimism' : 'DebtMigratorOnEthereum';
+	const DebtMigrator = getContract({
+		contract: migratorName,
+		getTarget,
+		getSource,
+		deploymentPath,
+		wallet,
+	});
+	console.log(gray(`  > ${migratorName}:`, DebtMigrator.address));
+
+	let Synthetix;
+	let BridgeEscrow;
+
+	if (!useOvm) {
+		Synthetix = getContract({
+			contract: 'ProxySynthetix',
+			getTarget,
+			getSource,
+			sourceName: 'Synthetix',
+			deploymentPath,
+			wallet,
+		});
+
+		BridgeEscrow = getContract({
+			contract: 'SynthetixBridgeEscrow',
+			getTarget,
+			getSource,
+			deploymentPath,
+			wallet,
+		});
+	}
 
 	return {
-		wallet,
 		AddressResolver,
+		BridgeEscrow,
+		OwnerRelay,
+		DebtMigrator,
+		Synthetix,
 		SynthetixBridge,
+		wallet,
 	};
 };
 
@@ -315,13 +432,13 @@ const bootstrapConnection = ({
 	};
 };
 
-const getContract = ({ contract, deploymentPath, getTarget, getSource, wallet }) => {
+const getContract = ({ contract, deploymentPath, getTarget, getSource, wallet, sourceName }) => {
 	const target = getTarget({ deploymentPath, contract });
 	if (!target) {
 		throw new Error(`Unable to find deployed target for ${contract} in ${deploymentPath}`);
 	}
 
-	const source = getSource({ deploymentPath, contract });
+	const source = getSource({ deploymentPath, contract: sourceName || contract });
 	if (!source) {
 		throw new Error(`Unable to find source for ${contract}`);
 	}
@@ -331,7 +448,7 @@ const getContract = ({ contract, deploymentPath, getTarget, getSource, wallet })
 
 module.exports = {
 	connectBridge,
-	cmd: program =>
+	cmd: (program) =>
 		program
 			.command('connect-bridge')
 			.description('Configures the bridge between an L1-L2 instance pair.')
@@ -347,7 +464,6 @@ module.exports = {
 			.option('--l2-use-fork', 'Wether to use a fork for the L2 connection', false)
 			.option('--l1-messenger <value>', 'L1 cross domain messenger to use')
 			.option('--l2-messenger <value>', 'L2 cross domain messenger to use')
-			.option('--l1-gas-price <value>', 'Gas price to set when performing transfers in L1', 1)
 			.option('--l1-gas-limit <value>', 'Max gas to use when signing transactions to l1', 8000000)
 			.option('--dry-run', 'Do not execute any transactions')
 			.option('--quiet', 'Do not print stdout', false)

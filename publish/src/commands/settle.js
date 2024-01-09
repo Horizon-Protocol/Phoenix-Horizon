@@ -30,7 +30,7 @@ const fromBlockMap = {
 	mainnet: 11590207, // system exchanged after SCCP-68 implemented
 };
 
-const pathToLocal = name => path.join(__dirname, `${name}.json`);
+const pathToLocal = (name) => path.join(__dirname, `${name}.json`);
 
 const saveExchangesToFile = ({ network, exchanges, fromBlock }) => {
 	fs.writeFileSync(pathToLocal(`exchanges-${network}-${fromBlock}`), stringify(exchanges));
@@ -60,7 +60,11 @@ const settle = async ({
 
 	console.log(gray('Using network:', yellow(network)));
 
-	const { providerUrl, privateKey: envPrivateKey, explorerLinkPrefix } = loadConnections({
+	const {
+		providerUrl,
+		privateKey: envPrivateKey,
+		explorerLinkPrefix,
+	} = loadConnections({
 		network,
 		useFork,
 	});
@@ -137,7 +141,7 @@ const settle = async ({
 	};
 
 	const Synthetix = getContract({
-		label: 'ProxyERC20',
+		label: 'ProxySynthetix',
 		source: 'Synthetix',
 	});
 
@@ -147,10 +151,11 @@ const settle = async ({
 				return [];
 			}
 			console.log(gray('-> Fetching page of results from target', yellow(target.address)));
-			const pageOfResults = await target.getPastEvents('SynthExchange', {
-				fromBlock: startingBlock,
-				toBlock: startingBlock + pageSize - 1,
-			});
+			const pageOfResults = await target.queryFilter(
+				'SynthExchange',
+				startingBlock,
+				startingBlock + pageSize - 1
+			);
 			startingBlock += pageSize;
 			return [].concat(pageOfResults).concat(await innerFnc());
 		};
@@ -183,7 +188,7 @@ const settle = async ({
 
 	for (const {
 		blockNumber,
-		returnValues: { account, toCurrencyKey },
+		args: [account, , , toCurrencyKey],
 	} of exchanges) {
 		if (cache[account + toCurrencyKey]) continue;
 		cache[account + toCurrencyKey] = true;
@@ -223,7 +228,9 @@ const settle = async ({
 				earliestTimestamp = Math.min(timestamp, earliestTimestamp);
 			}
 			const isSynthTheDest = new RegExp(synth).test(ethers.utils.toUtf8String(toCurrencyKey));
-			const isSynthOneSrcEntry = !!fromSynths.find(src => ethers.utils.toUtf8String(src) === synth);
+			const isSynthOneSrcEntry = !!fromSynths.find(
+				(src) => ethers.utils.toUtf8String(src) === synth
+			);
 
 			// skip when filtered by synth if not the destination and not any of the sources
 			if (synth && !isSynthTheDest && !isSynthOneSrcEntry) {
@@ -281,11 +288,7 @@ const settle = async ({
 				if (reclaimAmount > 0) {
 					const synth = await Synthetix.synths(toCurrencyKey);
 
-					const Synth = new ethers.eth.Contract(
-						synth,
-						getSource({ contract: 'Zasset' }).abi,
-						provider
-					);
+					const Synth = new ethers.Contract(synth, getSource({ contract: 'Zasset' }).abi, provider);
 
 					const balance = await Synth.balanceOf(account);
 
@@ -358,7 +361,7 @@ const settle = async ({
 
 module.exports = {
 	settle,
-	cmd: program =>
+	cmd: (program) =>
 		program
 			.command('settle')
 			.description('Settle all exchanges')
@@ -374,7 +377,7 @@ module.exports = {
 				false
 			)
 			.option('-l, --gas-limit <value>', 'Gas limit', parseInt, 350e3)
-			.option('-n, --network <value>', 'The network to run off.', x => x.toLowerCase(), 'kovan')
+			.option('-n, --network <value>', 'The network to run off.', (x) => x.toLowerCase(), 'testnet')
 			.option(
 				'-r, --dry-run',
 				'If enabled, will not run any transactions but merely report on them.'

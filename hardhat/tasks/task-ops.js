@@ -25,7 +25,7 @@ task('ops', 'Run Optimism chain')
 	.addOptionalParam(
 		'optimismCommit',
 		'Commit to checkout',
-		'05ace3ae2c12c6ba5a4a0ac33254f9547cc4557c'
+		'f1631a5f7ddb6eb4a342bfbd7d46233a43412f9b'
 	)
 	.setAction(async (taskArguments, hre, runSuper) => {
 		taskArguments.maxMemory = true;
@@ -101,7 +101,7 @@ function _isRunning({ opsPath }) {
 		return false;
 	}
 
-	OPS_PROCESSES.forEach(item => {
+	OPS_PROCESSES.forEach((item) => {
 		try {
 			const imageId = execa.sync('sh', [
 				'-c',
@@ -123,7 +123,7 @@ function _imagesExist() {
 	console.log(gray('  check if images exists'));
 	let result = true;
 
-	OPS_PROCESSES.forEach(item => {
+	OPS_PROCESSES.forEach((item) => {
 		const imageId = execa.sync('sh', ['-c', `docker image ls ${item.image} -q`]);
 		if (imageId.stdout === '') {
 			result = false;
@@ -150,9 +150,11 @@ function _build({ opsPath, opsCommit, opsBranch }) {
 		execa.sync('sh', ['-c', `cd ${opsPath} && git checkout ${opsCommit}`]);
 	}
 	console.log(gray('  get dependencies'));
-	execa.sync('sh', ['-c', `cd ${opsPath} && yarn `]);
+	// needed options for execa.sync https://github.com/sindresorhus/execa/issues/473
+	const yarnOpts = { stdout: 'inherit', stderr: 'inherit', shell: true, cwd: opsPath };
+	execa.sync('sh', ['-c', `yarn `], yarnOpts);
 	console.log(gray('  build'));
-	execa.sync('sh', ['-c', `cd ${opsPath} && yarn build `]);
+	execa.sync('sh', ['-c', `yarn build `], yarnOpts);
 }
 
 function _buildOps({ opsPath }) {

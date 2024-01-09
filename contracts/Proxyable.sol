@@ -12,7 +12,6 @@ contract Proxyable is Owned {
 
     /* The proxy this contract exists behind. */
     Proxy public proxy;
-    Proxy public integrationProxy;
 
     /* The caller of the proxy, passed through to this contract.
      * Note that every function using this member must apply the onlyProxy or
@@ -32,42 +31,38 @@ contract Proxyable is Owned {
         emit ProxyUpdated(_proxy);
     }
 
-    function setIntegrationProxy(address payable _integrationProxy) external onlyOwner {
-        integrationProxy = Proxy(_integrationProxy);
-    }
-
     function setMessageSender(address sender) external onlyProxy {
         messageSender = sender;
     }
 
-    modifier onlyProxy {
+    modifier onlyProxy() {
         _onlyProxy();
         _;
     }
 
     function _onlyProxy() private view {
-        require(Proxy(msg.sender) == proxy || Proxy(msg.sender) == integrationProxy, "Only the proxy can call");
+        require(Proxy(msg.sender) == proxy, "Only the proxy can call");
     }
 
-    modifier optionalProxy {
+    modifier optionalProxy() {
         _optionalProxy();
         _;
     }
 
     function _optionalProxy() private {
-        if (Proxy(msg.sender) != proxy && Proxy(msg.sender) != integrationProxy && messageSender != msg.sender) {
+        if (Proxy(msg.sender) != proxy && messageSender != msg.sender) {
             messageSender = msg.sender;
         }
     }
 
-    modifier optionalProxy_onlyOwner {
+    modifier optionalProxy_onlyOwner() {
         _optionalProxy_onlyOwner();
         _;
     }
 
     // solhint-disable-next-line func-name-mixedcase
     function _optionalProxy_onlyOwner() private {
-        if (Proxy(msg.sender) != proxy && Proxy(msg.sender) != integrationProxy && messageSender != msg.sender) {
+        if (Proxy(msg.sender) != proxy && messageSender != msg.sender) {
             messageSender = msg.sender;
         }
         require(messageSender == owner, "Owner only function");

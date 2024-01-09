@@ -5,7 +5,7 @@ import "./Owned.sol";
 import "./MixinResolver.sol";
 import "./interfaces/ISynthetixBridgeEscrow.sol";
 
-// External references.
+// Internal references.
 import "openzeppelin-solidity-2.3.0/contracts/token/ERC20/SafeERC20.sol";
 
 contract SynthetixBridgeEscrow is Owned, ISynthetixBridgeEscrow {
@@ -13,11 +13,7 @@ contract SynthetixBridgeEscrow is Owned, ISynthetixBridgeEscrow {
 
     constructor(address _owner) public Owned(_owner) {}
 
-    function approveBridge(
-        address _token,
-        address _bridge,
-        uint256 _amount
-    ) external onlyOwner {
+    function approveBridge(address _token, address _bridge, uint256 _amount) external onlyOwner {
         IERC20(_token).safeApprove(_bridge, _amount);
         emit BridgeApproval(_token, _bridge, _amount);
     }

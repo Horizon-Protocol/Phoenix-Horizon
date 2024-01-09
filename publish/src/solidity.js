@@ -17,7 +17,7 @@ const findSolFiles = ({ sourcePath, ignore = [] }) => {
 		for (const file of files) {
 			const fullPath = path.join(cd, file);
 			const relativePath = path.join(curRelativePath, file);
-			if (ignore.filter(regex => regex.test(relativePath)).length > 0) {
+			if (ignore.filter((regex) => regex.test(relativePath)).length > 0) {
 				continue;
 			} else if (fs.existsSync(fullPath) && fs.statSync(fullPath).isDirectory()) {
 				doWork(fullPath, relativePath, fileList);
@@ -39,7 +39,7 @@ module.exports = {
 
 	getLatestSolTimestamp(dir) {
 		let latestSolTimestamp = 0;
-		Object.keys(findSolFiles({ sourcePath: dir })).forEach(file => {
+		Object.keys(findSolFiles({ sourcePath: dir })).forEach((file) => {
 			const sourceFilePath = path.join(dir, file);
 			latestSolTimestamp = Math.max(latestSolTimestamp, fs.statSync(sourceFilePath).mtimeMs);
 		});
@@ -63,9 +63,9 @@ module.exports = {
 		return flattenedContracts;
 	},
 
-	compile({ sources, runs, useOvm }) {
+	compile({ sources, runs }) {
 		// Note: require this here as silent error is detected on require that impacts pretty-error
-		const solc = useOvm ? require('@eth-optimism/solc') : require('solc');
+		const solc = require('solc');
 
 		const artifacts = [];
 		const output = JSON.parse(
@@ -88,8 +88,8 @@ module.exports = {
 			)
 		);
 
-		const warnings = output.errors ? output.errors.filter(e => e.severity === 'warning') : [];
-		const errors = output.errors ? output.errors.filter(e => e.severity === 'error') : [];
+		const warnings = output.errors ? output.errors.filter((e) => e.severity === 'warning') : [];
+		const errors = output.errors ? output.errors.filter((e) => e.severity === 'error') : [];
 
 		// Ok, now pull the contract we care about out of each file's output.
 		for (const contract of Object.keys(output.contracts || {})) {
@@ -112,7 +112,7 @@ module.exports = {
 		}
 		const compiled = fs
 			.readdirSync(compiledSourcePath)
-			.filter(name => /^.+\.json$/.test(name))
+			.filter((name) => /^.+\.json$/.test(name))
 			.reduce((memo, contractFilename) => {
 				const contract = contractFilename.replace(/\.json$/, '');
 				const sourceFile = path.join(compiledSourcePath, contractFilename);
