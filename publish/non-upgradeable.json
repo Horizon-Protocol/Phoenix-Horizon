@@ -1,0 +1,14 @@
+[
+	"Depot",
+	"EternalStorage",
+	"ExchangeState",
+	"FeePoolEternalStorage",
+	"FeePoolState",
+	"Proxy",
+	"ProxyERC20",
+	"RewardsDistribution",
+	"SynthetixEscrow",
+	"SynthetixState",
+	"TokenState",
+	"ReadProxyAddressResolver"
+]

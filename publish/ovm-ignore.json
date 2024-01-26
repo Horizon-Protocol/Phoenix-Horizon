@@ -1,0 +1,8 @@
+[
+	"CollateralErc20",
+	"CollateralEth",
+	"ExchangerWithFeeRecAlternatives",
+	"FakeTradingRewards",
+	"Synthetix",
+	"NativeEtherWrapper"
+]
