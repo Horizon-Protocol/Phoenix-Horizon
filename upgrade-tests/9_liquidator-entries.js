@@ -10,12 +10,14 @@ const liquidatorEntries = async () => {
     const options = program.opts();
     console.log('FolderName', options.folder);
 
-    console.log(`Reading function initiated using multicall from LiquidatorRewards  for ${users.length}`);
+    const LiquidatorRewards = await getContractFromResolver('LiquidatorRewards');
+    console.log(`Reading function initiated using multicall from LiquidatorRewards at ${LiquidatorRewards.address}  for ${users.length}`);
 
     const abi = [
         'function initiated(address) external view returns (bool)',
     ]
-    const LiquidatorRewards = new ethers.Contract(getContractFromDeployment('LiquidatorRewards'), abi, provider);
+    // const LiquidatorRewards = new ethers.Contract(getContractFromDeployment('LiquidatorRewards'), abi, provider);
+
     
 
     let liquidatorEntries = [];

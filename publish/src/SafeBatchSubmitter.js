@@ -119,7 +119,7 @@ class SafeBatchSubmitter {
 			
 			console.log("PROPOSED TXNS DONE");
 			return { transactions, nonce };
-		} catch (e) {
+		} catch (err) {
 			throw Error(`Error trying to submit batch to safe.\n${err}`);
 		}
 	}
