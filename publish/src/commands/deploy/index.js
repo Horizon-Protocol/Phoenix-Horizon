@@ -53,7 +53,7 @@ const systemAndParameterCheck = require('./system-and-parameter-check');
 // const takeDebtSnapshotWhenRequired = require('./take-debt-snapshot-when-required');
 
 const DEFAULTS = {
-	priorityGasPrice: '1',
+	priorityGasPrice: '3',
 	debtSnapshotMaxDeviation: 0.01, // a 1 percent deviation will trigger a snapshot
 	network: 'testnet',
 	buildPath: path.join(__dirname, '..', '..', '..', '..', BUILD_FOLDER),
@@ -166,12 +166,13 @@ const deploy = async ({
 	console.log(gray('Loading the compiled contracts locally...'));
 	const { earliestCompiledTimestamp, compiled } = loadCompiledFiles({ buildPath });
 
-	const { privateKey: envPrivateKey, explorerLinkPrefix } = loadConnections({
+	const { providerUrl: url, privateKey: envPrivateKey, explorerLinkPrefix } = loadConnections({
 		network,
 		useFork,
 		useOvm,
 	});
 
+	providerUrl = url;
 	// Here we set a default private key for local-ovm deployment, as the
 	// OVM geth node has no notion of local/unlocked accounts.
 	// Deploying without a private key will give the error "OVM: Unsupported RPC method",

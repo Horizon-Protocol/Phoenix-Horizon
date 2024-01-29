@@ -20,7 +20,7 @@ const {
 const { performTransactionalStep } = require('../command-utils/transact');
 
 const DEFAULTS = {
-	priorityGasPrice: '1',
+	priorityGasPrice: '3',
 };
 
 const nominate = async ({
