@@ -1,6 +1,6 @@
 {
-	"name": "@rout-horizon/testnet-contracts",
-	"version": "2.80.9",
+	"name": "@horizon-protocol/smart-contract",
+	"version": "2.50.12",
 	"license": "MIT",
 	"author": "Horizon",
 	"description": "The smart contracts which make up the Horizon system.",
@@ -33,7 +33,7 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/rout-horizon/horizon-testnet.git"
+		"url": "https://github.com/Horizon-Protocol/Horizon-Smart-Contract.git"
 	},
 	"publishConfig": {
 		"access": "public"
@@ -66,7 +66,7 @@
 	"main": "index.js",
 	"browser": "browser.js",
 	"bugs": {
-		"url": "https://github.com/rout-horizon/horizon-testnet.git/issues"
+		"url": "https://github.com/Horizon-Protocol/Horizon-Smart-Contract.git"
 	},
 	"homepage": "https://www.horizonprotocol.com/",
 	"directories": {
