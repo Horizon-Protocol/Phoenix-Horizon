@@ -1267,8 +1267,9 @@
 		"contracts": {
 			"FuturesMarketManager": {
 				"address": "0x950eF7F5BeE940c6545Ee1c56634BCa9760A0dc2",
-				"status": "current",
-				"keccak256": "0x85f00ff030d03c32833d702e2ddb93541a0aed94d00b971a7869e991cdf2af23"
+				"status": "replaced",
+				"keccak256": "0x85f00ff030d03c32833d702e2ddb93541a0aed94d00b971a7869e991cdf2af23",
+				"replaced_in": "v3.0.0"
 			},
 			"PerpsV2MarketData": {
 				"address": "0xA91531ef1C8F07Eb6bC8722D884fE64a7A32AE34",
@@ -1443,6 +1444,20 @@
 				"address": "0xe5b4a0998A487B7A48bb4AAA7adFbb89D5d91928",
 				"status": "current",
 				"keccak256": "0x7183b87ad25cdb93c6e8dd2d7cb5a6b8cd538c05b905fc734cb203272a592df2"
+			}
+		}
+	},
+	"v3.0.0": {
+		"tag": "v3.0.0",
+		"fulltag": "v3.0.0",
+		"network": "testnet",
+		"date": "2024-01-26T21:52:43+05:30",
+		"commit": "a396fe45348352ca17ca691de4c21be2f312e58c",
+		"contracts": {
+			"FuturesMarketManager": {
+				"address": "0xDA0b4678d355F4efc1547A7B04ff086e501774c6",
+				"status": "current",
+				"keccak256": "0x7329d52e1f612f8042e75d406fddd5f62be7c68a2ed362c5d043578a3a05cebc"
 			}
 		}
 	}
