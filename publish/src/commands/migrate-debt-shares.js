@@ -152,7 +152,7 @@ module.exports = {
 			.command('migrate-debt-shares')
 			.description('Migrate to Debt Shares from debtLedger')
 			.option('-g, --max-fee-per-gas <value>', 'Maximum base gas fee price in GWEI')
-			.option('--max-priority-fee-per-gas <value>', 'Priority gas fee price in GWEI', '2')
+			.option('--max-priority-fee-per-gas <value>', 'Priority gas fee price in GWEI', '3')
 			.option('-n, --network <value>', 'The network to run off.', x => x.toLowerCase(), 'kovan')
 			.option(
 				'-k, --use-fork',
@@ -171,6 +171,6 @@ module.exports = {
 				'Forgive debt amounts for holders who have less than the given threshold of debt',
 				'0'
 			)
-			.option('--batch-size <value>', 'Number of addresses per import transaction', 200)
+			.option('--batch-size <value>', 'Number of addresses per import transaction', 1500)
 			.action(migrateDebtShares),
 };

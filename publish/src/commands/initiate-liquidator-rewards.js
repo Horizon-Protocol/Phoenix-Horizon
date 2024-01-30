@@ -328,7 +328,7 @@ const initiateLiquidatorRewards = async ({
 	
 	let filteredAddresses = JSON.parse(fs.readFileSync('./positiveDebtBalances-users.json'));
 
-	console.log('filteredAddresses updating entries for ', filteredAddresses, 'addresses');
+	// console.log('filteredAddresses updating entries for ', filteredAddresses, 'addresses');
 	console.log('filteredAddresses updating entries for ', filteredAddresses.length, 'addresses');
 
 	// Update liquidator rewards entries for all stakers.
@@ -337,7 +337,7 @@ const initiateLiquidatorRewards = async ({
 		(a) => LiquidatorRewards.populateTransaction.updateEntry(a),
 		(a, r) => {},
 		1, // 0 = READ; 1 = WRITE;
-		150 // L1 max size = ~200; L2 max size = ~150;
+		350 // L1 max size = ~200; L2 max size = ~150;
 	);
 
 	// Multicall function definition
@@ -371,6 +371,8 @@ const initiateLiquidatorRewards = async ({
 				const gasUsage = await MultiCall.estimateGas.aggregate3(calls);
 				const tx = await MultiCall.aggregate3(calls, {
 					gasLimit: gasUsage,
+					maxPriorityFeePerGas: '3000000000', // Recommended maxPriorityFeePerGas
+    				maxFeePerGas: '3000000000', // Recommended maxFeePerGas
 				});
 				console.log('submitted tx:', tx.hash);
 				await tx.wait();
@@ -390,7 +392,7 @@ module.exports = {
 			.command('initiate-liquidator-rewards')
 			.description('Initialize entries for liquidator rewards')
 			.option('-g, --max-fee-per-gas <value>', 'Maximum base gas fee price in GWEI')
-			.option('--max-priority-fee-per-gas <value>', 'Priority gas fee price in GWEI', '2')
+			.option('--max-priority-fee-per-gas <value>', 'Priority gas fee price in GWEI', '3')
 			.option('-n, --network <value>', 'The network to run off.', (x) => x.toLowerCase(), 'testnet')
 			.option(
 				'-k, --use-fork',

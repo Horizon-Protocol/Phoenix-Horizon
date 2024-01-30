@@ -949,8 +949,9 @@
 			},
 			"SupplySchedule": {
 				"address": "0xD5AC10780Be4A4F757b3b8199E544BEa9dEE39B2",
-				"status": "current",
-				"keccak256": "0x71525c13f5c9911c7555e9758bff5d5b8e389b696f55a20404fb4ee754a19a92"
+				"status": "replaced",
+				"keccak256": "0x71525c13f5c9911c7555e9758bff5d5b8e389b696f55a20404fb4ee754a19a92",
+				"replaced_in": "v3.0.1"
 			},
 			"ZassetzUSD": {
 				"address": "0x7F11125A2f22e1DCc19213475267D2dD2f838FF5",
@@ -1196,6 +1197,20 @@
 				"address": "0x5A740037688589B26d6008BC1b32786dB6B41B40",
 				"status": "current",
 				"keccak256": "0xcc6f21a5aa9b1362e21832d800dbf0abda52baf7e5b32f1c3636e8336ff55c29"
+			}
+		}
+	},
+	"v3.0.1": {
+		"tag": "v3.0.1",
+		"fulltag": "v3.0.1",
+		"network": "mainnet",
+		"date": "2024-01-29T09:44:26-08:00",
+		"commit": "f6b6b4702cffdfe1b6f3572cb0e9f81de1b6903f",
+		"contracts": {
+			"SupplySchedule": {
+				"address": "0x45151b3B1FFF51D404e7fCdB2A4067eD50165a55",
+				"status": "current",
+				"keccak256": "0x069c1087648181ee4d728e643fbade02a8dddc37a90f5e7682c8c7d6513a752e"
 			}
 		}
 	}
