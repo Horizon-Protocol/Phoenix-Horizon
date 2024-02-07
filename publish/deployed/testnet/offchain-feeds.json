@@ -1,14 +1,20 @@
 [
 	{
 		"kind": "pyth",
-		"oracle": "0xd7308b14BF4008e7C7196eC35610B1427C5702EA",
+		"oracle": "0x5744Cbf430D99456a0A8771208b674F27f8EF0Fb",
 		"asset": "zBNB",
-		"feedId": "0xecf553770d9b10965f8fb64771e93f5690a182edc32be4a3236e0caaa6e0581a"
+		"feedId": "0x2f95862b045670cd22bee3114c39763a4a08beeb663b145d283c31d7d1101c4f"
 	},
 	{
 		"kind": "pyth",
-		"oracle": "0xd7308b14BF4008e7C7196eC35610B1427C5702EA",
+		"oracle": "0x5744Cbf430D99456a0A8771208b674F27f8EF0Fb",
 		"asset": "zBTC",
-		"feedId": "0xf9c0172ba10dfa4d19088d94f5bf61d3b54d5bd7483a322a982e1373ee8ea31b"
+		"feedId": "0xe62df6c8b4a85fe1a67db44dc12de5db330f7ac66b72dc658afedf0f4a415b43"
+	},
+	{
+		"kind": "pyth",
+		"oracle": "0x5744Cbf430D99456a0A8771208b674F27f8EF0Fb",
+		"asset": "zETH",
+		"feedId": "0xff61491a931112ddf1bd8147cd1b641375f79f5825126d665480874634fd0ace"
 	}
 ]

@@ -249,6 +249,8 @@ const owner = async ({
 		// prevent dupes if some contracts are in there twice (looking at you ProxyERC20 and ProxyERC20sUSD)
 		const appendedOwnerCache = {};
 		for (const contract of Object.keys(config)) {
+			if(contract == 'OneNetAggregatorDebtRatio' || contract == 'OneNetAggregatorIssuedSynths') continue;
+
 			if (!deployment.targets[contract]) {
 				const msg = yellow(`WARNING: contract ${contract} not found in deployment file`);
 				console.log(msg);

@@ -1,22 +1,11 @@
 [
 	{
-		"name": "COLLATERAL_SHORT",
-		"value": {
-			"SYNTHS": ["zDAI"],
-			"MIN_CRATIO": "1200000000000000000",
-			"MIN_COLLATERAL": "100000000000000000000",
-			"ISSUE_FEE_RATE": "4000000000000000",
-			"INTERACTION_DELAY": "0",
-			"COLLAPSE_FEE_RATE": "0"
-		}
-	},
-	{
 		"name": "LIQUIDATION_DELAY",
-		"value": "180"
+		"value": "43200"
 	},
 	{
 		"name": "LIQUIDATION_RATIO",
-		"value": "500000000000000000"
+		"value": "666666666666666666"
 	},
 	{
 		"name": "FLAG_REWARD",

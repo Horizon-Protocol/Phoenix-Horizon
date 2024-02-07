@@ -26,33 +26,8 @@
 		"subclass": "MultiCollateralSynth"
 	},
 	{
-		"name": "zADA",
-		"asset": "ADA",
-		"subclass": "MultiCollateralSynth"
-	},
-	{
-		"name": "zCAKE",
-		"asset": "CAKE",
-		"subclass": "MultiCollateralSynth"
-	},
-	{
-		"name": "zDOT",
-		"asset": "DOT",
-		"subclass": "MultiCollateralSynth"
-	},
-	{
 		"name": "zLINK",
 		"asset": "LINK",
-		"subclass": "MultiCollateralSynth"
-	},
-	{
-		"name": "zXRP",
-		"asset": "XRP",
-		"subclass": "MultiCollateralSynth"
-	},
-	{
-		"name": "zDAI",
-		"asset": "DAI",
 		"subclass": "MultiCollateralSynth"
 	}
 ]

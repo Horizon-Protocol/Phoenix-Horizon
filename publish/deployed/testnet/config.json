@@ -74,9 +74,6 @@
 	"ZassetzBTC": {
 		"deploy": false
 	},
-	"ProxyERC20": {
-		"deploy": false
-	},
 	"ProxyFeePool": {
 		"deploy": false
 	},
@@ -104,15 +101,6 @@
 	"TokenStatezBTC": {
 		"deploy": false
 	},
-	"TokenStatezETH": {
-		"deploy": false
-	},
-	"ProxyzETH": {
-		"deploy": false
-	},
-	"ZassetzETH": {
-		"deploy": false
-	},
 	"TokenStatezBNB": {
 		"deploy": false
 	},
@@ -120,9 +108,6 @@
 		"deploy": false
 	},
 	"ZassetzBNB": {
-		"deploy": false
-	},
-	"ProxyERC20zUSD": {
 		"deploy": false
 	},
 	"FlexibleStorage": {
@@ -144,15 +129,6 @@
 		"deploy": false
 	},
 	"CollateralManagerState": {
-		"deploy": false
-	},
-	"CollateralStateErc20": {
-		"deploy": false
-	},
-	"CollateralStateEth": {
-		"deploy": false
-	},
-	"CollateralStateShort": {
 		"deploy": false
 	},
 	"CollateralShort": {
@@ -185,70 +161,10 @@
 	"CollateralUtil": {
 		"deploy": false
 	},
-	"TokenStatezADA": {
-		"deploy": false
-	},
-	"ProxyzADA": {
-		"deploy": false
-	},
-	"ZassetzADA": {
-		"deploy": false
-	},
-	"TokenStatezCAKE": {
-		"deploy": false
-	},
-	"ProxyzCAKE": {
-		"deploy": false
-	},
-	"ZassetzCAKE": {
-		"deploy": false
-	},
-	"TokenStatezDOT": {
-		"deploy": false
-	},
-	"ProxyzDOT": {
-		"deploy": false
-	},
-	"ZassetzDOT": {
-		"deploy": false
-	},
-	"TokenStatezLINK": {
-		"deploy": false
-	},
-	"ProxyzLINK": {
-		"deploy": false
-	},
-	"ZassetzLINK": {
-		"deploy": false
-	},
-	"ZassetzMATIC": {
-		"deploy": false
-	},
-	"TokenStatezXRP": {
-		"deploy": false
-	},
-	"ProxyzXRP": {
-		"deploy": false
-	},
-	"ZassetzXRP": {
-		"deploy": false
-	},
-	"ZassetzDOGE": {
-		"deploy": false
-	},
 	"SystemSettingsLib": {
 		"deploy": false
 	},
 	"SynthetixDebtShare": {
-		"deploy": false
-	},
-	"TokenStatezDAI": {
-		"deploy": false
-	},
-	"ProxyzDAI": {
-		"deploy": false
-	},
-	"ZassetzDAI": {
 		"deploy": false
 	},
 	"SignedSafeDecimalMath": {
@@ -272,21 +188,6 @@
 	"FuturesMarketSettings": {
 		"deploy": false
 	},
-	"FuturesMarketBTC": {
-		"deploy": false
-	},
-	"FuturesMarketBNB": {
-		"deploy": false
-	},
-	"FuturesMarketLINK": {
-		"deploy": false
-	},
-	"FuturesMarketCAKE": {
-		"deploy": false
-	},
-	"FuturesMarketADA": {
-		"deploy": false
-	},
 	"Liquidator": {
 		"deploy": false
 	},
@@ -294,9 +195,6 @@
 		"deploy": false
 	},
 	"CircuitBreaker": {
-		"deploy": false
-	},
-	"FuturesMarketDebtRatio": {
 		"deploy": false
 	},
 	"RewardEscrowV2Storage": {
@@ -335,15 +233,6 @@
 	"PerpsV2OffchainDelayedOrderBNBPERP": {
 		"deploy": false
 	},
-	"PerpsV2MarketLiquidateBNBPERP": {
-		"deploy": false
-	},
-	"PerpsV2DelayedIntentBNBPERP": {
-		"deploy": false
-	},
-	"PerpsV2DelayedExecutionBNBPERP": {
-		"deploy": false
-	},
 	"PerpsV2ProxyBTCPERP": {
 		"deploy": false
 	},
@@ -351,6 +240,42 @@
 		"deploy": false
 	},
 	"PerpsV2MarketBTCPERP": {
+		"deploy": false
+	},
+	"PerpsV2MarketViewsBTCPERP": {
+		"deploy": false
+	},
+	"PerpsV2DelayedOrderBTCPERP": {
+		"deploy": false
+	},
+	"PerpsV2OffchainDelayedOrderBTCPERP": {
+		"deploy": false
+	},
+	"TokenStatezETH": {
+		"deploy": false
+	},
+	"ProxyzETH": {
+		"deploy": false
+	},
+	"ZassetzETH": {
+		"deploy": false
+	},
+	"TokenStatezLINK": {
+		"deploy": false
+	},
+	"ProxyzLINK": {
+		"deploy": false
+	},
+	"ZassetzLINK": {
+		"deploy": false
+	},
+	"PerpsV2MarketLiquidateBNBPERP": {
+		"deploy": false
+	},
+	"PerpsV2DelayedIntentBNBPERP": {
+		"deploy": false
+	},
+	"PerpsV2DelayedExecutionBNBPERP": {
 		"deploy": false
 	},
 	"PerpsV2MarketLiquidateBTCPERP": {
@@ -362,7 +287,25 @@
 	"PerpsV2DelayedExecutionBTCPERP": {
 		"deploy": false
 	},
-	"PerpsV2MarketViewsBTCPERP": {
+	"PerpsV2ProxyETHPERP": {
+		"deploy": false
+	},
+	"PerpsV2MarketStateETHPERP": {
+		"deploy": false
+	},
+	"PerpsV2MarketETHPERP": {
+		"deploy": false
+	},
+	"PerpsV2MarketLiquidateETHPERP": {
+		"deploy": false
+	},
+	"PerpsV2DelayedIntentETHPERP": {
+		"deploy": false
+	},
+	"PerpsV2DelayedExecutionETHPERP": {
+		"deploy": false
+	},
+	"PerpsV2MarketViewsETHPERP": {
 		"deploy": false
 	}
 }
