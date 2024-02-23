@@ -196,6 +196,7 @@ const loadConnections = ({ network, useFork, useOvm }) => {
 	const etherscanUrl = `https://api${network !== 'mainnet' ? `-${network}` : ''}${
 		useOvm ? '-optimistic' : ''
 	}.bscscan.com/api`;
+	// const etherscanUrl = 'https://api-testnet.polygonscan.com/api';
 
 	const explorerLinkPrefix = getExplorerLinkPrefix({ network, useOvm });
 
