@@ -30,12 +30,12 @@ contract EtherWrapper is Owned, Pausable, MixinResolver, MixinSystemSettings, IE
     /* ========== ENCODED NAMES ========== */
 
     bytes32 internal constant zUSD = "zUSD";
-    bytes32 internal constant zBNB = "zBNB";
-    bytes32 internal constant BNB = "BNB";
+    bytes32 internal constant zBNB = "zMATIC";
+    bytes32 internal constant BNB = "MATIC";
     bytes32 internal constant HZN = "HZN";
 
     /* ========== ADDRESS RESOLVER CONFIGURATION ========== */
-    bytes32 private constant CONTRACT_ZASSETZBNB = "ZassetzBNB";
+    bytes32 private constant CONTRACT_ZASSETZBNB = "ZassetzMATIC";
     bytes32 private constant CONTRACT_ZASSETZUSD = "ZassetzUSD";
     bytes32 private constant CONTRACT_ISSUER = "Issuer";
     bytes32 private constant CONTRACT_EXRATES = "ExchangeRates";
