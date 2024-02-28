@@ -256,5 +256,20 @@
 	},
 	"PerpsV2MarketViewsETHPERP": {
 		"deploy": false
+	},
+	"SynthUtil": {
+		"deploy": false
+	},
+	"DappMaintenance": {
+		"deploy": false
+	},
+	"CollateralErc20": {
+		"deploy": false
+	},
+	"CollateralEth": {
+		"deploy": false
+	},
+	"RewardEscrowV2Frozen": {
+		"deploy": false
 	}
 }
