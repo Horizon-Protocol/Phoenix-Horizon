@@ -73,7 +73,7 @@
 			"TokenStateSynthetix": {
 				"address": "0x29624Bcb2211d643533eCc2Ab33e97E01B66e40C",
 				"status": "current",
-				"keccak256": "0xcd2fcbf75cd15641b7b39c8c785306cc891b655d9361e345ee344b1caef5f6b4",
+				"keccak256": "0xcd2fcbf75cd15641b7b39c8c785306cc891b655d9361e345ee344b1caef5f6b4"
 			},
 			"ProxySynthetix": {
 				"address": "0xc61B323a0a043E01e1E91Cd6Ac76a53a86587032",
@@ -83,7 +83,7 @@
 			"Synthetix": {
 				"address": "0xB0E86E3eBba425177D4728fadac66E67a87C6e0C",
 				"status": "current",
-				"keccak256": "0x9c9f38394999a35d5a82c2cb8bdb146b40235da09ee4df259b31003df2478527",
+				"keccak256": "0x9c9f38394999a35d5a82c2cb8bdb146b40235da09ee4df259b31003df2478527"
 			},
 			"RewardEscrow": {
 				"address": "0xd3573e6A4CB3f8017697F4dcf52C1a216fF05391",
@@ -91,15 +91,14 @@
 				"keccak256": "0xc74a4e6eefa6d79872e31573880a3b80e9efc7f98b72c0186355bad13df78fda"
 			},
 			"RewardEscrowV2Storage": {
-				"address": "0x175cd42F21e6ab235822cAffD346a5E51cEfde16",
+				"address": "0x678Aeca732A311E10fdA42fA7FD576494997210d",
 				"status": "current",
 				"keccak256": "0x1455cd2b8b6dd17e862449c8eb6d3f528c6a86506db202191a322f6407ee6b6b"
 			},
 			"RewardEscrowV2": {
-				"address": "0x2bC2290863B3841C0A72d722Ba6FF8b8c04EF981",
-				"status": "replaced",
-				"keccak256": "0x202c44e27541d0244eada62709846a8e3df465b4cb37d78094a1e0eb40397072",
-				"replaced_in": "v4.0.1"
+				"address": "0xf5D893E46F581872F429e406f506B3571f015958",
+				"status": "current",
+				"keccak256": "0x202c44e27541d0244eada62709846a8e3df465b4cb37d78094a1e0eb40397072"
 			},
 			"SynthetixEscrow": {
 				"address": "0x3603d7b9922d90f9058F4FE099Ec5c43a976002b",
@@ -437,6 +436,11 @@
 				"address": "0x22362d32be605737b2f92DC895e83C07CFC57446",
 				"status": "current",
 				"keccak256": "0xab754137889550fb1f5ef7631d9ce6a37902ad8bc947ca3e917a028367e34a4e"
+			},
+			"RewardEscrowV2Frozen": {
+				"address": "0x0348E5920E9D069D769ff1b953B07B2fB26A7362",
+				"status": "current",
+				"keccak256": "0x68fc92c9840bd93e91495ec9a0d072ff131fdba472b639e6bc1497db03078a50"
 			}
 		}
 	},
@@ -447,11 +451,6 @@
 		"date": "2024-02-23T21:02:02+05:30",
 		"commit": "c67de8171524e7506ee523d9cdf908d48874fad1",
 		"contracts": {
-			"RewardEscrowV2": {
-				"address": "0xf5D893E46F581872F429e406f506B3571f015958",
-				"status": "current",
-				"keccak256": "0x202c44e27541d0244eada62709846a8e3df465b4cb37d78094a1e0eb40397072"
-			},
 			"EtherWrapper": {
 				"address": "0xA0bB8f19F3A94918A74e9ae342c74a9744B89C10",
 				"status": "current",

@@ -153,6 +153,7 @@ module.exports = async ({
 		}); // only reset token state if redeploying
 	}
 
+
 	if (TokenStateSynthetix && config['TokenStateSynthetix'].deploy) {
 		const initialIssuance = await getDeployParameter('INITIAL_ISSUANCE');
 		await runStep({

@@ -144,6 +144,7 @@ module.exports = async ({
 			// side-effect
 			for (const contractDepName of requiredAddressesForContract) {
 				const contractDepNameParsed = ethers.utils.parseBytes32String(contractDepName);
+				console.log(targetContractAddress, contractDepNameParsed, contractDepName);
 				// collect all contract maps
 				contractToDepMap[contractDepNameParsed] = []
 					.concat(contractToDepMap[contractDepNameParsed] || [])
@@ -156,6 +157,7 @@ module.exports = async ({
 			);
 		}, []);
 
+	
 	// check which resolver addresses are imported
 	const resolvedAddresses = await Promise.all(
 		resolverAddressesRequired.map(id => {

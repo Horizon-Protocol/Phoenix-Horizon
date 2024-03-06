@@ -268,5 +268,8 @@
 	},
 	"CollateralEth": {
 		"deploy": false
+	},
+	"RewardEscrowV2Frozen": {
+		"deploy": false
 	}
 }
