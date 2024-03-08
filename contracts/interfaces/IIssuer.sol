@@ -5,6 +5,16 @@ import "../interfaces/ISynth.sol";
 // https://docs.synthetix.io/contracts/source/interfaces/iissuer
 interface IIssuer {
     // Views
+
+    function allNetworksDebtInfo()
+        external
+        view
+        returns (
+            uint256 debt,
+            uint256 sharesSupply,
+            bool isStale
+        );
+
     function anySynthOrSNXRateIsInvalid() external view returns (bool anyRateInvalid);
 
     function availableCurrencyKeys() external view returns (bytes32[] memory);
@@ -56,7 +66,19 @@ interface IIssuer {
         view
         returns (uint transferable, bool anyRateIsInvalid);
 
+    function liquidationAmounts(address account, bool isSelfLiquidation)
+        external
+        view
+        returns (
+            uint totalRedeemed,
+            uint debtToRemove,
+            uint escrowToLiquidate,
+            uint initialDebtBalance
+        );
+
     // Restricted: used internally to Synthetix
+    function addSynths(ISynth[] calldata synthsToAdd) external;
+
     function issueSynths(address from, uint amount) external;
 
     function issueSynthsOnBehalf(
@@ -87,9 +109,27 @@ interface IIssuer {
         uint balance
     ) external;
 
-    function liquidateDelinquentAccount(
-        address account,
-        uint zUSDAmount,
-        address liquidator
-    ) external returns (uint totalRedeemed, uint amountToLiquidate);
+    function setCurrentPeriodId(uint128 periodId) external;
+
+    function liquidateAccount(address account, bool isSelfLiquidation)
+        external
+        returns (
+            uint totalRedeemed,
+            uint debtRemoved,
+            uint escrowToLiquidate
+        );
+
+    function issueSynthsWithoutDebt(
+        bytes32 currencyKey,
+        address to,
+        uint amount
+    ) external returns (bool rateInvalid);
+
+    function burnSynthsWithoutDebt(
+        bytes32 currencyKey,
+        address to,
+        uint amount
+    ) external returns (bool rateInvalid);
+
+    function modifyDebtSharesForMigration(address account, uint amount) external;
 }

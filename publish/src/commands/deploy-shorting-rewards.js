@@ -31,21 +31,18 @@ const {
 } = require('../../../.');
 
 const DEFAULTS = {
-	gasPrice: '1',
-	methodCallGasLimit: 250e3, // 250k
-	contractDeploymentGasLimit: 6.9e6, // TODO split out into seperate limits for different contracts, Proxys, Synths, Synthetix
-	network: 'kovan',
+	priorityGasPrice: '1',
+	network: 'testnet',
 	buildPath: path.join(__dirname, '..', '..', '..', BUILD_FOLDER),
 	rewardsToDeploy: [],
 };
 
-const addressOf = c => (c ? c.address : '');
+const addressOf = (c) => (c ? c.address : '');
 
 const deployShortingRewards = async ({
 	rewardsToDeploy = DEFAULTS.rewardsToDeploy,
-	gasPrice = DEFAULTS.gasPrice,
-	methodCallGasLimit = DEFAULTS.methodCallGasLimit,
-	contractDeploymentGasLimit = DEFAULTS.contractDeploymentGasLimit,
+	maxFeePerGas,
+	maxPriorityFeePerGas = DEFAULTS.priorityGasPrice,
 	network = DEFAULTS.network,
 	buildPath = DEFAULTS.buildPath,
 	deploymentPath,
@@ -57,16 +54,11 @@ const deployShortingRewards = async ({
 	deploymentPath = deploymentPath || getDeploymentPathForNetwork({ network });
 	ensureDeploymentPath(deploymentPath);
 
-	const {
-		ownerActions,
-		ownerActionsFile,
-		shortingRewards,
-		deployment,
-		deploymentFile,
-	} = loadAndCheckRequiredSources({
-		deploymentPath,
-		network,
-	});
+	const { ownerActions, ownerActionsFile, shortingRewards, deployment, deploymentFile } =
+		loadAndCheckRequiredSources({
+			deploymentPath,
+			network,
+		});
 
 	console.log(
 		gray('Checking all contracts not flagged for deployment have addresses in this network...')
@@ -78,16 +70,16 @@ const deployShortingRewards = async ({
 	// 2. rewardsToken that is not an address
 	const requiredContractDeployments = ['RewardsDistribution', 'CollateralShort'];
 	const requiredTokenDeployments = shortingRewards
-		.map(x => {
-			return [x.rewardsToken].filter(y => !ethers.utils.isAddress(y));
+		.map((x) => {
+			return [x.rewardsToken].filter((y) => !ethers.utils.isAddress(y));
 		})
 		.reduce((acc, x) => acc.concat(x), [])
-		.filter(x => x !== undefined);
+		.filter((x) => x !== undefined);
 	const uniqueRequiredDeployments = Array.from(
 		new Set([].concat(requiredTokenDeployments, requiredContractDeployments))
 	);
 
-	const missingDeployments = uniqueRequiredDeployments.filter(name => {
+	const missingDeployments = uniqueRequiredDeployments.filter((name) => {
 		return !deployment.targets[name] || !deployment.targets[name].address;
 	});
 
@@ -106,7 +98,11 @@ const deployShortingRewards = async ({
 	// now get the latest time a Solidity file was edited
 	const latestSolTimestamp = getLatestSolTimestamp(CONTRACTS_FOLDER);
 
-	const { providerUrl, privateKey: envPrivateKey, explorerLinkPrefix } = loadConnections({
+	const {
+		providerUrl,
+		privateKey: envPrivateKey,
+		explorerLinkPrefix,
+	} = loadConnections({
 		network,
 	});
 
@@ -125,13 +121,12 @@ const deployShortingRewards = async ({
 
 	const deployer = new Deployer({
 		compiled,
-		contractDeploymentGasLimit,
 		config,
 		configFile: null, // null configFile so it doesn't overwrite config.json
 		deployment,
 		deploymentFile,
-		gasPrice,
-		methodCallGasLimit,
+		maxFeePerGas,
+		maxPriorityFeePerGas,
 		network,
 		privateKey,
 		providerUrl,
@@ -143,7 +138,7 @@ const deployShortingRewards = async ({
 	parameterNotice({
 		'Dry Run': dryRun ? green('true') : yellow('⚠ NO'),
 		Network: network,
-		'Gas price to use': `${gasPrice} GWEI`,
+		'Gas Options': `eip-1559 (with fallback) base fee max = ${maxFeePerGas} GWEI, miner tip = ${maxPriorityFeePerGas} GWEI`,
 		'Deployment Path': new RegExp(network, 'gi').test(deploymentPath)
 			? deploymentPath
 			: yellow('⚠⚠⚠ cant find network name in path. Please double check this! ') + deploymentPath,
@@ -195,7 +190,7 @@ const deployShortingRewards = async ({
 		}
 
 		// Try and get addresses for the reward token
-		const [rewardsTokenAddress] = [rewardsToken].map(token => {
+		const [rewardsTokenAddress] = [rewardsToken].map((token) => {
 			// If the token is specified, use that
 			// otherwise will default to ZERO_ADDRESS
 			if (token) {
@@ -237,7 +232,7 @@ const deployShortingRewards = async ({
 		// Deploy contract with deployer as RewardsDistribution.
 		const rewardsContract = await deployer.deployContract({
 			name: shortingRewardNameFixed,
-			deps: [rewardsToken].filter(x => !ethers.utils.isAddress(x)),
+			deps: [rewardsToken].filter((x) => !ethers.utils.isAddress(x)),
 			source: 'ShortingRewards',
 			args: [account, resolverAddress, account, rewardsTokenAddress],
 		});
@@ -245,13 +240,12 @@ const deployShortingRewards = async ({
 		const nonceManager = new NonceManager({});
 		const manageNonces = deployer.manageNonces;
 
-		const runStep = async opts =>
+		const runStep = async (opts) =>
 			performTransactionalStep({
-				gasLimit: methodCallGasLimit, // allow overriding of gasLimit
 				...opts,
 				signer,
-				deployer,
-				gasPrice,
+				maxFeePerGas,
+				maxPriorityFeePerGas,
 				explorerLinkPrefix,
 				ownerActions,
 				ownerActionsFile,
@@ -300,14 +294,14 @@ const deployShortingRewards = async ({
 module.exports = {
 	deployShortingRewards,
 	DEFAULTS,
-	cmd: program =>
+	cmd: (program) =>
 		program
 			.command('deploy-shorting-rewards')
 			.description('Deploy shorting rewards')
 			.option(
 				'-t, --rewards-to-deploy <items>',
 				`Deploys shorting rewards with matching names in ${SHORTING_REWARDS_FILENAME}`,
-				v => v.split(','),
+				(v) => v.split(','),
 				DEFAULTS.rewardsToDeploy
 			)
 			.option(
@@ -316,26 +310,19 @@ module.exports = {
 				DEFAULTS.buildPath
 			)
 			.option(
-				'-c, --contract-deployment-gas-limit <value>',
-				'Contract deployment gas limit',
-				parseInt,
-				DEFAULTS.contractDeploymentGasLimit
-			)
-			.option(
 				'-d, --deployment-path <value>',
 				`Path to a folder that has the rewards file ${SHORTING_REWARDS_FILENAME} and where your ${DEPLOYMENT_FILENAME} files will go`
 			)
-			.option('-g, --gas-price <value>', 'Gas price in GWEI', DEFAULTS.gasPrice)
+			.option('-g, --max-fee-per-gas <value>', 'Maximum base gas fee price in GWEI')
 			.option(
-				'-m, --method-call-gas-limit <value>',
-				'Method call gas limit',
-				parseInt,
-				DEFAULTS.methodCallGasLimit
+				'--max-priority-fee-per-gas <value>',
+				'Priority gas fee price in GWEI',
+				DEFAULTS.priorityGasPrice
 			)
 			.option(
 				'-n, --network <value>',
 				'The network to run off.',
-				x => x.toLowerCase(),
+				(x) => x.toLowerCase(),
 				DEFAULTS.network
 			)
 			.option(

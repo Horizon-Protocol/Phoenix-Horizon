@@ -1,7 +1,7 @@
 'use strict';
 
 const ethers = require('ethers');
-const { gray, yellow, red, cyan } = require('chalk');
+const { gray, yellow, cyan } = require('chalk');
 
 const {
 	getUsers,
@@ -17,9 +17,10 @@ const {
 	confirmAction,
 } = require('../util');
 
+const { performTransactionalStep } = require('../command-utils/transact');
+
 const DEFAULTS = {
-	gasPrice: '15',
-	gasLimit: 2e5, // 200,000
+	priorityGasPrice: '3',
 };
 
 const nominate = async ({
@@ -28,8 +29,8 @@ const nominate = async ({
 	contracts,
 	useFork = false,
 	deploymentPath,
-	gasPrice = DEFAULTS.gasPrice,
-	gasLimit = DEFAULTS.gasLimit,
+	maxFeePerGas,
+	maxPriorityFeePerGas = DEFAULTS.priorityGasPrice,
 	useOvm,
 	privateKey,
 	providerUrl,
@@ -44,31 +45,45 @@ const nominate = async ({
 	}
 
 	if (!newOwner || !ethers.utils.isAddress(newOwner)) {
-		console.error(red('Invalid new owner to nominate. Please check the option and try again.'));
-		process.exit(1);
+		throw Error('Invalid new owner to nominate. Please check the option and try again.');
 	} else {
 		newOwner = newOwner.toLowerCase();
 	}
 
-	const { config, deployment } = loadAndCheckRequiredSources({
+	const { config, deployment, ownerActions, ownerActionsFile } = loadAndCheckRequiredSources({
 		deploymentPath,
 		network,
 	});
 
-	contracts.forEach(contract => {
+	contracts.forEach((contract) => {
 		if (!(contract in config)) {
-			console.error(red(`Contract ${contract} isn't in the config for this deployment!`));
-			process.exit(1);
+			throw Error(`Contract ${contract} isn't in the config for this deployment!`);
 		}
 	});
+
+	// Contracts maintained by non-pDAO owners
+	// DappMaintenance (UI control)
+	// StakingRewardsSNXWETHUniswapV3
+	// StakingRewardssUSDDAIUniswapV3
+	const excludedContracts = [
+		'StakingRewardssUSDDAIUniswapV3',
+		'StakingRewardsSNXWETHUniswapV3',
+		'DappMaintenance',
+	];
+
 	if (!contracts.length) {
-		// if contracts not supplied, use all contracts except the DappMaintenance (UI control)
-		contracts = Object.keys(config).filter(contract => contract !== 'DappMaintenance');
+		// if contracts not supplied, use all contracts except the excluded contracts
+		contracts = Object.keys(config).filter((contract) => !excludedContracts.includes(contract));
 	}
 
-	const { providerUrl: envProviderUrl, privateKey: envPrivateKey } = loadConnections({
+	const {
+		providerUrl: envProviderUrl,
+		privateKey: envPrivateKey,
+		explorerLinkPrefix,
+	} = loadConnections({
 		network,
 		useFork,
+		useOvm,
 	});
 
 	if (!providerUrl) {
@@ -137,24 +152,29 @@ const nominate = async ({
 
 		console.log(
 			gray(
-				`${contract} current owner is ${currentOwner}.\nCurrent nominated owner is ${nominatedOwner}.`
+				`${yellow(contract)} current owner is ${yellow(
+					currentOwner
+				)}.\nCurrent nominated owner is ${yellow(nominatedOwner)}.`
 			)
 		);
-		if (signerAddress.toLowerCase() !== currentOwner) {
-			console.log(cyan(`Cannot nominateNewOwner for ${contract} as you aren't the owner!`));
-		} else if (currentOwner !== newOwner && nominatedOwner !== newOwner) {
+		if (currentOwner !== newOwner && nominatedOwner !== newOwner) {
 			// check for legacy function
 			const nominationFnc =
 				'nominateOwner' in deployedContract ? 'nominateOwner' : 'nominateNewOwner';
 
-			console.log(yellow(`Invoking ${contract}.${nominationFnc}(${newOwner})`));
-			const overrides = {
-				gasLimit,
-				gasPrice: ethers.utils.parseUnits(gasPrice, 'gwei'),
-			};
-
-			const tx = await deployedContract[nominationFnc](newOwner, overrides);
-			await tx.wait();
+			await performTransactionalStep({
+				contract,
+				encodeABI: network === 'mainnet',
+				explorerLinkPrefix,
+				maxFeePerGas,
+				maxPriorityFeePerGas,
+				ownerActions,
+				ownerActionsFile,
+				signer: wallet,
+				target: deployedContract,
+				write: nominationFnc,
+				writeArg: newOwner, // explicitly pass array of args so array not splat as params
+			});
 		} else {
 			console.log(gray('No change required.'));
 		}
@@ -162,14 +182,14 @@ const nominate = async ({
 	if (warnings.length) {
 		console.log(yellow('\nThere were some issues nominating owner\n'));
 		console.log(yellow('---'));
-		warnings.forEach(warning => console.log(warning));
+		warnings.forEach((warning) => console.log(warning));
 		console.log(yellow('---'));
 	}
 };
 
 module.exports = {
 	nominate,
-	cmd: program =>
+	cmd: (program) =>
 		program
 			.command('nominate')
 			.description('Nominate a new owner for one or more contracts')
@@ -177,14 +197,18 @@ module.exports = {
 				'-d, --deployment-path <value>',
 				`Path to a folder that has your input configuration file ${CONFIG_FILENAME} and where your ${DEPLOYMENT_FILENAME} files will go`
 			)
-			.option('-g, --gas-price <value>', 'Gas price in GWEI', '1')
+			.option('-g, --max-fee-per-gas <value>', 'Maximum base gas fee price in GWEI')
+			.option(
+				'--max-priority-fee-per-gas <value>',
+				'Priority gas fee price in GWEI',
+				DEFAULTS.priorityGasPrice
+			)
 			.option(
 				'-k, --use-fork',
 				'Perform the deployment on a forked chain running on localhost (see fork command).',
 				false
 			)
-			.option('-l, --gas-limit <value>', 'Gas limit', parseInt, 15e4)
-			.option('-n, --network <value>', 'The network to run off.', x => x.toLowerCase(), 'kovan')
+			.option('-n, --network <value>', 'The network to run off.', (x) => x.toLowerCase(), 'testnet')
 			.option(
 				'-o, --new-owner <value>',
 				'The address of the new owner (please include the 0x prefix)'

@@ -385,5 +385,56 @@
 	},
 	"ZassetzMATIC": {
 		"deploy": false
+	},
+	"SystemSettingsLib": {
+		"deploy": false
+	},
+	"SignedSafeDecimalMath": {
+		"deploy": false
+	},
+	"ExchangeSettlementLib": {
+		"deploy": false
+	},
+	"OneNetAggregatorIssuedSynths": {
+		"deploy": false
+	},
+	"OneNetAggregatorDebtRatio": {
+		"deploy": false
+	},
+	"RewardEscrowV2Storage": {
+		"deploy": false
+	},
+	"SynthetixDebtShare": {
+		"deploy": false
+	},
+	"Liquidator": {
+		"deploy": false
+	},
+	"LiquidatorRewards": {
+		"deploy": false
+	},
+	"CircuitBreaker": {
+		"deploy": false
+	},
+	"ExchangeCircuitBreaker": {
+		"deploy": false
+	},
+	"WrapperFactory": {
+		"deploy": false
+	},
+	"DirectIntegrationManager": {
+		"deploy": false
+	},
+	"FuturesMarketManager": {
+		"deploy": false
+	},
+	"PerpsV2MarketData": {
+		"deploy": false
+	},
+	"PerpsV2MarketSettings": {
+		"deploy": false
+	},
+	"PerpsV2ExchangeRate": {
+		"deploy": false
 	}
 }

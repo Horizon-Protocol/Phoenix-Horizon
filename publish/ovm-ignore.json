@@ -1,11 +1,8 @@
 [
-	"Collateral",
 	"CollateralErc20",
 	"CollateralEth",
-	"CollateralShort",
-	"ExchangerWithVirtualSynth",
+	"ExchangerWithFeeRecAlternatives",
 	"FakeTradingRewards",
 	"Synthetix",
-	"NativeEtherWrapper",
-	"WETH"
+	"NativeEtherWrapper"
 ]

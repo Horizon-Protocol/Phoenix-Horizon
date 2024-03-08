@@ -4,7 +4,7 @@ const linker = require('solc/linker');
 const ethers = require('ethers');
 const { gray, green, yellow } = require('chalk');
 const fs = require('fs');
-const { stringify, getExplorerLinkPrefix } = require('./util');
+const { stringify, getExplorerLinkPrefix, assignGasOptions } = require('./util');
 const { getVersions, getUsers } = require('../..');
 
 class Deployer {
@@ -15,21 +15,23 @@ class Deployer {
 	 * @param {object} deployment An object with full combined contract name keys mapping to existing deployment addresses (if any)
 	 */
 	constructor({
+		account,
 		compiled,
 		config,
 		configFile,
-		contractDeploymentGasLimit,
 		deployment,
 		deploymentFile,
 		dryRun,
 		gasPrice,
-		methodCallGasLimit,
+		maxFeePerGas,
+		maxPriorityFeePerGas,
 		network,
 		providerUrl,
+		provider,
 		privateKey,
+		signer,
 		useFork,
 		useOvm,
-		ignoreSafetyChecks,
 		nonceManager,
 	}) {
 		this.compiled = compiled;
@@ -39,24 +41,27 @@ class Deployer {
 		this.deploymentFile = deploymentFile;
 		this.dryRun = dryRun;
 		this.gasPrice = gasPrice;
-		this.methodCallGasLimit = methodCallGasLimit;
+		this.maxFeePerGas = maxFeePerGas;
+		this.maxPriorityFeePerGas = maxPriorityFeePerGas;
 		this.network = network;
-		this.contractDeploymentGasLimit = contractDeploymentGasLimit;
 		this.nonceManager = nonceManager;
 		this.useOvm = useOvm;
-		this.ignoreSafetyChecks = ignoreSafetyChecks;
 
-		this.provider = new ethers.providers.JsonRpcProvider(providerUrl);
+		this.provider =
+			provider || new ethers.providers.JsonRpcProvider(providerUrl || 'http://127.0.0.1:8545');
 
+		if (signer) {
+			this.signer = signer;
+		}
 		// use the default owner when in a fork or in local mode and no private key supplied
-		if ((useFork || network === 'local') && !privateKey) {
-			const ownerAddress = getUsers({ network, user: 'owner' }).address; // protocolDAO
+		else if ((useFork || network === 'local') && !privateKey) {
+			const ownerAddress = getUsers({ network, useOvm, user: 'owner' }).address;
 			this.signer = this.provider.getSigner(ownerAddress);
 			this.signer.address = ownerAddress;
 		} else {
 			this.signer = new ethers.Wallet(privateKey, this.provider);
 		}
-		this.account = this.signer.address;
+		this.account = account || this.signer.address;
 		this.deployedContracts = {};
 		this.replacedContracts = {};
 		this._dryRunCounter = 0;
@@ -96,7 +101,7 @@ class Deployer {
 	}
 
 	getEncodedDeploymentParameters({ abi, params }) {
-		const constructorABI = abi.find(item => item.type === 'constructor');
+		const constructorABI = abi.find((item) => item.type === 'constructor');
 		if (!constructorABI) {
 			return '0x';
 		}
@@ -106,17 +111,21 @@ class Deployer {
 			return '0x';
 		}
 
-		const types = inputs.map(input => input.type);
+		const types = inputs.map((input) => input.type);
 		return ethers.utils.defaultAbiCoder.encode(types, params);
 	}
 
 	async sendDummyTx() {
-		const tx = {
-			to: '0x0000000000000000000000000000000000000001',
-			data: '0x0000000000000000000000000000000000000000000000000000000000000000',
-			value: 0,
-			gasPrice: ethers.utils.parseUnits(this.gasPrice.toString(), 'gwei'),
-		};
+		const tx = await assignGasOptions({
+			tx: {
+				to: '0x0000000000000000000000000000000000000001',
+				data: '0x0000000000000000000000000000000000000000000000000000000000000000',
+				value: 0,
+			},
+			provider: this.provider,
+			maxFeePerGas: this.maxFeePerGas,
+			maxPriorityFeePerGas: this.maxPriorityFeePerGas,
+		});
 
 		const response = await this.signer.sendTransaction(tx);
 		await response.wait();
@@ -126,17 +135,13 @@ class Deployer {
 		}
 	}
 
-	async sendOverrides(type = 'method-call') {
-		const gasLimit = this.useOvm
-			? undefined
-			: type === 'method-call'
-			? this.methodCallGasLimit
-			: this.contractDeploymentGasLimit;
-
-		const params = {
-			gasLimit,
-			gasPrice: ethers.utils.parseUnits(this.gasPrice.toString(), 'gwei'),
-		};
+	async sendOverrides() {
+		const params = await assignGasOptions({
+			tx: {},
+			provider: this.provider,
+			maxFeePerGas: this.maxFeePerGas,
+			maxPriorityFeePerGas: this.maxPriorityFeePerGas,
+		});
 
 		if (this.nonceManager) {
 			params.nonce = await this.nonceManager.getNonce();
@@ -150,7 +155,9 @@ class Deployer {
 			console.log(yellow(`Skipping ${name} as it is NOT in contract flags file for deployment.`));
 			return;
 		}
-		const missingDeps = deps.filter(d => !this.deployedContracts[d] && !this.deployment.targets[d]);
+		const missingDeps = deps.filter(
+			(d) => !this.deployedContracts[d] && !this.deployment.targets[d]
+		);
 		if (missingDeps.length) {
 			throw Error(`Cannot deploy ${name} as it is missing dependencies: ${missingDeps.join(',')}`);
 		}
@@ -183,36 +190,20 @@ class Deployer {
 				);
 			}
 
-			if (!this.ignoreSafetyChecks) {
-				const compilerVersion = compiled.metadata.compiler.version;
-				const compiledForOvm = compiled.metadata.compiler.version.includes('ovm');
-				const compilerMismatch =
-					(this.useOvm && !compiledForOvm) || (!this.useOvm && compiledForOvm);
-				if (compilerMismatch) {
-					if (this.useOvm) {
-						throw new Error(
-							`You are deploying on Optimism, but the artifacts were not compiled for Optimism, using solc version ${compilerVersion} instead. Please use the correct compiler and try again.`
-						);
-					} else {
-						throw new Error(
-							`You are deploying on Ethereum, but the artifacts were compiled for Optimism, using solc version ${compilerVersion} instead. Please use the correct compiler and try again.`
-						);
-					}
-				}
-			}
-
 			// Any contract after SafeDecimalMath can automatically get linked.
 			// Doing this with bytecode that doesn't require the library is a no-op.
 			let bytecode = compiled.evm.bytecode.object;
-			['SafeDecimalMath', 'Math'].forEach(contractName => {
-				if (this.deployedContracts[contractName]) {
-					bytecode = linker.linkBytecode(bytecode, {
-						[source + '.sol']: {
-							[contractName]: this.deployedContracts[contractName].address,
-						},
-					});
+			['SafeDecimalMath', 'Math', 'SystemSettingsLib', 'ExchangeSettlementLib'].forEach(
+				contractName => {
+					if (this.deployedContracts[contractName]) {
+						bytecode = linker.linkBytecode(bytecode, {
+							[source + '.sol']: {
+								[contractName]: this.deployedContracts[contractName].address,
+							},
+						});
+					}
 				}
-			});
+			);
 
 			compiled.evm.bytecode.linkedObject = bytecode;
 			console.log(
@@ -221,63 +212,29 @@ class Deployer {
 			let gasUsed;
 			if (dryRun) {
 				this._dryRunCounter++;
-				// use the existing version of a contract in a dry run
-				deployedContract = this.makeContract({ abi: compiled.abi, address: existingAddress });
+				// use the existing version of a contract in a dry run, but deep clone it using JSON stringify
+				// to prevent issues with ethers and readonly
+				deployedContract = JSON.parse(
+					JSON.stringify(this.makeContract({ abi: compiled.abi, address: existingAddress }))
+				);
 				const { account } = this;
 				// but stub out all method calls except owner because it is needed to
 				// determine which actions can be performed directly or need to be added to ownerActions
-				Object.keys(deployedContract.functions).forEach(key => {
+				Object.keys(deployedContract.functions).forEach((key) => {
 					deployedContract.functions[key] = () => ({
 						call: () =>
 							key === 'owner'
 								? Promise.resolve(account)
 								: key === 'resolverAddressesRequired'
-								? Promise.resolve([])
-								: undefined,
+									? Promise.resolve([])
+									: undefined,
 					});
 				});
 				deployedContract.address = '0x' + this._dryRunCounter.toString().padStart(40, '0');
 			} else {
-				// If the contract creation will result in an address that's unsafe for OVM,
-				// increment the tx nonce until its not.
-				// Quite commonly, deployed contract addresses will be used as constructor arguments of
-				// other contracts.
-				if (this.useOvm) {
-					let addressIsSafe = false;
-
-					while (!addressIsSafe) {
-						const calculatedAddress = await this.evaluateNextDeployedContractAddress();
-						addressIsSafe = this.checkBytesAreSafeForOVM(calculatedAddress);
-
-						if (!addressIsSafe) {
-							console.log(
-								yellow(
-									`⚠ WARNING: Deploying this contract would result in the unsafe ${calculatedAddress} address for OVM. Sending a dummy transaction to increase the nonce...`
-								)
-							);
-
-							await this.sendDummyTx();
-						}
-					}
-				}
-
-				// Check if the deployment parameters are safe in OVM
-				// (No need to check the metadata hash since its stripped with the OVM compiler)
-				if (this.useOvm) {
-					const encodedParameters = this.getEncodedDeploymentParameters({
-						abi: compiled.abi,
-						params: args,
-					});
-					if (!this.checkBytesAreSafeForOVM(encodedParameters)) {
-						throw new Error(
-							`Attempting to deploy a contract with unsafe constructor parameters in OVM. Aborting. Encoded parameters: ${encodedParameters} - parameters: ${args}`
-						);
-					}
-				}
-
 				const factory = new ethers.ContractFactory(compiled.abi, bytecode, this.signer);
 
-				const overrides = await this.sendOverrides('contract-deployment');
+				const overrides = await this.sendOverrides();
 
 				deployedContract = await factory.deploy(...args, overrides);
 				const receipt = await deployedContract.deployTransaction.wait();
@@ -298,6 +255,7 @@ class Deployer {
 				});
 				this.replacedContracts[name].source = existingSource;
 			}
+
 			// Deployment in OVM could result in empty bytecode if
 			// the contract's constructor parameters are unsafe.
 			// This check is probably redundant given the previous check, but just in case...
@@ -311,8 +269,7 @@ class Deployer {
 
 			console.log(
 				green(
-					`${dryRun ? '[DRY RUN] - Simulated deployment of' : '- Deployed'} ${name} to ${
-						deployedContract.address
+					`${dryRun ? '[DRY RUN] - Simulated deployment of' : '- Deployed'} ${name} to ${deployedContract.address
 					} ${gasUsed ? `used ${(gasUsed / 1e6).toFixed(1)}m in gas` : ''}`
 				)
 			);
@@ -335,7 +292,7 @@ class Deployer {
 		return deployedContract;
 	}
 
-	async _updateResults({ name, source, deployed, address }) {
+	async _updateResults({ name, source, deployed, address, constructorArgs }) {
 		let timestamp = new Date();
 		let txn = '';
 		if (this.config[name] && !this.config[name].deploy) {
@@ -349,12 +306,12 @@ class Deployer {
 			name,
 			address,
 			source,
-			link: `${getExplorerLinkPrefix({ network, useOvm })}/address/${
-				this.deployedContracts[name].address
-			}`,
+			link: `${getExplorerLinkPrefix({ network, useOvm })}/address/${this.deployedContracts[name].address
+				}`,
 			timestamp,
 			txn,
 			network: this.network,
+			constructorArgs,
 		};
 		if (deployed) {
 			// remove the output from the metadata (don't dupe the ABI)
@@ -387,6 +344,8 @@ class Deployer {
 
 	async deployContract({
 		name,
+		library = false,
+		skipResolver = false,
 		source = name,
 		args = [],
 		deps = [],
@@ -407,11 +366,21 @@ class Deployer {
 		}
 
 		// Deploys contract according to configuration
-		const deployedContract = await this._deploy({ name, source, args, deps, force, dryRun });
+		const deployedContract = await this._deploy({
+			name,
+			source,
+			args,
+			deps,
+			force,
+			dryRun,
+		});
 
 		if (!deployedContract) {
 			return;
 		}
+
+		deployedContract.library = library;
+		deployedContract.skipResolver = skipResolver;
 
 		// Updates `config.json` and `deployment.json`, as well as to
 		// the local variable newContractsDeployed
@@ -420,6 +389,7 @@ class Deployer {
 			source: deployedContract.source,
 			deployed: deployedContract.justDeployed,
 			address: deployedContract.address,
+			constructorArgs: args,
 		});
 
 		return deployedContract;
@@ -429,7 +399,7 @@ class Deployer {
 		return new ethers.Contract(address, abi, this.signer);
 	}
 
-	getExistingContract({ contract }) {
+	getExistingContract({ contract, useDeployment = false }) {
 		let address;
 		if (this.network === 'local') {
 			// try find the last replaced contract
@@ -439,6 +409,8 @@ class Deployer {
 			({ address } = this.replacedContracts[contract]
 				? this.replacedContracts[contract]
 				: this.deployment.targets[contract]);
+		} else if (useDeployment === true) {
+			address = this.deployment.targets[contract].address;
 		} else {
 			const contractVersion = getVersions({
 				network: this.network,
@@ -452,6 +424,14 @@ class Deployer {
 		const { source } = this.deployment.targets[contract];
 		const { abi } = this.deployment.sources[source];
 		return this.makeContract({ abi, address });
+	}
+
+	getExistingAddress({ name }) {
+		const existingAddress = this.deployment.targets[name]
+			? this.deployment.targets[name].address
+			: '';
+
+		return existingAddress;
 	}
 }
 

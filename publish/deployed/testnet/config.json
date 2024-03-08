@@ -41,12 +41,6 @@
 	"Issuer": {
 		"deploy": false
 	},
-	"EternalStorageLiquidations": {
-		"deploy": false
-	},
-	"Liquidations": {
-		"deploy": false
-	},
 	"RewardEscrow": {
 		"deploy": false
 	},
@@ -80,9 +74,6 @@
 	"ZassetzBTC": {
 		"deploy": false
 	},
-	"ProxyERC20": {
-		"deploy": false
-	},
 	"ProxyFeePool": {
 		"deploy": false
 	},
@@ -110,15 +101,6 @@
 	"TokenStatezBTC": {
 		"deploy": false
 	},
-	"TokenStatezETH": {
-		"deploy": false
-	},
-	"ProxyzETH": {
-		"deploy": false
-	},
-	"ZassetzETH": {
-		"deploy": false
-	},
 	"TokenStatezBNB": {
 		"deploy": false
 	},
@@ -126,9 +108,6 @@
 		"deploy": false
 	},
 	"ZassetzBNB": {
-		"deploy": false
-	},
-	"ProxyERC20zUSD": {
 		"deploy": false
 	},
 	"FlexibleStorage": {
@@ -152,16 +131,10 @@
 	"CollateralManagerState": {
 		"deploy": false
 	},
-	"CollateralStateErc20": {
-		"deploy": false
-	},
-	"CollateralStateEth": {
-		"deploy": false
-	},
-	"CollateralStateShort": {
-		"deploy": false
-	},
 	"CollateralShort": {
+		"deploy": false
+	},
+	"WrapperFactory": {
 		"deploy": false
 	},
 	"RewardEscrowV2": {
@@ -188,49 +161,103 @@
 	"CollateralUtil": {
 		"deploy": false
 	},
-	"TokenStateiBTC": {
+	"SystemSettingsLib": {
 		"deploy": false
 	},
-	"ProxyiBTC": {
+	"SynthetixDebtShare": {
 		"deploy": false
 	},
-	"ZassetiBTC": {
+	"SignedSafeDecimalMath": {
 		"deploy": false
 	},
-	"TokenStateiBNB": {
+	"OneNetAggregatorIssuedSynths": {
 		"deploy": false
 	},
-	"ProxyiBNB": {
+	"OneNetAggregatorDebtRatio": {
 		"deploy": false
 	},
-	"ZassetiBNB": {
+	"ExchangeCircuitBreaker": {
 		"deploy": false
 	},
-	"TokenStatezADA": {
+	"FuturesMarketManager": {
 		"deploy": false
 	},
-	"ProxyzADA": {
+	"FuturesMarketData": {
 		"deploy": false
 	},
-	"ZassetzADA": {
+	"FuturesMarketSettings": {
 		"deploy": false
 	},
-	"TokenStatezCAKE": {
+	"Liquidator": {
 		"deploy": false
 	},
-	"ProxyzCAKE": {
+	"LiquidatorRewards": {
 		"deploy": false
 	},
-	"ZassetzCAKE": {
+	"CircuitBreaker": {
 		"deploy": false
 	},
-	"TokenStatezDOT": {
+	"RewardEscrowV2Storage": {
 		"deploy": false
 	},
-	"ProxyzDOT": {
+	"ExchangeSettlementLib": {
 		"deploy": false
 	},
-	"ZassetzDOT": {
+	"DirectIntegrationManager": {
+		"deploy": false
+	},
+	"PerpsV2MarketData": {
+		"deploy": false
+	},
+	"PerpsV2MarketSettings": {
+		"deploy": false
+	},
+	"PerpsV2ExchangeRate": {
+		"deploy": false
+	},
+	"PerpsV2ProxyBNBPERP": {
+		"deploy": false
+	},
+	"PerpsV2MarketStateBNBPERP": {
+		"deploy": false
+	},
+	"PerpsV2MarketBNBPERP": {
+		"deploy": false
+	},
+	"PerpsV2MarketViewsBNBPERP": {
+		"deploy": false
+	},
+	"PerpsV2DelayedOrderBNBPERP": {
+		"deploy": false
+	},
+	"PerpsV2OffchainDelayedOrderBNBPERP": {
+		"deploy": false
+	},
+	"PerpsV2ProxyBTCPERP": {
+		"deploy": false
+	},
+	"PerpsV2MarketStateBTCPERP": {
+		"deploy": false
+	},
+	"PerpsV2MarketBTCPERP": {
+		"deploy": false
+	},
+	"PerpsV2MarketViewsBTCPERP": {
+		"deploy": false
+	},
+	"PerpsV2DelayedOrderBTCPERP": {
+		"deploy": false
+	},
+	"PerpsV2OffchainDelayedOrderBTCPERP": {
+		"deploy": false
+	},
+	"TokenStatezETH": {
+		"deploy": false
+	},
+	"ProxyzETH": {
+		"deploy": false
+	},
+	"ZassetzETH": {
 		"deploy": false
 	},
 	"TokenStatezLINK": {
@@ -242,40 +269,43 @@
 	"ZassetzLINK": {
 		"deploy": false
 	},
-	"TokenStatezMATIC": {
+	"PerpsV2MarketLiquidateBNBPERP": {
 		"deploy": false
 	},
-	"ProxyzMATIC": {
+	"PerpsV2DelayedIntentBNBPERP": {
 		"deploy": false
 	},
-	"ZassetzMATIC": {
+	"PerpsV2DelayedExecutionBNBPERP": {
 		"deploy": false
 	},
-	"TokenStatezXRP": {
+	"PerpsV2MarketLiquidateBTCPERP": {
 		"deploy": false
 	},
-	"ProxyzXRP": {
+	"PerpsV2DelayedIntentBTCPERP": {
 		"deploy": false
 	},
-	"ZassetzXRP": {
+	"PerpsV2DelayedExecutionBTCPERP": {
 		"deploy": false
 	},
-	"TokenStatezDOGE": {
+	"PerpsV2ProxyETHPERP": {
 		"deploy": false
 	},
-	"ProxyzDOGE": {
+	"PerpsV2MarketStateETHPERP": {
 		"deploy": false
 	},
-	"ZassetzDOGE": {
+	"PerpsV2MarketETHPERP": {
 		"deploy": false
 	},
-	"TokenStatezXVS": {
+	"PerpsV2MarketLiquidateETHPERP": {
 		"deploy": false
 	},
-	"ProxyzXVS": {
+	"PerpsV2DelayedIntentETHPERP": {
 		"deploy": false
 	},
-	"ZassetzXVS": {
+	"PerpsV2DelayedExecutionETHPERP": {
+		"deploy": false
+	},
+	"PerpsV2MarketViewsETHPERP": {
 		"deploy": false
 	}
 }

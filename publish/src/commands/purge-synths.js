@@ -23,16 +23,15 @@ const { performTransactionalStep } = require('../command-utils/transact');
 
 const DEFAULTS = {
 	network: 'testnet',
-	gasLimit: 3e6,
-	gasPrice: '1',
+	priorityGasPrice: '1',
 	batchSize: 15,
 };
 
 const purgeSynths = async ({
 	network = DEFAULTS.network,
 	deploymentPath,
-	gasPrice = DEFAULTS.gasPrice,
-	gasLimit = DEFAULTS.gasLimit,
+	maxFeePerGas,
+	maxPriorityFeePerGas = DEFAULTS.priorityGasPrice,
 	synthsToPurge = [],
 	dryRun = false,
 	yes,
@@ -45,7 +44,7 @@ const purgeSynths = async ({
 	ensureNetwork(network);
 	deploymentPath = deploymentPath || getDeploymentPathForNetwork({ network });
 	ensureDeploymentPath(deploymentPath);
-
+	console.log('******************deploymentPath******************', deploymentPath);
 	const { synths, deployment } = loadAndCheckRequiredSources({
 		deploymentPath,
 		network,
@@ -98,7 +97,9 @@ const purgeSynths = async ({
 	}
 
 	console.log(gray(`Using account with public key ${wallet.address}`));
-	console.log(gray(`Using gas of ${gasPrice} GWEI with a max of ${gasLimit}`));
+	console.log(
+		gray(`Using max base fee of ${maxFeePerGas} GWEI miner tip ${maxPriorityFeePerGas} GWEI`)
+	);
 
 	console.log(gray('Dry-run:'), dryRun ? green('yes') : yellow('no'));
 
@@ -161,11 +162,11 @@ const purgeSynths = async ({
 		}
 
 		// step 1. fetch all holders via ethplorer api
-		if (network === 'mainnet') {
+		/*		if (network === 'mainnet') {
 			const topTokenHoldersUrl = `http://api.bscscan.com/getTopTokenHolders/${proxyAddress}`;
 			const response = await axios.get(topTokenHoldersUrl, {
 				params: {
-					apiKey: process.env.ETHPLORER_API_KEY || 'freekey',
+					apiKey: process.env.ETHERSCAN_KEY || 'freekey',
 					limit: 1000,
 				},
 			});
@@ -178,7 +179,14 @@ const purgeSynths = async ({
 			);
 			addresses = topTokenHolders.filter((e, i) => supplyPerEntry[i] !== '0');
 			console.log(gray(`Filtered to ${addresses.length} with supply`));
+		
 		}
+
+*/
+		addresses = [
+			'0x852AD4Eee1679CD64057F50480b3A7c6e89955f6',
+			'0x0b56a002f55EF92c75c1b73011D0c4b427E9161D',
+		];
 
 		const totalSupplyBefore = ethers.utils.formatEther(await Synth.totalSupply());
 
@@ -209,8 +217,8 @@ const purgeSynths = async ({
 					target: Synth,
 					write: 'purge',
 					writeArg: [entries], // explicitly pass array of args so array not splat as params
-					gasLimit,
-					gasPrice,
+					maxFeePerGas,
+					maxPriorityFeePerGas,
 					explorerLinkPrefix,
 					encodeABI: network === 'mainnet',
 				});
@@ -251,8 +259,12 @@ module.exports = {
 				'-d, --deployment-path <value>',
 				`Path to a folder that has your input configuration file ${CONFIG_FILENAME} and where your ${DEPLOYMENT_FILENAME} files will go`
 			)
-			.option('-g, --gas-price <value>', 'Gas price in GWEI', DEFAULTS.gasPrice)
-			.option('-l, --gas-limit <value>', 'Gas limit', DEFAULTS.gasLimit)
+			.option('-g, --max-fee-per-gas <value>', 'Maximum base gas fee price in GWEI')
+			.option(
+				'--max-priority-fee-per-gas <value>',
+				'Priority gas fee price in GWEI',
+				DEFAULTS.priorityGasPrice
+			)
 			.option(
 				'-n, --network [value]',
 				'The network to run off.',

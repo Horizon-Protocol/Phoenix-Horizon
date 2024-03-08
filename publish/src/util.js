@@ -5,7 +5,10 @@ const fs = require('fs');
 const readline = require('readline');
 const { gray, cyan, yellow, redBright, green } = require('chalk');
 const { table } = require('table');
-const { BigNumber } = require('ethers');
+const {
+	BigNumber,
+	utils: { parseUnits },
+} = require('ethers');
 
 const {
 	constants: {
@@ -18,6 +21,9 @@ const {
 		SHORTING_REWARDS_FILENAME,
 		VERSIONS_FILENAME,
 		FEEDS_FILENAME,
+		OFFCHAIN_FEEDS_FILENAME,
+		FUTURES_MARKETS_FILENAME,
+		PERPS_V2_MARKETS_FILENAME,
 	},
 	wrap,
 } = require('../..');
@@ -28,6 +34,7 @@ const {
 	getStakingRewards,
 	getVersions,
 	getFeeds,
+	getOffchainFeeds,
 	getShortingRewards,
 } = wrap({
 	path,
@@ -36,14 +43,16 @@ const {
 
 const { networks } = require('../..');
 const JSONreplacer = (key, value) => {
-	if (typeof value === 'object' && value.type && value.type === 'BigNumber') {
+	if (typeof value === 'object' && value && value.type === 'BigNumber' && !Array.isArray(value)) {
 		return BigNumber.from(value).toString();
 	}
 	return value;
 };
-const stringify = input => JSON.stringify(input, JSONreplacer, '\t') + '\n';
+const stringify = (input) => JSON.stringify(input, JSONreplacer, '\t') + '\n';
 
-const ensureNetwork = network => {
+const allowZeroOrUpdateIfNonZero = (param) => (input) => param === '0' || input !== '0';
+
+const ensureNetwork = (network) => {
 	if (!networks.includes(network)) {
 		throw Error(
 			`Invalid network name of "${network}" supplied. Must be one of ${networks.join(', ')}.`
@@ -56,7 +65,7 @@ const getDeploymentPathForNetwork = ({ network, useOvm }) => {
 	return getPathToNetwork({ network, useOvm });
 };
 
-const ensureDeploymentPath = deploymentPath => {
+const ensureDeploymentPath = (deploymentPath) => {
 	if (!fs.existsSync(deploymentPath)) {
 		throw Error(
 			`Invalid deployment path. Please provide a folder with a compatible ${CONFIG_FILENAME}`
@@ -88,12 +97,23 @@ const loadAndCheckRequiredSources = ({ deploymentPath, network, freshDeploy }) =
 	const paramsFile = path.join(deploymentPath, PARAMS_FILENAME);
 	const params = JSON.parse(fs.readFileSync(paramsFile));
 
+	console.log(gray(`Loading the list of futures markets on ${network.toUpperCase()}...`));
+	const futuresMarketsFile = path.join(deploymentPath, FUTURES_MARKETS_FILENAME);
+	const futuresMarkets = JSON.parse(fs.readFileSync(futuresMarketsFile));
+
+	console.log(gray(`Loading the list of perpsv2 markets on ${network.toUpperCase()}...`));
+	const perpsv2MarketsFile = path.join(deploymentPath, PERPS_V2_MARKETS_FILENAME);
+	const perpsv2Markets = JSON.parse(fs.readFileSync(perpsv2MarketsFile));
+	
 	const versionsFile = path.join(deploymentPath, VERSIONS_FILENAME);
 	const versions = network !== 'local' ? getVersions({ network, deploymentPath }) : {};
 
 	const feedsFile = path.join(deploymentPath, FEEDS_FILENAME);
 	const feeds = getFeeds({ network, deploymentPath });
 
+	const offchainFeedsFile = path.join(deploymentPath, OFFCHAIN_FEEDS_FILENAME);
+	const offchainFeeds = getOffchainFeeds({ network, deploymentPath });
+	
 	console.log(
 		gray(`Loading the list of contracts already deployed for ${network.toUpperCase()}...`)
 	);
@@ -122,6 +142,10 @@ const loadAndCheckRequiredSources = ({ deploymentPath, network, freshDeploy }) =
 		synthsFile,
 		stakingRewards,
 		stakingRewardsFile,
+		futuresMarkets,
+		futuresMarketsFile,
+		perpsv2Markets,
+		perpsv2MarketsFile,
 		deployment,
 		deploymentFile,
 		ownerActions,
@@ -130,6 +154,8 @@ const loadAndCheckRequiredSources = ({ deploymentPath, network, freshDeploy }) =
 		versionsFile,
 		feeds,
 		feedsFile,
+		offchainFeeds,
+		offchainFeedsFile,
 		shortingRewards,
 		shortingRewardsFile,
 	};
@@ -149,12 +175,17 @@ const loadConnections = ({ network, useFork, useOvm }) => {
 		providerUrl = 'http://127.0.0.1:8545';
 	} else {
 		if (useOvm) {
-			providerUrl = `https://${network}.optimism.io`;
+			if (network === 'mainnet' && process.env.OVM_PROVIDER_URL) {
+				providerUrl = process.env.OVM_PROVIDER_URL;
+			} else if (process.env.OVM_GOERLI_PROVIDER_URL) {
+				providerUrl = process.env.OVM_GOERLI_PROVIDER_URL;
+			}
 		} else {
 			if (network === 'mainnet' && process.env.PROVIDER_URL_MAINNET) {
 				providerUrl = process.env.PROVIDER_URL_MAINNET;
 			} else {
-				providerUrl = process.env.PROVIDER_URL.replace('network', network);
+				providerUrl = process.env.PROVIDER_URL
+				// providerUrl = process.env.PROVIDER_URL.replace('network', network);
 			}
 		}
 	}
@@ -165,41 +196,39 @@ const loadConnections = ({ network, useFork, useOvm }) => {
 	const etherscanUrl = `https://api${network !== 'mainnet' ? `-${network}` : ''}${
 		useOvm ? '-optimistic' : ''
 	}.bscscan.com/api`;
+	// const etherscanUrl = 'https://api-testnet.polygonscan.com/api';
 
 	const explorerLinkPrefix = getExplorerLinkPrefix({ network, useOvm });
 
 	return { providerUrl, privateKey, etherscanUrl, explorerLinkPrefix };
 };
 
-const confirmAction = prompt =>
+const confirmAction = (prompt) =>
 	new Promise((resolve, reject) => {
 		const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
 
-		rl.question(prompt, answer => {
+		rl.question(prompt, (answer) => {
 			if (/y|Y/.test(answer)) resolve();
 			else reject(Error('Not confirmed'));
 			rl.close();
 		});
 	});
 
-const appendOwnerActionGenerator = ({ ownerActions, ownerActionsFile, explorerLinkPrefix }) => ({
-	key,
-	action,
-	target,
-	data,
-}) => {
-	ownerActions[key] = {
-		target,
-		action,
-		complete: false,
-		link: `${explorerLinkPrefix}/address/${target}#writeContract`,
-		data,
+const appendOwnerActionGenerator =
+	({ ownerActions, ownerActionsFile, explorerLinkPrefix }) =>
+	({ key, action, target, data }) => {
+		ownerActions[key] = {
+			target,
+			action,
+			complete: false,
+			link: `${explorerLinkPrefix}/address/${target}#writeContract`,
+			data,
+		};
+		fs.writeFileSync(ownerActionsFile, stringify(ownerActions));
+		console.log(cyan(`Cannot invoke ${key} as not owner. Appended to actions.`));
 	};
-	fs.writeFileSync(ownerActionsFile, stringify(ownerActions));
-	console.log(cyan(`Cannot invoke ${key} as not owner. Appended to actions.`));
-};
 
-const parameterNotice = props => {
+const parameterNotice = (props) => {
 	console.log(gray('-'.repeat(50)));
 	console.log('Please check the following parameters are correct:');
 	console.log(gray('-'.repeat(50)));
@@ -249,7 +278,27 @@ const catchMissingResolverWhenGeneratingSolidity = ({
 	}
 };
 
+const assignGasOptions = async ({ tx, provider, maxFeePerGas, maxPriorityFeePerGas }) => {
+	// only add EIP-1559 options if the network supports EIP-1559
+	const gasOptions = {};
+
+	let feeData = {};
+	try {
+		feeData = await provider.getFeeData();
+	} catch (_) {} // network does not support the `getFeeData` rpc call
+	if (feeData.maxFeePerGas) {
+		gasOptions.type = 2;
+		if (maxFeePerGas)
+			gasOptions.maxFeePerGas = parseUnits(maxFeePerGas.toString() || '100', 'gwei');
+		if (maxPriorityFeePerGas)
+			gasOptions.maxPriorityFeePerGas = parseUnits(maxPriorityFeePerGas.toString(), 'gwei');
+	}
+
+	return Object.assign(gasOptions, tx);
+};
+
 module.exports = {
+	allowZeroOrUpdateIfNonZero,
 	ensureNetwork,
 	ensureDeploymentPath,
 	getDeploymentPathForNetwork,
@@ -262,4 +311,5 @@ module.exports = {
 	parameterNotice,
 	reportDeployedContracts,
 	catchMissingResolverWhenGeneratingSolidity,
+	assignGasOptions,
 };

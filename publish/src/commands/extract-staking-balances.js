@@ -18,10 +18,15 @@ const {
 } = require('../util');
 
 const DEFAULTS = {
-	network: 'kovan',
+	network: 'testnet',
 };
 
-async function extractStakingBalances({ network = DEFAULTS.network, deploymentPath, synth }) {
+async function extractStakingBalances({
+	network = DEFAULTS.network,
+	deploymentPath,
+	useOvm,
+	synth,
+}) {
 	ensureNetwork(network);
 	deploymentPath = deploymentPath || getDeploymentPathForNetwork({ network });
 	ensureDeploymentPath(deploymentPath);
@@ -71,7 +76,7 @@ async function extractStakingBalances({ network = DEFAULTS.network, deploymentPa
 			module: 'account',
 			action: 'txlist',
 			address: stakingAddress,
-			apikey: process.env.ETHERSCAN_KEY,
+			apikey: useOvm ? process.env.OVM_ETHERSCAN_KEY : process.env.ETHERSCAN_KEY,
 		},
 	});
 
@@ -164,8 +169,9 @@ async function extractStakingBalances({ network = DEFAULTS.network, deploymentPa
 		console.log(`    Staking Contract: ${stakingAddress}`);
 		console.log(`    Zasset: ${iSynthAddress}`);
 		console.log(
-			`    Starting Block: ${deploymentBlock} (${currentBlock -
-				deploymentBlock} blocks ago at ${formatDate(deploymentBlockDetails.timestamp * 1000)})\n`
+			`    Starting Block: ${deploymentBlock} (${
+				currentBlock - deploymentBlock
+			} blocks ago at ${formatDate(deploymentBlockDetails.timestamp * 1000)})\n`
 		);
 
 		const transferEvents = await iSynth.queryFilter(
@@ -179,7 +185,7 @@ async function extractStakingBalances({ network = DEFAULTS.network, deploymentPa
 			deploymentBlock - 1
 		);
 
-		const candidates = uniq(transferEvents.map(e => e.args.from));
+		const candidates = uniq(transferEvents.map((e) => e.args.from));
 
 		const nonzero = [];
 
@@ -213,7 +219,7 @@ async function extractStakingBalances({ network = DEFAULTS.network, deploymentPa
 		);
 
 		const feeMultiplier = ethers.utils.parseEther('1').sub(exchangeFee);
-		const result = balances.map(b => {
+		const result = balances.map((b) => {
 			const owed = multiplyDecimal(multiplyDecimal(b.balance, frozenPrice), feeMultiplier);
 
 			return {
@@ -259,19 +265,20 @@ async function extractStakingBalances({ network = DEFAULTS.network, deploymentPa
 
 module.exports = {
 	extractStakingBalances,
-	cmd: program =>
+	cmd: (program) =>
 		program
 			.command('extract-staking-balances')
 			.option(
 				'-n, --network <value>',
 				'The network to run off.',
-				x => x.toLowerCase(),
+				(x) => x.toLowerCase(),
 				DEFAULTS.network
 			)
 			.option(
 				'-d, --deployment-path <value>',
 				`Path to a folder that has your input configuration file ${CONFIG_FILENAME}, the synth list ${SYNTHS_FILENAME} and where your ${DEPLOYMENT_FILENAME} files will go`
 			)
+			.option('-z, --use-ovm', 'Target deployment for the OVM (Optimism).')
 			.option('-s, --synth <value>', 'The synth to extract from')
 			.description('Extracts staking reward balances')
 			.action(async (...args) => {

@@ -43,6 +43,8 @@ interface ISynthetix {
 
     function transferableSynthetix(address account) external view returns (uint transferable);
 
+    function getFirstNonZeroEscrowIndex(address account) external view returns (uint);
+
     // Mutative Functions
     function burnSynths(uint amount) external;
 
@@ -97,6 +99,14 @@ interface ISynthetix {
         bytes32 trackingCode
     ) external returns (uint amountReceived, IVirtualSynth vSynth);
 
+    function exchangeAtomically(
+        bytes32 sourceCurrencyKey,
+        uint sourceAmount,
+        bytes32 destinationCurrencyKey,
+        bytes32 trackingCode,
+        uint minAmount
+    ) external returns (uint amountReceived);
+
     function issueMaxSynths() external;
 
     function issueMaxSynthsOnBehalf(address issueForAddress) external;
@@ -116,7 +126,11 @@ interface ISynthetix {
         );
 
     // Liquidations
-    function liquidateDelinquentAccount(address account, uint zUSDAmount) external returns (bool);
+    function liquidateDelinquentAccount(address account) external returns (bool);
+
+    function liquidateDelinquentAccountEscrowIndex(address account, uint escrowStartIndex) external returns (bool);
+
+    function liquidateSelf() external returns (bool);
 
     // Restricted Functions
 
@@ -125,4 +139,8 @@ interface ISynthetix {
     function mintSecondaryRewards(uint amount) external;
 
     function burnSecondary(address account, uint amount) external;
+
+    function revokeAllEscrow(address account) external;
+
+    function migrateAccountBalances(address account) external returns (uint totalEscrowRevoked, uint totalLiquidBalance);
 }

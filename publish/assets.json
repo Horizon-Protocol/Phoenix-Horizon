@@ -344,7 +344,6 @@
 		"sign": "",
 		"description": "DeFi Index"
 	},
-
 	"AUD": {
 		"asset": "AUD",
 		"category": "forex",
@@ -481,6 +480,12 @@
 		"sign": "",
 		"description": "Alpha Finance"
 	},
+	"DAI": {
+		"asset": "DAI",
+		"category": "crypto",
+		"sign": "",
+		"description": "Maker Dao Dai"
+	},
 	"XVS": {
 		"asset": "XVS",
 		"category": "crypto",
@@ -499,5 +504,11 @@
 		"category": "crypto",
 		"sign": "",
 		"description": "Avalanche"
+	},
+	"DebtRatio": {
+		"asset": "DebtRatio",
+		"category": "crypto",
+		"sign": "",
+		"description": "Horizon Protocol Aggregator Debt Ratio"
 	}
 }

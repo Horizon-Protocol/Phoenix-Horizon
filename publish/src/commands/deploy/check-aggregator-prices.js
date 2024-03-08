@@ -7,17 +7,17 @@ const { gray, yellow, red, cyan } = require('chalk');
 const { loadConnections } = require('../../util');
 const { toBytes32 } = require('../../../..');
 
-module.exports = async ({ network, useOvm, providerUrl, synths, oldExrates, standaloneFeeds }) => {
+module.exports = async ({ network, useOvm, providerUrl, synths, oldExrates, feeds }) => {
 	const output = [];
 	const { etherscanUrl } = loadConnections({ network });
 
 	const provider = new ethers.providers.JsonRpcProvider(providerUrl);
 
-	const feeds = standaloneFeeds.concat(synths);
+	const allFeeds = Object.values(feeds).concat(synths);
 
 	let abi;
 
-	for (const { name, asset, feed, inverted } of feeds) {
+	for (const { name, asset, feed } of allFeeds) {
 		const currencyKey = name || asset; // either name of synth or asset for standalone
 		if (feed) {
 			if (!ethers.utils.isAddress(feed)) {
@@ -31,50 +31,42 @@ module.exports = async ({ network, useOvm, providerUrl, synths, oldExrates, stan
 					abi = require('@chainlink/contracts-0.0.10/abi/v0.5/AggregatorV2V3Interface.json')
 						.compilerOutput.abi;
 				} else {
-					// Get the ABI from the first aggregator on Etherscan
-					// Note: assumes all use the same ABI
-					const {
-						data: { result },
-					} = await axios.get(etherscanUrl, {
-						params: {
-							module: 'contract',
-							action: 'getabi',
-							address: feed,
-							apikey: process.env.ETHERSCAN_KEY,
-						},
-					});
-					abi = JSON.parse(result);
+					abi = require('@chainlink/contracts-0.0.10/abi/v0.5/AggregatorV2V3Interface.json')
+						.compilerOutput.abi;
+
+					// // Get the ABI from the first aggregator on Etherscan
+					// // Note: assumes all use the same ABI
+					// console.log('feed', feed);
+					// const {
+					// 	data: { result },
+					// } = await axios.get(etherscanUrl, {
+					// 	params: {
+					// 		module: 'contract',
+					// 		action: 'getabi',
+					// 		address: feed,
+					// 		apikey: process.env.ETHERSCAN_KEY,
+					// 	},
+					// });
+					// abi = JSON.parse(result);
 				}
 			}
 
 			const liveAggregator = new ethers.Contract(feed, abi, provider);
 
-			const [
-				aggAnswerRaw,
-				exRatesAnswerRaw,
-				{ frozenAtUpperLimit, frozenAtLowerLimit },
-			] = await Promise.all([
+			const [aggAnswerRaw, aggAnswerDecimals, exRatesAnswerRaw] = await Promise.all([
 				liveAggregator.latestAnswer(),
+				liveAggregator.decimals(),
 				oldExrates.rateForCurrency(toBytes32(currencyKey)),
-				oldExrates.inversePricing(toBytes32(currencyKey)),
 			]);
 
-			let answer = (aggAnswerRaw / 1e8).toString();
-
-			// do a quick calculation of he inverted number
-			if (inverted) {
-				answer = 2 * inverted.entryPoint - answer;
-				answer = frozenAtLowerLimit ? inverted.lowerLimit : Math.max(answer, inverted.lowerLimit);
-				answer = frozenAtUpperLimit ? inverted.upperLimit : Math.min(answer, inverted.upperLimit);
-			}
+			const answer = (aggAnswerRaw / 10 ** aggAnswerDecimals).toString();
 
 			const existing = ethers.utils.formatUnits(exRatesAnswerRaw);
 
 			if (answer === existing) {
 				output.push(
 					gray(
-						`- ${
-							name ? 'Zasset ' : ''
+						`- ${name ? 'Zasset ' : ''
 						}${currencyKey} aggregated price: ${answer} (same as currently on-chain)`
 					)
 				);
@@ -84,8 +76,7 @@ module.exports = async ({ network, useOvm, providerUrl, synths, oldExrates, stan
 				const colorize = diff > 5 ? red : diff > 1 ? yellow : cyan;
 				output.push(
 					colorize(
-						`- ${
-							name ? 'Zasset ' : ''
+						`- ${name ? 'Zasset ' : ''
 						}${currencyKey} aggregated price: ${answer} vs ${existing} (${diff} %)`
 					)
 				);
