@@ -9,13 +9,14 @@ const data = {
 	mainnet: require('./publish/deployed/mainnet'),
 	goerli: require('./publish/deployed/goerli'),
 	mumbai: require('./publish/deployed/mumbai'),
+	sepolia: require('./publish/deployed/sepolia'),
 };
 
 const assets = require('./publish/assets.json');
 const nonUpgradeable = require('./publish/non-upgradeable.json');
 const releases = require('./publish/releases.json');
 
-const networks = ['local', 'testnet', 'mainnet', 'goerli', 'mumbai'];
+const networks = ['local', 'testnet', 'mainnet', 'goerli', 'mumbai', 'sepolia'];
 
 const chainIdMapping = Object.entries({
 	56: {
@@ -29,6 +30,9 @@ const chainIdMapping = Object.entries({
 	},
 	80001: {
 		network: 'mumbai',
+	},
+	421614: {
+		network: 'sepolia',
 	},
 	// Hardhat fork of mainnet: https://hardhat.org/config/#hardhat-network
 	31337: {
@@ -144,12 +148,14 @@ const defaults = {
 		testnet: '0x765b1e342734fA9001C7497190BAbd8f706f47db',
 		goerli: '0x9B2fE385cEDea62D839E4dE89B0A23EF4eacC717',
 		mumbai: '0xCF6BC4Ae4a99C539353E4BF4C80fff296413CeeA',
+		sepolia: '0x99C67FFF21329c3B0f6922b7Df00bAB8D96325c9',
 	},
 	WETH_ERC20_ADDRESSES: {
 		mainnet: '0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c',
 		testnet: '0x094616f0bdfb0b526bd735bf66eca0ad254ca81f',
 		goerli: '0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6',
 		mumbai: '0x4DfAe612aaCB5b448C12A591cD0879bFa2e51d62',
+		sepolia: '0x980B62Da83eFf3D4576C647993b0c1D7faf17c73',
 	},
 	INITIAL_ISSUANCE: w3utils.toWei(`${100e6}`),
 	CROSS_DOMAIN_DEPOSIT_GAS_LIMIT: `${3e6}`,
@@ -160,15 +166,15 @@ const defaults = {
 	CROSS_DOMAIN_FEE_PERIOD_CLOSE_GAS_LIMIT: `${8e6}`,
 
 	COLLATERAL_MANAGER: {
-		SYNTHS: ['zUSD', 'zBTC', 'zBNB'],
-		SHORTS: ['zBTC', 'zBNB'],
+		SYNTHS: ['zUSD', 'zBTC', 'zETH'],
+		SHORTS: ['zBTC', 'zETH'],
 		MAX_DEBT: w3utils.toWei('75000000'), // 75 million zUSD
 		MAX_SKEW_RATE: w3utils.toWei('0.2'),
 		BASE_BORROW_RATE: Math.round((0.005 * 1e18) / 31556926).toString(), // 31556926 is CollateralManager seconds per year
 		BASE_SHORT_RATE: Math.round((0.005 * 1e18) / 31556926).toString(),
 	},
 	COLLATERAL_ETH: {
-		SYNTHS: ['zUSD', 'zBNB'],
+		SYNTHS: ['zUSD', 'zETH'],
 		MIN_CRATIO: w3utils.toWei('1.3'),
 		MIN_COLLATERAL: w3utils.toWei('2'),
 		ISSUE_FEE_RATE: w3utils.toWei('0.001'),
@@ -180,7 +186,7 @@ const defaults = {
 		ISSUE_FEE_RATE: w3utils.toWei('0.001'),
 	},
 	COLLATERAL_SHORT: {
-		SYNTHS: ['zBTC', 'zBNB'],
+		SYNTHS: ['zBTC', 'zETH'],
 		MIN_CRATIO: w3utils.toWei('1.2'),
 		MIN_COLLATERAL: w3utils.toWei('1000'),
 		ISSUE_FEE_RATE: w3utils.toWei('0.005'),

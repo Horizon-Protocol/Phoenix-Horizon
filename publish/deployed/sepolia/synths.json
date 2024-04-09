@@ -1,0 +1,29 @@
+[
+	{
+		"asset": "USD",
+		"category": "forex",
+		"sign": "$",
+		"description": "US Dollars",
+		"name": "zUSD",
+		"subclass": "MultiCollateralSynth",
+		"exchangeFeeRate": "0"
+	},
+	{
+		"name": "zBTC",
+		"asset": "BTC",
+		"subclass": "MultiCollateralSynth",
+		"exchangeFeeRate": "0.001"
+	},
+	{
+		"name": "zETH",
+		"asset": "ETH",
+		"subclass": "MultiCollateralSynth",
+		"exchangeFeeRate": "0.001"
+	},
+	{
+		"name": "zLINK",
+		"asset": "LINK",
+		"subclass": "MultiCollateralSynth",
+		"exchangeFeeRate": "0.001"
+	}
+]

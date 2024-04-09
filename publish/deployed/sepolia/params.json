@@ -1,0 +1,54 @@
+[
+	{
+		"name": "LIQUIDATION_DELAY",
+		"value": "300"
+	},
+	{
+		"name": "LIQUIDATION_ESCROW_DURATION",
+		"value": "31536000"
+	},
+	{
+		"name": "RATE_STALE_PERIOD",
+		"value": "90000"
+	},
+	{
+		"name": "SELF_LIQUIDATION_PENALTY",
+		"value": "200000000000000000"
+	},
+	{
+		"name": "SNX_LIQUIDATION_PENALTY",
+		"value": "300000000000000000"
+	},
+	{
+		"name": "LIQUIDATION_RATIO",
+		"value": "666666666666666666"
+	},
+	{
+		"name": "FLAG_REWARD",
+		"value": "1000000000000000000"
+	},
+	{
+		"name": "LIQUIDATE_REWARD",
+		"value": "2000000000000000000"
+	},
+	{
+		"name": "FUTURES_LIQUIDATION_BUFFER_RATIO",
+		"value": "10000000000000000"
+	},
+	{
+		"name": "WAITING_PERIOD_SECS",
+		"value": "0"
+	},
+	{
+		"name": "FUTURES_MIN_KEEPER_FEE",
+		"value": "250000000000000000"
+	},
+	{
+		"name": "FUTURES_MAX_KEEPER_FEE",
+		"value": "100000000000000000000"
+	},
+	{
+		"name": "FUTURES_LIQUIDATION_FEE_RATIO",
+		"value": "1000000000000000"
+	}
+]

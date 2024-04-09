@@ -37,7 +37,7 @@ contract BaseDebtCache is Owned, MixinSystemSettings, IDebtCache {
     /* ========== ENCODED NAMES ========== */
 
     bytes32 internal constant sUSD = "zUSD";
-    bytes32 internal constant sETH = "zBNB";
+    bytes32 internal constant sETH = "zETH";
 
     /* ========== ADDRESS RESOLVER CONFIGURATION ========== */
 

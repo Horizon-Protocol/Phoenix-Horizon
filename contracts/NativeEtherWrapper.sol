@@ -16,7 +16,7 @@ import "./interfaces/IEtherWrapper.sol";
 // https://docs.synthetix.io/contracts/source/contracts/nativeetherwrapper
 contract NativeEtherWrapper is Owned, MixinResolver {
     bytes32 private constant CONTRACT_ETHER_WRAPPER = "EtherWrapper";
-    bytes32 private constant CONTRACT_SYNTHSETH = "ZassetzBNB";
+    bytes32 private constant CONTRACT_SYNTHSETH = "ZassetzETH";
 
     constructor(address _owner, address _resolver) public Owned(_owner) MixinResolver(_resolver) {}
 
