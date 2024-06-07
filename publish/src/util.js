@@ -162,10 +162,10 @@ const loadAndCheckRequiredSources = ({ deploymentPath, network, freshDeploy }) =
 };
 
 const getExplorerLinkPrefix = ({ network, useOvm }) => {
-	// return `https://${network !== 'mainnet' ? network + (useOvm ? '-' : '.') : ''}${
-	// 	useOvm ? 'explorer.optimism' : 'bscscan'
-	// }.com`;
-	return `https://sepolia.arbiscan.io/`;
+	return `https://${network !== 'mainnet' ? network + (useOvm ? '-' : '.') : ''}${
+		useOvm ? 'explorer.optimism' : 'bscscan'
+	}.com`;
+	// return `https://sepolia.arbiscan.io/`;
 };
 
 const loadConnections = ({ network, useFork, useOvm }) => {
@@ -194,11 +194,12 @@ const loadConnections = ({ network, useFork, useOvm }) => {
 	const privateKey =
 		network === 'mainnet' ? process.env.DEPLOY_PRIVATE_KEY : process.env.TESTNET_DEPLOY_PRIVATE_KEY;
 
-	// const etherscanUrl = `https://api${network !== 'mainnet' ? `-${network}` : ''}${
-	// 	useOvm ? '-optimistic' : ''
-	// }.bscscan.com/api`;
+	const etherscanUrl = `https://api${network !== 'mainnet' ? `-${network}` : ''}${
+		useOvm ? '-optimistic' : ''
+	}.bscscan.com/api`;
 	// const etherscanUrl = 'https://api-testnet.polygonscan.com/api';
-	const etherscanUrl = 'https://api-sepolia.arbiscan.io/api';
+	// const etherscanUrl = 'https://api-sepolia.arbiscan.io/api';
+	
 	
 
 	const explorerLinkPrefix = getExplorerLinkPrefix({ network, useOvm });

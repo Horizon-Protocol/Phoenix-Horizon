@@ -23,7 +23,7 @@ const { performTransactionalStep } = require('../command-utils/transact');
 
 const DEFAULTS = {
 	network: 'testnet',
-	priorityGasPrice: '1',
+	priorityGasPrice: '2',
 	batchSize: 15,
 };
 
@@ -184,8 +184,7 @@ const purgeSynths = async ({
 
 */
 		addresses = [
-			'0x852ad4eee1679cd64057f50480b3a7c6e89955f6',
-			'0x0b56a002f55ef92c75c1b73011d0c4b427e9161d',
+			'0xcbecd6591b2BF37Dfc34F808A64796a991118Efd'
 		];
 
 		const totalSupplyBefore = ethers.utils.formatEther(await Synth.totalSupply());
