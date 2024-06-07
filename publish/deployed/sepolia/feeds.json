@@ -14,5 +14,9 @@
 	"LINK": {
 		"asset": "LINK",
 		"feed": "0x0FB99723Aee6f420beAD13e6bBB79b7E6F034298"
+	},
+	"MATIC": {
+		"asset": "MATIC",
+		"feed": "0x44a502d94c47f47aC6D65ebdFDf4c39500e72491"
 	}
 }

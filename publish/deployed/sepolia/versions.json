@@ -1,9 +1,10 @@
 {
-	"v5.0.0": {
-		"tag": "v5.0.0",
-		"fulltag": "v5.0.0",
+	"v4.0.2": {
+		"tag": "v4.0.2",
+		"fulltag": "v4.0.2",
 		"network": "sepolia",
-		"commit": "",
+		"date": "2024-04-09T22:47:24+05:30",
+		"commit": "50e560f30cc821117135fb6904e95350c0f83ffd",
 		"contracts": {
 			"SafeDecimalMath": {
 				"address": "0xc165bB7D6f469D0BDB7a2114FCA777DD5fB26A13",
@@ -397,6 +398,86 @@
 			},
 			"PerpsV2MarketViewsBTCPERP": {
 				"address": "0x0E4B50e9cc21798AD5594949f33Ff38126a2602A",
+				"status": "current",
+				"keccak256": "0xab754137889550fb1f5ef7631d9ce6a37902ad8bc947ca3e917a028367e34a4e"
+			},
+			"PerpsV2ProxyETHPERP": {
+				"address": "0xCC94ea7B225F1606615E3B07cD23Ae0eAA9Aa87D",
+				"status": "current",
+				"keccak256": "0x6f4b136397a78056b468feddd201ff6f02f688dce16280eecf5764ceff34728a"
+			},
+			"PerpsV2MarketStateETHPERP": {
+				"address": "0x1f8233D5Fbbc71fbeA1d901d19052947157C274a",
+				"status": "current",
+				"keccak256": "0x65ddd9955e4dfea1c91ca71d9bf26743222cb468e87c601009021d78b44947a6"
+			},
+			"PerpsV2MarketETHPERP": {
+				"address": "0x9D5C271bb2Aa6FFc92eDCc67fE2018aEDe3e3840",
+				"status": "current",
+				"keccak256": "0x7b9a5da094b7c9c91154ebcce5d1d038aed30c7019f0a30efb416b7f6ff6a74c"
+			},
+			"PerpsV2MarketLiquidateETHPERP": {
+				"address": "0xbE17A9b423E8DD9B9Ecb93240e500DCbc67F81f1",
+				"status": "current",
+				"keccak256": "0x574e6832e16560c426e1c703a71444476b4484d8a7e74979bd5e8473a366810f"
+			},
+			"PerpsV2DelayedIntentETHPERP": {
+				"address": "0x8FC2F6C7cf8b40ed5BaD06a497Cbf9a1E131192c",
+				"status": "current",
+				"keccak256": "0xc1c1d8066530760347cb2650f22b8a294f0c37a680e6d06e91a87e25535d184d"
+			},
+			"PerpsV2DelayedExecutionETHPERP": {
+				"address": "0x502F926Cf812Fd1c4eF26b8c3813c40F77390560",
+				"status": "current",
+				"keccak256": "0x5f71fa7f8ff3a6b767ea38abdb259135a94a374cd6e0bbddc47903e6eca74a09"
+			},
+			"PerpsV2MarketViewsETHPERP": {
+				"address": "0xCcCA23f8EA3958a7915A7eb2B3C4E4dB5f716a02",
+				"status": "current",
+				"keccak256": "0xab754137889550fb1f5ef7631d9ce6a37902ad8bc947ca3e917a028367e34a4e"
+			},
+			"SynthUtil": {
+				"address": "0xa00dDd0917412c2A180bA8E18e40c0a572D7C910",
+				"status": "current",
+				"keccak256": "0xf3337a7ff41f915ef500d4c2482e49e0b9ac32888a140b0c18e08f6f036475f6"
+			},
+			"DappMaintenance": {
+				"address": "0xC04d7F1D2236D402DD2329A80CdBeE417552D5E4",
+				"status": "current",
+				"keccak256": "0x2422519f447c33bf8ca16c2ba5c4b5eaa1eb57e31e66beba9cd4d4b7255b2969"
+			},
+			"PerpsV2ProxyLINKPERP": {
+				"address": "0x123f1049817f0172D318f2809CFc2082843F20d9",
+				"status": "current",
+				"keccak256": "0x6f4b136397a78056b468feddd201ff6f02f688dce16280eecf5764ceff34728a"
+			},
+			"PerpsV2MarketStateLINKPERP": {
+				"address": "0x00fd481d059039D6314065C341cbA82bCd88b5f2",
+				"status": "current",
+				"keccak256": "0x65ddd9955e4dfea1c91ca71d9bf26743222cb468e87c601009021d78b44947a6"
+			},
+			"PerpsV2MarketLINKPERP": {
+				"address": "0x3CcC6FA038F1b51Df570b9A61B2Ce1d13d8eBE3a",
+				"status": "current",
+				"keccak256": "0x7b9a5da094b7c9c91154ebcce5d1d038aed30c7019f0a30efb416b7f6ff6a74c"
+			},
+			"PerpsV2MarketLiquidateLINKPERP": {
+				"address": "0x9D3522Da4036683B5D687423221CCb801324396C",
+				"status": "current",
+				"keccak256": "0x574e6832e16560c426e1c703a71444476b4484d8a7e74979bd5e8473a366810f"
+			},
+			"PerpsV2DelayedIntentLINKPERP": {
+				"address": "0x758a853353ce9F79Bd1715213b99fb976304480D",
+				"status": "current",
+				"keccak256": "0xc1c1d8066530760347cb2650f22b8a294f0c37a680e6d06e91a87e25535d184d"
+			},
+			"PerpsV2DelayedExecutionLINKPERP": {
+				"address": "0xFceF0fADb29cdCAba308Eb74dC99a73a91817767",
+				"status": "current",
+				"keccak256": "0x5f71fa7f8ff3a6b767ea38abdb259135a94a374cd6e0bbddc47903e6eca74a09"
+			},
+			"PerpsV2MarketViewsLINKPERP": {
+				"address": "0x038545815e2421f905F7546F7fe84F06A482387B",
 				"status": "current",
 				"keccak256": "0xab754137889550fb1f5ef7631d9ce6a37902ad8bc947ca3e917a028367e34a4e"
 			}

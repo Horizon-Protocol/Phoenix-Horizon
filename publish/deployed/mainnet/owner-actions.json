@@ -1,1 +1,16 @@
-{}
+{
+	"ZassetzDOT.setTotalSupply(0)": {
+		"target": "0x46bCFA01345764ED138683487e68A833E9b79d78",
+		"action": "setTotalSupply(0)",
+		"complete": false,
+		"link": "https://sepolia.arbiscan.io//address/0x46bCFA01345764ED138683487e68A833E9b79d78#writeContract",
+		"data": "0xf7ea7a3d0000000000000000000000000000000000000000000000000000000000000000"
+	},
+	"Issuer.removeSynth(zDOT\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000)": {
+		"target": "0x2841052140b4eCA63c8ef0bd52c4818eEFD5146B",
+		"action": "removeSynth(0x7a444f5400000000000000000000000000000000000000000000000000000000)",
+		"complete": false,
+		"link": "https://sepolia.arbiscan.io//address/0x2841052140b4eCA63c8ef0bd52c4818eEFD5146B#writeContract",
+		"data": "0x0b887dae7a444f5400000000000000000000000000000000000000000000000000000000"
+	}
+}

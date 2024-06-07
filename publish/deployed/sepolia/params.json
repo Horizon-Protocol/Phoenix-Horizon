@@ -50,5 +50,9 @@
 	{
 		"name": "FUTURES_LIQUIDATION_FEE_RATIO",
 		"value": "1000000000000000"
+	},
+	{
+		"name": "FUTURES_MIN_INITIAL_MARGIN",
+		"value": "35000000000000000000"
 	}
 ]

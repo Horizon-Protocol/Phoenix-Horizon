@@ -45,7 +45,7 @@ const purgeSynths = async ({
 	deploymentPath = deploymentPath || getDeploymentPathForNetwork({ network });
 	ensureDeploymentPath(deploymentPath);
 	console.log('******************deploymentPath******************', deploymentPath);
-	const { synths, deployment } = loadAndCheckRequiredSources({
+	const { synths, deployment, ownerActions, ownerActionsFile } = loadAndCheckRequiredSources({
 		deploymentPath,
 		network,
 	});
@@ -184,8 +184,8 @@ const purgeSynths = async ({
 
 */
 		addresses = [
-			'0x852AD4Eee1679CD64057F50480b3A7c6e89955f6',
-			'0x0b56a002f55EF92c75c1b73011D0c4b427E9161D',
+			'0x852ad4eee1679cd64057f50480b3a7c6e89955f6',
+			'0x0b56a002f55ef92c75c1b73011d0c4b427e9161d',
 		];
 
 		const totalSupplyBefore = ethers.utils.formatEther(await Synth.totalSupply());
@@ -220,6 +220,8 @@ const purgeSynths = async ({
 					maxFeePerGas,
 					maxPriorityFeePerGas,
 					explorerLinkPrefix,
+					ownerActions,
+					ownerActionsFile,
 					encodeABI: network === 'mainnet',
 				});
 			}
@@ -231,8 +233,8 @@ const purgeSynths = async ({
 			console.log(
 				yellow(
 					`⚠⚠⚠ WARNING: totalSupply is not 0 after purge of ${currencyKey}. It is ${totalSupply}. ` +
-						`Were there 100 or 1000 holders noted above? If so then we have likely hit the tokenHolder ` +
-						`API limit; another purge is required for this synth.`
+					`Were there 100 or 1000 holders noted above? If so then we have likely hit the tokenHolder ` +
+					`API limit; another purge is required for this synth.`
 				)
 			);
 		}

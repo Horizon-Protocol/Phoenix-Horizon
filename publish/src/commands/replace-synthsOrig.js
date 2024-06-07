@@ -48,7 +48,7 @@ const replaceSynths = async ({
 
 	const { getTarget } = wrap({ network, fs, path });
 
-	const { configFile, synths, synthsFile, deployment, deploymentFile, ownerActions, ownerActionsFile } =
+	const { configFile, synths, synthsFile, deployment, deploymentFile } =
 		loadAndCheckRequiredSources({
 			deploymentPath,
 			network,
@@ -213,8 +213,6 @@ const replaceSynths = async ({
 			deployer,
 			signer,
 			explorerLinkPrefix,
-            ownerActions,
-            ownerActionsFile,
 		});
 
 	for (const { currencyKey, Synth, Proxy, TokenState } of deployedSynths) {

@@ -15,6 +15,7 @@ const data = {
 const assets = require('./publish/assets.json');
 const nonUpgradeable = require('./publish/non-upgradeable.json');
 const releases = require('./publish/releases.json');
+const sepolia = require('./publish/deployed/sepolia');
 
 const networks = ['local', 'testnet', 'mainnet', 'goerli', 'mumbai', 'sepolia'];
 
@@ -715,6 +716,10 @@ const getUsers = ({ network = 'mainnet', user, useOvm = false } = {}) => {
 			// deployer: '0xD9e11e52D2fAF7E735613CcB54478461611Fd4b7',
 		}),
 		mumbai: Object.assign({}, base, {
+			owner: '0xD9e11e52D2fAF7E735613CcB54478461611Fd4b7',
+			// deployer: '0xD9e11e52D2fAF7E735613CcB54478461611Fd4b7',
+		}),
+		sepolia: Object.assign({}, base, {
 			owner: '0xD9e11e52D2fAF7E735613CcB54478461611Fd4b7',
 			// deployer: '0xD9e11e52D2fAF7E735613CcB54478461611Fd4b7',
 		}),
