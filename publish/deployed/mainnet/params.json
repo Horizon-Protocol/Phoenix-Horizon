@@ -1,1 +1,26 @@
-[]
+[
+    {
+        "name": "FUTURES_LIQUIDATION_BUFFER_RATIO",
+        "value": "5000000000000000"
+    },
+    {
+        "name": "FUTURES_MIN_KEEPER_FEE",
+        "value": "0"
+    },
+    {
+        "name": "FUTURES_MAX_KEEPER_FEE",
+        "value": "100000000000000000000"
+    },
+    {
+        "name": "FUTURES_LIQUIDATION_FEE_RATIO",
+        "value": "1000000000000000"
+    },
+    {
+        "name": "FUTURES_MIN_INITIAL_MARGIN",
+        "value": "35000000000000000000"
+    },
+    {
+        "name": "PERPSV2_KEEPER_LIQUIDATION_FEE",
+        "value": "0"
+    }
+]
