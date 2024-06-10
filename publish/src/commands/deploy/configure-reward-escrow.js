@@ -39,16 +39,16 @@ module.exports = async ({ addressOf, deployer, runStep }) => {
 	// // this breaks creating entries (since SNX cannot be transferred)
 	// // note that FeePool will still be able to create entries on the old contract up to the point
 	// // its resolver cache is rebuilt (if this is not done atomcally in a migration contract)
-	await runStep({
-		contract: 'AddressResolver',
-		target: AddressResolver,
-		read: 'getAddress',
-		readArg: [toBytes32('RewardEscrowV2Frozen')],
-		expected: input => input === addressOf(frozenOrPreviousEscrow),
-		write: 'importAddresses',
-		writeArg: [[toBytes32('RewardEscrowV2Frozen')], [addressOf(frozenOrPreviousEscrow)]],
-		comment: 'Ensure that RewardEscrowV2Frozen is in the address resolver',
-	});
+	// await runStep({
+	// 	contract: 'AddressResolver',
+	// 	target: AddressResolver,
+	// 	read: 'getAddress',
+	// 	readArg: [toBytes32('RewardEscrowV2Frozen')],
+	// 	expected: input => input === addressOf(frozenOrPreviousEscrow),
+	// 	write: 'importAddresses',
+	// 	writeArg: [[toBytes32('RewardEscrowV2Frozen')], [addressOf(frozenOrPreviousEscrow)]],
+	// 	comment: 'Ensure that RewardEscrowV2Frozen is in the address resolver',
+	// });
 
 	// // move SNX balances if needed
 	// // this breaks vesting

@@ -167,15 +167,15 @@ const defaults = {
 	CROSS_DOMAIN_FEE_PERIOD_CLOSE_GAS_LIMIT: `${8e6}`,
 
 	COLLATERAL_MANAGER: {
-		SYNTHS: ['zUSD', 'zBTC', 'zETH'],
-		SHORTS: ['zBTC', 'zETH'],
+		SYNTHS: ['zUSD', 'zBTC', 'zBNB'],
+		SHORTS: ['zBTC', 'zBNB'],
 		MAX_DEBT: w3utils.toWei('75000000'), // 75 million zUSD
 		MAX_SKEW_RATE: w3utils.toWei('0.2'),
 		BASE_BORROW_RATE: Math.round((0.005 * 1e18) / 31556926).toString(), // 31556926 is CollateralManager seconds per year
 		BASE_SHORT_RATE: Math.round((0.005 * 1e18) / 31556926).toString(),
 	},
 	COLLATERAL_ETH: {
-		SYNTHS: ['zUSD', 'zETH'],
+		SYNTHS: ['zUSD', 'zBNB'],
 		MIN_CRATIO: w3utils.toWei('1.3'),
 		MIN_COLLATERAL: w3utils.toWei('2'),
 		ISSUE_FEE_RATE: w3utils.toWei('0.001'),
@@ -187,7 +187,7 @@ const defaults = {
 		ISSUE_FEE_RATE: w3utils.toWei('0.001'),
 	},
 	COLLATERAL_SHORT: {
-		SYNTHS: ['zBTC', 'zETH'],
+		SYNTHS: ['zBTC', 'zBNB'],
 		MIN_CRATIO: w3utils.toWei('1.2'),
 		MIN_COLLATERAL: w3utils.toWei('1000'),
 		ISSUE_FEE_RATE: w3utils.toWei('0.005'),
@@ -195,7 +195,7 @@ const defaults = {
 		COLLAPSE_FEE_RATE: '0',
 	},
 
-	ETHER_WRAPPER_MAX_ETH: w3utils.toWei('5000'),
+	ETHER_WRAPPER_MAX_ETH: w3utils.toWei('0'),
 	ETHER_WRAPPER_MINT_FEE_RATE: w3utils.toWei('0.005'), // 5 bps
 	ETHER_WRAPPER_BURN_FEE_RATE: w3utils.toWei('0'), // 0 bps
 
