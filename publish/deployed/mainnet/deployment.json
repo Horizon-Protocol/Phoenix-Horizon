@@ -1865,11 +1865,11 @@
 		},
 		"OneNetAggregatorIssuedSynths": {
 			"name": "OneNetAggregatorIssuedSynths",
-			"address": "0xA9500ea19AAdAc9Eea55aC8fD0C368b630cC877B",
+			"address": "0xe2d6579a9630985E390CB2Ca2f51b7519F2cA727",
 			"source": "OneNetAggregatorIssuedSynths",
-			"link": "https://bscscan.com/address/0xA9500ea19AAdAc9Eea55aC8fD0C368b630cC877B",
+			"link": "https://bscscan.com/address/0xe2d6579a9630985E390CB2Ca2f51b7519F2cA727",
 			"timestamp": "2024-01-29T15:07:09.000Z",
-			"txn": "https://bscscan.com/tx/0x19733e8cfcc49714c87846322098d2d741c084561456170b424b50ca448d4b3a",
+			"txn": "https://bscscan.com/tx/0x6333836dcc16b52eeddf262eacf332f3d34116083e979d7b21c114947101d642",
 			"network": "mainnet",
 			"constructorArgs": [
 				"0x263A8220e9351c5d0cC13567Db4d7BF58e7470c6"
@@ -1877,11 +1877,11 @@
 		},
 		"OneNetAggregatorDebtRatio": {
 			"name": "OneNetAggregatorDebtRatio",
-			"address": "0x5107453F4d12EDaF52Dd5480B02822D3490199d5",
+			"address": "0x2f43dc10cdaDB405F99d3BD5F94f7325338Aa607",
 			"source": "OneNetAggregatorDebtRatio",
-			"link": "https://bscscan.com/address/0x5107453F4d12EDaF52Dd5480B02822D3490199d5",
+			"link": "https://bscscan.com/address/0x2f43dc10cdaDB405F99d3BD5F94f7325338Aa607",
 			"timestamp": "2024-01-29T15:07:15.000Z",
-			"txn": "https://bscscan.com/tx/0x4f718fcdd459ea784d04829a259eec3454a9fe3a87ef8aae779d5b3735b06260",
+			"txn": "https://bscscan.com/tx/0xef54605b1c3ffcf7b90ab1fc377041bb79632a89d6a1f49e573f02a875942973",
 			"network": "mainnet",
 			"constructorArgs": [
 				"0x263A8220e9351c5d0cC13567Db4d7BF58e7470c6"
