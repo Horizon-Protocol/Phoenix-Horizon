@@ -499,5 +499,26 @@
 	},
 	"PerpsV2MarketViewsBNBPERP": {
 		"deploy": false
+	},
+	"PerpsV2ProxySOLPERP": {
+		"deploy": false
+	},
+	"PerpsV2MarketStateSOLPERP": {
+		"deploy": false
+	},
+	"PerpsV2MarketSOLPERP": {
+		"deploy": false
+	},
+	"PerpsV2MarketLiquidateSOLPERP": {
+		"deploy": false
+	},
+	"PerpsV2DelayedIntentSOLPERP": {
+		"deploy": false
+	},
+	"PerpsV2DelayedExecutionSOLPERP": {
+		"deploy": false
+	},
+	"PerpsV2MarketViewsSOLPERP": {
+		"deploy": false
 	}
 }

@@ -1,9 +1,9 @@
 {
 	"name": "@horizon-protocol/smart-contract",
-	"version": "3.0.14",
+	"version": "3.0.15",
 	"license": "MIT",
 	"author": "Horizon",
-	"description": "The smart contracts which make up the Horizon system.",
+	"description": "The smart contracts which make up the Horizon Protocol system.",
 	"scripts": {
 		"setup": "npm install && allow-scripts",
 		"clean-install": "rm -rf build && rm ./package-lock.json && rm -rf node_modules/* && npm install",
