@@ -40,5 +40,23 @@
 		"oracle": "0x4D7E825f80bDf85e913E0DD2A2D54927e9dE1594",
 		"asset": "zLINK",
 		"feedId": "0x8ac0c70fff57e9aefdf5edf44b51d62c2d433653cbb2cf5cc06bb115af04d221"
+	},
+	{
+		"kind": "pyth",
+		"oracle": "0x4D7E825f80bDf85e913E0DD2A2D54927e9dE1594",
+		"asset": "zMATIC",
+		"feedId": "0x5de33a9112c2b700b8d30b8a3402c103578ccfa2765696471cc672bd5cf6ac52"
+	},
+	{
+		"kind": "pyth",
+		"oracle": "0x4D7E825f80bDf85e913E0DD2A2D54927e9dE1594",
+		"asset": "zDOT",
+		"feedId": "0xca3eed9b267293f6595901c734c7525ce8ef49adafe8284606ceb307afa2ca5b"
+	},
+	{
+		"kind": "pyth",
+		"oracle": "0x4D7E825f80bDf85e913E0DD2A2D54927e9dE1594",
+		"asset": "zAVAX",
+		"feedId": "0x93da3352f9f1d105fdfe4971cfa80e9dd777bfc5d0f683ebb6e1294b92137bb7"
 	}
 ]
