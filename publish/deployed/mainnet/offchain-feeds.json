@@ -58,5 +58,17 @@
 		"oracle": "0x4D7E825f80bDf85e913E0DD2A2D54927e9dE1594",
 		"asset": "zAVAX",
 		"feedId": "0x93da3352f9f1d105fdfe4971cfa80e9dd777bfc5d0f683ebb6e1294b92137bb7"
+	},
+	{
+		"kind": "pyth",
+		"oracle": "0x4D7E825f80bDf85e913E0DD2A2D54927e9dE1594",
+		"asset": "zDOGE",
+		"feedId": "0xdcef50dd0a4cd2dcc17e45df1676dcb336a11a61c69df7a0299b0150c672d25c"
+	},
+	{
+		"kind": "pyth",
+		"oracle": "0x4D7E825f80bDf85e913E0DD2A2D54927e9dE1594",
+		"asset": "zSHIB",
+		"feedId": "0xf0d57deca57b3da2fe63a493f4c25925fdfd8edf834b20f93e1f84dbd1504d4a"
 	}
 ]

@@ -280,7 +280,7 @@
 				"0xC0eFf7749b125444953ef89682201Fb8c6A917CD",
 				"0xcACac39C7f8e51500E4eb70b9BF20839a9C28032",
 				"0x3a10A18Ca6d9378010D446068d2Fd4dE5D272915",
-				"244688770274621251826442173",
+				"245940236202917611934615247",
 				"0x263A8220e9351c5d0cC13567Db4d7BF58e7470c6"
 			]
 		},
@@ -383,8 +383,8 @@
 			"network": "mainnet",
 			"constructorArgs": [
 				"0x3a10A18Ca6d9378010D446068d2Fd4dE5D272915",
-				"1721692800",
-				"158"
+				"1724112000",
+				"162"
 			]
 		},
 		"TokenStatezUSD": {
@@ -3078,6 +3078,214 @@
 			"network": "mainnet",
 			"constructorArgs": [
 				"0xd647556e9449239Ced0CB7Cf4C4CD6259F937cb3",
+				"0x3a10A18Ca6d9378010D446068d2Fd4dE5D272915",
+				"0x263A8220e9351c5d0cC13567Db4d7BF58e7470c6"
+			]
+		},
+		"PerpsV2ProxyDOGEPERP": {
+			"name": "PerpsV2ProxyDOGEPERP",
+			"address": "0x743E691050a544FB515b1BE89698f8dd39cea876",
+			"source": "ProxyPerpsV2",
+			"link": "https://bscscan.com/address/0x743E691050a544FB515b1BE89698f8dd39cea876",
+			"timestamp": "2024-08-22T15:44:52.107Z",
+			"txn": "",
+			"network": "mainnet",
+			"constructorArgs": [
+				"0x3a10A18Ca6d9378010D446068d2Fd4dE5D272915"
+			]
+		},
+		"PerpsV2MarketStateDOGEPERP": {
+			"name": "PerpsV2MarketStateDOGEPERP",
+			"address": "0x6F08C7c8F3fc53B879ACF3F3106291a540CB8B4B",
+			"source": "PerpsV2MarketState",
+			"link": "https://bscscan.com/address/0x6F08C7c8F3fc53B879ACF3F3106291a540CB8B4B",
+			"timestamp": "2024-08-22T15:44:57.659Z",
+			"txn": "",
+			"network": "mainnet",
+			"constructorArgs": [
+				"0x3a10A18Ca6d9378010D446068d2Fd4dE5D272915",
+				[
+					"0x3a10A18Ca6d9378010D446068d2Fd4dE5D272915"
+				],
+				"0x7a444f4745000000000000000000000000000000000000000000000000000000",
+				"0x7a444f4745504552500000000000000000000000000000000000000000000000",
+				"0x0000000000000000000000000000000000000000"
+			]
+		},
+		"PerpsV2MarketDOGEPERP": {
+			"name": "PerpsV2MarketDOGEPERP",
+			"address": "0xa6b590d4EDefc51fBaCc73A4E85C1159e69152F7",
+			"source": "PerpsV2Market",
+			"link": "https://bscscan.com/address/0xa6b590d4EDefc51fBaCc73A4E85C1159e69152F7",
+			"timestamp": "2024-08-22T15:45:03.632Z",
+			"txn": "",
+			"network": "mainnet",
+			"constructorArgs": [
+				"0x743E691050a544FB515b1BE89698f8dd39cea876",
+				"0x6F08C7c8F3fc53B879ACF3F3106291a540CB8B4B",
+				"0x3a10A18Ca6d9378010D446068d2Fd4dE5D272915",
+				"0x263A8220e9351c5d0cC13567Db4d7BF58e7470c6"
+			]
+		},
+		"PerpsV2MarketLiquidateDOGEPERP": {
+			"name": "PerpsV2MarketLiquidateDOGEPERP",
+			"address": "0xBb492246bD82333ABe059A1CF95E1f2e1Dc6d67E",
+			"source": "PerpsV2MarketLiquidate",
+			"link": "https://bscscan.com/address/0xBb492246bD82333ABe059A1CF95E1f2e1Dc6d67E",
+			"timestamp": "2024-08-22T15:45:09.245Z",
+			"txn": "",
+			"network": "mainnet",
+			"constructorArgs": [
+				"0x743E691050a544FB515b1BE89698f8dd39cea876",
+				"0x6F08C7c8F3fc53B879ACF3F3106291a540CB8B4B",
+				"0x3a10A18Ca6d9378010D446068d2Fd4dE5D272915",
+				"0x263A8220e9351c5d0cC13567Db4d7BF58e7470c6"
+			]
+		},
+		"PerpsV2DelayedIntentDOGEPERP": {
+			"name": "PerpsV2DelayedIntentDOGEPERP",
+			"address": "0x0618887F56F1cD3c3C73d86925e23730d4063105",
+			"source": "PerpsV2MarketDelayedIntent",
+			"link": "https://bscscan.com/address/0x0618887F56F1cD3c3C73d86925e23730d4063105",
+			"timestamp": "2024-08-22T15:45:14.845Z",
+			"txn": "",
+			"network": "mainnet",
+			"constructorArgs": [
+				"0x743E691050a544FB515b1BE89698f8dd39cea876",
+				"0x6F08C7c8F3fc53B879ACF3F3106291a540CB8B4B",
+				"0x3a10A18Ca6d9378010D446068d2Fd4dE5D272915",
+				"0x263A8220e9351c5d0cC13567Db4d7BF58e7470c6"
+			]
+		},
+		"PerpsV2DelayedExecutionDOGEPERP": {
+			"name": "PerpsV2DelayedExecutionDOGEPERP",
+			"address": "0x1a27CF2dc84809d91F3711c8C1abc634f879cE68",
+			"source": "PerpsV2MarketDelayedExecution",
+			"link": "https://bscscan.com/address/0x1a27CF2dc84809d91F3711c8C1abc634f879cE68",
+			"timestamp": "2024-08-22T15:45:20.323Z",
+			"txn": "",
+			"network": "mainnet",
+			"constructorArgs": [
+				"0x743E691050a544FB515b1BE89698f8dd39cea876",
+				"0x6F08C7c8F3fc53B879ACF3F3106291a540CB8B4B",
+				"0x3a10A18Ca6d9378010D446068d2Fd4dE5D272915",
+				"0x263A8220e9351c5d0cC13567Db4d7BF58e7470c6"
+			]
+		},
+		"PerpsV2MarketViewsDOGEPERP": {
+			"name": "PerpsV2MarketViewsDOGEPERP",
+			"address": "0x559Fa3f002b917575876700553463ac291171729",
+			"source": "PerpsV2MarketViews",
+			"link": "https://bscscan.com/address/0x559Fa3f002b917575876700553463ac291171729",
+			"timestamp": "2024-08-22T15:45:30.358Z",
+			"txn": "",
+			"network": "mainnet",
+			"constructorArgs": [
+				"0x6F08C7c8F3fc53B879ACF3F3106291a540CB8B4B",
+				"0x3a10A18Ca6d9378010D446068d2Fd4dE5D272915",
+				"0x263A8220e9351c5d0cC13567Db4d7BF58e7470c6"
+			]
+		},
+		"PerpsV2ProxySHIBPERP": {
+			"name": "PerpsV2ProxySHIBPERP",
+			"address": "0x92091F9dc0e8878544A7f4C65d215A8437815a92",
+			"source": "ProxyPerpsV2",
+			"link": "https://bscscan.com/address/0x92091F9dc0e8878544A7f4C65d215A8437815a92",
+			"timestamp": "2024-08-22T15:51:21.394Z",
+			"txn": "",
+			"network": "mainnet",
+			"constructorArgs": [
+				"0x3a10A18Ca6d9378010D446068d2Fd4dE5D272915"
+			]
+		},
+		"PerpsV2MarketStateSHIBPERP": {
+			"name": "PerpsV2MarketStateSHIBPERP",
+			"address": "0xAA52488eaD873851E0854E5B446A096e272dAE3f",
+			"source": "PerpsV2MarketState",
+			"link": "https://bscscan.com/address/0xAA52488eaD873851E0854E5B446A096e272dAE3f",
+			"timestamp": "2024-08-22T15:51:27.478Z",
+			"txn": "",
+			"network": "mainnet",
+			"constructorArgs": [
+				"0x3a10A18Ca6d9378010D446068d2Fd4dE5D272915",
+				[
+					"0x3a10A18Ca6d9378010D446068d2Fd4dE5D272915"
+				],
+				"0x7a53484942000000000000000000000000000000000000000000000000000000",
+				"0x7a53484942504552500000000000000000000000000000000000000000000000",
+				"0x0000000000000000000000000000000000000000"
+			]
+		},
+		"PerpsV2MarketSHIBPERP": {
+			"name": "PerpsV2MarketSHIBPERP",
+			"address": "0x17C4424492eC8Eb75FB6695717aEA5c5bD514063",
+			"source": "PerpsV2Market",
+			"link": "https://bscscan.com/address/0x17C4424492eC8Eb75FB6695717aEA5c5bD514063",
+			"timestamp": "2024-08-22T15:51:34.017Z",
+			"txn": "",
+			"network": "mainnet",
+			"constructorArgs": [
+				"0x92091F9dc0e8878544A7f4C65d215A8437815a92",
+				"0xAA52488eaD873851E0854E5B446A096e272dAE3f",
+				"0x3a10A18Ca6d9378010D446068d2Fd4dE5D272915",
+				"0x263A8220e9351c5d0cC13567Db4d7BF58e7470c6"
+			]
+		},
+		"PerpsV2MarketLiquidateSHIBPERP": {
+			"name": "PerpsV2MarketLiquidateSHIBPERP",
+			"address": "0x0ef31a04CF151cA20ecf7Ab7e83c852fF97c0B04",
+			"source": "PerpsV2MarketLiquidate",
+			"link": "https://bscscan.com/address/0x0ef31a04CF151cA20ecf7Ab7e83c852fF97c0B04",
+			"timestamp": "2024-08-22T15:51:39.763Z",
+			"txn": "",
+			"network": "mainnet",
+			"constructorArgs": [
+				"0x92091F9dc0e8878544A7f4C65d215A8437815a92",
+				"0xAA52488eaD873851E0854E5B446A096e272dAE3f",
+				"0x3a10A18Ca6d9378010D446068d2Fd4dE5D272915",
+				"0x263A8220e9351c5d0cC13567Db4d7BF58e7470c6"
+			]
+		},
+		"PerpsV2DelayedIntentSHIBPERP": {
+			"name": "PerpsV2DelayedIntentSHIBPERP",
+			"address": "0x66f3551668A9FDA5c7751C657D0C99006f2e5607",
+			"source": "PerpsV2MarketDelayedIntent",
+			"link": "https://bscscan.com/address/0x66f3551668A9FDA5c7751C657D0C99006f2e5607",
+			"timestamp": "2024-08-22T15:51:45.327Z",
+			"txn": "",
+			"network": "mainnet",
+			"constructorArgs": [
+				"0x92091F9dc0e8878544A7f4C65d215A8437815a92",
+				"0xAA52488eaD873851E0854E5B446A096e272dAE3f",
+				"0x3a10A18Ca6d9378010D446068d2Fd4dE5D272915",
+				"0x263A8220e9351c5d0cC13567Db4d7BF58e7470c6"
+			]
+		},
+		"PerpsV2DelayedExecutionSHIBPERP": {
+			"name": "PerpsV2DelayedExecutionSHIBPERP",
+			"address": "0x310F1c767CCF7C732A8F678f4309f3a4790FC4cf",
+			"source": "PerpsV2MarketDelayedExecution",
+			"link": "https://bscscan.com/address/0x310F1c767CCF7C732A8F678f4309f3a4790FC4cf",
+			"timestamp": "2024-08-22T15:51:50.999Z",
+			"txn": "",
+			"network": "mainnet",
+			"constructorArgs": [
+				"0x92091F9dc0e8878544A7f4C65d215A8437815a92",
+				"0xAA52488eaD873851E0854E5B446A096e272dAE3f",
+				"0x3a10A18Ca6d9378010D446068d2Fd4dE5D272915",
+				"0x263A8220e9351c5d0cC13567Db4d7BF58e7470c6"
+			]
+		},
+		"PerpsV2MarketViewsSHIBPERP": {
+			"name": "PerpsV2MarketViewsSHIBPERP",
+			"address": "0xA51E4fB888B00F5dD8Feed2E049D8D18677b1024",
+			"source": "PerpsV2MarketViews",
+			"link": "https://bscscan.com/address/0xA51E4fB888B00F5dD8Feed2E049D8D18677b1024",
+			"timestamp": "2024-08-22T15:51:57.913Z",
+			"txn": "",
+			"network": "mainnet",
+			"constructorArgs": [
+				"0xAA52488eaD873851E0854E5B446A096e272dAE3f",
 				"0x3a10A18Ca6d9378010D446068d2Fd4dE5D272915",
 				"0x263A8220e9351c5d0cC13567Db4d7BF58e7470c6"
 			]

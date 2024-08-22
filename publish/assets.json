@@ -472,7 +472,7 @@
 		"asset": "DOGE",
 		"category": "crypto",
 		"sign": "",
-		"description": "DOGE"
+		"description": "Dogecoin"
 	},
 	"ALPHA": {
 		"asset": "ALPHA",
@@ -510,5 +510,11 @@
 		"category": "crypto",
 		"sign": "",
 		"description": "Horizon Protocol Aggregator Debt Ratio"
+	},
+	"SHIB": {
+		"asset": "SHIB",
+		"category": "crypto",
+		"sign": "",
+		"description": "Shiba Inu"
 	}
 }

@@ -646,5 +646,47 @@
 	},
 	"PerpsV2MarketViewsAVAXPERP": {
 		"deploy": false
+	},
+	"PerpsV2ProxyDOGEPERP": {
+		"deploy": false
+	},
+	"PerpsV2MarketStateDOGEPERP": {
+		"deploy": false
+	},
+	"PerpsV2MarketDOGEPERP": {
+		"deploy": false
+	},
+	"PerpsV2MarketLiquidateDOGEPERP": {
+		"deploy": false
+	},
+	"PerpsV2DelayedIntentDOGEPERP": {
+		"deploy": false
+	},
+	"PerpsV2DelayedExecutionDOGEPERP": {
+		"deploy": false
+	},
+	"PerpsV2MarketViewsDOGEPERP": {
+		"deploy": false
+	},
+	"PerpsV2ProxySHIBPERP": {
+		"deploy": false
+	},
+	"PerpsV2MarketStateSHIBPERP": {
+		"deploy": false
+	},
+	"PerpsV2MarketSHIBPERP": {
+		"deploy": false
+	},
+	"PerpsV2MarketLiquidateSHIBPERP": {
+		"deploy": false
+	},
+	"PerpsV2DelayedIntentSHIBPERP": {
+		"deploy": false
+	},
+	"PerpsV2DelayedExecutionSHIBPERP": {
+		"deploy": false
+	},
+	"PerpsV2MarketViewsSHIBPERP": {
+		"deploy": false
 	}
 }
