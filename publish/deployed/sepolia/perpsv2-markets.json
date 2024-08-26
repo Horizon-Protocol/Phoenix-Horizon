@@ -82,5 +82,33 @@
 		"maxLiquidationDelta": "0.001",
 		"paused": false,
 		"offchainPaused": false
-	}
+	},
+	{
+        "marketKey": "zBNBPERP",
+        "asset": "zBNB",
+        "makerFee": "0.3",
+        "takerFee": "0.3",
+        "takerFeeDelayedOrder": "0.3",
+        "makerFeeDelayedOrder": "0.3",
+        "makerFeeOffchainDelayedOrder": "0.0002",
+        "takerFeeOffchainDelayedOrder": "0.0008",
+        "nextPriceConfirmWindow": "2",
+        "delayedOrderConfirmWindow": "120",
+        "minDelayTimeDelta": "60",
+        "maxDelayTimeDelta": "6000",
+        "offchainDelayedOrderMinAge": "2",
+        "offchainDelayedOrderMaxAge": "30",
+        "maxLeverage": "27.5",
+        "maxMarketValue": "4200",
+        "maxFundingVelocity": "36",
+        "skewScale": "637500",
+        "offchainPriceDivergence": "0.10",
+        "liquidationPremiumMultiplier": "1.5625",
+        "offchainMarketKey": "ocBNBPERP",
+        "liquidationBufferRatio": "0.0075",
+        "maxPD": "0.002",
+        "maxLiquidationDelta": "0.001",
+        "paused": false,
+        "offchainPaused": false
+    }
 ]

@@ -16,5 +16,11 @@
 		"oracle": "0x4374e5a8b9c22271e9eb878a2aa31de97df15daf",
 		"asset": "zLINK",
 		"feedId": "0x8ac0c70fff57e9aefdf5edf44b51d62c2d433653cbb2cf5cc06bb115af04d221"
+	},
+	{
+		"kind": "pyth",
+		"oracle": "0x4374e5a8b9c22271e9eb878a2aa31de97df15daf",
+		"asset": "zBNB",
+		"feedId": "0x2f95862b045670cd22bee3114c39763a4a08beeb663b145d283c31d7d1101c4f"
 	}
 ]

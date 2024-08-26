@@ -25,5 +25,11 @@
 		"asset": "LINK",
 		"subclass": "MultiCollateralSynth",
 		"exchangeFeeRate": "0.001"
+	},
+	{
+		"name": "zBNB",
+		"asset": "BNB",
+		"subclass": "MultiCollateralSynth",
+		"exchangeFeeRate": "0.001"
 	}
 ]

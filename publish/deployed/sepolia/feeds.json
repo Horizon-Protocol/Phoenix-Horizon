@@ -18,5 +18,9 @@
 	"MATIC": {
 		"asset": "MATIC",
 		"feed": "0x44a502d94c47f47aC6D65ebdFDf4c39500e72491"
+	},
+	"BNB": {
+		"asset": "BNB",
+		"feed": "0x53ab995fBb01C617aa1256698aD55b417168bfF9"
 	}
 }
