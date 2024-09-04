@@ -70,5 +70,11 @@
 		"oracle": "0x4D7E825f80bDf85e913E0DD2A2D54927e9dE1594",
 		"asset": "zSHIB",
 		"feedId": "0xf0d57deca57b3da2fe63a493f4c25925fdfd8edf834b20f93e1f84dbd1504d4a"
+	},
+	{
+		"kind": "pyth",
+		"oracle": "0x4D7E825f80bDf85e913E0DD2A2D54927e9dE1594",
+		"asset": "zPOL",
+		"feedId": "0xffd11c5a1cfd42f80afb2df4d9f264c15f956d68153335374ec10722edd70472"
 	}
 ]

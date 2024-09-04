@@ -164,5 +164,11 @@
 		"asset": "MATIC",
 		"subclass": "MultiCollateralSynth",
 		"exchangeFeeRate": "0.002"
+	},
+	{
+		"name": "zPOL",
+		"asset": "POL",
+		"subclass": "MultiCollateralSynth",
+		"exchangeFeeRate": "0.002"
 	}
 ]

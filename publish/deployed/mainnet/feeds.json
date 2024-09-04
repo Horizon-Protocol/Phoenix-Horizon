@@ -110,5 +110,9 @@
 	"SHIB": {
 		"asset": "SHIB",
 		"feed": "0xA615Be6cb0f3F36A641858dB6F30B9242d0ABeD8"
+	},
+	"POL": {
+		"asset": "POL",
+		"feed": "0x081195B56674bb87b2B92F6D58F7c5f449aCE19d"
 	}
 }

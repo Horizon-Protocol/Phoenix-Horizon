@@ -1696,5 +1696,64 @@
 				"keccak256": "0xab754137889550fb1f5ef7631d9ce6a37902ad8bc947ca3e917a028367e34a4e"
 			}
 		}
+	},
+	"v3.0.7": {
+		"tag": "v3.0.7",
+		"fulltag": "v3.0.7",
+		"network": "mainnet",
+		"date": "2024-08-22T10:14:05-07:00",
+		"commit": "f99fa7cd404fe51bc60809bfe552b21b0c6dd8af",
+		"contracts": {
+			"TokenStatezPOL": {
+				"address": "0x8Bdc32bC0e24E359Fe355f915c5fB91F0b8d4F51",
+				"status": "current",
+				"keccak256": "0x152ca24e6fa1c40080f88f481a15cf4b33aa2956a629e84e035587d89776ab06"
+			},
+			"ProxyzPOL": {
+				"address": "0x5338b08c3Cf82cac45c1807119e20F7368e7B9F1",
+				"status": "current",
+				"keccak256": "0x6821830166f567e95f1ee06b8f3cb431d80d201b50418a214044a5ef7da50a26"
+			},
+			"ZassetzPOL": {
+				"address": "0x036Ec5B1CC1856cA8169487C0B6CCCB12D606cD5",
+				"status": "current",
+				"keccak256": "0x568e768ef097daf50f0fecde4a85a9f9b9ece1a419bd252ff6b2198f36442210"
+			},
+			"PerpsV2ProxyPOLPERP": {
+				"address": "0x8d824C22A9e4548d15db06893ACeCA14ac750735",
+				"status": "current",
+				"keccak256": "0x6f4b136397a78056b468feddd201ff6f02f688dce16280eecf5764ceff34728a"
+			},
+			"PerpsV2MarketStatePOLPERP": {
+				"address": "0x8b0C00EC4A7BC872a236B540294B21e6FB07bbE0",
+				"status": "current",
+				"keccak256": "0x65ddd9955e4dfea1c91ca71d9bf26743222cb468e87c601009021d78b44947a6"
+			},
+			"PerpsV2MarketPOLPERP": {
+				"address": "0x8B9335494AD3c890bD84D4c7CA8cA3C233F0b934",
+				"status": "current",
+				"keccak256": "0x7b9a5da094b7c9c91154ebcce5d1d038aed30c7019f0a30efb416b7f6ff6a74c"
+			},
+			"PerpsV2MarketLiquidatePOLPERP": {
+				"address": "0xCE7A36BCe98484C887e6EDe2c9D03A972cE684Cc",
+				"status": "current",
+				"keccak256": "0x574e6832e16560c426e1c703a71444476b4484d8a7e74979bd5e8473a366810f"
+			},
+			"PerpsV2DelayedIntentPOLPERP": {
+				"address": "0x20DdC5856994B69a184150Fbe742d962636Caf89",
+				"status": "current",
+				"keccak256": "0xc1c1d8066530760347cb2650f22b8a294f0c37a680e6d06e91a87e25535d184d"
+			},
+			"PerpsV2DelayedExecutionPOLPERP": {
+				"address": "0x3d5bF1F0BDf84aB25Eeec15639Fb09C6e3a05648",
+				"status": "current",
+				"keccak256": "0x5f71fa7f8ff3a6b767ea38abdb259135a94a374cd6e0bbddc47903e6eca74a09"
+			},
+			"PerpsV2MarketViewsPOLPERP": {
+				"address": "0x9daa7637c5bb2A23391A1c74bc4af8561AB3446f",
+				"status": "current",
+				"keccak256": "0xab754137889550fb1f5ef7631d9ce6a37902ad8bc947ca3e917a028367e34a4e"
+			}
+		}
 	}
 }

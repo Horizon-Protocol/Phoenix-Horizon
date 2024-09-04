@@ -688,5 +688,35 @@
 	},
 	"PerpsV2MarketViewsSHIBPERP": {
 		"deploy": false
+	},
+	"TokenStatezPOL": {
+		"deploy": false
+	},
+	"ProxyzPOL": {
+		"deploy": false
+	},
+	"ZassetzPOL": {
+		"deploy": false
+	},
+	"PerpsV2ProxyPOLPERP": {
+		"deploy": false
+	},
+	"PerpsV2MarketStatePOLPERP": {
+		"deploy": false
+	},
+	"PerpsV2MarketPOLPERP": {
+		"deploy": false
+	},
+	"PerpsV2MarketLiquidatePOLPERP": {
+		"deploy": false
+	},
+	"PerpsV2DelayedIntentPOLPERP": {
+		"deploy": false
+	},
+	"PerpsV2DelayedExecutionPOLPERP": {
+		"deploy": false
+	},
+	"PerpsV2MarketViewsPOLPERP": {
+		"deploy": false
 	}
 }
