@@ -280,7 +280,7 @@
 				"0xC0eFf7749b125444953ef89682201Fb8c6A917CD",
 				"0xcACac39C7f8e51500E4eb70b9BF20839a9C28032",
 				"0x3a10A18Ca6d9378010D446068d2Fd4dE5D272915",
-				"246542748603982146710096015",
+				"246838368092586216013461399",
 				"0x263A8220e9351c5d0cC13567Db4d7BF58e7470c6"
 			]
 		},
@@ -383,8 +383,8 @@
 			"network": "mainnet",
 			"constructorArgs": [
 				"0x3a10A18Ca6d9378010D446068d2Fd4dE5D272915",
-				"1725321600",
-				"164"
+				"1725926400",
+				"165"
 			]
 		},
 		"TokenStatezUSD": {
@@ -1789,37 +1789,12 @@
 				"0x263A8220e9351c5d0cC13567Db4d7BF58e7470c6"
 			]
 		},
-		"TokenStatezMATIC": {
-			"name": "TokenStatezMATIC",
-			"address": "0x783d7281EA92F5D04Fa8B5b39647a7ed151dd61E",
-			"source": "TokenState",
-			"link": "https://bscscan.com/address/0x783d7281EA92F5D04Fa8B5b39647a7ed151dd61E",
-			"timestamp": "2022-10-29T16:11:39.047Z",
-			"txn": "",
-			"network": "mainnet",
-			"constructorArgs": [
-				"0x3a10A18Ca6d9378010D446068d2Fd4dE5D272915",
-				"0x0000000000000000000000000000000000000000"
-			]
-		},
-		"ProxyzMATIC": {
-			"name": "ProxyzMATIC",
-			"address": "0x25B012a4a839849F06273fCbf1AB001387e1cDB6",
-			"source": "ProxyERC20",
-			"link": "https://bscscan.com/address/0x25B012a4a839849F06273fCbf1AB001387e1cDB6",
-			"timestamp": "2022-10-29T16:11:47.542Z",
-			"txn": "",
-			"network": "mainnet",
-			"constructorArgs": [
-				"0x3a10A18Ca6d9378010D446068d2Fd4dE5D272915"
-			]
-		},
 		"ZassetzMATIC": {
 			"name": "ZassetzMATIC",
-			"address": "0x206FcC868DD0036ED0D72Adb065996DC8fd1E8e7",
-			"source": "MultiCollateralSynth",
-			"link": "https://bscscan.com/address/0x206FcC868DD0036ED0D72Adb065996DC8fd1E8e7",
-			"timestamp": "2024-01-29T15:12:18.937Z",
+			"address": "0x510A2BBb4dB9D85DE6f2de60985b0fdE09C1e3f6",
+			"source": "PurgeableSynth",
+			"link": "https://bscscan.com/address/0x510A2BBb4dB9D85DE6f2de60985b0fdE09C1e3f6",
+			"timestamp": "2024-09-12T16:45:29.530Z",
 			"txn": "",
 			"network": "mainnet",
 			"constructorArgs": [
@@ -1829,7 +1804,7 @@
 				"zMATIC",
 				"0x3a10A18Ca6d9378010D446068d2Fd4dE5D272915",
 				"0x7a4d415449430000000000000000000000000000000000000000000000000000",
-				0,
+				"3676973065749287895492",
 				"0x263A8220e9351c5d0cC13567Db4d7BF58e7470c6"
 			]
 		},

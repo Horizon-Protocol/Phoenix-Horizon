@@ -160,12 +160,6 @@
 		"exchangeFeeRate": "0.005"
 	},
 	{
-		"name": "zMATIC",
-		"asset": "MATIC",
-		"subclass": "MultiCollateralSynth",
-		"exchangeFeeRate": "0.002"
-	},
-	{
 		"name": "zPOL",
 		"asset": "POL",
 		"subclass": "MultiCollateralSynth",

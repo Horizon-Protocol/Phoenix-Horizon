@@ -377,15 +377,6 @@
 	"ZassetzAVAX": {
 		"deploy": false
 	},
-	"TokenStatezMATIC": {
-		"deploy": false
-	},
-	"ProxyzMATIC": {
-		"deploy": false
-	},
-	"ZassetzMATIC": {
-		"deploy": false
-	},
 	"SystemSettingsLib": {
 		"deploy": false
 	},
@@ -582,27 +573,6 @@
 		"deploy": false
 	},
 	"PerpsV2MarketViewsLINKPERP": {
-		"deploy": false
-	},
-	"PerpsV2ProxyMATICPERP": {
-		"deploy": false
-	},
-	"PerpsV2MarketStateMATICPERP": {
-		"deploy": false
-	},
-	"PerpsV2MarketMATICPERP": {
-		"deploy": false
-	},
-	"PerpsV2MarketLiquidateMATICPERP": {
-		"deploy": false
-	},
-	"PerpsV2DelayedIntentMATICPERP": {
-		"deploy": false
-	},
-	"PerpsV2DelayedExecutionMATICPERP": {
-		"deploy": false
-	},
-	"PerpsV2MarketViewsMATICPERP": {
 		"deploy": false
 	},
 	"PerpsV2ProxyDOTPERP": {

@@ -184,8 +184,8 @@ const purgeSynths = async ({
 
 */
 		addresses = [
-			'0xcbecd6591b2BF37Dfc34F808A64796a991118Efd'
-		];
+			"0x",
+		]
 
 		const totalSupplyBefore = ethers.utils.formatEther(await Synth.totalSupply());
 

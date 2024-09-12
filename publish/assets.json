@@ -443,12 +443,6 @@
 		"sign": "",
 		"description": "Cream Finance"
 	},
-	"MATIC": {
-		"asset": "MATIC",
-		"category": "crypto",
-		"sign": "",
-		"description": "Polygon Token"
-	},
 	"DOGE": {
 		"asset": "DOGE",
 		"category": "crypto",
