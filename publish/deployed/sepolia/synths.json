@@ -11,25 +11,63 @@
 	{
 		"name": "zBTC",
 		"asset": "BTC",
+		"description": "Bitcoin",
 		"subclass": "MultiCollateralSynth",
-		"exchangeFeeRate": "0.001"
+		"exchangeFeeRate": "0.003"
 	},
 	{
 		"name": "zETH",
 		"asset": "ETH",
+		"description": "Ethereum",
 		"subclass": "MultiCollateralSynth",
-		"exchangeFeeRate": "0.001"
+		"exchangeFeeRate": "0.0005"
 	},
 	{
 		"name": "zLINK",
 		"asset": "LINK",
+		"description": "Chainlink",
 		"subclass": "MultiCollateralSynth",
-		"exchangeFeeRate": "0.001"
+		"exchangeFeeRate": "0.003"
 	},
 	{
 		"name": "zBNB",
 		"asset": "BNB",
+		"description": "Binance Coin",
 		"subclass": "MultiCollateralSynth",
-		"exchangeFeeRate": "0.001"
+		"exchangeFeeRate": "0.005"
+	},
+	{
+		"name": "zUSDT",
+		"asset": "USDT",
+		"subclass": "MultiCollateralSynth",
+		"exchangeFeeRate": "0.003"
+	},
+	{
+		"name": "zSOL",
+		"asset": "SOL",
+		"description": "Solana",
+		"subclass": "MultiCollateralSynth",
+		"exchangeFeeRate": "0.005"
+	},
+	{
+		"name": "zXRP",
+		"asset": "XRP",
+		"description": "Ripple",
+		"subclass": "MultiCollateralSynth",
+		"exchangeFeeRate": "0.005"
+	},
+	{
+		"name": "zAVAX",
+		"asset": "AVAX",
+		"description": "Avalanche",
+		"subclass": "MultiCollateralSynth",
+		"exchangeFeeRate": "0.005"
+	},
+	{
+		"name": "zARB",
+		"asset": "ARB",
+		"description": "Arbitrum",
+		"subclass": "MultiCollateralSynth",
+		"exchangeFeeRate": "0.0005"
 	}
 ]

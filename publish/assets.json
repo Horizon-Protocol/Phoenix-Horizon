@@ -443,6 +443,12 @@
 		"sign": "",
 		"description": "Cream Finance"
 	},
+	"MATIC": {
+		"asset": "MATIC",
+		"category": "crypto",
+		"sign": "",
+		"description": "Polygon Token"
+	},
 	"DOGE": {
 		"asset": "DOGE",
 		"category": "crypto",
@@ -503,5 +509,11 @@
 		"category": "crypto",
 		"sign": "",
 		"description": "Polygon Token"
+	},
+	"ARB": {
+		"asset": "ARB",
+		"category": "crypto",
+		"sign": "",
+		"description": "Arbitrum"
 	}
 }

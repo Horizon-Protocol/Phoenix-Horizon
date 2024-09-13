@@ -22,5 +22,21 @@
 	"BNB": {
 		"asset": "BNB",
 		"feed": "0x53ab995fBb01C617aa1256698aD55b417168bfF9"
+	},
+	"SOL": {
+		"asset": "SOL",
+		"feed": "0x32377717BC9F9bA8Db45A244bCE77e7c0Cc5A775"
+	},
+	"XRP": {
+		"asset": "XRP",
+		"feed": "0x72F48eBe69eB7f5DdA2394C9EA488e621727f8B1"
+	},
+	"AVAX": {
+		"asset": "AVAX",
+		"feed": "0xe27498c9Cc8541033F265E63c8C29A97CfF9aC6D"
+	},
+	"ARB": {
+		"asset": "ARB",
+		"feed": "0xD1092a65338d049DB68D7Be6bD89d17a0929945e"
 	}
 }

@@ -54,5 +54,9 @@
 	{
 		"name": "FUTURES_MIN_INITIAL_MARGIN",
 		"value": "35000000000000000000"
+	},
+	{
+		"name": "PERPSV2_KEEPER_LIQUIDATION_FEE",
+		"value": "2000000000000000000"
 	}
 ]
