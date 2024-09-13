@@ -5,10 +5,7 @@ const abiDecoder = require('abi-decoder');
 
 // load the data in explicitly (not programmatically) so webpack knows what to bundle
 const data = {
-	testnet: require('./publish/deployed/testnet'),
 	mainnet: require('./publish/deployed/mainnet'),
-	goerli: require('./publish/deployed/goerli'),
-	mumbai: require('./publish/deployed/mumbai'),
 	sepolia: require('./publish/deployed/sepolia'),
 };
 
@@ -17,7 +14,7 @@ const nonUpgradeable = require('./publish/non-upgradeable.json');
 const releases = require('./publish/releases.json');
 const sepolia = require('./publish/deployed/sepolia');
 
-const networks = ['local', 'testnet', 'mainnet', 'goerli', 'mumbai', 'sepolia'];
+const networks = ['local', 'mainnet', 'sepolia'];
 
 const chainIdMapping = Object.entries({
 	56: {
@@ -199,12 +196,12 @@ const defaults = {
 	ETHER_WRAPPER_MINT_FEE_RATE: w3utils.toWei('0.005'), // 5 bps
 	ETHER_WRAPPER_BURN_FEE_RATE: w3utils.toWei('0'), // 0 bps
 
-	FUTURES_MIN_KEEPER_FEE: w3utils.toWei('1'), // 1 zUSD liquidation fee
-	FUTURES_MAX_KEEPER_FEE: w3utils.toWei('1000'), // 1000 zUSD min keeper fee
+	FUTURES_MIN_KEEPER_FEE: w3utils.toWei('0'), // 0 zUSD min keeper fee
+	FUTURES_MAX_KEEPER_FEE: w3utils.toWei('1000'), // 1000 zUSD max keeper fee
 	FUTURES_LIQUIDATION_FEE_RATIO: w3utils.toWei('0.0035'), // 35 basis points liquidation incentive
 	FUTURES_LIQUIDATION_BUFFER_RATIO: w3utils.toWei('0.0025'), // 25 basis points liquidation buffer
 	FUTURES_MIN_INITIAL_MARGIN: w3utils.toWei('40'), // minimum initial margin for all markets
-	PERPSV2_KEEPER_LIQUIDATION_FEE: w3utils.toWei('2'), // 2 zUSD keeper liquidation fee (not flagger)
+	PERPSV2_KEEPER_LIQUIDATION_FEE: w3utils.toWei('1'), // 1 zUSD keeper liquidation fee (not flagger)
 
 	// SIP-120
 	ATOMIC_MAX_VOLUME_PER_BLOCK: w3utils.toWei(`${2e5}`), // 200k

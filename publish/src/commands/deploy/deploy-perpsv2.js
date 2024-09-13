@@ -265,14 +265,17 @@ const deployPerpsV2Markets = async ({
 		});
 
 		// Pause market to start linking/configuring
-		const { wasPaused } = newMarket
-			? true
-			: await pauseMarket({
-					marketKey,
-					deployer,
-					runStep,
-					generateSolidity,
-			  });
+		const { wasPaused } = true;
+		// const { wasPaused } = newMarket
+		// ? true
+		// : await pauseMarket({
+		// 			marketKey,
+		// 			deployer,
+		// 			runStep,
+		// 			generateSolidity,
+		// 	  });
+		
+		
 
 		// Initialize State
 		const stateInitialized = await deployedMarketState.target.initialized();

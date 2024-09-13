@@ -149,24 +149,6 @@
 		"sign": "",
 		"description": "Tezos"
 	},
-	"LTC": {
-		"asset": "LTC",
-		"category": "crypto",
-		"sign": "",
-		"description": "Litecoin"
-	},
-	"TRX": {
-		"asset": "TRX",
-		"category": "crypto",
-		"sign": "",
-		"description": "TRON"
-	},
-	"XTZ": {
-		"asset": "XTZ",
-		"category": "crypto",
-		"sign": "",
-		"description": "Tezos"
-	},
 
 	"LTC": {
 		"asset": "LTC",
@@ -389,7 +371,6 @@
 		"exchange": "TSE",
 		"description": "Nikkei 225 Index"
 	},
-
 	"SUSHI": {
 		"asset": "SUSHI",
 		"category": "crypto",
@@ -472,7 +453,7 @@
 		"asset": "DOGE",
 		"category": "crypto",
 		"sign": "",
-		"description": "DOGE"
+		"description": "Dogecoin"
 	},
 	"ALPHA": {
 		"asset": "ALPHA",
@@ -510,5 +491,29 @@
 		"category": "crypto",
 		"sign": "",
 		"description": "Horizon Protocol Aggregator Debt Ratio"
+	},
+	"IssuedSynth": {
+		"asset": "IssuedSynth",
+		"category": "crypto",
+		"sign": "",
+		"description": "Horizon Protocol Aggregator Issued Synth"
+	},
+	"SHIB": {
+		"asset": "SHIB",
+		"category": "crypto",
+		"sign": "",
+		"description": "Shiba Inu"
+	},
+	"POL": {
+		"asset": "POL",
+		"category": "crypto",
+		"sign": "",
+		"description": "Polygon Token"
+	},
+	"ARB": {
+		"asset": "ARB",
+		"category": "crypto",
+		"sign": "",
+		"description": "Arbitrum"
 	}
 }

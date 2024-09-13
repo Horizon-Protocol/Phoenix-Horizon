@@ -21,6 +21,7 @@ const { performTransactionalStep } = require('../command-utils/transact');
 
 const DEFAULTS = {
 	priorityGasPrice: '3',
+	maxFeePerGas: '3',
 };
 
 const nominate = async ({
@@ -29,7 +30,7 @@ const nominate = async ({
 	contracts,
 	useFork = false,
 	deploymentPath,
-	maxFeePerGas,
+	maxFeePerGas = DEFAULTS.maxFeePerGas,
 	maxPriorityFeePerGas = DEFAULTS.priorityGasPrice,
 	useOvm,
 	privateKey,
@@ -65,7 +66,11 @@ const nominate = async ({
 	// DappMaintenance (UI control)
 	// StakingRewardsSNXWETHUniswapV3
 	// StakingRewardssUSDDAIUniswapV3
+	// OneNetAggregatorDebtRatio
+	// OneNetAggregatorIssuedSynths
 	const excludedContracts = [
+		'OneNetAggregatorDebtRatio',
+		'OneNetAggregatorIssuedSynths',
 		'StakingRewardssUSDDAIUniswapV3',
 		'StakingRewardsSNXWETHUniswapV3',
 		'DappMaintenance',

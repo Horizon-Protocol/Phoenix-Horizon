@@ -21,6 +21,10 @@
     },
     {
         "name": "PERPSV2_KEEPER_LIQUIDATION_FEE",
-        "value": "0"
+        "value": "1000000000000000000"
+    },
+    {
+        "name": "ISSUANCE_RATIO",
+        "value": "285714285714286000"
     }
 ]

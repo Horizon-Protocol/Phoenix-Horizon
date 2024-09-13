@@ -24,7 +24,8 @@ const { getContract } = require('../command-utils/contract');
 const { safeInitializer } = require('../command-utils/safe-initializer');
 
 const DEFAULTS = {
-	priorityGasPrice: '1',
+	priorityGasPrice: '3',
+	maxFeePerGas: '3',
 	gasLimit: 2e5, // 200,000
 };
 
@@ -32,7 +33,7 @@ const owner = async ({
 	network,
 	newOwner,
 	deploymentPath,
-	maxFeePerGas,
+	maxFeePerGas = DEFAULTS.maxFeePerGas,
 	maxPriorityFeePerGas = DEFAULTS.priorityGasPrice,
 	gasLimit = DEFAULTS.gasLimit,
 	privateKey,
