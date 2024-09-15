@@ -38,5 +38,9 @@
 	"ARB": {
 		"asset": "ARB",
 		"feed": "0xD1092a65338d049DB68D7Be6bD89d17a0929945e"
+	},
+	"USDT": {
+		"asset": "USDT",
+		"feed": "0x80EDee6f667eCc9f63a0a6f55578F870651f06A4"
 	}
 }

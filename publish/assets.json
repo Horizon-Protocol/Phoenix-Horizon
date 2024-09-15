@@ -447,7 +447,7 @@
 		"asset": "MATIC",
 		"category": "crypto",
 		"sign": "",
-		"description": "Polygon Token"
+		"description": "Polygon"
 	},
 	"DOGE": {
 		"asset": "DOGE",
@@ -508,12 +508,18 @@
 		"asset": "POL",
 		"category": "crypto",
 		"sign": "",
-		"description": "Polygon Token"
+		"description": "Polygon"
 	},
 	"ARB": {
 		"asset": "ARB",
 		"category": "crypto",
 		"sign": "",
 		"description": "Arbitrum"
+	},
+	"USDT": {
+		"asset": "USDT",
+		"category": "crypto",
+		"sign": "$",
+		"description": "Tether"
 	}
 }
