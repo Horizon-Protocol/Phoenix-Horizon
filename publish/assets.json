@@ -515,5 +515,11 @@
 		"category": "crypto",
 		"sign": "",
 		"description": "Arbitrum"
+	},
+	"USDT": {
+		"asset": "USDT",
+		"category": "crypto",
+		"sign": "$",
+		"description": "Tether"
 	}
 }
