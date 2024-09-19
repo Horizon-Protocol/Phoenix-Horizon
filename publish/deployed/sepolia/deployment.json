@@ -185,7 +185,7 @@
 				"0xCa339847424a2645e4A0Eb568b31dD1AFb633E3E",
 				"0x4E3CF24f2eC8E0fD569eE7532c32BEe82404eEbF",
 				"0xD9e11e52D2fAF7E735613CcB54478461611Fd4b7",
-				"131730769230769230769230754",
+				"133173076923076923076923061",
 				"0xD97Fb64C06741A3c6def4259fDd5F68CC7254B80"
 			]
 		},
@@ -513,8 +513,8 @@
 			"network": "sepolia",
 			"constructorArgs": [
 				"0xD9e11e52D2fAF7E735613CcB54478461611Fd4b7",
-				"1726064350",
-				"22"
+				"1726669150",
+				"23"
 			]
 		},
 		"EscrowChecker": {
@@ -2177,6 +2177,50 @@
 			"constructorArgs": [
 				"0x9240a513Fded68e767D72F3FbAD1896004983407",
 				"0xD9e11e52D2fAF7E735613CcB54478461611Fd4b7",
+				"0xD97Fb64C06741A3c6def4259fDd5F68CC7254B80"
+			]
+		},
+		"TokenStatezUNI": {
+			"name": "TokenStatezUNI",
+			"address": "0x468eE1AD73438370467c54aFD11268AE67893413",
+			"source": "TokenState",
+			"link": "https://sepolia.arbiscan.io//address/0x468eE1AD73438370467c54aFD11268AE67893413",
+			"timestamp": "2024-09-19T20:00:26.286Z",
+			"txn": "",
+			"network": "sepolia",
+			"constructorArgs": [
+				"0xD9e11e52D2fAF7E735613CcB54478461611Fd4b7",
+				"0x0000000000000000000000000000000000000000"
+			]
+		},
+		"ProxyzUNI": {
+			"name": "ProxyzUNI",
+			"address": "0x507d5e57cee36Db0baDB2521E8e130f32bb6D87D",
+			"source": "ProxyERC20",
+			"link": "https://sepolia.arbiscan.io//address/0x507d5e57cee36Db0baDB2521E8e130f32bb6D87D",
+			"timestamp": "2024-09-19T20:00:29.766Z",
+			"txn": "",
+			"network": "sepolia",
+			"constructorArgs": [
+				"0xD9e11e52D2fAF7E735613CcB54478461611Fd4b7"
+			]
+		},
+		"ZassetzUNI": {
+			"name": "ZassetzUNI",
+			"address": "0x330DFD1ECFb482a76BC3Ab1133AC75Dd01c6d70C",
+			"source": "MultiCollateralSynth",
+			"link": "https://sepolia.arbiscan.io//address/0x330DFD1ECFb482a76BC3Ab1133AC75Dd01c6d70C",
+			"timestamp": "2024-09-19T20:00:34.038Z",
+			"txn": "",
+			"network": "sepolia",
+			"constructorArgs": [
+				"0x507d5e57cee36Db0baDB2521E8e130f32bb6D87D",
+				"0x468eE1AD73438370467c54aFD11268AE67893413",
+				"Zasset zUNI",
+				"zUNI",
+				"0xD9e11e52D2fAF7E735613CcB54478461611Fd4b7",
+				"0x7a554e4900000000000000000000000000000000000000000000000000000000",
+				0,
 				"0xD97Fb64C06741A3c6def4259fDd5F68CC7254B80"
 			]
 		}

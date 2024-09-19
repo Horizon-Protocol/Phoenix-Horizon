@@ -69,5 +69,12 @@
 		"description": "Arbitrum",
 		"subclass": "MultiCollateralSynth",
 		"exchangeFeeRate": "0.0005"
+	},
+	{
+		"name": "zUNI",
+		"asset": "UNI",
+		"description": "Uniswap",
+		"subclass": "MultiCollateralSynth",
+		"exchangeFeeRate": "0.0005"
 	}
 ]

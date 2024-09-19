@@ -42,5 +42,9 @@
 	"USDT": {
 		"asset": "USDT",
 		"feed": "0x80EDee6f667eCc9f63a0a6f55578F870651f06A4"
+	},
+	"UNI": {
+		"asset": "UNI",
+		"feed": "0x850A128C3f67C3D13B58a88AC2f4742D90705c0a"
 	}
 }
