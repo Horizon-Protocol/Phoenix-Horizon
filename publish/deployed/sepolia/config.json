@@ -463,5 +463,14 @@
 	},
 	"PerpsV2MarketViewsARBPERP": {
 		"deploy": false
+	},
+	"TokenStatezUNI": {
+		"deploy": false
+	},
+	"ProxyzUNI": {
+		"deploy": false
+	},
+	"ZassetzUNI": {
+		"deploy": false
 	}
 }
