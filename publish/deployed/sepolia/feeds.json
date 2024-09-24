@@ -46,5 +46,9 @@
 	"UNI": {
 		"asset": "UNI",
 		"feed": "0x850A128C3f67C3D13B58a88AC2f4742D90705c0a"
+	},
+	"DOGE": {
+		"asset": "DOGE",
+		"feed": "0x46C81F11b0e49F909eD80760b342B24C46a273D3"
 	}
 }
