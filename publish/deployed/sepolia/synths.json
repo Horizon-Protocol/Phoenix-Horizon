@@ -76,5 +76,12 @@
 		"description": "Uniswap",
 		"subclass": "MultiCollateralSynth",
 		"exchangeFeeRate": "0.0005"
+	},
+	{
+		"name": "zDOGE",
+		"asset": "DOGE",
+		"description": "Doge Coin",
+		"subclass": "MultiCollateralSynth",
+		"exchangeFeeRate": "0.0005"
 	}
 ]

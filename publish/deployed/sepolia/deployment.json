@@ -2223,6 +2223,50 @@
 				0,
 				"0xD97Fb64C06741A3c6def4259fDd5F68CC7254B80"
 			]
+		},
+		"TokenStatezDOGE": {
+			"name": "TokenStatezDOGE",
+			"address": "0xe5b4a0998A487B7A48bb4AAA7adFbb89D5d91928",
+			"source": "TokenState",
+			"link": "https://sepolia.arbiscan.io//address/0xe5b4a0998A487B7A48bb4AAA7adFbb89D5d91928",
+			"timestamp": "2024-09-23T11:05:24.623Z",
+			"txn": "",
+			"network": "sepolia",
+			"constructorArgs": [
+				"0xD9e11e52D2fAF7E735613CcB54478461611Fd4b7",
+				"0x0000000000000000000000000000000000000000"
+			]
+		},
+		"ProxyzDOGE": {
+			"name": "ProxyzDOGE",
+			"address": "0xC269F75C69aC95EA8f309eCEBE40F577D1c0C6D9",
+			"source": "ProxyERC20",
+			"link": "https://sepolia.arbiscan.io//address/0xC269F75C69aC95EA8f309eCEBE40F577D1c0C6D9",
+			"timestamp": "2024-09-23T11:05:27.971Z",
+			"txn": "",
+			"network": "sepolia",
+			"constructorArgs": [
+				"0xD9e11e52D2fAF7E735613CcB54478461611Fd4b7"
+			]
+		},
+		"ZassetzDOGE": {
+			"name": "ZassetzDOGE",
+			"address": "0xF31B0f0453d4cFCC1ca9795bC15b13EE8bbf576C",
+			"source": "MultiCollateralSynth",
+			"link": "https://sepolia.arbiscan.io//address/0xF31B0f0453d4cFCC1ca9795bC15b13EE8bbf576C",
+			"timestamp": "2024-09-23T11:05:32.133Z",
+			"txn": "",
+			"network": "sepolia",
+			"constructorArgs": [
+				"0xC269F75C69aC95EA8f309eCEBE40F577D1c0C6D9",
+				"0xe5b4a0998A487B7A48bb4AAA7adFbb89D5d91928",
+				"Zasset zDOGE",
+				"zDOGE",
+				"0xD9e11e52D2fAF7E735613CcB54478461611Fd4b7",
+				"0x7a444f4745000000000000000000000000000000000000000000000000000000",
+				0,
+				"0xD97Fb64C06741A3c6def4259fDd5F68CC7254B80"
+			]
 		}
 	},
 	"sources": {

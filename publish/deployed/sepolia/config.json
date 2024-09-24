@@ -472,5 +472,14 @@
 	},
 	"ZassetzUNI": {
 		"deploy": false
+	},
+	"TokenStatezDOGE": {
+		"deploy": false
+	},
+	"ProxyzDOGE": {
+		"deploy": false
+	},
+	"ZassetzDOGE": {
+		"deploy": false
 	}
 }
